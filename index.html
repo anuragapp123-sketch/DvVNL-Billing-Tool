@@ -2349,7 +2349,7 @@ async function downloadSelectedMergedPDF() {
 
     try {
         if (typeof PDFLib === 'undefined') {
-            alert("🚨 PDFLib लाइब्रेरी लोड नहीं हो पाई है! कृपया इंटरनेट कनेक्शन चेक करें।");
+            alert("🚨 PDFLib लाइब्रेरी लोड नहीं हो पाई है! कृपया इंटरनेट कनेक्शनチェック करें।");
             return;
         }
 
@@ -2361,15 +2361,16 @@ async function downloadSelectedMergedPDF() {
         for (let i = 0; i < fileIds.length; i++) {
             showThinAlert("⚡ प्रोसेसिंग बिल: " + (i + 1) + " / " + totalFiles + "...", false);
             
-            // 🎯 Proxy API Bridge फ़िक्स: विदाउट चेन कॉलिंग सीधा प्रॉमिस रिज़ॉल्यूशन
+            // 🎯 FIXED ENGINE: आपके रन-ब्रिज के साथ 100% मैच होने वाला प्रॉमिस कॉल
             const base64Data = await new Promise((resolve, reject) => {
-                var handler = createHandler(resolve, reject);
-                handler.getPdfDataAsBase64(fileIds[i]);
+                google.script.run
+                    .withSuccessHandler(function(res) { resolve(res); })
+                    .withFailureHandler(function(err) { reject(err); })
+                    .getPdfDataAsBase64(fileIds[i]);
             });
 
             if (base64Data && base64Data.trim() !== "") {
                 try {
-                    // 🎯 WebView Fix: सीधा और तेज़ Base64 To Uint8Array कनवर्टर
                     var cleanBase64 = base64Data.replace(/\s/g, '');
                     var rawBinary = window.atob ? window.atob(cleanBase64) : null;
                     
@@ -2429,7 +2430,7 @@ async function downloadSelectedMergedPDF() {
             AndroidBridge.processBase64Download(base64Pdf, "pdf");
             showThinAlert("🎉 सभी " + successfulCount + " बिल मर्ज होकर सफलतापूर्वक डाउनलोड हो गए!", true);
         } else {
-            // WebView Backup: Blob URL मोड
+            // WebView Backup Mode
             var blob = new Blob([mergedPdfBytes], { type: 'application/pdf' });
             var blobUrl = URL.createObjectURL(blob);
             
@@ -2443,7 +2444,7 @@ async function downloadSelectedMergedPDF() {
             showThinAlert("🎉 सभी " + successfulCount + " बिल मर्ज होकर डाउनलोड हो गए!", true);
         }
         
-        // प्रिंट स्टेटस अपडेट लॉजिक (सिर्फ स्टेटस बदलेगा)
+        // प्रिंट स्टेटस अपडेट लॉजिक
         if(printedAccNos.length > 0) {
             var printDateStr = new Date().toLocaleString('en-IN');
             var tx = db.transaction("consumers", "readwrite");
@@ -2463,9 +2464,8 @@ async function downloadSelectedMergedPDF() {
             });
             tx.oncomplete = function() { if(typeof refreshActiveDataViews === 'function') refreshActiveDataViews(); };
             
-            // सीधे सैंडबॉक्स बाईपास कॉल
-            var printHandler = createHandler(null, null);
-            printHandler.updateBulkBillPrintStatus(printedAccNos, printDateStr);
+            // स्टैंडर्ड रूटिंग के जरिए स्टेटस सिंक
+            google.script.run.updateBulkBillPrintStatus(printedAccNos, printDateStr);
         }
         
     } catch (err) {
