@@ -1,41 +1,79 @@
 <!DOCTYPE html>
 <html lang="hi">
 <head>
-  <!-- 🎯 सही तरीका: कोड को स्क्रिप्ट टैग के अंदर डालें -->
+  <!-- 🚀 ULTRA-FAST GOOGLE ENVIRONMENT BYPASS BRIDGE (स्प्लैश स्क्रीन फिक्स) -->
 <script>
-  // 🚀 GOOGLE ENVIRONMENT BYPASS BRIDGE ENGINE
-  const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyObTs_x2lntMcF0BHPkYOQbAywOfsZVdtOZVbyg6HsLEWHEZXYHgUH9d35rfbpc0cV/exec";
+  (function() {
+    // ⚠️ अपनी असली वेब ऐप यूआरएल यहाँ पेस्ट करें
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyObTs_x2lntMcF0BHPkYOQbAywOfsZVdtOZVbyg6HsLEWHEZXYHgUH9d35rfbpc0cV/exec";
 
-  if (typeof google === 'undefined' || !google.script || !google.script.run) {
-      window.google = {
-          script: {
-              run: {
-                  withSuccessHandler: function(successCallback) {
-                      return new Proxy({}, {
-                          get: function(target, propKey) {
-                              return function(...args) {
-                                  fetch(APPS_SCRIPT_URL, {
-                                      method: "POST",
-                                      body: JSON.stringify({
-                                          functionName: propKey,
-                                          arguments: args
-                                      })
-                                  })
-                                  .then(response => response.json())
-                                  .then(data => {
-                                      if (successCallback) successCallback(data);
-                                  })
-                                  .catch(err => {
-                                      console.error("API Bridge Error on " + propKey + ":", err);
-                                  });
-                              };
-                          }
-                      });
-                  }
+    function createHandler(successCallback, failureCallback) {
+      return new Proxy({}, {
+        get: function(target, propKey) {
+          return function(...args) {
+            console.log("🚀 API Bridge Calling Function: " + propKey);
+            
+            fetch(APPS_SCRIPT_URL, {
+              method: "POST",
+              mode: "cors", // ज़बरदस्ती CORS मोड एक्टिव करना
+              headers: {
+                "Content-Type": "text/plain;charset=utf-8"
+              },
+              body: JSON.stringify({
+                functionName: propKey,
+                arguments: args
+              })
+            })
+            .then(response => {
+              if (!response.ok) throw new Error('Network response was not ok');
+              return response.json();
+            })
+            .then(data => {
+              if (data && data.error) {
+                console.error("GS Execution Error:", data.error);
+                if (failureCallback) failureCallback(data.error);
+              } else {
+                if (successCallback) successCallback(data);
               }
-          }
-      };
-}
+            })
+            .catch(err => {
+              console.error("API Bridge Fetch Error on " + propKey + ":", err);
+              if (failureCallback) failureCallback(err);
+            });
+          };
+        }
+      });
+    }
+
+    // ऐप के लोड होने से ठीक पहले ही गूगल ऑब्जेक्ट को हैक/इंजेक्ट करना
+    const runBridge = {
+      withSuccessHandler: function(successCb) {
+        return {
+          withFailureHandler: function(failureCb) {
+            return createHandler(successCb, failureCb);
+          },
+          ...createHandler(successCb, null)
+        };
+      },
+      withFailureHandler: function(failureCb) {
+        return {
+          withSuccessHandler: function(successCb) {
+            return createHandler(successCb, failureCb);
+          },
+          ...createHandler(null, failureCb)
+        };
+      },
+      ...createHandler(null, null)
+    };
+
+    // वैश्विक स्तर पर इसे स्थापित करना ताकि कोई भी फ़ंक्शन मिस न हो
+    if (typeof google === 'undefined') {
+      window.google = { script: { run: runBridge } };
+    } else if (!google.script || !google.script.run) {
+      google.script = google.script || {};
+      google.script.run = runBridge;
+    }
+  })();
 </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
