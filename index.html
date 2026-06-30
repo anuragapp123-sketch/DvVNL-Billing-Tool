@@ -35,13 +35,18 @@
             .then(data => {
               if (loader) loader.style.display = 'none';
               
-              if (data && data.error) {
-                console.error("GS Execution Error:", data.error);
-                alert("🚨 सर्वर एरर: " + data.error);
-                if (failureCallback) failureCallback(data.error);
+              // 🎯 गिटहब के लिए रिस्पॉन्स इंजन फिक्स (अगर ऑब्जेक्ट के अंदर डेटा लिपटा हो या डायरेक्ट हो)
+              var finalData = data;
+              if (data && data.data !== undefined) {
+                finalData = data.data;
+              }
+              
+              if (data && (data.success === false || data.error)) {
+                var errMessage = data.error || data.msg || "Unknown Server Error";
+                console.error("GS Execution Error:", errMessage);
+                alert("🚨 सर्वर एरर: " + errMessage);
+                if (failureCallback) failureCallback(errMessage);
               } else {
-                // अगर डेटा डायरेक्ट आ रहा है या .data पैकेट में लिपटा है
-                var finalData = (data && data.data !== undefined) ? data.data : data;
                 if (successCallback) successCallback(finalData);
               }
             })
@@ -1347,11 +1352,21 @@
         if(!name || !pin) return alert("कृपया नाम और पिन दर्ज करें");
         document.getElementById('loginLoader').style.display = "block";
         google.script.run.withSuccessHandler(function(res) {
-            if(res.success) {
-                loggedInReader = toTitleProperCase(res.readerName); localStorage.setItem("mtr_reader_session_lock", loggedInReader);
-                document.getElementById('loginLoader').style.display = "none"; launchDashboard(); 
+            document.getElementById('loginLoader').style.display = "none";
+            // 🎯 गिटहब के लिए लचीला रिस्पॉन्स चेकर (अगर res खुद सच है या res.success सच है)
+            if(res && (res.success === true || res === true || (res.readerName))) {
+                var readerNameFinal = res.readerName || name;
+                loggedInReader = toTitleProperCase(readerNameFinal); 
+                localStorage.setItem("mtr_reader_session_lock", loggedInReader);
+                launchDashboard(); 
                 triggerSilentBackgroundDataDownload();
-            } else { document.getElementById('loginLoader').style.display = "none"; alert(res.msg); }
+            } else { 
+                var errorMsg = (res && res.msg) ? res.msg : "पासवर्ड या पिन सही नहीं है!";
+                alert("🚨 लॉगिन फेल: " + errorMsg); 
+            }
+        }).withFailureHandler(function(err) {
+            document.getElementById('loginLoader').style.display = "none";
+            alert("🚨 नेटवर्क एरर: " + err.toString());
         }).verifyReaderLogin(name, pin);
     }
 
