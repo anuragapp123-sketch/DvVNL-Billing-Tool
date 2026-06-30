@@ -1,6 +1,42 @@
 <!DOCTYPE html>
 <html lang="hi">
 <head>
+  <!-- 🎯 सही तरीका: कोड को स्क्रिप्ट टैग के अंदर डालें -->
+<script>
+  // 🚀 GOOGLE ENVIRONMENT BYPASS BRIDGE ENGINE
+  const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyObTs_x2lntMcF0BHPkYOQbAywOfsZVdtOZVbyg6HsLEWHEZXYHgUH9d35rfbpc0cV/exec";
+
+  if (typeof google === 'undefined' || !google.script || !google.script.run) {
+      window.google = {
+          script: {
+              run: {
+                  withSuccessHandler: function(successCallback) {
+                      return new Proxy({}, {
+                          get: function(target, propKey) {
+                              return function(...args) {
+                                  fetch(APPS_SCRIPT_URL, {
+                                      method: "POST",
+                                      body: JSON.stringify({
+                                          functionName: propKey,
+                                          arguments: args
+                                      })
+                                  })
+                                  .then(response => response.json())
+                                  .then(data => {
+                                      if (successCallback) successCallback(data);
+                                  })
+                                  .catch(err => {
+                                      console.error("API Bridge Error on " + propKey + ":", err);
+                                  });
+                              };
+                          }
+                      });
+                  }
+              }
+          }
+      };
+}
+</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
