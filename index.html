@@ -5,7 +5,7 @@
 <script>
   (function() {
     // ⚠️ अपनी असली वेब ऐप यूआरएल यहाँ पेस्ट करें
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwwLYirMKQD2eW063QBlpn46fcnsySiNmQ1qrhsYpuuU4PAO2nm-wn__Tl-ufDM6SLL/exec";
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzr8Nxh7ev9fpRdRSNL5I8aF1QnGH-Cc7jX1NbU7CYebLou_JClqE_gqoCLM3MZOhcA/exec";
 
     function createHandler(successCallback, failureCallback) {
       return new Proxy({}, {
@@ -39,6 +39,14 @@
             })
             .catch(err => {
               console.error("API Bridge Fetch Error on " + propKey + ":", err);
+              
+              // 🚀 APK स्क्रीन पर लाइव एरर दिखाने का मैकेनिज्म
+              var errBox = document.getElementById('apkErrorLogger');
+              if(errBox) {
+                errBox.style.display = 'block';
+                errBox.innerText = "🚨 APK System Error (" + propKey + "):\n" + err.toString() + "\n\n💡 सुझाव: कृपया इंटरनेट चेक करें या Apps Script का New Deployment URL अपडेट करें।";
+              }
+              
               if (failureCallback) failureCallback(err);
             });
           };
@@ -663,6 +671,9 @@
         <div class="input-group"><label>लॉगिन पिन दर्ज करें</label><input type="password" id="loginPin" placeholder="6 अंकों का पिन दर्ज करें" inputmode="numeric" maxlength="6"></div>
         <button class="btn" onclick="processLogin()">लॉगिन करें</button>
         <div class="loader" id="loginLoader">सर्वर से जुड़ रहे हैं...</div>
+        
+        <!-- 🔴 APK एरर ट्रैकर (यह केवल एरर आने पर ही दिखेगा) -->
+        <div id="apkErrorLogger" style="display:none; margin-top:10px; padding:10px; background:#fef2f2; border:1px solid #fca5a5; border-radius:6px; color:#b91c1c; font-size:11px; font-weight:bold; text-align:left; word-break:break-all; white-space:pre-wrap;"></div>
         <div class="app-footer-branding" style="position: relative;">
             Developed by:- Anurag Shakya | 9761414105
             <span style="display:block; margin-top:4px; font-size:10px; color:#ef4444; font-weight:900;">App Version: V1.0.7</span>
