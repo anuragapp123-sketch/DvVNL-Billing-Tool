@@ -5,7 +5,7 @@
 <script>
   (function() {
     // ⚠️ अपनी असली वेब ऐप यूआरएल यहाँ पेस्ट करें
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyObTs_x2lntMcF0BHPkYOQbAywOfsZVdtOZVbyg6HsLEWHEZXYHgUH9d35rfbpc0cV/exec";
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwjhrxijUngKh5uv9JFNqfUseZe4ly2IMtDbYqlsUWAUYgoeq1_O8-mvWOgOeo0vrZp/exec";
 
     function createHandler(successCallback, failureCallback) {
       return new Proxy({}, {
@@ -4640,6 +4640,7 @@ function quickViewNavigate(direction) {
     }
 
     // दोनों फंक्शन्स को मिलाकर एक परफेक्ट क्लीन इंजन:
+/* 🚀 100% कंबाइंड क्लोज्ड नोटिफिकेशन और फुलस्क्रीन इंजन (टकराव मुक्त) */
 function closeGlobalNotification() {
     var overlay = document.getElementById('globalNotificationOverlay');
     var textNode = document.getElementById('globalNotificationText');
@@ -4649,56 +4650,24 @@ function closeGlobalNotification() {
     
     if(overlay) overlay.style.display = 'none';
     
-    /* ⚡ ऐप को ऊपर चिपकाकर फुल-स्क्रीन मोड एक्टिवेट करें */
+    /* ⚡ जैसे ही अलर्ट बंद होगा, ऐप फुल स्क्रीन मोड पर शिफ्ट हो जाएगी और ऊपर चिपक जाएगी */
     document.body.style.setProperty("margin-top", "0px", "important");
     if (document.documentElement.requestFullscreen) {
         document.documentElement.requestFullscreen().catch(e => console.log("APK Fullscreen Initialized"));
     }
     
-    if(loggedInReader && msgText) {
+    if(loggedInReader && msgText && msgText !== "महत्वपूर्ण सूचना यहाँ दिखाई देगी...") {
         try {
-            google.script.run.withFailureHandler(e => console.log("Seen sync failed"))
+            google.script.run.withFailureHandler(e => console.log("Seen log failed"))
                              .markNotificationAsSeen(loggedInReader.toUpperCase(), msgText);
         } catch(e) { console.error("Seen sync failed", e); }
     }
 }
-/* 🚀 APK TOP-SLIDE & DYNAMIC FULLSCREEN LOCK ENGINE */
+
+/* 🚀 APK TOP-SLIDE INTIALIZER */
 window.addEventListener('load', function() {
-    // शुरुआत में ऐप को 45px नीचे खिसकाएँ ताकि लड़के Apps Script बैनर/नोटिफिकेशन देख और हटा सकें
     document.body.style.setProperty("margin-top", "45px", "important");
     document.body.style.setProperty("transition", "margin-top 0.4s ease", "important");
-});
-
-// जैसे ही लड़के क्लोज़ (X) या 'ठीक है, मैंने पढ़ लिया' बटन पर क्लिक करेंगे, यह ट्रिगर होगा
-function closeGlobalNotification() {
-    var overlay = document.getElementById('globalNotificationOverlay');
-    var textNode = document.getElementById('globalNotificationText');
-    
-    if(!textNode) return;
-    var msgText = textNode.innerText;
-    
-    if(overlay) overlay.style.display = 'none';
-    
-    /* ⚡ जैसे ही 'X' दबाया, ऐप ऊपर चिपक जाएगा और फुल-स्क्रीन लॉक एक्टिवेट हो जाएगा */
-    document.body.style.setProperty("margin-top", "0px", "important");
-    
-    if (document.documentElement.requestFullscreen) {
-        document.documentElement.requestFullscreen().catch(e => console.log("APK Fullscreen Initialized"));
-    }
-    
-    if(loggedInReader && msgText) {
-        try {
-            google.script.run.markNotificationAsSeen(loggedInReader.toUpperCase(), msgText);
-        } catch(e) { console.error("Seen sync failed", e); }
-    }
-}
-/* 🚀 DYNAMIC MOBILE THEME SWITCHER ENGINE */
-var availableThemesList = ["default", "velvet", "teal"];
-
-// ऐप स्टार्ट होते ही पुरानी सेव्ड थीम लोड करना
-document.addEventListener("DOMContentLoaded", function() {
-    var savedThemeCtx = localStorage.getItem("app_user_selected_color_theme") || "default";
-    applySelectedThemeEngine(savedThemeCtx);
 });
 
 // बटन पर क्लिक करने पर अगली थीम पर स्विच करने का ड्राइवर
