@@ -2361,13 +2361,15 @@ async function downloadSelectedMergedPDF() {
         for (let i = 0; i < fileIds.length; i++) {
             showThinAlert("⚡ प्रोसेसिंग बिल: " + (i + 1) + " / " + totalFiles + "...", false);
             
-            const base64Data = await new Promise(resolve => 
-                google.script.run.withSuccessHandler(resolve).getPdfDataAsBase64(fileIds[i])
-            );
+            // 🎯 Proxy API Bridge फ़िक्स: विदाउट चेन कॉलिंग सीधा प्रॉमिस रिज़ॉल्यूशन
+            const base64Data = await new Promise((resolve, reject) => {
+                var handler = createHandler(resolve, reject);
+                handler.getPdfDataAsBase64(fileIds[i]);
+            });
 
             if (base64Data && base64Data.trim() !== "") {
                 try {
-                    // 🎯 WebView Fix: atob की जगह सीधा और तेज़ Base64 To Uint8Array कनवर्टर
+                    // 🎯 WebView Fix: सीधा और तेज़ Base64 To Uint8Array कनवर्टर
                     var cleanBase64 = base64Data.replace(/\s/g, '');
                     var rawBinary = window.atob ? window.atob(cleanBase64) : null;
                     
@@ -2379,7 +2381,6 @@ async function downloadSelectedMergedPDF() {
                             bytes[j] = rawBinary.charCodeAt(j);
                         }
                     } else {
-                        // वैकल्पिक तरीका अगर WebView का पुराना वर्जन हो
                         const bChars = window.atob(cleanBase64);
                         bytes = new Uint8Array(bChars.length).map((_, idx) => bChars.charCodeAt(idx));
                     }
@@ -2394,13 +2395,13 @@ async function downloadSelectedMergedPDF() {
                 }
             }
             
-            // ⏳ मोबाइल रैम को फ्री होने का समय देने के लिए 60ms का डिले (WebView क्रैश को रोकने के लिए सबसे जरूरी)
+            // ⏳ मोबाइल रैम को फ्री होने का समय देने के लिए 60ms का डिले
             await new Promise(resolve => setTimeout(resolve, 60));
         }
 
         if (successfulCount === 0) {
             alert("🚨 सर्वर से पीडीएफ डेटा नहीं मिल सका।");
-            showThinAlert("🚨 प्रोसेस封 हुआ।", true);
+            showThinAlert("🚨 प्रोसेस फ़ेल हुआ।", true);
             return;
         }
 
@@ -2415,11 +2416,11 @@ async function downloadSelectedMergedPDF() {
         var prefix = cleanMrName ? cleanMrName + "_Merged_Bills_" : "Merged_Bills_";
         var filename = prefix + timeStampStr + ".pdf";
 
-        // 🚀 Android Studio APK (Native Bridge vs DataURI Mode) Fix
+        // 🚀 Android Studio APK (Native Bridge) Fix
         if (typeof AndroidBridge !== "undefined" && AndroidBridge.processBase64Download) {
             var bytes = new Uint8Array(mergedPdfBytes);
             var binary = '';
-            const chunk = 8192; // बड़े चंक साइज से स्पीड बढ़ेगी
+            const chunk = 8192; 
             for (var k = 0; k < bytes.byteLength; k += chunk) {
                 var subArray = bytes.subarray(k, Math.min(k + chunk, bytes.byteLength));
                 binary += String.fromCharCode.apply(null, subArray);
@@ -2428,28 +2429,21 @@ async function downloadSelectedMergedPDF() {
             AndroidBridge.processBase64Download(base64Pdf, "pdf");
             showThinAlert("🎉 सभी " + successfulCount + " बिल मर्ज होकर सफलतापूर्वक डाउनलोड हो गए!", true);
         } else {
-            // WebView Backup: सीधा Blob URL बनाकर डाउनलोड ट्रिगर करना
+            // WebView Backup: Blob URL मोड
             var blob = new Blob([mergedPdfBytes], { type: 'application/pdf' });
             var blobUrl = URL.createObjectURL(blob);
             
-            if (navigator.userAgent.match(/Android/i)) {
-                // अगर आपके APK में download listener है तो यह काम करेगा
-                var link = document.createElement('a');
-                link.href = blobUrl;
-                link.download = filename;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            } else {
-                var link = document.createElement('a');
-                link.href = blobUrl;
-                link.download = filename;
-                link.click();
-            }
+            var link = document.createElement('a');
+            link.href = blobUrl;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
             showThinAlert("🎉 सभी " + successfulCount + " बिल मर्ज होकर डाउनलोड हो गए!", true);
         }
         
-        // प्रिंट स्टेटस अपडेट लॉजिक
+        // प्रिंट स्टेटस अपडेट लॉजिक (सिर्फ स्टेटस बदलेगा)
         if(printedAccNos.length > 0) {
             var printDateStr = new Date().toLocaleString('en-IN');
             var tx = db.transaction("consumers", "readwrite");
@@ -2468,7 +2462,10 @@ async function downloadSelectedMergedPDF() {
                 };
             });
             tx.oncomplete = function() { if(typeof refreshActiveDataViews === 'function') refreshActiveDataViews(); };
-            try { google.script.run.updateBulkBillPrintStatus(printedAccNos, printDateStr); } catch(e) {}
+            
+            // सीधे सैंडबॉक्स बाईपास कॉल
+            var printHandler = createHandler(null, null);
+            printHandler.updateBulkBillPrintStatus(printedAccNos, printDateStr);
         }
         
     } catch (err) {
