@@ -2349,7 +2349,7 @@ async function downloadSelectedMergedPDF() {
 
     try {
         if (typeof PDFLib === 'undefined') {
-            alert("🚨 PDFLib लाइब्रेरी लोड नहीं हो पाई है! कृपया इंटरनेट कनेक्शनチェック करें।");
+            alert("🚨 PDFLib लाइब्रेरी लोड नहीं हो पाई है! कृपया इंटरनेट कनेक्शन चेक करें।");
             return;
         }
 
@@ -2361,11 +2361,20 @@ async function downloadSelectedMergedPDF() {
         for (let i = 0; i < fileIds.length; i++) {
             showThinAlert("⚡ प्रोसेसिंग बिल: " + (i + 1) + " / " + totalFiles + "...", false);
             
-            // 🎯 FIXED ENGINE: आपके रन-ब्रिज के साथ 100% मैच होने वाला प्रॉमिस कॉल
+            // 🎯 FIXED CALLING ENGINE WITH FAILSAFE TIMER: नेटवर्क फेलियर को रोकने के लिए प्रॉमिस चेन
             const base64Data = await new Promise((resolve, reject) => {
+                // कनेक्शन अटकने पर 15 सेकंड का एक सेफ्टी टाइमआउट बैकअप
+                var timeoutTimer = setTimeout(() => { reject("Network Timeout (फाइल बड़ी है या नेट स्लो है)"); }, 15000);
+
                 google.script.run
-                    .withSuccessHandler(function(res) { resolve(res); })
-                    .withFailureHandler(function(err) { reject(err); })
+                    .withSuccessHandler(function(res) { 
+                        clearTimeout(timeoutTimer);
+                        resolve(res); 
+                    })
+                    .withFailureHandler(function(err) { 
+                        clearTimeout(timeoutTimer);
+                        reject(err); 
+                    })
                     .getPdfDataAsBase64(fileIds[i]);
             });
 
@@ -2396,13 +2405,13 @@ async function downloadSelectedMergedPDF() {
                 }
             }
             
-            // ⏳ मोबाइल रैम को फ्री होने का समय देने के लिए 60ms का डिले
-            await new Promise(resolve => setTimeout(resolve, 60));
+            // ⏳ मोबाइल रैम और नेटवर्क को संभलने के लिए थोड़ा अतिरिक्त (80ms) डिले
+            await new Promise(resolve => setTimeout(resolve, 80));
         }
 
         if (successfulCount === 0) {
             alert("🚨 सर्वर से पीडीएफ डेटा नहीं मिल सका।");
-            showThinAlert("🚨 प्रोसेस फ़ेल हुआ।", true);
+            showThinAlert("🚨 प्रोसेस फेल हुआ।", true);
             return;
         }
 
@@ -2444,7 +2453,7 @@ async function downloadSelectedMergedPDF() {
             showThinAlert("🎉 सभी " + successfulCount + " बिल मर्ज होकर डाउनलोड हो गए!", true);
         }
         
-        // प्रिंट स्टेटस अपडेट लॉजिक
+        // प्रिंट स्टेटस अपडेट लॉजिक (प्रॉक्सी कम्पैटिबल मोड)
         if(printedAccNos.length > 0) {
             var printDateStr = new Date().toLocaleString('en-IN');
             var tx = db.transaction("consumers", "readwrite");
@@ -2464,8 +2473,11 @@ async function downloadSelectedMergedPDF() {
             });
             tx.oncomplete = function() { if(typeof refreshActiveDataViews === 'function') refreshActiveDataViews(); };
             
-            // स्टैंडर्ड रूटिंग के जरिए स्टेटस सिंक
-            google.script.run.updateBulkBillPrintStatus(printedAccNos, printDateStr);
+            // 🎯 FIXED BRIDGING CALL: इसे भी प्रॉक्सी एनवायरनमेंट के अनुसार विथ हैंडल्स बांध दिया गया है
+            google.script.run
+                .withSuccessHandler(function(){})
+                .withFailureHandler(function(){})
+                .updateBulkBillPrintStatus(printedAccNos, printDateStr);
         }
         
     } catch (err) {
