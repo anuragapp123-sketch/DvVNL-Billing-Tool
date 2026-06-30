@@ -5,7 +5,7 @@
 <script>
   (function() {
     // ⚠️ अपनी असली वेब ऐप यूआरएल यहाँ पेस्ट करें
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwjhrxijUngKh5uv9JFNqfUseZe4ly2IMtDbYqlsUWAUYgoeq1_O8-mvWOgOeo0vrZp/exec";
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwwLYirMKQD2eW063QBlpn46fcnsySiNmQ1qrhsYpuuU4PAO2nm-wn__Tl-ufDM6SLL/exec";
 
     function createHandler(successCallback, failureCallback) {
       return new Proxy({}, {
@@ -13,9 +13,10 @@
           return function(...args) {
             console.log("🚀 API Bridge Calling Function: " + propKey);
             
+            // GitHub और External Hosting के लिए अपग्रेडेड बाईपास रिक्वेस्ट इंजन
             fetch(APPS_SCRIPT_URL, {
               method: "POST",
-              mode: "cors", // ज़बरदस्ती CORS मोड एक्टिव करना
+              mode: "cors", 
               headers: {
                 "Content-Type": "text/plain;charset=utf-8"
               },
@@ -140,6 +141,51 @@
         --theme-heading: #134e4a;
         --theme-table-th: #ccfbf1;
         --theme-table-border: #99f6e4;
+    }
+
+    /* ✨ THEME 4: ROYAL GOLD (शाही सुनहरा लुक) */
+    [data-app-theme="gold"] {
+        --theme-bg: linear-gradient(-45deg, #fef9c3, #fffbeb, #f1f5f9, #fef9c3);
+        --theme-primary: #854d0e; 
+        --theme-primary-dark: #a16207;
+        --theme-sec-bg: #fef9c3;
+        --theme-border: #eab308;
+        --theme-header-gradient: linear-gradient(-45deg, #713f12, #854d0e, #111827, #a16207);
+        --theme-card-bg: rgba(255, 255, 255, 0.95);
+        --theme-text: #713f12;
+        --theme-heading: #422006;
+        --theme-table-th: #fef9c3;
+        --theme-table-border: #fde047;
+    }
+
+    /* ✨ THEME 5: MIDNIGHT DARK (आँखों के लिए आरामदायक डार्क मोड) */
+    [data-app-theme="midnight"] {
+        --theme-bg: linear-gradient(-45deg, #0f172a, #1e293b, #111827, #0f172a);
+        --theme-primary: #3b82f6; 
+        --theme-primary-dark: #2563eb;
+        --theme-sec-bg: #1e293b;
+        --theme-border: #475569;
+        --theme-header-gradient: linear-gradient(-45deg, #1e1b4b, #0f172a, #020617, #1e293b);
+        --theme-card-bg: rgba(30, 41, 59, 0.9);
+        --theme-text: #94a3b8;
+        --theme-heading: #f8fafc;
+        --theme-table-th: #1e293b;
+        --theme-table-border: #334155;
+    }
+
+    /* ✨ THEME 6: ROSE PINK (आकर्षक रोज़ पिंक लुक) */
+    [data-app-theme="pink"] {
+        --theme-bg: linear-gradient(-45deg, #fce7f3, #fdf2f8, #f1f5f9, #fce7f3);
+        --theme-primary: #be185d; 
+        --theme-primary-dark: #9d174d;
+        --theme-sec-bg: #fce7f3;
+        --theme-border: #f472b6;
+        --theme-header-gradient: linear-gradient(-45deg, #9d174d, #be185d, #111827, #db2777);
+        --theme-card-bg: rgba(255, 255, 255, 0.95);
+        --theme-text: #9d174d;
+        --theme-heading: #831843;
+        --theme-table-th: #fce7f3;
+        --theme-table-border: #fbcfe8;
     }
 
     /* 🚀 ULTIMATE GOOGLE APPS SCRIPT BANNER FORCED-HIDE ENGINE */
@@ -389,6 +435,24 @@
     
     .detail-view-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; background: white; font-size: 11px; margin-top:10px; }
     .detail-view-grid div { background: #ffffff; padding: 6px; border: 1px solid var(--theme-table-border); border-radius: 4px; word-break: break-word; }
+    
+    /* 📱 मोबाइल स्क्रीन के लिए विशेष सुधार (डेटा एक तरफ भागना बंद होगा) */
+    @media (max-width: 768px) {
+        .detail-view-grid {
+            grid-template-columns: 1fr !important; /* मोबाइल पर जबरदस्ती 1-कॉलम लेआउट */
+            gap: 8px !important;
+            padding: 4px !important;
+        }
+        .detail-view-grid div {
+            padding: 8px !important; /* मोबाइल पर बॉक्स के अंदर की पैडिंग थोड़ी बड़ी */
+            width: 100% !important;   /* पूरी चौड़ाई लेगा */
+            box-sizing: border-box !important;
+        }
+        .detail-view-grid .grp-title {
+            grid-column: span 1 !important; /* 1-कॉलम में टाइटल को सही एडजस्ट करेगा */
+            font-size: 13px !important;
+        }
+    }
     .detail-lbl { font-weight: 800; color: #4f46e5; display: block; margin-bottom: 2px; font-size: 10px; }
     .flex-row-btns { display: flex; gap: 6px; justify-content: space-between; margin-bottom: 10px; }
     .flex-row-btns .btn { margin-bottom: 0; font-size: 12px; padding: 10px; }
@@ -596,7 +660,7 @@
         <h2>DvVNL Reading Tool</h2>
         <div class="sub-heading">Sai Computer Ltd Mainpuri</div>
         <div class="input-group"><label>अपना नाम चुनें</label><select id="readerDropdown"><option value="">लोड हो रहा है...</option></select></div>
-        <div class="input-group"><label>लॉगिन पिन दर्ज करें</label><input type="password" id="loginPin" placeholder="XXXX" inputmode="numeric"></div>
+        <div class="input-group"><label>लॉगिन पिन दर्ज करें</label><input type="password" id="loginPin" placeholder="6 अंकों का पिन दर्ज करें" inputmode="numeric" maxlength="6"></div>
         <button class="btn" onclick="processLogin()">लॉगिन करें</button>
         <div class="loader" id="loginLoader">सर्वर से जुड़ रहे हैं...</div>
         <div class="app-footer-branding" style="position: relative;">
@@ -1005,6 +1069,8 @@
         var installBtn = document.getElementById('forceAppCodeUpdate'); // या कोई भी बटन
     });
 
+    // 🎨 वैश्विक थीम लिस्ट इंजन (त्रुटि सुधार और 3 नई प्रीमियम थीम्स)
+    var availableThemesList = ["default", "velvet", "teal", "gold", "midnight", "pink"];
     var db = null; var loggedInReader = ""; var activeReportType = "";
     var currentReportDataList = []; var viewHistoryStack = []; var adminSelectedReaders = [];
     var globalReportConfigs = []; // शीट कॉन्फ़िगरेशन को स्टोर करने के लिए
@@ -4688,8 +4754,15 @@ function applySelectedThemeEngine(themeName) {
     }
     localStorage.setItem("app_user_selected_color_theme", themeName);
     
-    // यूज़र फीडबैक अलर्ट
-    var alertTexts = { "default": "रॉयल ब्लू", "velvet": "डार्क वेलवेट", "teal": "मॉडर्न टील" };
+    // यूज़र फीडबैक अलर्ट (सभी 6 थीम्स के नाम अपडेटेड)
+    var alertTexts = { 
+        "default": "रॉयल ब्लू", 
+        "velvet": "डार्क वेलवेट", 
+        "teal": "मॉडर्न टील",
+        "gold": "रॉयल गोल्ड",
+        "midnight": "मिडनाइट डार्क",
+        "pink": "रोज़ पिंक"
+    };
     if (typeof showThinAlert === "function" && localStorage.getItem("mtr_reader_session_lock")) {
         showThinAlert("🎨 थीम बदली गई: " + alertTexts[themeName], true);
     }
