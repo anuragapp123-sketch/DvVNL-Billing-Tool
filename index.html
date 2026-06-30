@@ -667,7 +667,13 @@
         <i class="fa-solid fa-bolt glowing-bolt"></i>
         <h2 style="color: white; font-weight: 900; letter-spacing: 1.5px; text-shadow: 0 4px 10px rgba(0,0,0,0.3); font-size: 24px;">DvVNL Reading Tool</h2>
         <!-- 🟢 आपका नया हिंदी संदेश बिल्कुल सही फ़ॉन्ट वेट के साथ -->
-        <p style="color: #93c5fd; font-size: 14px; font-weight: 700; margin-top: 10px; letter-spacing: 0.5px; text-shadow: 0 2px 5px rgba(0,0,0,0.2);">एप्लिकेशन खुल रहा है कृपया थोड़ा इंतजार करें...</p>
+        <p style="color: #93c5fd; font-size: 14px; font-weight: 700; margin-top: 10px; letter-spacing: 0.5px; text-shadow: 0 2px 5px rgba(0,0,0,0.2); margin-bottom: 25px;">एप्लिकेशन खुल रहा है कृपया थोड़ा इंतजार करें...</p>
+        
+        <!-- 📱 डेवलपर क्रेडिट्स विथ मोबाइल आइकॉन ड्राइवर -->
+        <div style="position: absolute; bottom: 30px; text-align: center; color: rgba(255,255,255,0.85); font-size: 12px; font-weight: 700; letter-spacing: 0.5px;">
+            <div>Developed by :- Er. Anurag Shakya</div>
+            <div style="margin-top: 5px; color: #facc15; font-size: 13px;"><i class="fa-solid fa-phone"></i> 9761414105</div>
+        </div>
     </div>
 
     <div id="pullToRefreshLoader" class="ptr-loader"><i class="fa-solid fa-arrows-rotate fa-spin"></i> Refreshing Data...</div>
@@ -2936,7 +2942,7 @@ async function downloadSelectedMergedPDF() {
             });
         }
         
-        var doc = new window.jspdf.jsPDF('p', 'pt', 'a4');
+        var doc = new window.jspdf.jsPDF({ orientation: 'landscape', unit: 'pt', format: 'a4' });
         doc.setFontSize(16); doc.setTextColor(15, 23, 42); doc.setFont("Helvetica", "bold");
         doc.text("CONSUMER DETAIL REPORT", 40, 40);
         
@@ -3609,35 +3615,118 @@ function universalExportToExcel(tabName) {
     function exportAdminFilterMasterExcel() {
         getAdminDashboardDataAsync(function(result) {
             var wb = XLSX.utils.book_new();
-            var filename = "Master_Detailed_Report_" + getFormattedDateTimeForFile();
+            
+            var selectAllCb = document.getElementById('adminSelectAll');
+            var displayReaderName = (selectAllCb && selectAllCb.checked) ? "ALL" : (adminSelectedReaders.length > 0 ? toTitleProperCase(adminSelectedReaders[0]) : "ALL");
+            
+            var filename = displayReaderName.replace(/\s+/g, "_") + "_All_Type_Pendency_Report_" + getFormattedDateTimeForFile();
+
+            var selectedLoadCat = document.getElementById('billLoadCategoryFilter') ? document.getElementById('billLoadCategoryFilter').value : "ALL";
+            var allConsumersReport = result.reports.find(r => r.key === 'all_consumers_list');
+            var allData = allConsumersReport ? (allConsumersReport.data || []) : [];
+            
+            var filteredData = allData.filter(function(item) {
+                var itemLoadCat = (item["LOAD_CATOGERY (5,10)"] || "").toString();
+                return (selectedLoadCat === "ALL" || itemLoadCat.includes(selectedLoadCat));
+            });
+
+            var total = filteredData.length;
+            var done = 0, billP = 0, today = 0, yest = 0;
+            filteredData.forEach(function(item) {
+                var rStatus = (item.attendStatus || "").toString().toUpperCase();
+                if(parseTrue(item.isDone) || rStatus === "ATTEND") done++;
+                if(parseTrue(item.isBillAvailableButDistributionPending)) billP++;
+                if(isVisitDateMatch(item.finalVisitDate, 0)) today++;
+                if(isVisitDateMatch(item.finalVisitDate, 1)) yest++;
+            });
+
+            var localSavedCount = document.getElementById('st-local-saved') ? parseInt(document.getElementById('st-local-saved').innerText) || 0 : 0;
 
             var sumAoa = [
-                [{v: "Mainpuri Circle Pendency Dashboard & Report", s:{font:{bold:true, color:{rgb:"FFFFFF"}, sz:14}, fill:{fgColor:{rgb:"1E3A8A"}}, alignment:{horizontal:"center"}}}, {v:"", s:{fill:{fgColor:{rgb:"1E3A8A"}}}}],
+                [{v: displayReaderName + " All Type Pendency Report", s:{font:{bold:true, color:{rgb:"FFFFFF"}, sz:14}, fill:{fgColor:{rgb:"1E3A8A"}}, alignment:{horizontal:"center"}}}, {v:"", s:{fill:{fgColor:{rgb:"1E3A8A"}}}}],
                 [{v: "Report Prepared By: Billing_App Tool | Anurag Shakya | Mo: 9761414105", s:{font:{bold:true, color:{rgb:"1E3A8A"}, sz:10}, alignment:{horizontal:"center"}}}, {v:""}],
                 [{v: "Generated: " + getPrintableDateTime(), s:{font:{bold:true}, alignment:{horizontal:"center"}}}, {v:""}],
                 ["", ""],
-                ["Metric Label", "Count Value"]
+                ["New Card Metric Label", "Live Count Value"],
+                ["TOTAL ALLOTTED", total],
+                ["VISIT DONE", done],
+                ["VISIT PENDING", (total - done)],
+                ["TODAY VISIT", today]
             ];
-            result.summary.forEach(function(r) { sumAoa.push(r); });
-            sumAoa.push(["", ""]); sumAoa.push([{v:"REPORT PENDENCY WATCHLIST", s:{font:{bold:true, color:{rgb:"FFFFFF"}}, fill:{fgColor:{rgb:"1E3A8A"}}}}]);
-            result.reports.forEach(function(r) {
-                if(r.key !== 'all_consumers_list' && r.key !== 'all_bills_report') {
-                    var vStyle = r.data.length > 0 ? { fill: { fgColor: { rgb: "FEF08A" } }, font: { bold: true } } : {};
-                    sumAoa.push([{v: r.name, s: vStyle}, {v: r.data.length, s: vStyle}]);
-                }
-            });
+
+            if (Array.isArray(globalReportConfigs)) {
+                globalReportConfigs.forEach(function(config) {
+                    var userRole = loggedInReader.toUpperCase();
+                    if (config.target === "ADMIN" && userRole !== "ANURAG SHAKYA") return;
+                    if (config.reportGroup && config.reportGroup.trim().toUpperCase() === "TOP_CARD") {
+                        var matchedItems = filteredData.filter(function(item) {
+                            if (item.isDone === true || item.isDone === "true") return false;
+                            return evaluateCustomCondition(item, config.conditionStr); 
+                        });
+                        // 🚀 की-आईडी को बिना अंडरस्कोर के साफ़ लिखना
+                        var cleanKeyName = config.key.replace(/_/g, ' ').toUpperCase();
+                        sumAoa.push([cleanKeyName, matchedItems.length]);
+                    }
+                });
+            }
+
+            sumAoa.push(["BILL DIST PENDING", billP]);
+            sumAoa.push(["OFFLINE SAVED", localSavedCount]);
+            sumAoa.push(["", ""]); 
+
+            // वॉचलिस्ट टेबल हेडर
+            sumAoa.push([{v:"Report Key ID", s:{font:{bold:true, color:{rgb:"FFFFFF"}}, fill:{fgColor:{rgb:"0F172A"}}}}, {v:"Pendency Count", s:{font:{bold:true, color:{rgb:"FFFFFF"}}, fill:{fgColor:{rgb:"0F172A"}}}}]);
+            
+            var currentSummaryGroup = "";
+            if (Array.isArray(globalReportConfigs)) {
+                globalReportConfigs.forEach(function(config) {
+                    var userRole = loggedInReader.toUpperCase();
+                    if (config.target === "ADMIN" && userRole !== "ANURAG SHAKYA") return;
+                    
+                    var isTopCard = config.reportGroup && config.reportGroup.trim().toUpperCase() === "TOP_CARD";
+                    
+                    var watchlistItems = filteredData.filter(function(item) {
+                        if (config.key === 'all_consumers_list' || config.key === 'all_bills_report') {
+                            return evaluateCustomCondition(item, config.conditionStr);
+                        }
+                        if (item.isDone === true || item.isDone === "true") return false;
+                        return evaluateCustomCondition(item, config.conditionStr);
+                    });
+
+                    var groupName = config.reportGroup || "OTHER REPORTS";
+                    if (!isTopCard) {
+                        if (groupName !== currentSummaryGroup) {
+                            var cleanGroupName = groupName.replace(/[^\x00-\x7F]/g, "").trim().toUpperCase().replace(/_/g, ' ');
+                            sumAoa.push([{v: cleanGroupName, s:{font:{bold:true, color:{rgb:"FFFFFF"}}, fill:{fgColor:{rgb:"1E40AF"}}}}, {v: "", s:{fill:{fgColor:{rgb:"1E40AF"}}}}]);
+                            currentSummaryGroup = groupName;
+                        }
+                        
+                        // 🚀 हिंदी नाम की जगह बिना अंडरस्कोर वाला Report Key ID डालना
+                        var cleanReportKeyId = config.key.replace(/_/g, ' ').toUpperCase();
+                        var vStyle = watchlistItems.length > 0 ? { fill: { fgColor: { rgb: "FEF08A" } }, font: { bold: true } } : {};
+                        sumAoa.push([{v: cleanReportKeyId, s: vStyle}, {v: watchlistItems.length, s: vStyle}]);
+                    }
+                });
+            }
+            
             var wsSum = XLSX.utils.aoa_to_sheet(sumAoa); XLSX.utils.book_append_sheet(wb, wsSum, "01_Summary_Dashboard");
 
+            // Sub-Reports टैब्स जनरेशन
             result.reports.forEach(function(r) {
-                if(r.key !== 'all_consumers_list' && r.key !== 'all_bills_report' && r.data.length > 0) {
-                    var reqCols = r.isBilling ? COLUMNS_MASTER_STD.concat(COLUMNS_BILL_ADDITIONS).concat(["MR NAME"]) : COLUMNS_MASTER_STD.concat(["MR NAME"]);
+                if(r.data.length > 0) {
+                    var reqCols = [];
+                    var matchedConfig = globalReportConfigs.find(function(c) { return c.key === r.key; });
+                    if (matchedConfig && matchedConfig.reqColumnsStr) {
+                        reqCols = matchedConfig.reqColumnsStr.split(",").map(function(s) { return s.trim(); });
+                        if(reqCols.indexOf("MR NAME") === -1) reqCols.push("MR NAME");
+                    } else {
+                        reqCols = r.isBilling ? COLUMNS_MASTER_STD.concat(COLUMNS_BILL_ADDITIONS).concat(["MR NAME"]) : COLUMNS_MASTER_STD.concat(["MR NAME"]);
+                    }
+
                     var rAoa = [reqCols.map(function(c) { return { v: c, s: { font: { bold: true, color: { rgb: "FFFFFF" } }, fill: { fgColor: { rgb: "1E3A8A" } }, alignment: { horizontal: "center", vertical: "center" } } }; })];
                     
-                    // 🚀 A to Z Sorting Logic: डेटा को Excel में डालने से ठीक पहले MR Name से सॉर्ट करें
                     r.data.sort(function(a, b) {
-                        var nameA = (getReaderName(a) || "").toUpperCase().trim();
-                        var nameB = (getReaderName(b) || "").toUpperCase().trim();
-                        return nameA.localeCompare(nameB);
+                        return (getReaderName(a) || "").toUpperCase().trim().localeCompare((getReaderName(b) || "").toUpperCase().trim());
                     });
 
                     r.data.forEach(function(item) {
@@ -3648,7 +3737,17 @@ function universalExportToExcel(tabName) {
                     XLSX.utils.book_append_sheet(wb, ws, safeName);
                 }
             });
-            XLSX.writeFile(wb, filename + '.xlsx');
+
+            var wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'base64' });
+            if (typeof AndroidBridge !== "undefined" && AndroidBridge.processBase64Download) {
+                AndroidBridge.processBase64Download(wbout, "excel");
+                showThinAlert("🎉 एक्सेल फ़ाइल जनरेट हो गई...", true);
+            } else {
+                var link = document.createElement('a');
+                link.href = "data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64," + wbout;
+                link.download = filename + '.xlsx';
+                link.click();
+            }
         });
     }
 
@@ -3657,48 +3756,152 @@ function universalExportToExcel(tabName) {
         getAdminDashboardDataAsync(function(result) {
             var doc = new window.jspdf.jsPDF({ orientation: 'landscape', unit: 'pt', format: 'a1' });
             var dts = getPrintableDateTime();
-            var targetFilename = "Master_Detailed_Report_" + getFormattedDateTimeForFile() + ".pdf";
             
-            doc.setFontSize(28); doc.setTextColor(30, 58, 138); doc.setFont("Helvetica", "bold");
-            doc.text("MASTER REPORT - EXECUTIVE OVERVIEW", 40, 80);
-            doc.setFontSize(16); doc.setTextColor(0, 0, 0); doc.setFont("Helvetica", "normal");
-            doc.text("Generated: " + dts, 40, 110);
+            var selectAllCb = document.getElementById('adminSelectAll');
+            var displayReaderName = (selectAllCb && selectAllCb.checked) ? "ALL" : (adminSelectedReaders.length > 0 ? toTitleProperCase(adminSelectedReaders[0]) : "ALL");
             
-            doc.autoTable({ head: [["Metric Label", "Count Value"]], body: result.summary, startY: 130, theme: 'grid', styles: { fontSize: 16, halign: 'center', cellPadding: 8, textColor: [0,0,0] }, headStyles: { fillColor: [30, 58, 138], textColor:[255,255,255], fontSize: 18 }, margin: { left: 40, right: 40 } });
+            var pdfHeaderTitle = displayReaderName + " All Type Pendency Report " + dts;
+            var targetFilename = displayReaderName.replace(/\s+/g, "_") + "_All_Type_Pendency_Report_" + getFormattedDateTimeForFile() + ".pdf";
             
+            doc.setFontSize(26); doc.setTextColor(30, 58, 138); doc.setFont("Helvetica", "bold");
+            doc.text(pdfHeaderTitle, 40, 70);
+            
+            doc.setFontSize(14); doc.setTextColor(100, 116, 139); doc.setFont("Helvetica", "normal");
+            doc.text("Executive Summary Dashboard Overview", 40, 95);
+            
+            var selectedLoadCat = document.getElementById('billLoadCategoryFilter') ? document.getElementById('billLoadCategoryFilter').value : "ALL";
+            var allConsumersReport = result.reports.find(r => r.key === 'all_consumers_list');
+            var allData = allConsumersReport ? (allConsumersReport.data || []) : [];
+            
+            var filteredData = allData.filter(function(item) {
+                var itemLoadCat = (item["LOAD_CATOGERY (5,10)"] || "").toString();
+                return (selectedLoadCat === "ALL" || itemLoadCat.includes(selectedLoadCat));
+            });
+
+            var total = filteredData.length;
+            var done = 0, billP = 0, today = 0, yest = 0;
+            filteredData.forEach(function(item) {
+                var rStatus = (item.attendStatus || "").toString().toUpperCase();
+                if(parseTrue(item.isDone) || rStatus === "ATTEND") done++;
+                if(parseTrue(item.isBillAvailableButDistributionPending)) billP++;
+                if(isVisitDateMatch(item.finalVisitDate, 0)) today++;
+                if(isVisitDateMatch(item.finalVisitDate, 1)) yest++;
+            });
+
+            var localSavedCount = document.getElementById('st-local-saved') ? parseInt(document.getElementById('st-local-saved').innerText) || 0 : 0;
+
+            var pdfSummaryRows = [
+                ["TOTAL ALLOTTED", total.toString()],
+                ["VISIT DONE", done.toString()],
+                ["VISIT PENDING", (total - done).toString()],
+                ["TODAY VISIT", today.toString()]
+            ];
+
+            if (Array.isArray(globalReportConfigs)) {
+                globalReportConfigs.forEach(function(config) {
+                    var userRole = loggedInReader.toUpperCase();
+                    if (config.target === "ADMIN" && userRole !== "ANURAG SHAKYA") return;
+                    if (config.reportGroup && config.reportGroup.trim().toUpperCase() === "TOP_CARD") {
+                        var matchedItems = filteredData.filter(function(item) {
+                            if (item.isDone === true || item.isDone === "true") return false;
+                            return evaluateCustomCondition(item, config.conditionStr); 
+                        });
+                        var cleanKeyName = config.key.replace(/_/g, ' ').toUpperCase();
+                        pdfSummaryRows.push([cleanKeyName, matchedItems.length.toString()]);
+                    }
+                });
+            }
+
+            pdfSummaryRows.push(["BILL DIST PENDING", billP.toString()]);
+            pdfSummaryRows.push(["OFFLINE SAVED", localSavedCount.toString()]);
+
+            doc.autoTable({ head: [["New Card Metric Label", "Live Count Value"]], body: pdfSummaryRows, startY: 115, theme: 'grid', styles: { fontSize: 16, halign: 'center', cellPadding: 8, textColor: [0,0,0] }, headStyles: { fillColor: [30, 58, 138], textColor:[255,255,255], fontSize: 18 }, margin: { left: 40, right: 40 } });
+            
+            // 🚀 वॉचलिस्ट में भी "Report Key ID" को बिना अंडरस्कोर के फ़ीड करना
             var pendRows = [];
-            result.reports.forEach(function(r) { if(r.key !== 'all_consumers_list' && r.key !== 'all_bills_report') pendRows.push([r.name, r.data.length.toString()]); });
+            var currentSummaryGroup = "";
+            
+            if (Array.isArray(globalReportConfigs)) {
+                globalReportConfigs.forEach(function(config) {
+                    var userRole = loggedInReader.toUpperCase();
+                    if (config.target === "ADMIN" && userRole !== "ANURAG SHAKYA") return;
+                    
+                    var isTopCard = config.reportGroup && config.reportGroup.trim().toUpperCase() === "TOP_CARD";
+                    
+                    var watchlistItems = filteredData.filter(function(item) {
+                        if (config.key === 'all_consumers_list' || config.key === 'all_bills_report') {
+                            return evaluateCustomCondition(item, config.conditionStr);
+                        }
+                        if (item.isDone === true || item.isDone === "true") return false;
+                        return evaluateCustomCondition(item, config.conditionStr);
+                    });
+
+                    var groupName = config.reportGroup || "OTHER REPORTS";
+                    if (!isTopCard) {
+                        if (groupName !== currentSummaryGroup) {
+                            var cleanGroupName = groupName.replace(/[^\x00-\x7F]/g, "").trim().toUpperCase().replace(/_/g, ' ');
+                            pendRows.push([cleanGroupName, "__GROUP_HEADER_STRIP__"]);
+                            currentSummaryGroup = groupName;
+                        }
+                        // 🚀 यहाँ config.name (हिंदी नाम) हटाकर config.key को साफ़ स्पेसिंग के साथ डाल दिया है
+                        var cleanReportKeyId = config.key.replace(/_/g, ' ').toUpperCase();
+                        pendRows.push([cleanReportKeyId, watchlistItems.length.toString()]);
+                    }
+                });
+            }
+            
             doc.autoTable({ 
-                head: [["Report Pendency Watchlist", "Count"]], 
+                head: [["Report Key ID", "Pendency Count"]], 
                 body: pendRows, 
-                startY: doc.lastAutoTable.finalY + 40, 
+                startY: doc.lastAutoTable.finalY + 35, 
                 theme: 'grid', 
-                styles: { fontSize: 16, cellPadding: 8, textColor: [0,0,0] }, 
-                headStyles: { fillColor: [30, 58, 138], textColor:[255,255,255], fontSize: 18 }, 
+                styles: { fontSize: 15, cellPadding: 7, textColor: [0,0,0] }, 
+                headStyles: { fillColor: [15, 23, 42], textColor:[255,255,255], fontSize: 16 }, 
                 margin: { left: 40, right: 40 },
                 didParseCell: function(data) {
-                    if (data.section === 'body' && parseInt(data.row.raw[1]) > 0) {
-                        data.cell.styles.fillColor = [254, 240, 138];
-                        data.cell.styles.fontStyle = 'bold';
+                    if (data.section === 'body') {
+                        if (data.row.raw[1] === "__GROUP_HEADER_STRIP__") {
+                            if (data.column.index === 0) {
+                                data.cell.styles.fillColor = [30, 64, 175];
+                                data.cell.styles.textColor = [255, 255, 255];
+                                data.cell.styles.fontStyle = 'bold';
+                                data.cell.styles.fontSize = 16;
+                                data.cell.colSpan = 2;
+                            }
+                        } else if (data.column.index === 1 && parseInt(data.cell.text[0]) > 0) {
+                            data.row.cells[0].styles.fillColor = [254, 253, 222];
+                            data.cell.styles.fillColor = [254, 240, 138];
+                            data.cell.styles.fontStyle = 'bold';
+                        }
                     }
                 }
             });
 
+            // सब-रिपोर्ट्स पेजों को मर्ज करना
             result.reports.forEach(function(r) {
-                if(r.key !== 'all_consumers_list' && r.key !== 'all_bills_report' && r.data.length > 0) {
+                if(r.data.length > 0) {
                     doc.addPage();
-                    doc.setFontSize(24); doc.setTextColor(30, 58, 138); doc.setFont("Helvetica", "bold");
-                    doc.text("Report Name :- " + r.name, 40, 60);
-                    doc.setFontSize(16); doc.setTextColor(0, 0, 0); doc.setFont("Helvetica", "normal");
-                    doc.text("Date & Time :- " + dts + "   |   Total Pending: " + r.data.length, 40, 90);
+                    doc.setFontSize(22); doc.setTextColor(30, 58, 138); doc.setFont("Helvetica", "bold");
+                    doc.text(pdfHeaderTitle, 40, 55); 
                     
-                    var reqCols = r.isBilling ? COLUMNS_MASTER_STD.concat(COLUMNS_BILL_ADDITIONS).concat(["MR NAME"]) : COLUMNS_MASTER_STD.concat(["MR NAME"]);
+                    doc.setFontSize(14); doc.setTextColor(22, 163, 74);
+                    doc.text("Sub Report Name :- " + r.name + "   |   Total Pending: " + r.data.length, 40, 80);
+                    
+                    var reqCols = [];
+                    var matchedConfig = globalReportConfigs.find(function(c) { return c.key === r.key; });
+                    if (matchedConfig && matchedConfig.reqColumnsStr) {
+                        reqCols = matchedConfig.reqColumnsStr.split(",").map(function(s) { return s.trim(); });
+                        if(reqCols.indexOf("MR NAME") === -1) reqCols.push("MR NAME");
+                    } else {
+                        reqCols = r.isBilling ? COLUMNS_MASTER_STD.concat(COLUMNS_BILL_ADDITIONS).concat(["MR NAME"]) : COLUMNS_MASTER_STD.concat(["MR NAME"]);
+                    }
+
                     var rRows = r.data.map(function(item) { return reqCols.map(function(c) { return ((c === "MR NAME") ? getReaderName(item) : getRobustKey(item, c)).toString(); }); });
                     
                     doc.autoTable({ 
                         head: [reqCols], 
                         body: rRows, 
-                        startY: 110, 
+                        startY: 100, 
                         theme: 'grid', 
                         styles: { fontSize: 10, cellPadding: 6, halign: 'center', textColor: [0,0,0], overflow: 'linebreak' }, 
                         headStyles: { fillColor: [30, 58, 138], textColor: [255,255,255], fontSize: 11 }, 
@@ -3717,22 +3920,39 @@ function universalExportToExcel(tabName) {
             for(var i = 1; i <= totalPages; i++) {
                 doc.setPage(i);
                 doc.setFontSize(14); doc.setTextColor(30, 58, 138); doc.setFont("Helvetica", "bold");
-                doc.text("Report Prepared By: Billing_App Tool | Anurag Shakya | Mo: 9761414105", doc.internal.pageSize.width / 2, doc.internal.pageSize.height - 25, { align: 'center' });
+                doc.text("Report Prepared By: DvVNL Billing Tool | Circle Manager: Anurag Shakya | Mo: 9761414105 - Page " + i + " of " + totalPages, doc.internal.pageSize.width / 2, doc.internal.pageSize.height - 25, { align: 'center' });
             }
             
-            doc.save(targetFilename);
+            if (typeof AndroidBridge !== "undefined" && AndroidBridge.processBase64Download) {
+                var rawBase64 = doc.output('arraybuffer');
+                var uint8 = new Uint8Array(rawBase64);
+                var binary = '';
+                for (var j = 0; j < uint8.byteLength; j++) { binary += String.fromCharCode(uint8[j]); }
+                var base64String = btoa(binary);
+                AndroidBridge.processBase64Download(base64String, "pdf");
+                showThinAlert("🎉 पीडीएफ सफलतापूर्वक डाउनलोड फ़ोल्डर में भेजी गई...", true);
+            } else {
+                doc.save(targetFilename);
+            }
         });
     }
 
     function exportSummaryDashboardToPDF() {
     getAdminDashboardDataAsync(function(res) {
-        var doc = new window.jspdf.jsPDF('p', 'pt', 'a4');
+        // 🚀 नया फिक्स: लैंडस्केप (l) मोड और a4 साइज पर सेट ताकि सब कुछ एक पेज पर आ जाए[cite: 1]
+        var doc = new window.jspdf.jsPDF('l', 'pt', 'a4');
         var softwareName = "DvVNL Billing Tool";
         
-        doc.setFontSize(22); doc.setTextColor(30, 58, 138); doc.setFont("Helvetica", "bold");
-        doc.text("Summary Pendency Report", 40, 50);
-        doc.setFontSize(11); doc.setTextColor(71, 85, 105); doc.setFont("Helvetica", "normal");
-        doc.text("Generated: " + getPrintableDateTime(), 40, 70);
+        // हेडर सेटिंग्स
+        doc.setFontSize(22); 
+        doc.setTextColor(30, 58, 138); 
+        doc.setFont("Helvetica", "bold");
+        doc.text("Summary Pendency Report", 40, 45);
+        
+        doc.setFontSize(10); 
+        doc.setTextColor(71, 85, 105); 
+        doc.setFont("Helvetica", "normal");
+        doc.text("Generated: " + getPrintableDateTime(), 40, 62);
         
         // 🚀 स्क्रीन पर जो लोड फ़िल्टर सेलेक्ट है, उसके हिसाब से लाइव डेटा फ़िल्टर करना
         var selectedLoadCat = document.getElementById('billLoadCategoryFilter') ? document.getElementById('billLoadCategoryFilter').value : "ALL";
@@ -3742,7 +3962,7 @@ function universalExportToExcel(tabName) {
             return (selectedLoadCat === "ALL" || itemLoadCat.includes(selectedLoadCat));
         });
 
-        // Live Filtered Counts
+        // लाइव काउंट कैलकुलेशन
         var total = filteredData.length;
         var done = 0, billP = 0, today = 0, yest = 0;
         filteredData.forEach(function(item) {
@@ -3753,128 +3973,212 @@ function universalExportToExcel(tabName) {
             if(isVisitDateMatch(item.finalVisitDate, 1)) yest++;
         });
 
-        var dynamicSummaryMetrics = [
-            ["Total Allotted", total.toString()],
-            ["Visit Done", done.toString()],
-            ["Visit Pending", (total - done).toString()],
-            ["Today Visit", today.toString()],
-            ["Yesterday Visit", yest.toString()],
-            ["Bill Dist Pending", billP.toString()]
+        // 🚀 100% डायनामिक कार्ड्स इंजन: शुरुआती 4 डिफ़ॉल्ट कार्ड्स
+        var dynamicCards = [
+            { label: "TOTAL ALLOTTED", val: total, color: [30, 64, 175], bg: [239, 246, 255] },
+            { label: "VISIT DONE", val: done, color: [21, 128, 61], bg: [240, 253, 244] },
+            { label: "VISIT PENDING", val: (total - done), color: [159, 18, 57], bg: [254, 242, 242] },
+            { label: "TODAY VISIT", val: today, color: [107, 33, 168], bg: [250, 245, 255] }
         ];
 
-        // 1. टॉप मैट्रिक्स कार्ड्स की टेबल
-        doc.autoTable({ 
-            head: [["Metric Label", "Count Value"]], 
-            body: dynamicSummaryMetrics, 
-            startY: 90, 
-            theme: 'grid', 
-            headStyles: { fillColor: [30, 58, 138], fontSize: 12, halign: 'center' },
-            styles: { fontSize: 11, cellPadding: 6, halign: 'center', valign: 'middle' },
-            margin: { left: 40, right: 40 }
-        });
-        
-        // 2. ग्रुप-वाइज पेंडेंसी वॉचलिस्ट टेबल (Key / ID नामों के साथ)
-        var pendRows = [];
-        var currentSummaryGroup = "";
-        
+        // ऑटो-मैचिंग कलर्स पैलेट डायनामिक कार्ड्स के लिए
+        var colorPalette = [
+            { text: [180, 83, 9], bg: [255, 251, 235], border: [217, 119, 6] },   // बर्न ऑरेंज
+            { text: [3, 105, 161], bg: [240, 249, 255], border: [2, 132, 199] },   // स्काई ब्लू
+            { text: [190, 24, 93], bg: [253, 242, 248], border: [219, 39, 119] },  // रोज पिंक
+            { text: [30, 41, 59], bg: [241, 245, 249], border: [71, 85, 105] }     // स्लेट ग्रे
+        ];
+        var paletteIdx = 0;
+
+        // 🎯 आपके कॉन्फ़िगरेशन से 'TOP_CARD' वाले लाइव कार्ड्स को ऑटो-कैप्चर करके लिस्ट में जोड़ना
         try {
             var cachedConfigs = localStorage.getItem("app_report_configs_cache");
             if(cachedConfigs) globalReportConfigs = JSON.parse(cachedConfigs);
         } catch(e){}
 
-        globalReportConfigs.forEach(function(config) {
-            var userRole = loggedInReader.toUpperCase();
-            if (config.target === "ADMIN" && userRole !== "ANURAG SHAKYA") return;
+        if (Array.isArray(globalReportConfigs)) {
+            globalReportConfigs.forEach(function(config) {
+                var userRole = loggedInReader.toUpperCase();
+                if (config.target === "ADMIN" && userRole !== "ANURAG SHAKYA") return;
+                
+                if (config.reportGroup && config.reportGroup.trim().toUpperCase() === "TOP_CARD") {
+                    var matchedItems = filteredData.filter(function(item) {
+                        if (item.isDone === true || item.isDone === "true") return false;
+                        return evaluateCustomCondition(item, config.conditionStr); 
+                    });
+                    
+                    var currentPalette = colorPalette[paletteIdx % colorPalette.length];
+                    paletteIdx++;
 
-            // 🎯 फ़िक्स: 'all_consumers_list', 'all_bills_report' और 'TOP_CARD' को हटाना
-            var isTopCard = config.reportGroup && config.reportGroup.trim().toUpperCase() === "TOP_CARD";
-            if (config.key !== 'all_consumers_list' && config.key !== 'all_bills_report' && !isTopCard) {
-                
-                var matchedItems = filteredData.filter(function(item) {
-                    return evaluateCustomCondition(item, config.conditionStr);
-                });
-                
-                var groupName = config.reportGroup || "OTHER REPORTS";
-                
-                if (groupName !== currentSummaryGroup) {
-                    var cleanGroupName = groupName.replace(/[^\x00-\x7F]/g, "").trim().toUpperCase();
-                    if(cleanGroupName === "") cleanGroupName = "REPORT GROUP";
-                    pendRows.push([cleanGroupName, "__GROUP_HEADER__"]);
-                    currentSummaryGroup = groupName;
+                    dynamicCards.push({
+                        label: config.name.toUpperCase().replace(/_/g, ' '),
+                        val: matchedItems.length,
+                        color: currentPalette.text,
+                        bg: currentPalette.bg,
+                        border: currentPalette.border
+                    });
                 }
-                
-                // 🎯 फ़िक्स: अब PDF की टेबल में 'config.name' की जगह शुद्ध 'config.key' (ID) प्रिंट होगी
-                var safeReportKeyName = config.key.trim();
-                if(!safeReportKeyName || safeReportKeyName === "") safeReportKeyName = "UNKNOWN_KEY";
-                
-                pendRows.push([safeReportKeyName, matchedItems.length.toString()]);
-            }
+            });
+        }
+
+        // अंत में यूटिलिटी काउंट्स लाइव डैशबोर्ड के आधार पर जोड़ना
+        dynamicCards.push({ label: "BILL DIST PENDING", val: billP, color: [180, 83, 9], bg: [255, 251, 235] });
+        dynamicCards.push({ 
+            label: "OFFLINE SAVED", 
+            val: (document.getElementById('st-local-saved') ? parseInt(document.getElementById('st-local-saved').innerText) || 0 : 0), 
+            color: [4, 120, 87], 
+            bg: [240, 253, 244] 
         });
 
+        // 🚀 10 कार्ड्स प्रति लाइन ग्रिड इंजन (यदि 10 से ज़्यादा होंगे तो ऑटोमैटिक दूसरी लाइन में जाएंगे)
+        var startX = 40;
+        var startY = 80;
+        var totalAvailableWidth = 762; // लैंडस्केप का कुल प्रिंट एरिया (842 - 80)
+        var gapX = 6;
+        var gapY = 8;
+        var maxCardsPerRow = 10; // एक लाइन में कम से कम 10 कार्ड्स का सख्त नियम
+        var cardW = Math.floor((totalAvailableWidth - (gapX * (maxCardsPerRow - 1))) / maxCardsPerRow);
+        var cardH = 44;
+
+        dynamicCards.forEach(function(card, index) {
+            var colIdx = index % maxCardsPerRow;
+            var rowIdx = Math.floor(index / maxCardsPerRow); // रो (Row) ऑटो-शिफ्टर लॉजिक
+            var x = startX + colIdx * (cardW + gapX);
+            var y = startY + rowIdx * (cardH + gapY);
+
+            // कार्ड बैकग्राउंड ड्रा करना
+            doc.setFillColor(card.bg[0], card.bg[1], card.bg[2]);
+            doc.rect(x, y, cardW, cardH, 'F');
+
+            // लेफ्ट साइड सॉलिड एक्सेन्ट बॉर्डर
+            var bColor = card.border || card.color;
+            doc.setFillColor(bColor[0], bColor[1], bColor[2]);
+            doc.rect(x, y, 2.5, cardH, 'F');
+
+            // काउंट नंबर
+            doc.setFontSize(13);
+            doc.setFont("Helvetica", "bold");
+            doc.setTextColor(card.color[0], card.color[1], card.color[2]);
+            doc.text(card.val.toString(), x + 6, y + 18);
+
+            // छोटा लेबल टेक्स्ट (टेक्स्ट ओवरलैप से बचने के लिए कॉम्पैक्ट फॉन्ट)
+            doc.setFontSize(5.8);
+            doc.setFont("Helvetica", "bold");
+            doc.setTextColor(100, 116, 139);
+            
+            var cleanLabel = card.label.replace(/ REPORT/g, '').replace(/ CONSUMER/g, '').replace(/ PENDENCY/g, '').trim();
+            var maxChars = Math.floor(cardW / 4);
+            var txtLabel = cleanLabel.length > maxChars ? cleanLabel.substring(0, maxChars - 2) + ".." : cleanLabel;
+            doc.text(txtLabel, x + 6, y + 34);
+        });
+
+        // 2. ग्रुप-वाइज पेंडेंसी वॉचलिस्ट टेबल (डेटा जेनरेशन फेज)
+        var pendRows = [];
+        var currentSummaryGroup = "";
+
+        if (Array.isArray(globalReportConfigs)) {
+            globalReportConfigs.forEach(function(config) {
+                var userRole = loggedInReader.toUpperCase();
+                if (config.target === "ADMIN" && userRole !== "ANURAG SHAKYA") return;
+
+                var isTopCard = config.reportGroup && config.reportGroup.trim().toUpperCase() === "TOP_CARD";
+                if (config.key !== 'all_consumers_list' && config.key !== 'all_bills_report' && !isTopCard) {
+                    
+                    var matchedItems = filteredData.filter(function(item) {
+                        return evaluateCustomCondition(item, config.conditionStr);
+                    });
+                    
+                    var groupName = config.reportGroup || "OTHER REPORTS";
+                    
+                    if (groupName !== currentSummaryGroup) {
+                        var cleanGroupName = groupName.replace(/[^\x00-\x7F]/g, "").trim().toUpperCase();
+                        if(cleanGroupName === "") cleanGroupName = "REPORT GROUP";
+                        cleanGroupName = cleanGroupName.replace(/_/g, ' ');
+                        pendRows.push([cleanGroupName, "__GROUP_HEADER__"]);
+                        currentSummaryGroup = groupName;
+                    }
+                    
+                    var safeReportKeyName = config.key.trim().replace(/_/g, ' ');
+                    if(!safeReportKeyName || safeReportKeyName === "") safeReportKeyName = "UNKNOWN KEY";
+                    
+                    pendRows.push([safeReportKeyName, matchedItems.length.toString()]);
+                }
+            });
+        }
+
+        // टेबल स्टार्ट पोजीशन (कार्ड्स की लाइनों की संख्या के आधार पर डायनामिकली शिफ्ट होगी)
+        var totalCardRows = Math.ceil(dynamicCards.length / maxCardsPerRow);
+        var tableStartY = startY + (totalCardRows * (cardH + gapY)) + 15;
+
+        // कॉम्पैक्ट ऑटो-टेबल रेंडरर[cite: 1]
         doc.autoTable({ 
             head: [["Report Key ID", "Pendency Count"]], 
             body: pendRows, 
-            startY: doc.lastAutoTable.finalY + 25, 
+            startY: tableStartY, 
             theme: 'grid', 
-            headStyles: { fillColor: [15, 23, 42], fontSize: 12, halign: 'center' },
-            styles: { fontSize: 11, cellPadding: 6, valign: 'middle' },
-            margin: { left: 40, right: 40 },
+            headStyles: { fillColor: [15, 23, 42], fontSize: 10, halign: 'center', fontStyle: 'bold' },
+            styles: { fontSize: 8.5, cellPadding: 4.5, valign: 'middle', overflow: 'linebreak' },
+            margin: { left: 40, right: 40, bottom: 30 },
             columnStyles: {
                 0: { halign: 'left' },
-                1: { halign: 'center', cellWidth: 100 }
+                1: { halign: 'center', cellWidth: 110 }
             },
             didParseCell: function(data) {
-                if (data.row.raw[1] === "__GROUP_HEADER__") {
-                    if (data.column.index === 0) {
-                        data.cell.styles.fillColor = [241, 245, 249];
-                        data.cell.styles.textColor = [30, 64, 175];
-                        data.cell.styles.fontStyle = 'bold';
-                        data.cell.styles.fontSize = 11;
-                        data.cell.colSpan = 2;
+                if (data.section === 'body') {
+                    // ग्रुप हेडर स्ट्रिप को प्रीमियम रॉयल थीम स्टाइल देना
+                    if (data.row.raw[1] === "__GROUP_HEADER__") {
+                        if (data.column.index === 0) {
+                            data.cell.styles.fillColor = [30, 64, 175];
+                            data.cell.styles.textColor = [255, 255, 255];
+                            data.cell.styles.fontStyle = 'bold';
+                            data.cell.styles.fontSize = 9.5;
+                            data.cell.colSpan = 2;
+                        }
+                    } 
+                    // लाइव कंडीशनल कलरिंग ब्लॉक्स
+                    else if (data.column.index === 1) {
+                        var countVal = parseInt(data.cell.text[0]);
+                        if (countVal === 0) {
+                            data.row.cells[0].styles.fillColor = [240, 253, 244];
+                            data.cell.styles.fillColor = [220, 252, 231];
+                            data.cell.styles.textColor = [21, 128, 61];
+                            data.cell.styles.fontStyle = 'bold';
+                        } else if (countVal > 0) {
+                            data.row.cells[0].styles.fillColor = [254, 253, 222];
+                            data.cell.styles.fillColor = [254, 240, 138];
+                            data.cell.styles.textColor = [133, 77, 14];
+                            data.cell.styles.fontStyle = 'bold';
+                        }
                     }
-                } 
-                else if (data.section === 'body' && data.column.index === 1 && parseInt(data.cell.text) > 0) {
-                    data.row.cells[0].styles.fillColor = [254, 240, 138];
-                    data.row.cells[0].styles.textColor = [133, 77, 14];
-                    data.row.cells[0].styles.fontStyle = 'bold';
-                    data.cell.styles.fillColor = [254, 240, 138];
-                    data.cell.styles.textColor = [133, 77, 14];
-                    data.cell.styles.fontStyle = 'bold';
                 }
             }
         });
         
+        // फुटर सिग्नेचर इंजन
         var pageCount = doc.internal.getNumberOfPages();
         for (var i = 1; i <= pageCount; i++) {
-            doc.setPage(i); doc.setFontSize(10); doc.setTextColor(30, 58, 138); doc.setFont("Helvetica", "bold");
-            doc.text("Report Prepared By: " + softwareName + " | Anurag Shakya | Mo: 9761414105 - Page " + i + " of " + pageCount, doc.internal.pageSize.width/2, doc.internal.pageSize.height - 20, {align:'center'});
+            doc.setPage(i); doc.setFontSize(9); doc.setTextColor(30, 58, 138); doc.setFont("Helvetica", "bold");
+            doc.text("Report Prepared By: " + softwareName + " | Anurag Shakya | Mo: 9761414105 - Page " + i + " of " + pageCount, doc.internal.pageSize.width/2, doc.internal.pageSize.height - 15, {align:'center'});
         }
         
-        // 🎯 फ़िक्स: PDF डाउनलोड होने पर फ़ाइल का नाम हमेशा 'Pendecy_Summary_तारीख_समय.pdf' आएगा
         var filename = "Pendecy_Summary_" + getFormattedDateTimeForFile() + ".pdf";
         
+        // एंड्रॉयड नेटिव ऐप ब्रिज और ब्राउज़र फ़ॉलबैक मोड
         if (typeof AndroidBridge !== "undefined" && AndroidBridge.processBase64Download) {
             var rawBase64 = doc.output('arraybuffer');
             var uint8 = new Uint8Array(rawBase64);
             var binary = '';
             var len = uint8.byteLength;
-            for (var i = 0; i < len; i++) {
-                binary += String.fromCharCode(uint8[i]);
-            }
+            for (var j = 0; j < len; j++) { binary += String.fromCharCode(uint8[j]); }
             var base64String = btoa(binary);
-            
             AndroidBridge.processBase64Download(base64String, "pdf");
             showThinAlert("🎉 Pendecy Summary PDF डाउनलोड होना शुरू हो गया है...", true);
         } else {
-            // 🚀 सामान्य ब्राउज़र एरर को बायपास करने का अचूक ब्लास्टर इंजन
             try {
                 var rawBase64 = doc.output('arraybuffer');
                 var uint8 = new Uint8Array(rawBase64);
                 var binary = '';
-                var len = uint8.byteLength;
-                for (var j = 0; j < len; j++) {
-                    binary += String.fromCharCode(uint8[j]);
-                }
+                for (var k = 0; k < uint8.byteLength; k++) { binary += String.fromCharCode(uint8[k]); }
                 var base64String = btoa(binary);
                 
                 var downloadLink = document.createElement('a');
@@ -3884,7 +4188,6 @@ function universalExportToExcel(tabName) {
                 downloadLink.click();
                 document.body.removeChild(downloadLink);
             } catch(pdfBlobErr) {
-                // फॉलबैक के लिए सुरक्षित तरीका
                 var blob = doc.output('blob');
                 var blobUrl = URL.createObjectURL(blob);
                 window.location.href = blobUrl;
@@ -4257,7 +4560,7 @@ function triggerSilentBackgroundSync() {
     }
     
     function destroyActiveSessionsOnExit() {
-        // 1. पूरा डेटा और सेशन्स साफ़ करें
+        // 1. पूरा लोकल सेशन्स और फ़िल्टर्स साफ़ करें
         localStorage.clear(); 
         loggedInReader = ""; 
         adminSelectedReaders = [];
@@ -4266,38 +4569,56 @@ function triggerSilentBackgroundSync() {
             if(document.getElementById('entryForm')) document.getElementById('entryForm').reset();
         } catch(e) {}
 
-        // 2. डेटाबेस कनेक्शन क्लोज करके डिलीट करें
-        if(db) { try { db.close(); } catch(e) {} } 
-        
-        var req = indexedDB.deleteDatabase("MeterReaderOfflineDB");
-        
-        // 🚀 अल्टीमेट फिक्स: डेटाबेस डिलीट होने के बाद पेज रीलोड करने के बजाय सीधे व्यू बदलें
+        // व्यू को तुरंत लॉगिन पेज पर स्विच करने का इंजन (इसे ऊपर डिफाइन किया गया है ताकि क्रैश न हो)
         var handleViewSwitch = function() {
-            // स्पलैश स्क्रीन और मुख्य कंटेनर्स को पूरी तरह छुपाएं
-            var splashNode = document.getElementById('splashLoaderView') || document.querySelector('[id*="splash"]') || document.getElementById('loginLoader');
+            // स्पलैश स्क्रीन और मुख्य डैशबोर्ड को तुरंत छुपाएं
+            if (document.getElementById('appSplashScreen')) document.getElementById('appSplashScreen').style.display = 'none';
+            if (document.getElementById('splashLoaderView')) document.getElementById('splashLoaderView').style.display = 'none';
+            if (document.getElementById('loginLoader')) document.getElementById('loginLoader').style.display = 'none';
+            if (document.getElementById('appDashboardView')) document.getElementById('appDashboardView').style.display = 'none';
+            if (document.getElementById('reportDetailContainer')) document.getElementById('reportDetailContainer').style.display = 'none';
+            if (document.getElementById('formView')) document.getElementById('formView').style.display = 'none';
+
+            // मुख्य कंटेनर को लॉक रखकर सीधे लॉगिन व्यू को ऑन करें
             var appMainNode = document.getElementById('mainAppContainer') || document.getElementById('container') || document.querySelector('.container');
+            if (appMainNode) appMainNode.style.setProperty("display", "block", "important");
+
             var loginNode = document.getElementById('loginView');
-
-            if (splashNode) splashNode.style.display = 'none';
-            if (appMainNode) appMainNode.style.display = 'none';
-
-            // सीधे लॉगिन व्यू को स्क्रीन पर खोलें ताकि स्पलैश पर न अटके
             if (loginNode) {
-                loginNode.style.display = 'block';
-                
-                // इनपुट्स खाली करें
-                var rInput = document.getElementById('l-readerSelect') || document.getElementById('username');
-                var pInput = document.getElementById('l-password') || document.getElementById('password');
+                loginNode.style.setProperty("display", "block", "important");
+                // ड्रॉपडाउन और पिन बॉक्स को खाली करें
+                var rInput = document.getElementById('readerDropdown') || document.getElementById('l-readerSelect') || document.getElementById('username');
+                var pInput = document.getElementById('loginPin') || document.getElementById('l-password') || document.getElementById('password');
                 if (rInput) rInput.value = "";
                 if (pInput) pInput.value = "";
             } else {
-                // अगर आपके कोड में लॉगिन व्यू का नाम कुछ और है, तो ही बैकअप में रीलोड करें
-                window.location.reload();
+                window.location.reload(); // सेफ फॉलबैक
             }
         };
 
-        req.onsuccess = function () { handleViewSwitch(); }; 
-        req.onerror = function () { handleViewSwitch(); };
+        // 2. ⚡ क्रैश-प्रूफ डेटाबेस क्लियरिंग इंजन (बिना ब्लॉक हुए तुरंत रीसेट)
+        if(db) { 
+            try { 
+                db.close(); // पहले एक्टिव कनेक्शन को बंद करें
+                db = null;  // ऑब्जेक्ट को नल करें ताकि डिलीट कमांड अटके ना
+            } catch(e) { console.error("Database close error:", e); } 
+        } 
+        
+        // डेटाबेस को डिलीट करने का कमांड
+        var req = indexedDB.deleteDatabase("MeterReaderOfflineDB");
+        
+        req.onsuccess = function () { 
+            console.log("Database deleted successfully on logout.");
+            handleViewSwitch(); 
+        }; 
+        req.onerror = function () { 
+            console.error("Database deletion failed, forcing UI switch.");
+            handleViewSwitch(); 
+        };
+        req.onblocked = function () {
+            console.warn("Database deletion blocked by another tab/iframe, bypassing to login page.");
+            handleViewSwitch(); // अगर डिलीट होना ब्लॉक भी हो जाए, तो भी स्क्रीन ब्लैंक नहीं होगी, सीधा लॉगिन पेज आ जाएगा
+        };
     }
     
     function toTitleProperCase(str) { 
