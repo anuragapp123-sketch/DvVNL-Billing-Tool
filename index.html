@@ -2321,9 +2321,7 @@ async function downloadSelectedMergedPDF() {
     var printedAccNos = [];
     var finalReaderName = ""; 
 
-    // 🚀 लॉगिन स्टेटस चेक इंजन: अगर एडमिन नहीं है, तो सीधे लॉगिन वाले MR का नाम उठाएं
     var currentUserRole = (typeof loggedInReader !== "undefined" && loggedInReader) ? loggedInReader.toUpperCase().trim() : "";
-    
     if (currentUserRole !== "" && currentUserRole !== "ANURAG SHAKYA" && currentUserRole !== "ADMIN") {
         finalReaderName = currentUserRole;
     }
@@ -2335,15 +2333,11 @@ async function downloadSelectedMergedPDF() {
             var accNo = cb.getAttribute('data-acc');
             if(accNo) {
                 printedAccNos.push(accNo);
-                
-                // 🚀 एडमिन मोड फिक्स: अगर एडमिन लॉगिन है, तो लिस्ट की पहली रो से MR का नाम निकालें
                 if (finalReaderName === "" && index === 0) {
                     var trRow = cb.closest('.list-item');
                     if (trRow) {
                         var mrBadge = trRow.querySelector('.c-mtr');
-                        if (mrBadge) {
-                            finalReaderName = mrBadge.innerText.replace("MR:", "").trim().toUpperCase();
-                        }
+                        if (mrBadge) finalReaderName = mrBadge.innerText.replace("MR:", "").trim().toUpperCase();
                     }
                 }
             }
@@ -2351,15 +2345,17 @@ async function downloadSelectedMergedPDF() {
     });
 
     var totalFiles = fileIds.length;
-    showThinAlert("⏳ सुपर मर्ज इंजन चालू हो रहा है...", false);
+    showThinAlert("⏳ मास्टर मर्ज इंजन चालू हो रहा है...", false);
 
     try {
         const { PDFDocument } = PDFLib;
+        // 🚀 एक खाली मास्टर पीडीएफ कंटेनर बनाना
         let mergedPdf = await PDFDocument.create();
+        var successfulCount = 0;
         
-        // 🚀 लो-मेमोरी स्ट्रीम इंजन (1-1 बिल प्रोसेसिंग)
+        // 🚀 1-1 करके डेटा लाना और सीधे मास्टर कंटेनर में लॉक (Merge) करते जाना
         for (let i = 0; i < fileIds.length; i++) {
-            showThinAlert("⚡ प्रोसेसिंग बिल: " + (i + 1) + " / " + totalFiles + "...", false);
+            showThinAlert("⚡ प्रोसेसिंग और मर्जिंग बिल: " + (i + 1) + " / " + totalFiles + "...", false);
             
             const base64Data = await new Promise(resolve => 
                 google.script.run.withSuccessHandler(resolve).getPdfDataAsBase64(fileIds[i])
@@ -2368,53 +2364,55 @@ async function downloadSelectedMergedPDF() {
             if (base64Data) {
                 try {
                     const binaryString = atob(base64Data);
-                    const len = binaryString.length;
-                    const bytes = new Uint8Array(len);
-                    for (let j = 0; j < len; j++) {
+                    const bytes = new Uint8Array(binaryString.length);
+                    for (let j = 0; j < binaryString.length; j++) {
                         bytes[j] = binaryString.charCodeAt(j);
                     }
                     
+                    // बिल को लोड करके तुरंत मास्टर पीडीएफ में जोड़ना
                     const pdf = await PDFDocument.load(bytes);
                     const copiedPages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
                     copiedPages.forEach(page => mergedPdf.addPage(page));
                     
+                    successfulCount++;
                 } catch (innerErr) {
-                    console.error("Single PDF skipped due to limits", innerErr);
+                    console.error("Single PDF Merge Error:", innerErr);
                 }
             }
             
-            // 💡 रैम को तुरंत रीसेट करने के लिए हर 2 फाइल्स के बाद छोटा सा ब्रेक
-            if (i % 2 === 0) {
-                await new Promise(resolve => setTimeout(resolve, 30));
-            }
+            // 💡 हर बिल के बाद 30ms का गैप ताकि ब्राउज़र की रैम तुरंत खाली (Free) होती रहे
+            await new Promise(resolve => setTimeout(resolve, 30));
         }
 
-        showThinAlert("⚙️ फाइल्स मर्ज हो चुकी हैं! कंप्रेस किया जा रहा है...", false);
+        if (successfulCount === 0) {
+            throw new Error("कोई भी बिल डाउनलोड या मर्ज नहीं हो पाया।");
+        }
 
-        // 🎯 ऑब्जेक्ट स्ट्रीम कंप्रेशन एक्टिवेशन (फाइल साइज 50% छोटा करने के लिए)
+        showThinAlert("⚙️ सभी " + successfulCount + " बिल मर्ज हो चुके हैं! फाइल तैयार हो रही है...", false);
+
+        // 🎯 सबसे ज़रूरी फिक्स: ऑब्जेक्ट स्ट्रीम्स को कंप्रेस करना ताकि फाइल साइज 50% छोटा हो जाए और क्रैश न हो
         const mergedPdfBytes = await mergedPdf.save({ useObjectStreams: true });
-        mergedPdf = null; // मेमोरी तुरंत खाली करने के लिए ऑब्जेक्ट क्लियर
+        mergedPdf = null; // मेमोरी को तुरंत खाली करना
 
-        // 🚀 डायनामिक नामकरण इंजन
         var cleanMrName = finalReaderName.replace(/[\\/:*?"<>|]/g, "").replace(/\s+/g, "_").toUpperCase();
         var prefix = cleanMrName ? cleanMrName + "_Merged_Bills_" : "Merged_Bills_";
         var filename = prefix + getFormattedDateTimeForFile() + ".pdf";
 
-        // --- 🚀 एंड्रॉइड APK डाउनलोड मैनेजर नेटिव ब्रिज लॉजिक ---
+        // --- 🚀 एंड्रॉइड APK डाउनलोड मैनेजर नेटिव ब्रिज (फाइल सीधे फोन में जाएगी) ---
         if (typeof AndroidBridge !== "undefined" && AndroidBridge.processBase64Download) {
             var binary = '';
             var bytes = new Uint8Array(mergedPdfBytes);
             var len = bytes.byteLength;
-            const chunk = 8192; // चंक साइज बढाकर स्पीड तेज की
+            const chunk = 8192; 
             for (var k = 0; k < len; k += chunk) {
                 var subArray = bytes.subarray(k, Math.min(k + chunk, len));
                 binary += String.fromCharCode.apply(null, subArray);
             }
             var base64Pdf = window.btoa(binary);
             AndroidBridge.processBase64Download(base64Pdf, "pdf");
-            showThinAlert("🎉 " + totalFiles + " बिल सफलतापूर्वक डाउनलोड हो गए!", true);
+            showThinAlert("🎉 सभी " + successfulCount + " बिल एक साथ मर्ज होकर डाउनलोड हो गए!", true);
         } else {
-            // 🚀 ब्राउज़र फॉलबैक: डायरेक्ट ब्लॉब स्ट्रीम (मेमोरी एरर का पक्का इलाज)
+            // ब्राउज़र के लिए सुरक्षित ब्लॉब यूआरएल स्ट्रीमिंग
             var blob = new Blob([mergedPdfBytes], { type: 'application/pdf' });
             var link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
@@ -2425,10 +2423,10 @@ async function downloadSelectedMergedPDF() {
             } else {
                 link.click();
             }
-            showThinAlert("🎉 All " + totalFiles + " Bills Merged & Downloaded Successfully!", true);
+            showThinAlert("🎉 सभी " + successfulCount + " बिल एक साथ मर्ज होकर डाउनलोड हो गए!", true);
         }
         
-        // प्रिंट स्टेटस अपडेट लॉजिक
+        // प्रिंट स्टेटस अपडेट लॉजिक (सिर्फ स्टेटस बदलेगा, डेटा डिलीट नहीं होगा)
         if(printedAccNos.length > 0) {
             var printDateStr = new Date().toLocaleString('en-IN');
             var tx = db.transaction("consumers", "readwrite");
@@ -2451,7 +2449,7 @@ async function downloadSelectedMergedPDF() {
         }
         
     } catch (err) {
-        showThinAlert("🚨 एरर: मर्ज प्रक्रिया में समस्या आई। कृपया थोड़े कम बिल चुनें।", true);
+        showThinAlert("🚨 एरर: डेटा बहुत बड़ा है, कृपया थोड़े कम बिल चुनें।", true);
         console.error(err);
     }
 }
