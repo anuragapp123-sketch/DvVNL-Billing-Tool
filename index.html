@@ -4,8 +4,8 @@
   <!-- 🚀 ULTRA-FAST GOOGLE ENVIRONMENT BYPASS BRIDGE (स्प्लैश स्क्रीन फिक्स) -->
 <script>
   (function() {
-    // ⚠️ अपनी असली वेब ऐप यूआरएल यहाँ पेस्ट करें
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzr8Nxh7ev9fpRdRSNL5I8aF1QnGH-Cc7jX1NbU7CYebLou_JClqE_gqoCLM3MZOhcA/exec";
+    // ⚠️ अपना नया Deployment URL यहाँ पेस्ट करें
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxV4KmruNry1ARBLH2Oqbm1JBpR5Wq-r08FHTDMqVentcMUKCkjs3szONKjIW4BamVCQg/exec";
 
     function createHandler(successCallback, failureCallback) {
       return new Proxy({}, {
@@ -13,7 +13,10 @@
           return function(...args) {
             console.log("🚀 API Bridge Calling Function: " + propKey);
             
-            // GitHub और External Hosting के लिए अपग्रेडेड बाईपास रिक्वेस्ट इंजन
+            // लॉगिन पेज पर लोडर को ऑन करना
+            var loader = document.getElementById('loginLoader') || document.getElementById('globalLoader');
+            if(loader) loader.style.display = 'block';
+
             fetch(APPS_SCRIPT_URL, {
               method: "POST",
               mode: "cors", 
@@ -26,27 +29,34 @@
               })
             })
             .then(response => {
-              if (!response.ok) throw new Error('Network response was not ok');
+              if (!response.ok) throw new Error('Network response was not ok (Status: ' + response.status + ')');
               return response.json();
             })
             .then(data => {
+              if (loader) loader.style.display = 'none';
+              
               if (data && data.error) {
                 console.error("GS Execution Error:", data.error);
+                alert("🚨 सर्वर एरर: " + data.error);
                 if (failureCallback) failureCallback(data.error);
               } else {
-                if (successCallback) successCallback(data);
+                // अगर डेटा डायरेक्ट आ रहा है या .data पैकेट में लिपटा है
+                var finalData = (data && data.data !== undefined) ? data.data : data;
+                if (successCallback) successCallback(finalData);
               }
             })
             .catch(err => {
+              if (loader) loader.style.display = 'none';
               console.error("API Bridge Fetch Error on " + propKey + ":", err);
               
-              // 🚀 APK स्क्रीन पर लाइव एरर दिखाने का मैकेनिज्म
+              // स्क्रीन पर साफ़ एरर दिखाने का बॉक्स
               var errBox = document.getElementById('apkErrorLogger');
               if(errBox) {
                 errBox.style.display = 'block';
-                errBox.innerText = "🚨 APK System Error (" + propKey + "):\n" + err.toString() + "\n\n💡 सुझाव: कृपया इंटरनेट चेक करें या Apps Script का New Deployment URL अपडेट करें।";
+                errBox.innerText = "🚨 कनेक्शन फेल! विवरण नीचे देखें:\n" + err.toString() + "\n\n💡 समाधान: चेक करें कि Apps Script में Deploy करते समय 'Who has access' को 'Anyone' किया है या नहीं।";
+              } else {
+                alert("🚨 कनेक्शन एरर: " + err.toString());
               }
-              
               if (failureCallback) failureCallback(err);
             });
           };
@@ -54,28 +64,22 @@
       });
     }
 
-    // ऐप के लोड होने से ठीक पहले ही गूगल ऑब्जेक्ट को हैक/इंजेक्ट करना
     const runBridge = {
       withSuccessHandler: function(successCb) {
         return {
-          withFailureHandler: function(failureCb) {
-            return createHandler(successCb, failureCb);
-          },
+          withFailureHandler: function(failureCb) { return createHandler(successCb, failureCb); },
           ...createHandler(successCb, null)
         };
       },
       withFailureHandler: function(failureCb) {
         return {
-          withSuccessHandler: function(successCb) {
-            return createHandler(successCb, failureCb);
-          },
+          withSuccessHandler: function(successCb) { return createHandler(successCb, failureCb); },
           ...createHandler(null, failureCb)
         };
       },
       ...createHandler(null, null)
     };
 
-    // वैश्विक स्तर पर इसे स्थापित करना ताकि कोई भी फ़ंक्शन मिस न हो
     if (typeof google === 'undefined') {
       window.google = { script: { run: runBridge } };
     } else if (!google.script || !google.script.run) {
@@ -671,12 +675,13 @@
         <div class="input-group"><label>लॉगिन पिन दर्ज करें</label><input type="password" id="loginPin" placeholder="6 अंकों का पिन दर्ज करें" inputmode="numeric" maxlength="6"></div>
         <button class="btn" onclick="processLogin()">लॉगिन करें</button>
         <div class="loader" id="loginLoader">सर्वर से जुड़ रहे हैं...</div>
+        <div id="apkErrorLogger" style="display:none; margin-top:10px; padding:10px; background:#fef2f2; border:1px solid #fca5a5; border-radius:6px; color:#b91c1c; font-size:11px; font-weight:bold; text-align:left; word-break:break-all; white-space:pre-wrap;"></div>
         
         <!-- 🔴 APK एरर ट्रैकर (यह केवल एरर आने पर ही दिखेगा) -->
         <div id="apkErrorLogger" style="display:none; margin-top:10px; padding:10px; background:#fef2f2; border:1px solid #fca5a5; border-radius:6px; color:#b91c1c; font-size:11px; font-weight:bold; text-align:left; word-break:break-all; white-space:pre-wrap;"></div>
         <div class="app-footer-branding" style="position: relative;">
             Developed by:- Anurag Shakya | 9761414105
-            <span style="display:block; margin-top:4px; font-size:10px; color:#ef4444; font-weight:900;">App Version: V1.0.7</span>
+            <span style="display:block; margin-top:4px; font-size:10px; color:#ef4444; font-weight:900;">App Version: V1.0.8</span>
         </div>
     </div>
     
@@ -871,7 +876,7 @@
             
             <div style="text-align: center; margin-top: 25px; padding-top: 15px; border-top: 1px dashed #cbd5e1; color: #64748b;">
                 <div style="font-size: 12px; font-weight: bold;">Developed by: Anurag Shakya</div>
-                <div style="font-size: 11px; color: #ef4444; font-weight: 900; margin-top: 4px;">App Version: V1.0.7</div>
+                <div style="font-size: 11px; color: #ef4444; font-weight: 900; margin-top: 4px;">App Version: V1.0.8</div>
             </div>
         </div>
 
@@ -920,7 +925,7 @@
         <div style="width: 100%; height: 40px; clear: both; display: block !important; visibility: hidden; pointer-events: none;"></div>
         
         <div class="card" style="background: rgba(255, 255, 255, 0.7); margin-bottom: 20px; text-align: center; border: 1px dashed #cbd5e1;">
-            <div style="font-size: 11px; color: #ef4444; font-weight: 900; margin-bottom: 3px;">App Version: V1.0.7</div>
+            <div style="font-size: 11px; color: #ef4444; font-weight: 900; margin-bottom: 3px;">App Version: V1.0.8</div>
             <div style="font-size: 12px; color: #1e40af; font-weight: 800; text-transform: uppercase; margin-bottom: 5px;"><i class="fa-solid fa-user-tie"></i> <span id="welcomeTxt">Mr Name: Loading...</span></div>
             <div style="font-size: 11px; font-weight: 700; color: #475569; border-top: 1px solid #cbd5e1; padding-top: 5px;">
                 Developed by:- Er. Anurag Shakya | 9761414105
