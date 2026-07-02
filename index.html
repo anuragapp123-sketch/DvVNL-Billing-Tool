@@ -1352,66 +1352,65 @@
 
 <script>
     // 🚀 1. Dynamic Start URL & Manifest (ताकि Address Bar न दिखे)
-    var currentResolvedUrl = window.location.href.split('?')[0]; // Redirect के बाद का असली URL
+    // 🚀 1. Dynamic Start URL & Manifest (ताकि Address Bar न दिखे)
+var currentResolvedUrl = window.location.href.split('?')[0]; // Redirect के बाद का असली URL
+
+var manifestJSON = {
+    "name": "DvVNL Billing Tool",
+    "short_name": "DvVNL",
+    "start_url": currentResolvedUrl,
+    "display": "minimal-ui",
+    "scope": "/", 
+    "background_color": "#0f172a",
+    "theme_color": "#0f172a",
+    "icons": [
+        {
+            "src": "https://cdn-icons-png.flaticon.com/512/2830/2830284.png", 
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ]
+};
+
+var manifestBlob = new Blob([JSON.stringify(manifestJSON)], {type: 'application/json'});
+document.getElementById('manifest-placeholder').setAttribute('href', URL.createObjectURL(manifestBlob));
+
+var deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    var installBtn = document.getElementById('forceAppCodeUpdate'); 
+});
+
+// 🎨 वैश्विक थीम लिस्ट इंजन
+var availableThemesList = ["default", "velvet", "teal", "gold", "midnight", "pink", "cyber", "sunset", "frost", "emerald", "volcano", "nebula", "espresso", "steel", "cherry", "ocean", "plum", "lemon", "imperial"];
+var db = null; var loggedInReader = ""; var activeReportType = "";
+var currentReportDataList = []; var viewHistoryStack = []; var adminSelectedReaders = [];
+var globalReportConfigs = []; // शीट कॉन्फ़िगरेशन को स्टोर करने के लिए
+
+// 🔥 CRITICAL FIX: 'isDownloadingMasterData' को यहाँ ग्लोबली डिफाइन किया गया है ताकि ReferenceError न आए
+var isDownloadingMasterData = false; 
+
+// Columns Configs
+var COLUMNS_MASTER_STD = ["DIVISION", "ACCOUNT NO", "Consumer Type", "Consumer Catogary", "Process Final", "CONSUMER-NAME", "ADDRESS", "Master Mobile Number", "LOAD IN KW", "LAST MONTH FINAL MM NO.", "LAST MONTH FINAL MM MAKE", "FINAL VISIT_DATE", "EXCEPTION TYPE (MAIN METER)", "FINAL_MAIN_METER_SITE_REMARK", "REMARK", "IS MRI AVAILABLE (MAIN METER)", "IS LOAD SURVAY AVAILBLE (MAIN Mtr)", "LAST MONTH FINAL PM NO.", "LAST MONTH FINAL PM MAKE", "EXCEPTION TYPE (POLE METER)", "FINAL_POLE_METER_SITE_REMARK", "IS MRI AVAILABLE (POLE METER)", "IS LOAD SURVAY AVAILBLE (Pole Mtr)", "TIME STAMP", "ATTEND STATUS"];
+var COLUMNS_BILL_ADDITIONS = ["BILLED DATE", "BILL PRINT TAG", "IS BILL SEND BY WHATUP", "BILL_GROUP", "FOR_BILL DISTRIBUTION", "IS BILL UPLOAD", "BILL UPLOAD DATE", "BILL DOWNLOAD LINK", "ERROR (BILL NOT DOWNLOAD)", "IS BILL PRINT", "BILL PRINT DATE", "DISTRIBUTION STATUS"];
+
+var REPORT_COL_MAP = {
+    "DIVISION": "division", "ACCOUNT NO": "accountNo", "Consumer Type": "consumerType", "Consumer Catogary": "consumerCatogary", "Process Final": "processFinal",
+    "CONSUMER-NAME": "consumerName", "ADDRESS": "address", "Master Mobile Number": "masterMobileNumber", "LOAD IN KW": "loadGroup", 
+    "LAST MONTH FINAL MM NO.": "lastMmNo", "LAST MONTH FINAL MM MAKE": "lastMmMake", "FINAL VISIT_DATE": "finalVisitDate",
+    "EXCEPTION TYPE (MAIN METER)": "mainMeterFieldException", "FINAL_MAIN_METER_SITE_REMARK": "mainStatusRemark", "REMARK": "preFetchedRemark",
+    "IS MRI AVAILABLE (MAIN METER)": "mriAvailableMain", "IS LOAD SURVAY AVAILBLE (MAIN Mtr)": "surveyAvailableMain",
+    "LAST MONTH FINAL PM NO.": "lastPmNo", "LAST MONTH FINAL PM MAKE": "lastPmMake", "EXCEPTION TYPE (POLE METER)": "poleMeterFieldException",
+    "FINAL_POLE_METER_SITE_REMARK": "poleStatusRemark", "IS MRI AVAILABLE (POLE METER)": "mriAvailablePole", "IS LOAD SURVAY AVAILBLE (Pole Mtr)": "surveyAvailablePole",
+    "TIME STAMP": "timeStampVal", "ATTEND STATUS": "attendStatus",
     
-    var manifestJSON = {
-        "name": "DvVNL Billing Tool",
-        "short_name": "DvVNL",
-        "start_url": currentResolvedUrl,
-        "display": "minimal-ui",
-        "scope": "/", // 🚀 यह ब्राउज़र को बताता है कि यह एक ही ऐप है // फुल स्क्रीन ऐप के लिए
-        "background_color": "#0f172a",
-        "theme_color": "#0f172a",
-        "icons": [
-            {
-                // PWA इंस्टॉल होने के लिए Icon का HTTPS होना जरूरी है
-                "src": "https://cdn-icons-png.flaticon.com/512/2830/2830284.png", 
-                "sizes": "512x512",
-                "type": "image/png",
-                "purpose": "any maskable"
-            }
-        ]
-    };
-    
-    var manifestBlob = new Blob([JSON.stringify(manifestJSON)], {type: 'application/json'});
-    document.getElementById('manifest-placeholder').setAttribute('href', URL.createObjectURL(manifestBlob));
-
-    // 🚀 फिक्स: क्रोम में ऐप इंस्टॉल बटन (PWA Install Engine) और फुल स्क्रीन ड्राइवर
-    var deferredPrompt;
-    window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        deferredPrompt = e;
-        // अगर आप ऐप के अंदर कोई विशिष्ट इंस्टॉल बटन दिखाना चाहते हैं, तो उसे यहाँ block से flex कर सकते हैं
-        var installBtn = document.getElementById('forceAppCodeUpdate'); // या कोई भी बटन
-    });
-
-    // 🎨 वैश्विक थीम लिस्ट इंजन (त्रुटि सुधार और 3 नई प्रीमियम थीम्स)
-    var availableThemesList = ["default", "velvet", "teal", "gold", "midnight", "pink", "cyber", "sunset", "frost", "emerald", "volcano", "nebula", "espresso", "steel", "cherry", "ocean", "plum", "lemon", "imperial"];
-    var db = null; var loggedInReader = ""; var activeReportType = "";
-    var currentReportDataList = []; var viewHistoryStack = []; var adminSelectedReaders = [];
-    var globalReportConfigs = []; // शीट कॉन्फ़िगरेशन को स्टोर करने के लिए
-
-    // Columns Configs
-    var COLUMNS_MASTER_STD = ["DIVISION", "ACCOUNT NO", "Consumer Type", "Consumer Catogary", "Process Final", "CONSUMER-NAME", "ADDRESS", "Master Mobile Number", "LOAD IN KW", "LAST MONTH FINAL MM NO.", "LAST MONTH FINAL MM MAKE", "FINAL VISIT_DATE", "EXCEPTION TYPE (MAIN METER)", "FINAL_MAIN_METER_SITE_REMARK", "REMARK", "IS MRI AVAILABLE (MAIN METER)", "IS LOAD SURVAY AVAILBLE (MAIN Mtr)", "LAST MONTH FINAL PM NO.", "LAST MONTH FINAL PM MAKE", "EXCEPTION TYPE (POLE METER)", "FINAL_POLE_METER_SITE_REMARK", "IS MRI AVAILABLE (POLE METER)", "IS LOAD SURVAY AVAILBLE (Pole Mtr)", "TIME STAMP", "ATTEND STATUS"];
-    var COLUMNS_BILL_ADDITIONS = ["BILLED DATE", "BILL PRINT TAG", "IS BILL SEND BY WHATUP", "BILL_GROUP", "FOR_BILL DISTRIBUTION", "IS BILL UPLOAD", "BILL UPLOAD DATE", "BILL DOWNLOAD LINK", "ERROR (BILL NOT DOWNLOAD)", "IS BILL PRINT", "BILL PRINT DATE", "DISTRIBUTION STATUS"];
-
-    var REPORT_COL_MAP = {
-        "DIVISION": "division", "ACCOUNT NO": "accountNo", "Consumer Type": "consumerType", "Consumer Catogary": "consumerCatogary", "Process Final": "processFinal",
-        "CONSUMER-NAME": "consumerName", "ADDRESS": "address", "Master Mobile Number": "masterMobileNumber", "LOAD IN KW": "loadGroup", 
-        "LAST MONTH FINAL MM NO.": "lastMmNo", "LAST MONTH FINAL MM MAKE": "lastMmMake", "FINAL VISIT_DATE": "finalVisitDate",
-        "EXCEPTION TYPE (MAIN METER)": "mainMeterFieldException", "FINAL_MAIN_METER_SITE_REMARK": "mainStatusRemark", "REMARK": "preFetchedRemark",
-        "IS MRI AVAILABLE (MAIN METER)": "mriAvailableMain", "IS LOAD SURVAY AVAILBLE (MAIN Mtr)": "surveyAvailableMain",
-        "LAST MONTH FINAL PM NO.": "lastPmNo", "LAST MONTH FINAL PM MAKE": "lastPmMake", "EXCEPTION TYPE (POLE METER)": "poleMeterFieldException",
-        "FINAL_POLE_METER_SITE_REMARK": "poleStatusRemark", "IS MRI AVAILABLE (POLE METER)": "mriAvailablePole", "IS LOAD SURVAY AVAILBLE (Pole Mtr)": "surveyAvailablePole",
-        "TIME STAMP": "timeStampVal", "ATTEND STATUS": "attendStatus",
-        
-        "BILLED DATE": "billedDate", "BILL PRINT TAG": "billPrintTag", "IS BILL SEND BY WHATUP": "isWaSent", "BILL_GROUP": "billGroup",
-        "FOR_BILL DISTRIBUTION": "forBillDist", "IS BILL UPLOAD": "isBillUpload", "BILL UPLOAD DATE": "billUpDate",
-        "BILL DOWNLOAD LINK": "pdfLink", "ERROR (BILL NOT DOWNLOAD)": "errBill", "IS BILL PRINT": "isBillPrint",
-        "BILL PRINT DATE": "billPrDate", "DISTRIBUTION STATUS": "distStatus"
-    };
-
-    var REPORT_KEYS = ['main_mri_pending', 'pole_mri_pending', 'main_field_exception', 'pole_field_exception', 'mri_no_survey_main', 'mri_no_survey_pole', 'billed_no_bill', 'bill_print_pending', 'bill_dist_pending', 'rep10', 'rep11', 'rep12', 'rep13'];
+    "BILLED DATE": "billedDate", "BILL PRINT TAG": "billPrintTag", "IS BILL SEND BY WHATUP": "isWaSent", "BILL_GROUP": "billGroup",
+    "FOR_BILL DISTRIBUTION": "forBillDist", "IS BILL UPLOAD": "isBillUpload", "BILL UPLOAD DATE": "billUpDate",
+    "BILL DOWNLOAD LINK": "pdfLink", "ERROR (BILL NOT DOWNLOAD)": "errBill", "IS BILL PRINT": "isBillPrint",
+    "BILL PRINT DATE": "billPrDate", "DISTRIBUTION STATUS": "distStatus"
+};
     var REPORT_NAMES = { 'main_mri_pending': '1. Main Meter MRI Pending', 'pole_mri_pending': '2. Pole Meter MRI Pending', 'main_field_exception': '3. Main Meter Field Exception', 'pole_field_exception': '4. Pole Meter Field Exception', 'mri_no_survey_main': '5. MRI But No Load Survay (Main)', 'mri_no_survey_pole': '6. MRI But No Load Survay (Pole)', 'billed_no_bill': '7. Billed But No Bill Available', 'bill_print_pending': '8. Bill Available But Print Pending', 'bill_dist_pending': '9. Bill Available But Distribution Pending', 'rep10': '10. 50 Kw MRI Pending List', 'rep11': '11. 50 Kw VisiT Pending', 'rep12': '12. 50 Kw Main Meter Field Exception', 'rep13': '13. 50 Kw Pole Meter Field Exception', 'all_bills_report': 'All Bills Report', 'all_consumers_list': 'All Consumers Master' };
 
     var IMAGE_VALIDATED_REMARKS = ["Mri Done", "Cmri Done", "China Meter/Sem I-Electronic Meter/Electro Mechnical Meter", "Communication Error", "Ct-Pt Damaged", "Duplicate", "Entry Denied By Consumer", "Meter Defective/ Display Off/ Meter Burnt", "Meter Lead/Sensor Faulty", "Meter Not Accessible", "Meter Ok But Meter Bypass", "No Meter At Site", "No Meter No Cable At Site (Pdc)", "No Supply", "No Use Of Supply At Site (Stw Or Payjal)", "No_Need To_Visit (<10)", "Premises Locked", "Single Phase Meter", "Site Not Found", "Smart/Prepaid Meter", "Street Light OR Payjal (Unmeterd)", "Tdc", "Under Load", "Water/Flood Logging", "Wrong Tarrif (Ptw)"];
