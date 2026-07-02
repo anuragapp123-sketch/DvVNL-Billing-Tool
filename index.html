@@ -5,7 +5,7 @@
 <script>
   (function() {
     // ⚠️ अपना नया Deployment URL यहाँ पेस्ट करें
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxgkHi5ozfcf_KRQKEFB_2KzlMIVmsFCTAJRjqD2hgCkM-o8pbNS_uweoRXzX41xFBKBw/exec";
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxI4nJVxUVCm3-UyjamN3tZxJd6D6nG7tA3VvyhgiXBGgOgwT2Gmql8zwiROveUwzj3uw/exec";
 
     function createHandler(successCallback, failureCallback) {
       return new Proxy({}, {
@@ -204,6 +204,199 @@
         --theme-table-th: #fce7f3;
         --theme-table-border: #fbcfe8;
     }
+    /* ⚡ THEME 7: NEON CYBER (हाई-टेक डार्क मोड) */
+    [data-app-theme="cyber"] {
+        --theme-bg: linear-gradient(-45deg, #090d16, #0f172a, #020617, #090d16);
+        --theme-primary: #06b6d4;   /* इलेक्ट्रिक स्यान */
+        --theme-primary-dark: #0891b2;
+        --theme-sec-bg: #0e1e2e;
+        --theme-border: #22d3ee;
+        --theme-header-gradient: linear-gradient(-45deg, #0f172a, #0891b2, #020617, #0f172a);
+        --theme-card-bg: rgba(15, 23, 42, 0.95);
+        --theme-text: #94a3b8;
+        --theme-heading: #22d3ee;
+        --theme-table-th: #0e1e2e;
+        --theme-table-border: #1e293b;
+    }
+
+    /* 🍊 THEME 8: SUNSET ORANGE (ऊर्जावान और वाइब्रेंट) */
+    [data-app-theme="sunset"] {
+        --theme-bg: linear-gradient(-45deg, #ffedd5, #fef3c7, #f1f5f9, #ffedd5);
+        --theme-primary: #ea580c;   /* बर्न ऑरेंज */
+        --theme-primary-dark: #c2410c;
+        --theme-sec-bg: #ffedd5;
+        --theme-border: #f97316;
+        --theme-header-gradient: linear-gradient(-45deg, #c2410c, #ea580c, #111827, #f97316);
+        --theme-card-bg: rgba(255, 255, 255, 0.95);
+        --theme-text: #7c2d12;
+        --theme-heading: #431407;
+        --theme-table-th: #ffedd5;
+        --theme-table-border: #fed7aa;
+    }
+
+    /* 🥶 THEME 9: NORDIC FROST (बेहद शांत और प्रोफेशनल स्लेट-ब्लू) */
+    [data-app-theme="frost"] {
+        --theme-bg: linear-gradient(-45deg, #f0f4f8, #e6ebf4, #f8fafc, #f0f4f8);
+        --theme-primary: #475569;   /* स्लेट ग्रे-ब्लू */
+        --theme-primary-dark: #334155;
+        --theme-sec-bg: #e2e8f0;
+        --theme-border: #64748b;
+        --theme-header-gradient: linear-gradient(-45deg, #334155, #475569, #0f172a, #1e293b);
+        --theme-card-bg: rgba(255, 255, 255, 0.96);
+        --theme-text: #334155;
+        --theme-heading: #0f172a;
+        --theme-table-th: #e2e8f0;
+        --theme-table-border: #cbd5e1;
+    }
+    /* 🍏 THEME 10: EMERALD ECO (फ्रेश लाइट ग्रीन) */
+    [data-app-theme="emerald"] {
+        --theme-bg: linear-gradient(-45deg, #dcfce7, #f0fdf4, #f1f5f9, #dcfce7);
+        --theme-primary: #047857;
+        --theme-primary-dark: #065f46;
+        --theme-sec-bg: #dcfce7;
+        --theme-border: #10b981;
+        --theme-header-gradient: linear-gradient(-45deg, #065f46, #047857, #111827, #10b981);
+        --theme-card-bg: rgba(255, 255, 255, 0.95);
+        --theme-text: #064e3b;
+        --theme-heading: #022c22;
+        --theme-table-th: #dcfce7;
+        --theme-table-border: #a7f3d0;
+    }
+
+    /* 🌋 THEME 11: VOLCANO ASH (हाई-कंट्रास्ट रेड-ब्लैक) */
+    [data-app-theme="volcano"] {
+        --theme-bg: linear-gradient(-45deg, #180808, #0f172a, #020617, #180808);
+        --theme-primary: #dc2626;
+        --theme-primary-dark: #b91c1c;
+        --theme-sec-bg: #2d1212;
+        --theme-border: #ef4444;
+        --theme-header-gradient: linear-gradient(-45deg, #0f172a, #b91c1c, #020617, #dc2626);
+        --theme-card-bg: rgba(15, 23, 42, 0.96);
+        --theme-text: #cbd5e1;
+        --theme-heading: #fca5a5;
+        --theme-table-th: #2d1212;
+        --theme-table-border: #3f1d1d;
+    }
+
+    /* 🌌 THEME 12: COSMIC NEBULA (पर्पल-स्यान मैजिक) */
+    [data-app-theme="nebula"] {
+        --theme-bg: linear-gradient(-45deg, #fae8ff, #e0f2fe, #f3e8ff, #fae8ff);
+        --theme-primary: #7c3aed;
+        --theme-primary-dark: #6d28d9;
+        --theme-sec-bg: #f3e8ff;
+        --theme-border: #06b6d4;
+        --theme-header-gradient: linear-gradient(-45deg, #6d28d9, #0891b2, #4c1d95, #7c3aed);
+        --theme-card-bg: rgba(255, 255, 255, 0.95);
+        --theme-text: #4c1d95;
+        --theme-heading: #2e1065;
+        --theme-table-th: #f3e8ff;
+        --theme-table-border: #e9d5ff;
+    }
+
+    /* ☕ THEME 13: ESPRESSO BAR (क्लासिक ब्राउन और क्रीम) */
+    [data-app-theme="espresso"] {
+        --theme-bg: linear-gradient(-45deg, #f5ebe6, #f0e3db, #f8fafc, #f5ebe6);
+        --theme-primary: #78350f;
+        --theme-primary-dark: #451a03;
+        --theme-sec-bg: #f5ebe6;
+        --theme-border: #92400e;
+        --theme-header-gradient: linear-gradient(-45deg, #451a03, #78350f, #111827, #92400e);
+        --theme-card-bg: rgba(255, 255, 255, 0.95);
+        --theme-text: #451a03;
+        --theme-heading: #1c1917;
+        --theme-table-th: #f5ebe6;
+        --theme-table-border: #fed7aa;
+    }
+
+    /* 🦾 THEME 14: STEEL GREY (मैट ग्रे और सिल्वर) */
+    [data-app-theme="steel"] {
+        --theme-bg: linear-gradient(-45deg, #f1f5f9, #e2e8f0, #cbd5e1, #f1f5f9);
+        --theme-primary: #334155;
+        --theme-primary-dark: #1e293b;
+        --theme-sec-bg: #e2e8f0;
+        --theme-border: #475569;
+        --theme-header-gradient: linear-gradient(-45deg, #1e293b, #334155, #0f172a, #475569);
+        --theme-card-bg: rgba(255, 255, 255, 0.95);
+        --theme-text: #1e293b;
+        --theme-heading: #0f172a;
+        --theme-table-th: #e2e8f0;
+        --theme-table-border: #cbd5e1;
+    }
+
+    /* 🌸 THEME 15: CHERRY BLOSSOM (सॉफ्ट पिंक और व्हाइट) */
+    [data-app-theme="cherry"] {
+        --theme-bg: linear-gradient(-45deg, #fff5f5, #fff5f7, #f8fafc, #fff5f5);
+        --theme-primary: #db2777;
+        --theme-primary-dark: #be185d;
+        --theme-sec-bg: #ffe4e6;
+        --theme-border: #f43f5e;
+        --theme-header-gradient: linear-gradient(-45deg, #be185d, #db2777, #111827, #f43f5e);
+        --theme-card-bg: rgba(255, 255, 255, 0.95);
+        --theme-text: #9d174d;
+        --theme-heading: #4c0519;
+        --theme-table-th: #ffe4e6;
+        --theme-table-border: #fecdd3;
+    }
+
+    /* 🌊 THEME 16: DEEP OCEAN (गहरा समुद्री नीला) */
+    [data-app-theme="ocean"] {
+        --theme-bg: linear-gradient(-45deg, #0c1a30, #0a1324, #020617, #0c1a30);
+        --theme-primary: #38bdf8;
+        --theme-primary-dark: #0284c7;
+        --theme-sec-bg: #0b2545;
+        --theme-border: #0ea5e9;
+        --theme-header-gradient: linear-gradient(-45deg, #0284c7, #0369a1, #020617, #38bdf8);
+        --theme-card-bg: rgba(10, 25, 47, 0.95);
+        --theme-text: #94a3b8;
+        --theme-heading: #e0f2fe;
+        --theme-table-th: #0b2545;
+        --theme-table-border: #1e293b;
+    }
+
+    /* 🍇 THEME 17: PLUM WINE (लक्ज़री जामुनी लुक) */
+    [data-app-theme="plum"] {
+        --theme-bg: linear-gradient(-45deg, #fae8ff, #fdf4ff, #f1f5f9, #fae8ff);
+        --theme-primary: #86198f;
+        --theme-primary-dark: #701a75;
+        --theme-sec-bg: #fae8ff;
+        --theme-border: #d946ef;
+        --theme-header-gradient: linear-gradient(-45deg, #701a75, #86198f, #111827, #d946ef);
+        --theme-card-bg: rgba(255, 255, 255, 0.95);
+        --theme-text: #701a75;
+        --theme-heading: #4a044e;
+        --theme-table-th: #fae8ff;
+        --theme-table-border: #f5d0fe;
+    }
+
+    /* 🍋 THEME 18: LEMON MINT (ताजगी भरा पीला-हरा) */
+    [data-app-theme="lemon"] {
+        --theme-bg: linear-gradient(-45deg, #fef9c3, #ecfccb, #f8fafc, #fef9c3);
+        --theme-primary: #4d7c0f;
+        --theme-primary-dark: #3f6212;
+        --theme-sec-bg: #fef9c3;
+        --theme-border: #a3e635;
+        --theme-header-gradient: linear-gradient(-45deg, #3f6212, #4d7c0f, #111827, #eab308);
+        --theme-card-bg: rgba(255, 255, 255, 0.95);
+        --theme-text: #3f6212;
+        --theme-heading: #1a2e05;
+        --theme-table-th: #ecfccb;
+        --theme-table-border: #d9f99d;
+    }
+
+    /* 👑 THEME 19: IMPERIAL GOLD (गहरे काले बेस पर चमकता सोना) */
+    [data-app-theme="imperial"] {
+        --theme-bg: linear-gradient(-45deg, #111318, #1a1d24, #020617, #111318);
+        --theme-primary: #fbbf24;
+        --theme-primary-dark: #d97706;
+        --theme-sec-bg: #242016;
+        --theme-border: #f59e0b;
+        --theme-header-gradient: linear-gradient(-45deg, #111827, #d97706, #020617, #fbbf24);
+        --theme-card-bg: rgba(26, 29, 36, 0.95);
+        --theme-text: #94a3b8;
+        --theme-heading: #fef08a;
+        --theme-table-th: #242016;
+        --theme-table-border: #332b1a;
+    }
 
     /* 🚀 ULTIMATE GOOGLE APPS SCRIPT BANNER FORCED-HIDE ENGINE */
     body > div:first-child[style*="background-color"], 
@@ -363,16 +556,16 @@
     .badge { background-color: #e11d48; color: white; font-size: 9px; font-weight: bold; padding: 1px 5px; border-radius: 10px; margin-left: 5px; vertical-align: middle; }
     
     /* 🟢 PREMIUM & PERFECT NEUMORPHIC SUMMARY CARDS DESIGN */
-    .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 15px; }
+    .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; margin-bottom: 8px; }
     .stat-card { 
         background: #ffffff; 
-        padding: 14px 8px; 
-        border-radius: 14px; 
+        padding: 8px 6px; 
+        border-radius: 10px; 
         text-align: center; 
-        box-shadow: 0 10px 15px -3px rgba(15, 23, 42, 0.04), 0 4px 6px -2px rgba(15, 23, 42, 0.02); 
+        box-shadow: 0 4px 6px -1px rgba(15,23,42,0.05); 
         border: 1px solid var(--theme-table-border); 
         cursor: pointer; 
-        min-height: 85px; 
+        min-height: 68px; 
         display: flex; 
         flex-direction: column; 
         justify-content: center; 
@@ -383,16 +576,16 @@
     }
     .stat-card:active { 
         transform: scale(0.95); 
-        box-shadow: 0 4px 6px -1px rgba(15, 23, 42, 0.06);
+        box-shadow: 0 2px 4px -1px rgba(15, 23, 42, 0.06);
         background: #f8fafc;
     }
     .stat-val { 
-        font-size: 24px; 
+        font-size: 19px; 
         font-weight: 900; 
         line-height: 1; 
         font-family: 'Roboto', sans-serif; 
         letter-spacing: -0.5px; 
-        margin-bottom: 4px;
+        margin-bottom: 2px;
     }
     .stat-lbl { 
         font-size: 11px; 
@@ -604,8 +797,8 @@
 <body>
   <div id="thinDarkAlert" style="display:none; position:fixed; top:0; left:0; width:100%; background:#0f172a; color:#facc15; font-size:12px; font-weight:bold; text-align:center; padding:8px; z-index:99999; box-shadow:0 2px 4px rgba(0,0,0,0.5);"><i class="fa-solid fa-cloud-arrow-down fa-fade"></i> <span id="thinDarkAlertTxt">Master Data Downloading In Process Pls wait...</span></div>
 
-  <div id="globalNotificationOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15,23,42,0.75); z-index:9999999; align-items:center; justify-content:center; backdrop-filter:blur(5px); box-sizing:border-box;">
-    <div id="globalNotificationBox" style="background:#ffffff; width:90%; max-width:400px; min-height:220px; border-radius:20px; padding:25px 20px; text-align:center; box-shadow:0 25px 50px -12px rgba(0,0,0,0.4); border:3px solid #1e40af; position:relative; display:flex; flex-direction:column; justify-content:space-between; animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); overscroll-behavior:contain;">
+  <div id="globalNotificationOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15,23,42,0.75); z-index:9999999; align-items:center; justify-content:center; backdrop-filter:blur(5px); box-sizing:border-box;" onclick="event.stopPropagation();">
+    <div id="globalNotificationBox" style="background:#ffffff; width:90%; max-width:400px; min-height:220px; border-radius:20px; padding:25px 20px; text-align:center; box-shadow:0 25px 50px -12px rgba(0,0,0,0.4); border:3px solid #1e40af; position:relative; display:flex; flex-direction:column; justify-content:space-between; animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); overscroll-behavior:contain;" onclick="event.stopPropagation();">
         
         <style>
             @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
@@ -686,13 +879,12 @@
         <div class="input-group"><label>लॉगिन पिन दर्ज करें</label><input type="password" id="loginPin" placeholder="6 अंकों का पिन दर्ज करें" inputmode="numeric" maxlength="6"></div>
         <button class="btn" onclick="processLogin()">लॉगिन करें</button>
         <div class="loader" id="loginLoader">सर्वर से जुड़ रहे हैं...</div>
-        <div id="apkErrorLogger" style="display:none; margin-top:10px; padding:10px; background:#fef2f2; border:1px solid #fca5a5; border-radius:6px; color:#b91c1c; font-size:11px; font-weight:bold; text-align:left; word-break:break-all; white-space:pre-wrap;"></div>
         
         <!-- 🔴 APK एरर ट्रैकर (यह केवल एरर आने पर ही दिखेगा) -->
         <div id="apkErrorLogger" style="display:none; margin-top:10px; padding:10px; background:#fef2f2; border:1px solid #fca5a5; border-radius:6px; color:#b91c1c; font-size:11px; font-weight:bold; text-align:left; word-break:break-all; white-space:pre-wrap;"></div>
         <div class="app-footer-branding" style="position: relative;">
             Developed by:- Anurag Shakya | 9761414105
-            <span style="display:block; margin-top:4px; font-size:10px; color:#ef4444; font-weight:900;">App Version: V1.0.8</span>
+            <span style="display:block; margin-top:4px; font-size:10px; color:#ef4444; font-weight:900;">App Version: V1.0.9</span>
         </div>
     </div>
     
@@ -719,46 +911,90 @@
         
         <div class="loader" id="globalLoader">Master Data Downloding In Processing Please wait...</div>
 
-        <div id="view-filter" class="tab-content" style="display: none;">
-            <div class="card" style="border: 1px solid #bfdbfe; background: #f8fafc; padding: 15px; margin-bottom: 15px; border-radius: 12px;">
-                <h3 style="color:#1e40af; font-size: 14px; font-weight:900; margin-bottom:10px; border-bottom:1px solid #bfdbfe; padding-bottom:6px;"><i class="fa-solid fa-paper-plane"></i> Live Notification Sender Panel</h3>
+        <!-- 🟢 एडमिन फ़िल्टर और लाइव नोटिफिकेशन का अलग-अलग पैनल फिक्स -->
+        <!-- 📢 टैब 1: केवल लाइव नोटिफिकेशन सेंडर पैनल (नया टैब) -->
+        <div id="view-notifyadmin" class="tab-content" style="display: none;">
+            <div class="card" style="border: 1px solid #bfdbfe; background: #f8fafc; padding: 15px; margin-bottom: 15px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(30,64,175,0.1);">
+                <h3 style="color:#1e40af; font-size: 14px; font-weight:900; margin-bottom:12px; border-bottom:2px solid #bfdbfe; padding-bottom:6px; text-align: left;"><i class="fa-solid fa-paper-plane"></i> Live Notification Sender Panel</h3>
                 
-                <div class="input-group">
-                    <label>मीटर रीडर (लड़के) का नाम चुनें *</label>
-                    <select id="notifyTargetReader" style="background:#fff; font-weight:bold; color:#1e40af; border-color:#bfdbfe;"></select>
+                <!-- 🎯 अल्टीमेट कॉलाप्सिबल मल्टी-सिलेक्ट ड्रॉपडाउन मेनू इंजन -->
+                <div class="input-group" style="position: relative;">
+                    <label style="font-weight: bold; color: #1e40af; margin-bottom: 6px;">मीटर रीडर (लड़के) का नाम चुनें (एक या एक से अधिक चुनें) *</label>
+                    
+                    <!-- नकली ड्रॉपडाउन बार (क्लिक करने के लिए) -->
+                    <div onclick="toggleNotifyDropdownMenu(event)" style="width: 100%; padding: 11px 12px; border: 1px solid #bfdbfe; border-radius: 6px; font-size: 13px; font-weight: bold; color: #1e40af; background: #ffffff; cursor: pointer; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 2px rgba(0,0,0,0.05); user-select: none;">
+                        <span id="notifyDropdownSelectedText" style="color: #475569;">-- लड़के चुनें (Click to Select) --</span>
+                        <i class="fa-solid fa-chevron-down" id="notifyDropdownArrowIcon" style="transition: transform 0.2s; color: #1e40af;"></i>
+                    </div>
+                    
+                    <!-- 🎯 फिक्स: एक के नीचे एक सिंगल कॉलम और स्मूथ वर्टिकल स्क्रॉल लिस्ट -->
+                    <div id="notifyDropdownMenuContentBlock" style="display: none; position: absolute; top: 100%; left: 0; right: 0; background: #ffffff; border: 1px solid #bfdbfe; border-radius: 6px; padding: 8px; max-height: 250px; overflow-y: auto; z-index: 1000; box-shadow: 0 10px 20px rgba(0,0,0,0.15); margin-top: 4px;-webkit-overflow-scrolling: touch;">
+                        <div id="notifyReaderCheckboxesContainer" style="display: flex; flex-direction: column; gap: 5px; width: 100%;">
+                            <span style="color:#64748b; font-size:11px; text-align:center; padding:10px;">लोड हो रहा है...</span>
+                        </div>
+                    </div>
                 </div>
                 
                 <div class="input-group">
                     <label>संदेश / सूचना (Message Text) *</label>
-                    <textarea id="notifyMessageText" rows="2" placeholder="लड़कों के लिए महत्वपूर्ण संदेश यहाँ टाइप करें..." style="background:#fff; border-color:#bfdbfe; font-size:13px;"></textarea>
+                    <textarea id="notifyMessageText" rows="2" placeholder="लड़कों के लिए महत्वपूर्ण संदेश यहाँ टाइप करें..." style="background:#fff; border-color:#bfdbfe; font-size:13px; font-weight: 600; color:#0f172a;"></textarea>
                 </div>
                 
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:10px;">
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:5px;">
                     <div class="input-group">
                         <label>लॉक समय (सेकंड) *</label>
-                        <select id="notifyLockTime" style="background:#fff; font-weight:bold; border-color:#bfdbfe;">
+                        <select id="notifyLockTime" style="background:#fff; font-weight:bold; border-color:#bfdbfe; color:#0f172a;">
                             <option value="5">5 Second</option>
                             <option value="7">7 Second</option>
                             <option value="10">10 Second</option>
                         </select>
                     </div>
                     <div style="display:flex; align-items:flex-end;">
-                        <button onclick="sendLiveNotificationFromAdmin()" class="btn" style="background: linear-gradient(90deg, #1e40af, #6b21a8); margin-bottom:0; height:42px;"><i class="fa-solid fa-share-from-square"></i> Send Message</button>
+                        <button onclick="sendLiveNotificationFromAdmin()" class="btn" style="background: linear-gradient(90deg, #1e40af, #6b21a8); margin-bottom:0; height:42px; box-shadow: 0 4px 6px rgba(30,64,175,0.2);"><i class="fa-solid fa-share-from-square"></i> Send Message</button>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <div class="universal-header-actions" style="margin-bottom: 10px; justify-content:space-between; border-bottom: 1px solid #cbd5e1; padding-bottom:10px;">
-                <span style="font-size: 12px; font-weight: bold; color: #0f172a;">Master Report Export:</span>
-                <div>
-                    <button onclick="exportAdminFilterMasterExcel()" class="export-btn excel-bg"><i class="fa-solid fa-file-excel"></i></button>
-                    <button onclick="exportAdminFilterMasterPDF()" class="export-btn pdf-bg"><i class="fa-solid fa-file-pdf"></i></button>
+        <!-- 🔍 टैब 2: केवल ग्लोबल फ़िल्टर और एक्सपोर्ट पैनल -->
+        <div id="view-filter" class="tab-content" style="display: none; width: 100%; box-sizing: border-box;">
+            <!-- मास्टर रिपोर्ट एक्सपोर्ट बार -->
+            <div class="card" style="border: 1px solid #cbd5e1; background: #ffffff; padding: 12px; margin-bottom: 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                <span style="font-size: 13px; font-weight: 800; color: #0f172a; text-transform: uppercase; letter-spacing: 0.5px;"><i class="fa-solid fa-download" style="color:#1d4ed8;"></i> Master Report Export:</span>
+                <div style="display: flex; gap: 8px;">
+                    <button onclick="exportAdminFilterMasterExcel()" class="export-btn excel-bg" style="padding: 8px 15px; border-radius: 6px; box-shadow: 0 2px 4px rgba(5,150,105,0.3);"><i class="fa-solid fa-file-excel"></i> Excel</button>
+                    <button onclick="exportAdminFilterMasterPDF()" class="export-btn pdf-bg" style="padding: 8px 15px; border-radius: 6px; box-shadow: 0 2px 4px rgba(220,38,38,0.3);"><i class="fa-solid fa-file-pdf"></i> PDF</button>
                 </div>
             </div>
-            <div class="admin-green-box" style="padding: 8px;">
-                <h3 style="color:#166534; font-size: 13px; font-weight:900; margin-bottom:8px; text-align:center; border-bottom:1px solid #86efac; padding-bottom:6px;"><i class="fa-solid fa-user-gear"></i> Master Data Global Filter</h3>
-                <p style="font-size:10px; color:#15803d; margin-bottom:8px; text-align:center;">Select readers to strictly filter the entire App.</p>
-                <div class="checkbox-dropdown" id="adminMultiReaderSelect"></div>
+
+            <!-- मास्टर डेटा ग्लोबल फ़िल्टर -->
+            <div class="card" style="border: 1px solid #86efac; background: #f0fdf4; padding: 15px; margin-bottom: 20px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(34,197,94,0.1);">
+                <h3 style="color:#166534; font-size: 14px; font-weight:900; margin-bottom:4px; text-align:center; border-bottom:2px solid #86efac; padding-bottom:6px;"><i class="fa-solid fa-user-gear"></i> Master Data Global Filter</h3>
+                <p style="font-size:11px; color:#15803d; margin-bottom:12px; text-align:center; font-weight: 600;">Select readers below to strictly filter the entire Application data.</p>
+                <div class="checkbox-dropdown" id="adminMultiReaderSelect" style="border: 1px solid #cbd5e1; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);"></div>
+            </div>
+        </div>
+
+        <!-- ⚙️ टैब 3: सिंगल इनपुट बॉक्स कंडीशन कनवर्टर पैनल (डैशबोर्ड के अंदर फिक्स) -->
+        <div id="view-configmaker" class="tab-content" style="display: none; width: 100%; box-sizing: border-box;">
+            <div class="card" style="border: 1px solid #c084fc; background: #faf5ff; padding: 15px; margin-bottom: 20px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(168,85,247,0.1); width: 100%; box-sizing: border-box;">
+                <h3 style="color:#6b21a8; font-size: 14px; font-weight:900; margin-bottom:12px; border-bottom:2px solid #e9d5ff; padding-bottom:6px; text-align: left;"><i class="fa-solid fa-gears"></i> Report Condition Generator</h3>
+                
+                <!-- सिंगल मल्टी-कंडीशन इनपुट बॉक्स -->
+                <div class="card" style="background:#ffffff; border:1px solid #e9d5ff; padding:12px; margin-bottom:15px; border-radius: 8px;">
+                    <label style="font-weight:bold; color:#6b21a8; display: block; margin-bottom: 6px; font-size: 13px;">अपनी कंडीशन्स यहाँ लिखें (Write Multiple Conditions):</label>
+                    <textarea id="cfgCustomInputTextArea" rows="3" style="width: 100%; padding: 10px; border: 2px solid #cbd5e1; border-radius: 6px; font-size: 13px; font-weight: 700; color: #0f172a; background: #ffffff; resize: vertical; box-sizing: border-box;" placeholder="उदाहरण: FINAL_MAIN_METER_SITE_REMARK=MRI DONE,IS BILL UPLOAD=NO"></textarea>
+                    <small style="color:#701a75; font-size:10.5px; display:block; margin-top:6px; font-weight: 600; line-height: 1.4;">💡 सुझाव: अलग-अलग नियमों को अलग करने के लिए बीच में कोमा (,) का प्रयोग करें।</small>
+                </div>
+
+                <button onclick="generateSheetConfigString()" class="btn" style="background: linear-gradient(90deg, #7c3aed, #6b21a8) !important; color: white; border: none; padding: 12px; border-radius: 6px; font-size: 14px; font-weight: 700; width: 100%; cursor: pointer; box-shadow: 0 4px 6px rgba(124,58,237,0.2); margin-bottom:15px;"><i class="fa-solid fa-wand-magic-sparkles"></i> Generate Config Code</button>
+
+                <!-- रिजल्ट आउटपुट बॉक्स -->
+                <div class="input-group">
+                    <label style="color:#6b21a8; font-weight:bold; display: block; margin-bottom: 4px;">Google Sheet में पेस्ट करने लायक कोड (Click to Copy):</label>
+                    <input type="text" id="cfgGeneratedResultOutput" readonly style="background:#ffffff; border:2px solid #c084fc; font-weight:800; color:#4c1d95; text-align:center; padding: 12px; border-radius: 6px; font-size: 14px; width: 100%; box-sizing: border-box;" placeholder="कोड यहाँ दिखाई देगा" onclick="this.select(); document.execCommand('copy');">
+                    <small style="color:#701a75; font-size:11px; display:block; margin-top:6px; text-align:center; font-weight: bold;">💡 बॉक्स पर क्लिक करते ही कोड अपने आप कॉपी हो जाएगा!</small>
+                </div>
             </div>
         </div>
 
@@ -874,6 +1110,16 @@
                     <button onclick="toggleReportSidebar(false)" style="background: #ef4444; color: white; border: none; border-radius: 50%; width: 30px; height: 30px; font-size: 16px; cursor: pointer; box-shadow: 0 2px 4px rgba(239,68,68,0.4); display: flex; align-items: center; justify-content: center;"><i class="fa-solid fa-xmark"></i></button>
                 </div>
             </div>
+
+            <!-- 🛠️ केवल एडमिन के लिए साइडबार मेनू पैनल -->
+            <div id="sidebarAdminControlSection" style="display: none; margin-bottom: 15px; background: #faf5ff; border: 1px solid #e9d5ff; padding: 10px; border-radius: 8px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);">
+                <div style="font-size: 11px; font-weight: 900; color: #6b21a8; text-transform: uppercase; margin-bottom: 8px; border-bottom: 1px dashed #c084fc; padding-bottom: 4px;"><i class="fa-solid fa-user-shield"></i> Admin Control Panel</div>
+                <div style="display: flex; flex-direction: column; gap: 6px;">
+                    <button onclick="switchTab('filter'); toggleReportSidebar(false);" class="report-menu-btn" style="margin-bottom:0; padding:10px; background:#ffffff; border-color:#d8b4fe; color:#6b21a8;"><span style="font-weight:700;"><i class="fa-solid fa-filter" style="color:#7c3aed; margin-right:6px;"></i> ग्लोबल फ़िल्टर पैनल</span><i class="fa-solid fa-chevron-right" style="font-size:10px; color:#c084fc;"></i></button>
+                    <button onclick="switchTab('notifyadmin'); toggleReportSidebar(false);" class="report-menu-btn" style="margin-bottom:0; padding:10px; background:#ffffff; border-color:#d8b4fe; color:#6b21a8;"><span style="font-weight:700;"><i class="fa-solid fa-paper-plane" style="color:#7c3aed; margin-right:6px;"></i> लाइव सूचना सेंडर</span><i class="fa-solid fa-chevron-right" style="font-size:10px; color:#c084fc;"></i></button>
+                    <button onclick="switchTab('configmaker'); toggleReportSidebar(false);" class="report-menu-btn" style="margin-bottom:0; padding:10px; background:#ffffff; border-color:#d8b4fe; color:#6b21a8;"><span style="font-weight:700;"><i class="fa-solid fa-sliders" style="color:#7c3aed; margin-right:6px;"></i> रिपोर्ट कन्फिग मेकर</span><i class="fa-solid fa-chevron-right" style="font-size:10px; color:#c084fc;"></i></button>
+                </div>
+            </div>
             
             <div class="universal-header-actions" style="margin-bottom: 10px; justify-content:space-between; border-bottom: 1px solid #cbd5e1; padding-bottom:10px;">
                 <span style="font-size: 12px; font-weight: bold; color: #0f172a;">Master Export:</span>
@@ -887,7 +1133,7 @@
             
             <div style="text-align: center; margin-top: 25px; padding-top: 15px; border-top: 1px dashed #cbd5e1; color: #64748b;">
                 <div style="font-size: 12px; font-weight: bold;">Developed by: Anurag Shakya</div>
-                <div style="font-size: 11px; color: #ef4444; font-weight: 900; margin-top: 4px;">App Version: V1.0.8</div>
+                <div style="font-size: 11px; color: #ef4444; font-weight: 900; margin-top: 4px;">App Version: V1.0.9</div>
             </div>
         </div>
 
@@ -936,7 +1182,7 @@
         <div style="width: 100%; height: 40px; clear: both; display: block !important; visibility: hidden; pointer-events: none;"></div>
         
         <div class="card" style="background: rgba(255, 255, 255, 0.7); margin-bottom: 20px; text-align: center; border: 1px dashed #cbd5e1;">
-            <div style="font-size: 11px; color: #ef4444; font-weight: 900; margin-bottom: 3px;">App Version: V1.0.8</div>
+            <div style="font-size: 11px; color: #ef4444; font-weight: 900; margin-bottom: 3px;">App Version: V1.0.9</div>
             <div style="font-size: 12px; color: #1e40af; font-weight: 800; text-transform: uppercase; margin-bottom: 5px;"><i class="fa-solid fa-user-tie"></i> <span id="welcomeTxt">Mr Name: Loading...</span></div>
             <div style="font-size: 11px; font-weight: 700; color: #475569; border-top: 1px solid #cbd5e1; padding-top: 5px;">
                 Developed by:- Er. Anurag Shakya | 9761414105
@@ -963,6 +1209,24 @@
                 <span>विजिट्स</span>
             </button>
             
+            <!-- 📢 नया सूचना टैब (केवल एडमिन के लिए) -->
+            <button class="tab-btn admin-green" id="btn-tab-notifyadmin" onclick="switchTab('notifyadmin')" style="display:none;">
+                <i class="fa-solid fa-paper-plane"></i>
+                <span>सूचना</span>
+            </button>
+            
+            <!-- 🔍 नया फ़िल्ट<!-- 🔍 नया फ़िल्टर टैब (केवल एडमिन के लिए) -->
+            <button class="tab-btn admin-green" id="btn-tab-filter" onclick="switchTab('filter')" style="display:none;">
+                <i class="fa-solid fa-filter"></i>
+                <span>फ़िल्टर</span>
+            </button>
+
+            <!-- ⚙️ नया कन्फिग जनरेटर टैब (केवल एडमिन के लिए) -->
+            <button class="tab-btn admin-green" id="btn-tab-configmaker" onclick="switchTab('configmaker')" style="display:none;">
+                <i class="fa-solid fa-sliders"></i>
+                <span>कन्फिग</span>
+            </button>
+        </div>
             <button class="tab-btn admin-green" id="btn-tab-filter" onclick="switchTab('filter')" style="display:none;">
                 <i class="fa-solid fa-filter"></i>
                 <span>फ़िल्टर</span>
@@ -1037,11 +1301,35 @@
             <div id="billDistributionFields" style="display: none;">
                 <div class="section-title" style="background:#e0e7ff; color:#1e3a8a; border-left-color:#4f46e5; margin-top:0;">बिल वितरण सत्यापन विवरण (Mandatory)</div>
                 <div class="input-group"><label>Bill Delivered Date & Time</label><input type="text" id="f-billDeliveredDate" readonly style="background:#e2e8f0; font-weight:bold;"></div>
-                <div class="input-group"><label>Bill Receiver Name *</label><input type="text" id="f-billReceiverName" placeholder="प्राप्तकर्ता का नाम"></div>
-                <div class="input-group"><label>Receiver Mobile No *</label><input type="text" id="f-receiverMobile" placeholder="10 अंकों का नंबर" inputmode="tel" maxlength="10"></div>
+                
+                <!-- नाम को ऑटोमैटिक कैपिटल करने का फिक्स -->
+                <div class="input-group">
+                    <label>Bill Receiver Name *</label>
+                    <input type="text" id="f-billReceiverName" placeholder="प्राप्तकर्ता का नाम" oninput="this.value = this.value.toUpperCase();" style="text-transform: uppercase; font-weight: 700;">
+                </div>
+                
+                <!-- मोबाइल नंबर लाइव लॉक और क्विक क्लियर इंजन -->
+                <div class="input-group" style="position: relative;">
+                    <label>Receiver Mobile No *</label>
+                    <div style="position: relative; display: flex; align-items: center; width: 100%;">
+                        <input type="text" id="f-receiverMobile" placeholder="10 अंकों का नंबर" inputmode="numeric" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '');" style="padding-right: 35px; font-weight: 700;">
+                        <span onclick="document.getElementById('f-receiverMobile').value='';" style="position: absolute; right: 12px; color: #94a3b8; cursor: pointer; font-size: 16px; font-weight: bold; user-select: none; padding: 2px;" title="Clear Number">✕</span>
+                    </div>
+                </div>
+                
                 <div class="input-group"><label style="color:#4f46e5; font-weight:bold;">Is Bill Sent by WhatsApp?</label><select id="f-isWhatsappSent" onchange="toggleWhatsappInputFieldLayout()"><option value="NO">NO</option><option value="YES">YES</option></select></div>
-                <div id="whatsappDynamicGroupBlock"><div class="input-group"><label style="color:#b45309; font-weight:bold;">New WhatsApp Mobile Number:</label><input type="tel" id="f-newWhatsappNo" placeholder="Enter 10 Digits WhatsApp No" maxlength="10"></div></div>
-                <div class="input-group"><label>Remarks / टिप्पणी *</label><textarea id="f-distributionRemark" rows="2" placeholder="टिप्पणी दर्ज करें"></textarea></div>
+                
+                <div id="whatsappDynamicGroupBlock">
+                    <div class="input-group" style="position: relative;">
+                        <label style="color:#b45309; font-weight:bold;">New WhatsApp Mobile Number:</label>
+                        <div style="position: relative; display: flex; align-items: center; width: 100%;">
+                            <input type="text" id="f-newWhatsappNo" placeholder="Enter 10 Digits WhatsApp No" inputmode="numeric" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '');" style="padding-right: 35px; font-weight: 700;">
+                            <span onclick="document.getElementById('f-newWhatsappNo').value='';" style="position: absolute; right: 12px; color: #94a3b8; cursor: pointer; font-size: 16px; font-weight: bold; user-select: none; padding: 2px;">✕</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="input-group"><label>Remarks / टिप्पणी *</label><textarea id="f-distributionRemark" rows="2" placeholder="टिप्पणी दर्ज करें" style="font-weight: 600;"></textarea></div>
                 <div class="input-group">
                     <label style="color:#dc2626;">Bill Receiver Photo (अनिवार्य) *</label>
                     <div class="camera-btn-container">
@@ -1097,7 +1385,7 @@
     });
 
     // 🎨 वैश्विक थीम लिस्ट इंजन (त्रुटि सुधार और 3 नई प्रीमियम थीम्स)
-    var availableThemesList = ["default", "velvet", "teal", "gold", "midnight", "pink"];
+    var availableThemesList = ["default", "velvet", "teal", "gold", "midnight", "pink", "cyber", "sunset", "frost", "emerald", "volcano", "nebula", "espresso", "steel", "cherry", "ocean", "plum", "lemon", "imperial"];
     var db = null; var loggedInReader = ""; var activeReportType = "";
     var currentReportDataList = []; var viewHistoryStack = []; var adminSelectedReaders = [];
     var globalReportConfigs = []; // शीट कॉन्फ़िगरेशन को स्टोर करने के लिए
@@ -1490,7 +1778,9 @@ function saveLiveNotificationToServer(targetReader, messageText, lockSeconds) {
                         if (bulkData && bulkData.activeNotification) {
                             var nData = bulkData.activeNotification; // ऑब्जेक्ट: { text: "...", lockTime: 5, target: "..." }
                             var userMe = loggedInReader.toUpperCase();
-                            if (nData.target === "ALL" || nData.target === userMe) {
+// 🎯 कोमा से अलग किए गए नामों की लिस्ट में अपना नाम खोजना
+var allowedTargetsList = nData.target ? nData.target.split(",") : [];
+if (nData.target === "ALL" || allowedTargetsList.includes(userMe)) {
                                 showGlobalNotification(nData.text, parseInt(nData.lockTime));
                             }
                         }
@@ -1530,112 +1820,221 @@ function saveLiveNotificationToServer(targetReader, messageText, lockSeconds) {
     }
 
     function buildAdminMultiSelectCheckbox(consumersList) {
-        var selectNode = document.getElementById('adminMultiReaderSelect'); 
-        var filterTabBtn = document.getElementById('btn-tab-filter');
-        var visitTabBtn = document.getElementById('btn-tab-visitdata');
+        setTimeout(function() {
+            var selectNode = document.getElementById('adminMultiReaderSelect'); 
+            var filterTabBtn = document.getElementById('btn-tab-filter');
+            var visitTabBtn = document.getElementById('btn-tab-visitdata');
+            var notifyTabBtn = document.getElementById('btn-tab-notifyadmin');
 
-        if(loggedInReader.toUpperCase() !== "ANURAG SHAKYA") { 
-            if(filterTabBtn) filterTabBtn.style.display = "none"; 
-            if(visitTabBtn) visitTabBtn.style.display = "none"; 
-            return; 
-        }
-        if(filterTabBtn) filterTabBtn.style.display = "block"; 
-        if(visitTabBtn) visitTabBtn.style.display = "block";
-        
-        // 🚀 पैरेंट कंटेनर को पूरी तरह रीसेट करें ताकि कोई पुराना CSS इसे न बिगाड़े
-        if (selectNode) {
-            selectNode.style.cssText = "display: block !important; width: 100% !important; max-height: 60vh !important; overflow-y: auto !important; padding: 5px !important; background: transparent !important; border: none !important;";
-        }
-        
-        var readerSet = new Set(); 
-        var readerPhoneMap = {}; 
-        
-        consumersList.forEach(function(item) { 
-            var rn = getReaderName(item); 
-            if(rn && rn.trim() !== "") {
-                var cleanName = rn.trim().toUpperCase();
-                readerSet.add(cleanName); 
-                // 🔥 अब यह नंबर सबसे पहले आपकी Readers_List (readerMasterPhone) से उठाएगा!
-                var phone = item.readerMasterPhone || item["MR MOBILE NO."] || item["MR MOBILE NO"] || item["Master Mobile Number"] || "";
-                if (phone && !readerPhoneMap[cleanName]) {
-                    readerPhoneMap[cleanName] = phone;
-                }
+            if (!loggedInReader || loggedInReader.toUpperCase() !== "ANURAG SHAKYA") { 
+                if(filterTabBtn) filterTabBtn.style.setProperty("display", "none", "important"); 
+                if(visitTabBtn) visitTabBtn.style.setProperty("display", "none", "important"); 
+                if(notifyTabBtn) notifyTabBtn.style.setProperty("display", "none", "important"); 
+                return; 
             }
-        });
-        
-        var html = "<div style='display:block; width:100%;'>";
-
-        // 🟢 SELECT ALL बटन (सॉलिड लेआउट)
-        html += "<div style='display: grid; grid-template-columns: 40px 1fr; align-items: center; background: #dcfce7; padding: 12px; border: 2px solid #22c55e; border-radius: 6px; margin-bottom: 12px; cursor: pointer;' onclick=\"document.getElementById('adminSelectAll').click()\">" + 
-                "<div style='text-align: center;'><input type='checkbox' id='adminSelectAll' checked onchange='toggleAllAdminReaders(this); event.stopPropagation();' onclick='event.stopPropagation();' style='transform: scale(1.4); cursor: pointer;'></div>" + 
-                "<div style='color: #0f172a; font-size: 15px; font-weight: 900; text-align: left;'>SELECT ALL METER READERS</div>" +
-                "</div>";
-        
-        var currentSelections = adminSelectedReaders.length > 0 ? adminSelectedReaders : Array.from(readerSet);
-        adminSelectedReaders = [];
-
-        var idx = 0;
-        
-        // ⚪ इंडिविजुअल मीटर रीडर बटन (3-कॉलम फिक्स ग्रिड: Checkbox | Name | WhatsApp)
-        readerSet.forEach(function(reader) { 
-            var isChecked = currentSelections.includes(reader) ? "checked" : "";
-            var safeReader = reader || "UNKNOWN";
-            var phoneNo = readerPhoneMap[safeReader] || ""; 
             
-            var waBtn = "<button onclick=\"sendReaderPendencyWhatsApp(event, '" + safeReader + "', '" + phoneNo + "')\" style='background: none; border: none; color: #25D366; font-size: 24px; cursor: pointer; padding: 0;' title='Send Pendency'><i class='fa-brands fa-whatsapp'></i></button>";
-
-            html += "<div style='display: grid; grid-template-columns: 40px 1fr 40px; align-items: center; background: #ffffff; border: 1px solid #94a3b8; padding: 10px; border-radius: 6px; margin-bottom: 6px; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.1);' onclick=\"var cb=document.getElementById('adm-cb-" + idx + "'); cb.checked=!cb.checked; applyAdminReaderFilter();\">" +
-                    "<div style='text-align: center;'><input type='checkbox' id='adm-cb-" + idx + "' class='adm-reader-cb' value='" + safeReader + "' " + isChecked + " onchange='applyAdminReaderFilter(); event.stopPropagation();' onclick='event.stopPropagation();' style='transform: scale(1.4); cursor: pointer;'></div>" + 
-                    "<div style='color: #000000; font-size: 14px; font-weight: bold; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: left; padding-left: 5px;'>" + safeReader + "</div>" +
-                    "<div style='text-align: center;'>" + waBtn + "</div>" +
-                    "</div>"; 
-            if(isChecked) adminSelectedReaders.push(safeReader); 
-            idx++;
-        });
-        
-        html += "</div>"; 
-        
-        if (selectNode) selectNode.innerHTML = html;
-        var selectAllNode = document.getElementById('adminSelectAll');
-        if(selectAllNode) selectAllNode.checked = (adminSelectedReaders.length === readerSet.size && readerSet.size > 0);
-
-        // 🟢 नया: एडमिन नोटिफिकेशन पैनल के ड्रॉपडाउन में लाइव लड़कों के नाम सिंक करना
-        var notifyDropdown = document.getElementById('notifyTargetReader');
-        if (notifyDropdown) {
-            notifyDropdown.innerHTML = '<option value="ALL">📢 ALL (सभी लड़कों को एक साथ)</option>';
-            readerSet.forEach(function(r) {
-                notifyDropdown.innerHTML += '<option value="' + r + '">' + r + '</option>';
+            if(filterTabBtn) filterTabBtn.style.setProperty("display", "flex", "important"); 
+            if(visitTabBtn) visitTabBtn.style.setProperty("display", "flex", "important");
+            if(notifyTabBtn) notifyTabBtn.style.setProperty("display", "flex", "important");
+            
+            if (selectNode) {
+                selectNode.style.cssText = "display: flex !important; flex-direction: column !important; gap: 4px !important; width: 100% !important; max-height: 60vh !important; overflow-y: auto !important; padding: 10px !important; background: #ffffff !important; border: 1px solid #cbd5e1 !important; border-radius: 6px !important; box-sizing: border-box !important;";
+            }
+            
+            var dataArray = consumersList || [];
+            var readerSet = new Set(); 
+            var readerPhoneMap = {}; 
+            
+            dataArray.forEach(function(item) { 
+                var rn = getReaderName(item); 
+                if(rn && rn.trim() !== "") {
+                    var cleanName = rn.trim().toUpperCase();
+                    readerSet.add(cleanName); 
+                    var phone = item.readerMasterPhone || item["MR MOBILE NO."] || item["MR MOBILE NO"] || item["Master Mobile Number"] || "";
+                    if (phone && !readerPhoneMap[cleanName]) {
+                        readerPhoneMap[cleanName] = phone;
+                    }
+                }
             });
-        }
+            
+            if (readerSet.size === 0) {
+                console.log("Readers list temporary empty or downloading in background...");
+                return;
+            }
+
+            var html = "";
+
+            html += "<label style='display: inline-flex; flex-direction: row; align-items: center; justify-content: flex-start; gap: 8px; background: #dcfce7; padding: 6px 10px; border: 1px solid #22c55e; border-radius: 4px; font-weight: 800; color: #166534; cursor: pointer; margin-bottom: 6px; width: max-content; max-width: 100%; box-sizing: border-box; text-align: left;'>" + 
+                    "<input type='checkbox' id='adminSelectAll' checked onchange='toggleAllAdminReaders(this); event.stopPropagation();' onclick='event.stopPropagation();' style='width: 14px; height: 14px; cursor: pointer; margin: 0; flex-shrink: 0;'> " + 
+                    "<div style='font-size: 13px; font-weight: 800; text-align: left; white-space: nowrap;'>📢 SELECT ALL METER READERS</div>" +
+                    "</label>";
+            
+            var currentSelections = adminSelectedReaders.length > 0 ? adminSelectedReaders : Array.from(readerSet);
+            adminSelectedReaders = [];
+
+            var idx = 0;
+            readerSet.forEach(function(reader) { 
+                var isChecked = currentSelections.includes(reader) ? "checked" : "";
+                var safeReader = reader || "UNKNOWN";
+                var phoneNo = readerPhoneMap[safeReader] || ""; 
+                
+                var waBtn = "<button onclick=\"sendReaderPendencyWhatsApp(event, '" + safeReader + "', '" + phoneNo + "')\" style='background: none; border: none; color: #25D366; font-size: 18px; cursor: pointer; padding: 0; display: inline-flex; align-items: center; margin-left: 4px; flex-shrink: 0;' title='Send Pendency'><i class='fa-brands fa-whatsapp'></i></button>";
+
+                html += "<label style='display: inline-flex; flex-direction: row; align-items: center; justify-content: flex-start; gap: 8px; background: transparent; padding: 5px 8px; border: none; cursor: pointer; width: max-content; max-width: 100%; box-sizing: border-box; text-align: left; margin-bottom: 2px; transition: background 0.1s;' onclick=\"var cb=document.getElementById('adm-cb-" + idx + "'); if(cb) { cb.checked=!cb.checked; applyAdminReaderFilter(); }\">" +
+                        "<input type='checkbox' id='adm-cb-" + idx + "' class='adm-reader-cb' value='" + safeReader + "' " + isChecked + " onchange='applyAdminReaderFilter(); event.stopPropagation();' onclick='event.stopPropagation();' style='width: 14px; height: 14px; cursor: pointer; margin: 0; flex-shrink: 0;'>\n" + 
+                        "<div style='font-size: 13px; font-weight: 700; color: #0f172a; text-align: left; white-space: nowrap; display: flex; align-items: center; gap: 6px;'> " + 
+                        "<span>" + safeReader + "</span>" + 
+                        waBtn + 
+                        "</div>" +
+                        "</label>"; 
+                
+                if(isChecked) adminSelectedReaders.push(safeReader); 
+                idx++;
+            });
+            
+            if (selectNode) selectNode.innerHTML = html;
+            
+            var selectAllNode = document.getElementById('adminSelectAll');
+            if(selectAllNode) selectAllNode.checked = (adminSelectedReaders.length === readerSet.size && readerSet.size > 0);
+
+            var notifyCheckboxesContainer = document.getElementById('notifyReaderCheckboxesContainer');
+            if (notifyCheckboxesContainer) {
+                var cbHtml = "";
+                cbHtml += "<label style='display: inline-flex; flex-direction: row; align-items: center; justify-content: flex-start; gap: 8px; background: #eff6ff; padding: 6px 10px; border: 1px solid #bfdbfe; border-radius: 4px; font-weight: 800; color: #1e40af; cursor: pointer; margin-bottom: 4px; width: max-content; max-width: 100%; box-sizing: border-box; text-align: left;'><input type='checkbox' id='notifyTargetMasterSelectAll' onchange='toggleAllNotifyReaders(this)' style='width: 14px; height: 14px; cursor:pointer; margin: 0; flex-shrink: 0;' " + (selectAllNode && selectAllNode.checked ? "checked" : "") + "><div style='font-size: 13px; font-weight: 800; text-align: left; color: #1e40af; white-space: nowrap;'>📢 SELECT ALL (सभी लड़के)</div></label>";
+                
+                readerSet.forEach(function(r) {
+                    cbHtml += "<label style='display: inline-flex; flex-direction: row; align-items: center; justify-content: flex-start; gap: 8px; background: transparent; padding: 5px 8px; border: none; cursor: pointer; width: max-content; max-width: 100%; box-sizing: border-box; text-align: left; margin-bottom: 2px; transition: background 0.1s;' onclick='if(typeof updateNotifyDropdownLabelText === \"function\") updateNotifyDropdownLabelText();' onmouseover='this.style.background=\"#f1f5f9\"' onmouseout='this.style.background=\"transparent\"'><input type='checkbox' class='notify-reader-cb' value='" + r + "' onchange='if(typeof updateNotifyDropdownLabelText === \"function\") updateNotifyDropdownLabelText();' onclick='event.stopPropagation();' style='width: 14px; height: 14px; cursor:pointer; margin: 0; flex-shrink: 0;'><div style='font-size: 13px; font-weight: 700; color: #0f172a; text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;'> " + r + "</div></label>";
+                });
+                notifyCheckboxesContainer.innerHTML = cbHtml;
+                if(typeof window.updateNotifyDropdownLabelText === 'function') window.updateNotifyDropdownLabelText();
+            }
+        }, 10);
     }
 
-    // 🟢 नया: एडमिन पैनल से लाइव नोटिफिकेशन भेजने का मैकेनिज्म
+    // 🟢 फिक्स: एडमिन पैनल से लाइव नोटिफिकेशन भेजने का मैकेनिज्म (पूर्णतः सुधरा हुआ रूप)
     function sendLiveNotificationFromAdmin() {
-        var targetReader = document.getElementById('notifyTargetReader').value;
         var msgText = document.getElementById('notifyMessageText').value.trim();
         var lockSec = document.getElementById('notifyLockTime').value;
 
         if(!msgText) return alert("🚨 कृपया भेजने के लिए कोई संदेश टाइप करें!");
 
-        document.getElementById('globalLoader').style.display = "block";
+        // 🎯 सभी टिक किए गए लड़कों के नाम इकट्ठे करना
+        var selectedNotifyReaders = [];
+        var masterSelectAll = document.getElementById('notifyTargetMasterSelectAll') || document.getElementById('notifySelectAllRows');
+        var cbs = document.querySelectorAll('.notify-reader-cb');
+        
+        cbs.forEach(function(cb) { if(cb.checked) selectedNotifyReaders.push(cb.value); });
 
-        // Google Apps Script (Server) पर डेटा भेजना ताकि वह शीट में सेव कर सके
+        if(selectedNotifyReaders.length === 0 && (!masterSelectAll || !masterSelectAll.checked)) {
+            return alert("🚨 कृपया संदेश भेजने के लिए कम से कम एक मीटर रीडर ज़रूर चुनें!");
+        }
+
+        // अगर 'Select All' टिक है या सारे लड़के चुने गए हैं, तो सर्वर को "ALL" भेजेंगे
+        var finalTargetParam = (masterSelectAll && masterSelectAll.checked) || (selectedNotifyReaders.length === cbs.length) 
+                               ? "ALL" 
+                               : selectedNotifyReaders.join(","); // नामों को कोमा (,) से जोड़कर भेजेंगे
+
+        document.getElementById('globalLoader').style.setProperty("display", "block", "important");
+
         google.script.run
         .withSuccessHandler(function(res) {
-            document.getElementById('globalLoader').style.display = "none";
+            var loaderEl = document.getElementById('globalLoader') || document.getElementById('loginLoader');
+            if (loaderEl) loaderEl.style.setProperty("display", "none", "important");
+            
             if(res && res.success) {
-                alert("🚀 सूचना सफलतापूर्वक सुरक्षित हो गई! अगले डेटा डाउनलोड पर लड़के को दिखाई देगी।");
+                alert("🚀 सूचना सफलतापूर्वक सुरक्षित हो गई! चुने गए लड़कों के अगले डेटा डाउनलोड पर दिखाई देगी।");
                 document.getElementById('notifyMessageText').value = ""; // क्लियर बॉक्स
+                
+                // चेकबॉक्स और ड्रॉपडाउन रीसेट इंजन
+                var masterReset = document.getElementById('notifyTargetMasterSelectAll') || document.getElementById('notifySelectAllRows');
+                if(masterReset) masterReset.checked = false;
+                
+                var cbsReset = document.querySelectorAll('.notify-reader-cb');
+                cbsReset.forEach(function(cb) { cb.checked = false; });
+                
+                // ड्रॉपडाउन बंद करें और लेबल पुराने जैसा करें
+                if(typeof window.updateNotifyDropdownLabelText === 'function') window.updateNotifyDropdownLabelText();
+                
+                var contentBlock = document.getElementById('notifyDropdownMenuContentBlock');
+                var arrowIcon = document.getElementById('notifyDropdownArrowIcon');
+                if(contentBlock) contentBlock.style.setProperty("display", "none", "important");
+                if(arrowIcon) arrowIcon.style.transform = "rotate(0deg)";
             } else {
                 alert("🚨 सर्वर एरर: संदेश सेव नहीं हो सका।");
             }
         })
         .withFailureHandler(function(err) {
-            document.getElementById('globalLoader').style.display = "none";
+            var loaderEl = document.getElementById('globalLoader') || document.getElementById('loginLoader');
+            if (loaderEl) loaderEl.style.setProperty("display", "none", "important");
             alert("नेटवर्क एरर: " + err.message);
         })
-        .saveLiveNotificationToServer(targetReader, msgText, lockSec); // यह फंक्शन आपके .gs (सर्वर कोड) में होना चाहिए
+        .saveLiveNotificationToServer(finalTargetParam, msgText, lockSec);
     }
+
+    // 🟢 फिक्स: 'toggleNotifyDropdownMenu is not defined' एरर को पूरी तरह ठीक करने वाला ग्लोबल बाइंडिंग इंजन
+    
+    // 1. सभी लड़कों को एक साथ टिक/अनटिक करने का मास्टर इंजन
+    window.toggleAllNotifyReaders = function(masterEl) {
+        var cbs = document.querySelectorAll('.notify-reader-cb');
+        cbs.forEach(function(cb) { cb.checked = masterEl.checked; });
+        if(typeof window.updateNotifyDropdownLabelText === 'function') window.updateNotifyDropdownLabelText();
+    };
+
+    // 2. ड्रॉपडाउन मेनू को खोलने और बंद करने का स्मूथ ड्राइवर
+    window.toggleNotifyDropdownMenu = function(event) {
+        if(event) event.stopPropagation();
+        var contentBlock = document.getElementById('notifyDropdownMenuContentBlock');
+        var arrowIcon = document.getElementById('notifyDropdownArrowIcon');
+        if(!contentBlock) return;
+        
+        if(contentBlock.style.display === "none" || contentBlock.style.display === "") {
+            contentBlock.style.setProperty("display", "block", "important");
+            if(arrowIcon) arrowIcon.style.transform = "rotate(180deg)";
+        } else {
+            contentBlock.style.setProperty("display", "none", "important");
+            if(arrowIcon) arrowIcon.style.transform = "rotate(0deg)";
+        }
+    };
+
+    // 3. चुने हुए लड़कों की संख्या को बाहर ड्रॉपडाउन बार पर लाइव दिखाने वाला इंजन
+    window.updateNotifyDropdownLabelText = function() {
+        var labelNode = document.getElementById('notifyDropdownSelectedText');
+        if(!labelNode) return;
+        
+        var masterSelect = document.getElementById('notifyTargetMasterSelectAll') || document.getElementById('notifySelectAllRows');
+        var cbs = document.querySelectorAll('.notify-reader-cb');
+        var selectedCount = 0;
+        
+        cbs.forEach(function(cb) { if(cb.checked) selectedCount++; });
+        
+        if (masterSelect && masterSelect.checked) {
+            labelNode.innerText = "📢 ALL (सभी मीटर रीडर सिलेक्टेड)";
+            labelNode.style.color = "#1e40af";
+        } else if (selectedCount === 0) {
+            labelNode.innerText = "-- लड़के चुनें (Click to Select) --";
+            labelNode.style.color = "#475569";
+        } else if (selectedCount === cbs.length && cbs.length > 0) {
+            if(masterSelect) masterSelect.checked = true;
+            labelNode.innerText = "📢 ALL (सभी मीटर रीडर सिलेक्टेड)";
+            labelNode.style.color = "#1e40af";
+        } else {
+            if(masterSelect) masterSelect.checked = false;
+            labelNode.innerText = "✓ कुल " + selectedCount + " लड़के चुने गए हैं";
+            labelNode.style.color = "#059669";
+        }
+    };
+
+    // 4. बाहर कहीं भी स्क्रीन पर क्लिक करने पर ड्रॉपडाउन को अपने आप बंद करने का सेफ़्टी कवच
+    document.addEventListener('click', function(e) {
+        var contentBlock = document.getElementById('notifyDropdownMenuContentBlock');
+        var arrowIcon = document.getElementById('notifyDropdownArrowIcon');
+        if(contentBlock && contentBlock.style.display === "block") {
+            if(!e.target.closest('.input-group')) {
+                contentBlock.style.setProperty("display", "none", "important");
+                if(arrowIcon) arrowIcon.style.transform = "rotate(0deg)";
+            }
+        }
+    });
 
     function applyAdminReaderFilter() {
         var cbs = document.querySelectorAll('.adm-reader-cb'); 
@@ -1751,16 +2150,40 @@ function saveLiveNotificationToServer(targetReader, messageText, lockSeconds) {
         var statsGridNode = document.getElementById('summaryGridToPrint');
         if (statsGridNode) {
             statsGridNode.innerHTML = cardsHtml.join('');
-            
-            // 🚀 [अल्टीमेट सुरक्षा कवच] - यहाँ सीधी कॉलिंग को सेफ कर दिया है ताकि डेटा डाउनलोड पर क्रैश न हो
-            if (typeof checkSyncStatus === 'function') {
-                checkSyncStatus();
-            } else if (typeof window.checkSyncStatus === 'function') {
-                window.checkSyncStatus();
-            } else {
-                console.log("Summary update engines temporarily bypassed sync cards layout verification.");
+        }
+
+        // 🟢 ऑफलाइन सेव काउंटर और सिंक बॉक्स को लाइव अपडेट करने वाला नया फंक्शन
+        function checkSyncStatus() {
+            if (!db) return;
+            try {
+                var tx = db.transaction("saved_entries", "readonly");
+                var store = tx.objectStore("saved_entries");
+                var countReq = store.count();
+                
+                countReq.onsuccess = function() {
+                    var count = countReq.result;
+                    var syncBox = document.getElementById("syncBox");
+                    var syncCountTxt = document.getElementById("syncCountTxt");
+                    var localSavedNode = document.getElementById("st-local-saved");
+                    
+                    // ऑफलाइन सेव वाले कार्ड का नंबर बदलें
+                    if (localSavedNode) localSavedNode.innerText = count;
+                    
+                    // अगर पेंडिंग डेटा है तो सिंक बार दिखाएं, वरना छुपाएं
+                    if (count > 0) {
+                        if (syncBox) syncBox.style.setProperty("display", "block", "important");
+                        if (syncCountTxt) syncCountTxt.innerText = count;
+                    } else {
+                        if (syncBox) syncBox.style.setProperty("display", "none", "important");
+                    }
+                };
+            } catch (e) {
+                console.error("Sync status check error:", e);
             }
         }
+
+        // इस फंक्शन को तुरंत रन करें ताकि लोड होते ही काउंटर अपडेट हो जाए
+        checkSyncStatus();
 
         // --- Watchlist Table Engine ---
         var tableHtmlBuffer = [];
@@ -1841,17 +2264,38 @@ function saveLiveNotificationToServer(targetReader, messageText, lockSeconds) {
 
     function setCountBadgeColor(elemId, count) { var el = document.getElementById(elemId); if(el) el.className = (count === 0) ? "badge-count zero" : "badge-count alert"; }
 
+    // 🟢 अल्टीमेट टैब फिक्स: कन्फिग टैब दबाने पर ब्लैंक स्क्रीन की समस्या का 100% परमानेंट इलाज
     function switchTab(tabName) {
-        var tabs = ['summary', 'list', 'billdist', 'visitdata', 'reports', 'filter'];
-        tabs.forEach(function(t) { var view = document.getElementById('view-' + t); var btn = document.getElementById('btn-tab-' + t); if(view) view.style.display = "none"; if(btn) btn.classList.remove('active'); });
-        var activeView = document.getElementById('view-' + tabName); var activeBtn = document.getElementById('btn-tab-' + tabName);
-        if(activeView) activeView.style.display = "block"; if(activeBtn) activeBtn.classList.add('active');
-        if(loggedInReader) { localStorage.setItem("app_current_tab_state_" + loggedInReader, tabName); }
+        // मास्टर लिस्ट में सभी 7 टैब्स को शामिल किया गया है
+        var tabs = ['summary', 'list', 'billdist', 'visitdata', 'reports', 'filter', 'notifyadmin', 'configmaker'];
+        
+        tabs.forEach(function(t) { 
+            var view = document.getElementById('view-' + t); 
+            var btn = document.getElementById('btn-tab-' + t); 
+            if(view) view.style.setProperty("display", "none", "important"); 
+            if(btn) btn.classList.remove('active'); 
+        });
+        
+        var activeView = document.getElementById('view-' + tabName); 
+        var activeBtn = document.getElementById('btn-tab-' + tabName);
+        
+        if(activeView) {
+            activeView.style.setProperty("display", "block", "important"); 
+        }
+        // यदि बटन नीचे मेन्यू बार में मौजूद है, तभी उसे एक्टिव क्लास दें (साइडबार बटन्स के लिए क्रैश सेफ्टी फिक्स)
+        if(activeBtn) {
+            activeBtn.classList.add('active');
+        }
+        
+        if(loggedInReader) { 
+            localStorage.setItem("app_current_tab_state_" + loggedInReader, tabName); 
+        }
+        
         if(tabName === 'billdist') renderBillDistributionList(); 
-        if(tabName === 'summary') { updateSummaryStatsRaw(); } 
+        if(tabName === 'summary') updateSummaryStatsRaw(); 
         if(tabName === 'list') renderNewListTab(); 
         if(tabName === 'visitdata') renderVisitDataList(); 
-        if(tabName === 'reports') { closeReportView(); }
+        if(tabName === 'reports') closeReportView();
     }
 
     // 🟢 नया: होम पेज सब-टैब टॉगल मैकेनिज्म इंजन
@@ -1973,12 +2417,19 @@ function saveLiveNotificationToServer(targetReader, messageText, lockSeconds) {
         
         var filterTabBtn = document.getElementById('btn-tab-filter');
         var visitTabBtn = document.getElementById('btn-tab-visitdata');
-        if(loggedInReader.toUpperCase() !== "ANURAG SHAKYA") { 
+        var notifyTabBtn = document.getElementById('btn-tab-notifyadmin');
+        var configTabBtn = document.getElementById('btn-tab-configmaker');
+        
+        if(!loggedInReader || loggedInReader.toUpperCase() !== "ANURAG SHAKYA") { 
             if(filterTabBtn) filterTabBtn.style.setProperty("display", "none", "important");
             if(visitTabBtn) visitTabBtn.style.setProperty("display", "none", "important");
+            if(notifyTabBtn) notifyTabBtn.style.setProperty("display", "none", "important");
+            if(configTabBtn) configTabBtn.style.setProperty("display", "none", "important");
         } else {
             if(filterTabBtn) filterTabBtn.style.setProperty("display", "flex", "important");
             if(visitTabBtn) visitTabBtn.style.setProperty("display", "flex", "important");
+            if(notifyTabBtn) notifyTabBtn.style.setProperty("display", "flex", "important");
+            if(configTabBtn) configTabBtn.style.setProperty("display", "flex", "important");
         }
         
         navigateToViewRaw('appDashboardView');
@@ -2059,11 +2510,16 @@ function saveLiveNotificationToServer(targetReader, messageText, lockSeconds) {
         document.getElementById('f-editablePrefetchedRemark').value = record.preFetchedRemark || "";
         document.getElementById('f-formType').value = mode;
         
-        // 🔄 मोड चेकर ड्राइवर
+        // 🔄 मोड चेकर ड्राइवर (Master Mobile Number ऑटो-फ़िल फ़िक्स)
         if(mode === "BILL_DIST") {
             document.getElementById('standardReadingFormBlocks').style.display = "none"; 
             document.getElementById('billDistributionFields').style.display = "block"; 
             document.getElementById('f-billDeliveredDate').value = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }); 
+            
+            // 🎯 फ़िक्स: शीट का मास्टर मोबाइल नंबर ऑटोमैटिक इस बॉक्स में भर जाएगा
+            var preFetchedMobile = record.masterMobileNumber || record["Master Mobile Number"] || record.mobileNo || "";
+            document.getElementById('f-receiverMobile').value = preFetchedMobile;
+            
             if (typeof toggleWhatsappInputFieldLayout === 'function') {
                 toggleWhatsappInputFieldLayout(); 
             }
@@ -4560,65 +5016,75 @@ function triggerSilentBackgroundSync() {
     }
     
     function destroyActiveSessionsOnExit() {
-        // 1. पूरा लोकल सेशन्स और फ़िल्टर्स साफ़ करें
+        // 1. पूरा लोकल सेशन्स, थीम्स और फ़िल्टर्स साफ़ करें
         localStorage.clear(); 
         loggedInReader = ""; 
         adminSelectedReaders = [];
         
         try {
             if(document.getElementById('entryForm')) document.getElementById('entryForm').reset();
+            // 🎯 फिक्स: डेस्कटॉप साइडबार और लेआउट की क्लासेस तुरंत हटाएँ ताकि लॉगिन स्क्रीन न बिगड़े
+            document.body.classList.remove('desktop-force');
         } catch(e) {}
 
-        // व्यू को तुरंत लॉगिन पेज पर स्विच करने का इंजन (इसे ऊपर डिफाइन किया गया है ताकि क्रैश न हो)
+        // व्यू को बिना किसी लेआउट गड़बड़ी के सीधे रीसेट करने का इंजन
         var handleViewSwitch = function() {
-            // स्पलैश स्क्रीन और मुख्य डैशबोर्ड को तुरंत छुपाएं
-            if (document.getElementById('appSplashScreen')) document.getElementById('appSplashScreen').style.display = 'none';
-            if (document.getElementById('splashLoaderView')) document.getElementById('splashLoaderView').style.display = 'none';
-            if (document.getElementById('loginLoader')) document.getElementById('loginLoader').style.display = 'none';
-            if (document.getElementById('appDashboardView')) document.getElementById('appDashboardView').style.display = 'none';
-            if (document.getElementById('reportDetailContainer')) document.getElementById('reportDetailContainer').style.display = 'none';
-            if (document.getElementById('formView')) document.getElementById('formView').style.display = 'none';
+            // सभी संभावित डैशबोर्ड व्यूज और टैब्स को पूरी तरह छुपाएं
+            var views = ['appSplashScreen', 'splashLoaderView', 'loginLoader', 'appDashboardView', 'reportDetailContainer', 'formView', 'view-summary', 'view-list', 'view-billdist', 'view-visitdata', 'view-reports', 'view-filter'];
+            views.forEach(function(id) {
+                var el = document.getElementById(id);
+                if (el) el.style.setProperty("display", "none", "important");
+            });
 
-            // मुख्य कंटेनर को लॉक रखकर सीधे लॉगिन व्यू को ऑन करें
-            var appMainNode = document.getElementById('mainAppContainer') || document.getElementById('container') || document.querySelector('.container');
-            if (appMainNode) appMainNode.style.setProperty("display", "block", "important");
+            // मुख्य कंटेनर को ऑन करें और उसकी साइड पैडिंग रीसेट करें
+            var appMainNode = document.getElementById('mainAppContainer') || document.querySelector('.container');
+            if (appMainNode) {
+                appMainNode.style.setProperty("display", "block", "important");
+                appMainNode.style.setProperty("padding-left", "0px", "important"); 
+                appMainNode.style.setProperty("padding-right", "0px", "important");
+            }
 
+            // लॉगिन व्यू को स्क्रीन पर जबरदस्ती लाएं
             var loginNode = document.getElementById('loginView');
             if (loginNode) {
                 loginNode.style.setProperty("display", "block", "important");
-                // ड्रॉपडाउन और पिन बॉक्स को खाली करें
-                var rInput = document.getElementById('readerDropdown') || document.getElementById('l-readerSelect') || document.getElementById('username');
-                var pInput = document.getElementById('loginPin') || document.getElementById('l-password') || document.getElementById('password');
+                
+                // इनपुट्स खाली करें
+                var rInput = document.getElementById('readerDropdown');
+                var pInput = document.getElementById('loginPin');
                 if (rInput) rInput.value = "";
                 if (pInput) pInput.value = "";
+                
+                // 🚀 अल्टीमेट फिक्स: ब्राउज़र मेमोरी और सेशन्स को 100% क्लीन करने के लिए एक टाइमस्टैम्प के साथ पेज फ्रेश रीलोड करें
+                setTimeout(function() {
+                    var cleanUrl = window.location.href.split('?')[0];
+                    window.location.href = cleanUrl + '?logout=' + new Date().getTime();
+                }, 150);
             } else {
-                window.location.reload(); // सेफ फॉलबैक
+                window.location.reload();
             }
         };
 
-        // 2. ⚡ क्रैश-प्रूफ डेटाबेस क्लियरिंग इंजन (बिना ब्लॉक हुए तुरंत रीसेट)
+        // 2. ⚡ IndexedDB कनेक्शन को सुरक्षित रूप से बंद करें
         if(db) { 
             try { 
-                db.close(); // पहले एक्टिव कनेक्शन को बंद करें
-                db = null;  // ऑब्जेक्ट को नल करें ताकि डिलीट कमांड अटके ना
+                db.close(); 
+                db = null;  
             } catch(e) { console.error("Database close error:", e); } 
         } 
         
-        // डेटाबेस को डिलीट करने का कमांड
-        var req = indexedDB.deleteDatabase("MeterReaderOfflineDB");
+        // 🎯 सबसे पहले व्यू को स्विच करें ताकि यूजर को ब्लैंक स्क्रीन न दिखे (Instant UI Response)
+        handleViewSwitch();
         
-        req.onsuccess = function () { 
-            console.log("Database deleted successfully on logout.");
-            handleViewSwitch(); 
-        }; 
-        req.onerror = function () { 
-            console.error("Database deletion failed, forcing UI switch.");
-            handleViewSwitch(); 
-        };
-        req.onblocked = function () {
-            console.warn("Database deletion blocked by another tab/iframe, bypassing to login page.");
-            handleViewSwitch(); // अगर डिलीट होना ब्लॉक भी हो जाए, तो भी स्क्रीन ब्लैंक नहीं होगी, सीधा लॉगिन पेज आ जाएगा
-        };
+        // 3. बैकग्राउंड में डेटाबेस डिलीट होने दें (यह ब्लॉक भी हो तो लॉगिन स्क्रीन पर असर नहीं पड़ेगा)
+        try {
+            var req = indexedDB.deleteDatabase("MeterReaderOfflineDB");
+            req.onsuccess = function () { console.log("DB deleted."); }; 
+            req.onerror = function () { console.error("DB delete failed."); };
+            req.onblocked = function () { console.warn("DB delete blocked."); };
+        } catch(dbErr) {
+            console.error("IndexedDB critical delete error bypassed:", dbErr);
+        }
     }
     
     function toTitleProperCase(str) { 
@@ -5086,13 +5552,10 @@ function closeGlobalNotification() {
     if(!textNode) return;
     var msgText = textNode.innerText;
     
-    if(overlay) overlay.style.display = 'none';
+    // सिर्फ ओवरले (पॉप-अप) को छुपाएं
+    if(overlay) overlay.style.setProperty("display", "none", "important");
     
-    /* ⚡ जैसे ही अलर्ट बंद होगा, ऐप फुल स्क्रीन मोड पर शिफ्ट हो जाएगी और ऊपर चिपक जाएगी */
-    document.body.style.setProperty("margin-top", "0px", "important");
-    if (document.documentElement.requestFullscreen) {
-        document.documentElement.requestFullscreen().catch(e => console.log("APK Fullscreen Initialized"));
-    }
+    // 🎯 फिक्स: यहाँ से फुलस्क्रीन मोड एक्टिवेट करने वाली लाइनों को साफ़ कर दिया गया है
     
     if(loggedInReader && msgText && msgText !== "महत्वपूर्ण सूचना यहाँ दिखाई देगी...") {
         try {
@@ -5101,13 +5564,6 @@ function closeGlobalNotification() {
         } catch(e) { console.error("Seen sync failed", e); }
     }
 }
-
-/* 🚀 APK TOP-SLIDE INTIALIZER */
-window.addEventListener('load', function() {
-    document.body.style.setProperty("margin-top", "45px", "important");
-    document.body.style.setProperty("transition", "margin-top 0.4s ease", "important");
-});
-
 // बटन पर क्लिक करने पर अगली थीम पर स्विच करने का ड्राइवर
 function changeAppThemeNext() {
     var currentTheme = localStorage.getItem("app_user_selected_color_theme") || "default";
@@ -5129,11 +5585,24 @@ function applySelectedThemeEngine(themeName) {
     // यूज़र फीडबैक अलर्ट (सभी 6 थीम्स के नाम अपडेटेड)
     var alertTexts = { 
         "default": "रॉयल ब्लू", 
-        "velvet": "डार्क वेलवेट", 
+        "velvet": "डार्क Velvet", 
         "teal": "मॉडर्न टील",
         "gold": "रॉयल गोल्ड",
         "midnight": "मिडनाइट डार्क",
-        "pink": "रोज़ पिंक"
+        "pink": "रोज़ पिंक",
+        "cyber": "नियॉन साइबर (डार्क)",
+        "sunset": "सनसेट ऑरेंज",
+        "frost": "नॉर्डिक फ्रॉस्ट",
+        "emerald": "Emerald Eco (हरा)",
+        "volcano": "Volcano Ash (डार्क)",
+        "nebula": "Cosmic Nebula",
+        "espresso": "Espresso Bar",
+        "steel": "Steel Grey",
+        "cherry": "Cherry Blossom",
+        "ocean": "Deep Ocean (डार्क नीलो)",
+        "plum": "Plum Wine",
+        "lemon": "Lemon Mint",
+        "imperial": "Imperial Gold (डार्क)"
     };
     if (typeof showThinAlert === "function" && localStorage.getItem("mtr_reader_session_lock")) {
         showThinAlert("🎨 थीम बदली गई: " + alertTexts[themeName], true);
@@ -5180,7 +5649,84 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // 6 सेकंड बाद लूप बंद करें
     setTimeout(function() { clearInterval(supremeBannerKillTimer); }, 6000);
-});
+});// 🟢 फिक्स: टेक्स्ट बॉक्स के डेटा को 100% सटीक और क्रैश-प्रूफ शीट कंडीशन में बदलने वाला एडवांस इंजन
+    window.generateSheetConfigString = function() {
+        var inputNode = document.getElementById('cfgCustomInputTextArea');
+        var outputNode = document.getElementById('cfgGeneratedResultOutput');
+        if (!inputNode || !outputNode) return;
+        
+        var rawInput = inputNode.value.trim();
+        if (rawInput === "") {
+            outputNode.value = "";
+            alert("🚨 कृपया बॉक्स में अपनी कंडीशन्स टाइप करें!");
+            return;
+        }
+        
+        // 🎯 नियमों को प्रोसेस करना (कोमा से अलग करना और हर एक वैल्यू के एक्स्ट्रा स्पेस को मारना)
+        var cleanLines = rawInput.split(',').map(function(line) { 
+            var str = line.trim();
+            
+            // अगर नियम में '=' का साइन मौजूद है
+            if (str.indexOf('=') !== -1) {
+                var operator = "=";
+                var parts = str.split('=');
+                
+                // अगर '!=' ऑपरेटर का इस्तेमाल किया गया हो
+                if (str.indexOf('!=') !== -1) {
+                    operator = "!=";
+                    parts = str.split('!=');
+                }
+                
+                if (parts.length === 2) {
+                    var key = parts[0].trim();
+                    var val = parts[1].trim();
+                    
+                    // 🚀 पाइप (|) वाले मल्टीपल वैल्यूज़ के अंदर के स्पेस को भी साफ़ करना
+                    if (val.indexOf('|') !== -1) {
+                        val = val.split('|').map(function(v) { return v.trim(); }).join('|');
+                    }
+                    
+                    return key + operator + val;
+                }
+            }
+            return str;
+        }).filter(function(line) { 
+            return line !== ""; 
+        });
+        
+        // बिना किसी स्पेस गड़बड़ी के फाइनल कनवर्टर आउटपुट जनरेट करना
+        var finalCodeString = cleanLines.join(",");
+        outputNode.value = finalCodeString;
+        
+        // यूजर फीडबैक अलर्ट
+        if(typeof showThinAlert === 'function') {
+            showThinAlert("🚀 कोड सफलतापूर्वक जनरेट हो गया है!", true);
+        }
+    };
+// 🟢 नया फंक्शन: टेक्स्ट बॉक्स के डेटा को डायरेक्ट क्लीन शीट कंडीशन फॉर्मेट में बदलना
+    window.generateSheetConfigString = function() {
+        var inputNode = document.getElementById('cfgCustomInputTextArea');
+        var outputNode = document.getElementById('cfgGeneratedResultOutput');
+        if (!inputNode || !outputNode) return;
+        
+        var rawInput = inputNode.value.trim();
+        if (rawInput === "") {
+            outputNode.value = "";
+            alert("🚨 कृपया बॉक्स में अपनी कंडीशन्स टाइप करें!");
+            return;
+        }
+        
+        // यूज़र द्वारा लिखे गए नियमों को साफ़ (Clean) करना
+        var cleanLines = rawInput.split(',').map(function(line) { 
+            return line.trim(); 
+        }).filter(function(line) { 
+            return line !== ""; 
+        });
+        
+        var finalCodeString = cleanLines.join(",");
+        outputNode.value = finalCodeString;
+    };
+
     </script>
 </body> <!-- यहाँ से ठीक पहले पेस्ट करें -->
 </html>
