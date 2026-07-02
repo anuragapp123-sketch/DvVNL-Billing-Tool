@@ -881,7 +881,7 @@
         <div id="apkErrorLogger" style="display:none; margin-top:10px; padding:10px; background:#fef2f2; border:1px solid #fca5a5; border-radius:6px; color:#b91c1c; font-size:11px; font-weight:bold; text-align:left; word-break:break-all; white-space:pre-wrap;"></div>
         <div class="app-footer-branding" style="position: relative;">
             Developed by:- Anurag Shakya | 9761414105
-            <span style="display:block; margin-top:4px; font-size:10px; color:#ef4444; font-weight:900;">App Version: V1.0.9</span>
+            <span style="display:block; margin-top:4px; font-size:10px; color:#ef4444; font-weight:900;">App Version: V1.0.10</span>
         </div>
     </div>
     
@@ -1134,7 +1134,7 @@
             
             <div style="text-align: center; margin-top: 25px; padding-top: 15px; border-top: 1px dashed #cbd5e1; color: #64748b;">
                 <div style="font-size: 12px; font-weight: bold;">Developed by: Anurag Shakya</div>
-                <div style="font-size: 11px; color: #ef4444; font-weight: 900; margin-top: 4px;">App Version: V1.0.9</div>
+                <div style="font-size: 11px; color: #ef4444; font-weight: 900; margin-top: 4px;">App Version: V1.0.10</div>
             </div>
         </div>
 
@@ -1183,7 +1183,7 @@
         <div style="width: 100%; height: 40px; clear: both; display: block !important; visibility: hidden; pointer-events: none;"></div>
         
         <div class="card" style="background: rgba(255, 255, 255, 0.7); margin-bottom: 20px; text-align: center; border: 1px dashed #cbd5e1;">
-            <div style="font-size: 11px; color: #ef4444; font-weight: 900; margin-bottom: 3px;">App Version: V1.0.9</div>
+            <div style="font-size: 11px; color: #ef4444; font-weight: 900; margin-bottom: 3px;">App Version: V1.0.10</div>
             <div style="font-size: 12px; color: #1e40af; font-weight: 800; text-transform: uppercase; margin-bottom: 5px;"><i class="fa-solid fa-user-tie"></i> <span id="welcomeTxt">Mr Name: Loading...</span></div>
             <div style="font-size: 11px; font-weight: 700; color: #475569; border-top: 1px solid #cbd5e1; padding-top: 5px;">
                 Developed by:- Er. Anurag Shakya | 9761414105
@@ -1710,16 +1710,35 @@ function saveLiveNotificationToServer(targetReader, messageText, lockSeconds) {
 }
 
     function populateDivisionFilter(consumersList) {
-        var divSet = new Set();
-        consumersList.forEach(function(item) { var div = (item.division || item.DIVISION || "").toString().trim().toUpperCase(); if(div) divSet.add(div); });
-        var select = document.getElementById('listDivisionFilter'); var currentSelection = select.value;
-        select.innerHTML = '<option value="ALL">All Div</option>';
-        divSet.forEach(function(div) { select.innerHTML += '<option value="' + div + '">' + div + '</option>'; });
-        if (divSet.has(currentSelection)) { select.value = currentSelection; }
-    }
+    var divSet = new Set();
+    
+    consumersList.forEach(function(item) { 
+        // 🚀 नया फिक्स: हम हर संभव की-नेम (Key name) को चेक करेंगे
+        // यह DIVISION, Division या division तीनों को पकड़ लेगा
+        var div = (item.division || item.DIVISION || item["DIVISION"] || "").toString().trim().toUpperCase(); 
+        
+        if(div && div !== "undefined" && div !== "") {
+            divSet.add(div); 
+        }
+    });
 
-    var isDownloadingMasterData = false;
-    var isAutoDownloading = false;
+    var select = document.getElementById('listDivisionFilter'); 
+    var currentSelection = select.value;
+    
+    // ड्रॉपडाउन को रीसेट करें
+    select.innerHTML = '<option value="ALL">All Div</option>';
+    
+    // अब सेट को सॉर्ट करके ड्रॉपडाउन में डालें
+    var sortedDivs = Array.from(divSet).sort();
+    sortedDivs.forEach(function(div) { 
+        select.innerHTML += '<option value="' + div + '">' + div + '</option>'; 
+    });
+
+    // अगर पहले से कोई सिलेक्शन था, तो उसे बनाए रखें
+    if (divSet.has(currentSelection)) { 
+        select.value = currentSelection; 
+    }
+}
 
     function showThinAlert(msg, autoHide) {
         if (autoHide === undefined) autoHide = true;
@@ -2253,10 +2272,25 @@ if (nData.target === "ALL" || allowedTargetsList.includes(userMe)) {
         if(nodeReports) { nodeReports.innerText = totalReportsPendencyCount; setCountBadgeColor('count-reports', totalReportsPendencyCount); }
 
         var nodeList = document.getElementById('count-list');
-        if(nodeList) { nodeList.innerText = total; setCountBadgeColor('count-list', total); }
+        if(nodeList) { 
+            // 🎯 फिक्स: अगर उपभोक्ता टैब खुला है, तो यह फंक्शन काउंट को जबरदस्ती चेंज नहीं करेगा
+            var listViewActive = document.getElementById('view-list') && document.getElementById('view-list').style.display === 'block';
+            if (!listViewActive && nodeList.getAttribute('data-search-locked') !== "true") {
+                nodeList.innerText = total; 
+                setCountBadgeColor('count-list', total); 
+            }
+        }
 
         var nodeBillDist = document.getElementById('count-billdist');
-        if(nodeBillDist) { nodeBillDist.innerText = billP; setCountBadgeColor('count-billdist', billP); }
+        if(nodeBillDist) { 
+            // 🎯 फिक्स: अगर बिल वितरण टैब खुला है, तो यह फंक्शन काउंट को ओवरराइड नहीं करेगा
+            var billdistViewActive = document.getElementById('view-billdist') && document.getElementById('view-billdist').style.display === 'block';
+            if (!billdistViewActive && nodeBillDist.getAttribute('data-search-locked') !== "true") {
+                nodeBillDist.innerText = billP; 
+                setCountBadgeColor('count-billdist', billP); 
+            }
+        } 
+        
 
         var nodeVisit = document.getElementById('count-visitdata');
         if(nodeVisit) { nodeVisit.innerText = total; setCountBadgeColor('count-visitdata', total); }
@@ -2401,6 +2435,12 @@ if (nData.target === "ALL" || allowedTargetsList.includes(userMe)) {
             } 
             else { launchDashboard(); }
         } else { 
+            // 🎯 फॉर्म बंद होते ही पैरेंट कंटेनर का लेआउट वापस सामान्य (Original) करें
+            var mainContainerNode = document.getElementById('mainAppContainer');
+            if (mainContainerNode) {
+                mainContainerNode.style.removeProperty("min-height");
+                mainContainerNode.style.setProperty("padding-bottom", "140px", "important");
+            }
             launchDashboard(); 
         }
     }
@@ -2439,18 +2479,31 @@ if (nData.target === "ALL" || allowedTargetsList.includes(userMe)) {
     function universalListSearch(inputId, containerId) {
         var input = document.getElementById(inputId).value.toUpperCase().trim();
         var nodes = document.querySelectorAll('#' + containerId + ' .list-item');
+        var visibleCount = 0; // लाइव दिखने वाले कार्ड्स को गिनने के लिए
+        
         nodes.forEach(function(node) { 
-            // textContent की मदद से यह छुपी हुई डिटेल्स को भी सर्च कर लेगा
             var matchText = node.textContent.toUpperCase(); 
             
             if (matchText.indexOf(input) > -1) {
-                // अगर सर्च मैच हुआ, तो वापस ओरिजिनल डिज़ाइन में दिखाएगा
                 node.style.removeProperty("display"); 
+                visibleCount++; // अगर मैच हुआ तो काउंटर बढ़ाएं
             } else {
-                // अगर मैच नहीं हुआ, तो CSS !important को काटकर जबरदस्ती छिपा देगा
                 node.style.setProperty("display", "none", "important"); 
             }
         });
+        
+        // 🎯 लाइव सर्च काउंट इंजन: सर्च करने पर ऊपर का नंबर तुरंत बदलेगा
+        var targetBadgeId = (containerId === 'listDataContainer') ? 'count-list' : 
+                            (containerId === 'billDistributionContainer') ? 'count-billdist' : 'count-billdist';
+        
+        var countBadge = document.getElementById(targetBadgeId);
+        if (countBadge) {
+            countBadge.innerText = visibleCount;
+            countBadge.className = (visibleCount === 0) ? "badge-count zero" : "badge-count alert";
+            
+            // 🔥 सिंक लॉकिंग कवच: बैकग्राउंड फंक्शन को इस काउंट को बदलने से रोकने के लिए डेटा ऐट्रिब्यूट सेट करें
+            countBadge.setAttribute('data-search-locked', input !== "" ? "true" : "false");
+        }
     }
 
     function toggleWhatsappInputFieldLayout() { var state = document.getElementById("f-isWhatsappSent").value; document.getElementById("whatsappDynamicGroupBlock").style.display = (state === "YES") ? "block" : "none"; }
@@ -2554,6 +2607,20 @@ if (nData.target === "ALL" || allowedTargetsList.includes(userMe)) {
         if(loggedInReader) { 
             localStorage.setItem("app_current_view_state_" + loggedInReader, "formView"); 
         }
+
+        // 🎯 पैरेंट कंटेनर पैडिंग फिक्स: फॉर्म को जबरदस्ती ऊपर खींचने का इंजन
+        var mainContainerNode = document.getElementById('mainAppContainer');
+        if (mainContainerNode) {
+            mainContainerNode.style.setProperty("min-height", "auto", "important");
+            mainContainerNode.style.setProperty("padding-bottom", "20px", "important");
+            mainContainerNode.style.setProperty("margin-top", "0px", "important");
+            mainContainerNode.style.setProperty("padding-top", "0px", "important");
+        }
+        
+        // स्क्रीन को पूरी तरह टॉप पर लॉक करें
+        document.body.scrollTop = 0;
+        document.documentElement.scrollTop = 0;
+        window.scrollTo(0, 0);
     };
 }
 
@@ -2635,8 +2702,17 @@ function renderNewListTab() {
             var container = document.getElementById('listDataContainer');
             if (container) {
                 container.innerHTML = htmlBuffer.length === 0 ? '<div style="text-align:center; padding:25px; color:#475569; font-weight:bold;">कोई उपभोक्ता नहीं मिला।</div>' : htmlBuffer.join(''); 
-                universalListSearch('listSearchBar', 'listDataContainer'); 
             }
+            
+            // 🎯 लाइव फ़िल्टर काउंट अपडेट: फ़िल्टर के अनुसार ऊपर का काउंट तुरंत बदलेगा
+            var listCountNode = document.getElementById('count-list');
+            if (listCountNode) {
+                listCountNode.innerText = htmlBuffer.length;
+                listCountNode.className = (htmlBuffer.length === 0) ? "badge-count zero" : "badge-count alert";
+            }
+            
+            // सर्च बार की मौजूदा स्थिति के हिसाब से भी लिस्ट को री-फ़िल्टर करें
+            universalListSearch('listSearchBar', 'listDataContainer'); 
             
             if(typeof updateSummaryStatsRaw === 'function') { updateSummaryStatsRaw(); }
         }; 
