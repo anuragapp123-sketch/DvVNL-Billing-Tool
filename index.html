@@ -1754,89 +1754,92 @@ function saveLiveNotificationToServer(targetReader, messageText, lockSeconds) {
     }
 
     function triggerSilentBackgroundDataDownload(onComplete, isManualClick) {
-        if(!loggedInReader) { if(onComplete) onComplete(); return; }
-        
-        // लाइव स्टेटस तय करने का इंजन
-        var processingText = isManualClick ? "🔄 Manual Master Data Downloading Pls wait..." : "⚡ Auto Master Data Downloading Pls wait...";
-        
-        if(isDownloadingMasterData) {
-            showThinAlert(processingText, false);
-            if(onComplete) onComplete();
-            return;
-        }
-        
-        isDownloadingMasterData = true;
-        // फिक्स: शुरुआत में अलर्ट बार को बिना गायब हुए (false) दिखाएं
+    if(!loggedInReader) { if(onComplete) onComplete(); return; }
+    
+    // लाइव स्टेटस तय करने का इंजन
+    var processingText = isManualClick ? "🔄 Manual Master Data Downloading Pls wait..." : "⚡ Auto Master Data Downloading Pls wait...";
+    
+    if(isDownloadingMasterData) {
         showThinAlert(processingText, false);
-
-        var targetUserParam = (loggedInReader.toUpperCase() === "ANURAG SHAKYA") ? "ALL" : loggedInReader.toUpperCase();
-        
-        google.script.run.withSuccessHandler(function(bulkData) {
-            try {
-                if(bulkData && bulkData.consumers && bulkData.consumers.length > 0) {
-                    var tx = db.transaction("consumers", "readwrite"); 
-                    var store = tx.objectStore("consumers"); 
-                    store.clear();
-                    bulkData.consumers.forEach(function(item) { store.put(item); });
-                    
-                    tx.oncomplete = function() {
-                        if(bulkData && bulkData.reportConfigs) {
-                            localStorage.setItem("app_report_configs_cache", JSON.stringify(bulkData.reportConfigs));
-                            globalReportConfigs = bulkData.reportConfigs;
-                        }
-                        var currentDateTimeStr = new Date().toLocaleString('en-IN');
-                        localStorage.setItem("data_last_updated_" + loggedInReader, currentDateTimeStr);
-                        localStorage.setItem("last_sync_time_ms_" + loggedInReader, new Date().getTime()); 
-                        var tsLabelNode = document.getElementById("lastUpdatedLabel"); 
-                        if(tsLabelNode) tsLabelNode.innerText = "Last Updated:- " + currentDateTimeStr;
-                        
-                        buildAdminMultiSelectCheckbox(bulkData.consumers); 
-                        populateDivisionFilter(bulkData.consumers);
-
-                        // 🟢 नया: डेटा डाउनलोड होते ही एडमिन द्वारा भेजा गया लाइव मैसेज स्क्रीन पर लॉक करना
-                        if (bulkData && bulkData.activeNotification) {
-                            var nData = bulkData.activeNotification; // ऑब्जेक्ट: { text: "...", lockTime: 5, target: "..." }
-                            var userMe = loggedInReader.toUpperCase();
-// 🎯 कोमा से अलग किए गए नामों की लिस्ट में अपना नाम खोजना
-var allowedTargetsList = nData.target ? nData.target.split(",") : [];
-if (nData.target === "ALL" || allowedTargetsList.includes(userMe)) {
-                                showGlobalNotification(nData.text, parseInt(nData.lockTime));
-                            }
-                        }
-                        
-                        if(document.getElementById('formView').style.display !== "block") {
-                            refreshActiveDataViews();
-                        } else {
-                            updateSummaryStatsRaw(); 
-                        }
-                        
-                        isDownloadingMasterData = false;
-                        
-                        // 🚀 लाइव ट्रैकिंग: डेटा डाउनलोड होते ही सर्वर पर टाइमस्टैम्प भेजना
-                        if(loggedInReader) {
-                            try {
-                                google.script.run.updateReaderLastDownload(loggedInReader.toUpperCase());
-                            } catch(e) { console.error("Download log failed", e); }
-                        }
-
-                        // फिक्स: काम पूरा होते ही 'true' पास किया ताकि 4 सेकंड बाद यह अपने आप स्क्रीन से हट जाए
-                        showThinAlert("🎉 Master Data Downloaded Successfully!", true);
-                        if(onComplete) onComplete();
-                    };
-                } else { 
-                    isDownloadingMasterData = false;
-                    if(onComplete) onComplete(); 
-                }
-            } catch(error) {
-                isDownloadingMasterData = false;
-                if(onComplete) onComplete();
-            }
-        }).withFailureHandler(function(error) {
-            isDownloadingMasterData = false;
-            showThinAlert("Data Download Failed! Please check internet.", true);
-            if(onComplete) onComplete();
-        }).getBulkDashboardData(targetUserParam);
+        if(onComplete) onComplete();
+        return;
     }
+    
+    isDownloadingMasterData = true;
+    // फिक्स: शुरुआत में अलर्ट बार को बिना गायब हुए (false) दिखाएं
+    showThinAlert(processingText, false);
+
+    var targetUserParam = (loggedInReader.toUpperCase() === "ANURAG SHAKYA") ? "ALL" : loggedInReader.toUpperCase();
+    
+    google.script.run.withSuccessHandler(function(bulkData) {
+        try {
+            if(bulkData && bulkData.consumers && bulkData.consumers.length > 0) {
+                var tx = db.transaction("consumers", "readwrite"); 
+                var store = tx.objectStore("consumers"); 
+                store.clear();
+                bulkData.consumers.forEach(function(item) { store.put(item); });
+                
+                tx.oncomplete = function() {
+                    if(bulkData && bulkData.reportConfigs) {
+                        localStorage.setItem("app_report_configs_cache", JSON.stringify(bulkData.reportConfigs));
+                        globalReportConfigs = bulkData.reportConfigs;
+                    }
+                    var currentDateTimeStr = new Date().toLocaleString('en-IN');
+                    localStorage.setItem("data_last_updated_" + loggedInReader, currentDateTimeStr);
+                    localStorage.setItem("last_sync_time_ms_" + loggedInReader, new Date().getTime()); 
+                    var tsLabelNode = document.getElementById("lastUpdatedLabel"); 
+                    if(tsLabelNode) tsLabelNode.innerText = "Last Updated:- " + currentDateTimeStr;
+                    
+                    buildAdminMultiSelectCheckbox(bulkData.consumers); 
+                    populateDivisionFilter(bulkData.consumers);
+
+                    // 🟢 नया: डेटा डाउनलोड होते ही एडमिन द्वारा भेजा गया लाइव मैसेज स्क्रीन पर लॉक करना
+                    if (bulkData && bulkData.activeNotification) {
+                        var nData = bulkData.activeNotification; // ऑब्जेक्ट: { text: "...", lockTime: 5, target: "..." }
+                        var userMe = loggedInReader.toUpperCase();
+                        // 🎯 कोमा से अलग किए गए नामों की लिस्ट में अपना नाम खोजना
+                        var allowedTargetsList = nData.target ? nData.target.split(",") : [];
+                        if (nData.target === "ALL" || allowedTargetsList.includes(userMe)) {
+                            showGlobalNotification(nData.text, parseInt(nData.lockTime));
+                        }
+                    }
+                    
+                    if(document.getElementById('formView').style.display !== "block") {
+                        refreshActiveDataViews();
+                    } else {
+                        updateSummaryStatsRaw(); 
+                    }
+                    
+                    isDownloadingMasterData = false;
+                    
+                    // 🚀 लाइव ट्रैकिंग: एरर फिक्स - प्रॉक्सी ब्रिज के नियम के अनुसार success/failure handlers के साथ कॉल
+                    if(loggedInReader) {
+                        try {
+                            google.script.run
+                                .withSuccessHandler(function(){ console.log("Download time logged."); })
+                                .withFailureHandler(function(e){ console.error("Download log failed silently", e); })
+                                .updateReaderLastDownload(loggedInReader.toUpperCase());
+                        } catch(e) { console.error("Download log setup failed", e); }
+                    }
+
+                    // फिक्स: काम पूरा होते ही 'true' पास किया ताकि 4 सेकंड बाद यह अपने आप स्क्रीन से हट जाए
+                    showThinAlert("🎉 Master Data Downloaded Successfully!", true);
+                    if(onComplete) onComplete();
+                };
+            } else { 
+                isDownloadingMasterData = false;
+                if(onComplete) onComplete(); 
+            }
+        } catch(error) {
+            isDownloadingMasterData = false;
+            if(onComplete) onComplete();
+        }
+    }).withFailureHandler(function(error) {
+        isDownloadingMasterData = false;
+        showThinAlert("Data Download Failed! Please check internet.", true);
+        if(onComplete) onComplete();
+    }).getBulkDashboardData(targetUserParam);
+}
 
     function buildAdminMultiSelectCheckbox(consumersList) {
         setTimeout(function() {
@@ -2730,18 +2733,34 @@ function renderNewListTab() {
             var consumerName = item.consumerName || "Customer"; 
             var pdfLink = item.pdfLink || "";
             
-            // Due Date निकालना (अगर डेटाबेस में नहीं है तो खाली छोड़ देगा)
-            var dueDate = item.dueDate || item["DUE DATE"] || "[Due Date Not Found]";
+            // 🎯 DUE DATE PARSER: Sheet se tarikh uthayega, nahi toh automatic backup text dikhayega
+            var dueDate = item["DUE DATE"] || item.dueDate || item["Due Date"] || item["due_date"] || "";
+            dueDate = dueDate.toString().trim();
+            if(dueDate === "" || dueDate.toUpperCase() === "NOT FOUND") {
+                dueDate = "बिल पर देखें"; 
+            }
             
-            // Current Month - Year निकालना (जैसे: June-2026)
+            // Current Month - Year calculation
             var monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
             var d = new Date();
             var currentMonthYear = monthNames[d.getMonth()] + "-" + d.getFullYear();
             
-            // नया हिंदी मैसेज फॉर्मेट
-            var message = "नमस्कार " + consumerName + " जी,\n\nआपका माह " + currentMonthYear + " का विधुत बिल बन गया है जिसको जमा करने की अंतिम तिथि " + dueDate + " है। कृपया अंतिम तिथि से पहले भुगतान करें।\n\nबिल डाउनलोड लिंक: " + pdfLink + "\n\nधन्यवाद 🙏\nबिलिंग टीम मैनपुरी";
+            // 🎯 AAPKA NAYA HINDI FORMAT (Bina toote aur perfect line-spacing ke sath)
+            var message = "आपका बिजली बिल यहाँ है: " + pdfLink + "\n" +
+                          "नमस्कार जी,\n" +
+                          "आपका विधुत संयोजन जिसका नाम \"" + consumerName + "\" से है जिसका माह \"" + currentMonthYear + "\" का विद्युत बिल बन चुका है, जिसकी जमा करने की अंतिम तिथि \"" + dueDate + "\" है।\n" +
+                          "कृपया अंतिम तिथि से पहले भुगतान करें।\n\n" +
+                          "धन्यवाद 🙏\n" +
+                          "बिलिंग टीम\n" +
+                          "विद्युत वितरण खंड, मैनपुरी";
             
-            window.open("https://wa.me/" + cleanPhone + "?text=" + encodeURIComponent(message), '_blank');
+            // System Intent Bypass taaki tabs ka kachra na ho
+            var whatsappIntentUrl = "whatsapp://send?phone=" + cleanPhone + "&text=" + encodeURIComponent(message);
+            var link = document.createElement('a');
+            link.href = whatsappIntentUrl;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         };
     }
     function toggleAllBillsDist(source) {
@@ -2964,7 +2983,7 @@ async function downloadSelectedMergedPDF() {
         var prefix = cleanMrName ? cleanMrName + "_Merged_Bills_" : "Merged_Bills_";
         var filename = prefix + timeStampStr + ".pdf";
 
-        // 🚀 Android Studio APK (Native Bridge) Fix
+        // 🚀 Android Studio APK (Native Bridge) Fix - Dynamic Name Enabled
         if (typeof AndroidBridge !== "undefined" && AndroidBridge.processBase64Download) {
             var bytes = new Uint8Array(mergedPdfBytes);
             var binary = '';
@@ -2974,7 +2993,13 @@ async function downloadSelectedMergedPDF() {
                 binary += String.fromCharCode.apply(null, subArray);
             }
             var base64Pdf = window.btoa(binary);
-            AndroidBridge.processBase64Download(base64Pdf, "pdf");
+            
+            // Checking if multi-parameter interface exists
+            if (AndroidBridge.processBase64Download.length >= 3) {
+                AndroidBridge.processBase64Download(base64Pdf, "pdf", filename);
+            } else {
+                AndroidBridge.processBase64Download(base64Pdf, "pdf");
+            }
             showThinAlert("🎉 सभी " + successfulCount + " बिल मर्ज होकर सफलतापूर्वक डाउनलोड हो गए!", true);
         } else {
             // WebView Backup Mode
@@ -3944,12 +3969,19 @@ function universalExportToExcel(tabName) {
         
         XLSX.utils.book_append_sheet(wb, ws, "Data");
         
-        // --- 🚀 एंड्रॉइड APK डाउनलोड मैनेजर नेटिव ब्रिज लॉजिक ---
+        // --- 🚀 एंड्रॉइड APK डाउनलोड मैनेजर नेटिव ब्रिज लॉजिक - Dynamic Name Enabled ---
         var wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'base64' });
         var targetFilename = filename + '.xlsx';
 
         if (typeof AndroidBridge !== "undefined" && AndroidBridge.processBase64Download) {
-            AndroidBridge.processBase64Download(wbout, "excel");
+            // Android Bridge ke methods aur parameters check karke sahi naam bhej rha hai
+            if (typeof AndroidBridge.processBase64DownloadWithFileName === "function") {
+                AndroidBridge.processBase64DownloadWithFileName(wbout, "excel", targetFilename);
+            } else if (AndroidBridge.processBase64Download.length >= 3) {
+                AndroidBridge.processBase64Download(wbout, "excel", targetFilename);
+            } else {
+                AndroidBridge.processBase64Download(wbout, "excel");
+            }
             showThinAlert("🎉 " + reportNameStr + " एक्सेल डाउनलोड शुरू हो गया है...", true);
         } else {
             var base64Data = "data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64," + wbout;
@@ -4060,9 +4092,21 @@ function universalExportToExcel(tabName) {
             doc.text('Report Prepared By: DvVNL Billing Tool | Er. Anurag Shakya | Mo: 9761414105 - Page ' + i + ' of ' + pageCount, doc.internal.pageSize.width / 2, doc.internal.pageSize.height - 15, { align: 'center' }); 
         }
         
-        // --- 🚀 एंड्रॉइड APK डाउनलोड मैनेजर ब्रिज बाईपास लॉजिक ---
+        // --- 🚀 एंड्रॉइड APK डाउनलोड मैनेजर ब्रिज बाईपास लॉजिक - Dynamic Name Enabled ---
         var filename = pdfDisplayTitle.replace(/[^a-zA-Z0-9_ ]/g, "").replace(/\s+/g, "_") + "_" + getFormattedDateTimeForFile() + ".pdf";
-        if (navigator.userAgent.match(/Android/i)) {
+        if (typeof AndroidBridge !== "undefined" && AndroidBridge.processBase64Download) {
+            var rawBase64 = doc.output('arraybuffer');
+            var uint8 = new Uint8Array(rawBase64);
+            var binary = '';
+            for (var j = 0; j < uint8.byteLength; j++) { binary += String.fromCharCode(uint8[j]); }
+            var base64String = btoa(binary);
+            if (AndroidBridge.processBase64Download.length >= 3) {
+                AndroidBridge.processBase64Download(base64String, "pdf", filename);
+            } else {
+                AndroidBridge.processBase64Download(base64String, "pdf");
+            }
+            showThinAlert("🎉 Report PDF डाउनलोड होना शुरू हो गया है...", true);
+        } else if (navigator.userAgent.match(/Android/i)) {
             var pdfBase64 = doc.output('datauristring');
             window.location.href = pdfBase64;
             showThinAlert("🎉 Report PDF डाउनलोड होना शुरू हो गया है...", true);
@@ -4271,10 +4315,18 @@ function universalExportToExcel(tabName) {
             });
 
             var wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'base64' });
-            if (typeof AndroidBridge !== "undefined" && AndroidBridge.processBase64Download) {
-                AndroidBridge.processBase64Download(wbout, "excel");
-                showThinAlert("🎉 एक्सेल फ़ाइल जनरेट हो गई...", true);
-            } else {
+        var targetFilename = filename + '.xlsx';
+
+        // Agar purana Android App hai toh automatic Chrome/Browser mode me download karwayega sahi naam se
+        if (typeof AndroidBridge !== "undefined" && AndroidBridge.processBase64Download) {
+            // Hum safe side ke liye direct browser download par bhej rahe hain taaki naam sahi aaye aur purana app crash na ho
+            var base64Data = "data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64," + wbout;
+            var link = document.createElement('a');
+            link.href = base64Data;
+            link.download = targetFilename;
+            link.click();
+            showThinAlert("🎉 " + reportNameStr + " एक्सेल डाउनलोड शुरू हो गया है...", true);
+        } else {
                 var link = document.createElement('a');
                 link.href = "data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64," + wbout;
                 link.download = filename + '.xlsx';
@@ -4695,7 +4747,7 @@ function universalExportToExcel(tabName) {
         
         var filename = "Pendecy_Summary_" + getFormattedDateTimeForFile() + ".pdf";
         
-        // एंड्रॉयड नेटिव ऐप ब्रिज और ब्राउज़र फ़ॉलबैक मोड
+        // एंड्रॉयड नेटिव ऐप ब्रिज और ब्राउज़र फ़ॉलबैक मोड - Dynamic Name Enabled
         if (typeof AndroidBridge !== "undefined" && AndroidBridge.processBase64Download) {
             var rawBase64 = doc.output('arraybuffer');
             var uint8 = new Uint8Array(rawBase64);
@@ -4703,7 +4755,11 @@ function universalExportToExcel(tabName) {
             var len = uint8.byteLength;
             for (var j = 0; j < len; j++) { binary += String.fromCharCode(uint8[j]); }
             var base64String = btoa(binary);
-            AndroidBridge.processBase64Download(base64String, "pdf");
+            if (AndroidBridge.processBase64Download.length >= 3) {
+                AndroidBridge.processBase64Download(base64String, "pdf", filename);
+            } else {
+                AndroidBridge.processBase64Download(base64String, "pdf");
+            }
             showThinAlert("🎉 Pendecy Summary PDF डाउनलोड होना शुरू हो गया है...", true);
         } else {
             try {
