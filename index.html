@@ -881,7 +881,7 @@
         <div id="apkErrorLogger" style="display:none; margin-top:10px; padding:10px; background:#fef2f2; border:1px solid #fca5a5; border-radius:6px; color:#b91c1c; font-size:11px; font-weight:bold; text-align:left; word-break:break-all; white-space:pre-wrap;"></div>
         <div class="app-footer-branding" style="position: relative;">
             Developed by:- Anurag Shakya | 9761414105
-            <span style="display:block; margin-top:4px; font-size:10px; color:#ef4444; font-weight:900;">App Version: V1.0.10</span>
+            <span style="display:block; margin-top:4px; font-size:10px; color:#ef4444; font-weight:900;">App Version: V1.0.11</span>
         </div>
     </div>
     
@@ -1134,7 +1134,7 @@
             
             <div style="text-align: center; margin-top: 25px; padding-top: 15px; border-top: 1px dashed #cbd5e1; color: #64748b;">
                 <div style="font-size: 12px; font-weight: bold;">Developed by: Anurag Shakya</div>
-                <div style="font-size: 11px; color: #ef4444; font-weight: 900; margin-top: 4px;">App Version: V1.0.10</div>
+                <div style="font-size: 11px; color: #ef4444; font-weight: 900; margin-top: 4px;">App Version: V1.0.11</div>
             </div>
         </div>
 
@@ -1183,7 +1183,7 @@
         <div style="width: 100%; height: 40px; clear: both; display: block !important; visibility: hidden; pointer-events: none;"></div>
         
         <div class="card" style="background: rgba(255, 255, 255, 0.7); margin-bottom: 20px; text-align: center; border: 1px dashed #cbd5e1;">
-            <div style="font-size: 11px; color: #ef4444; font-weight: 900; margin-bottom: 3px;">App Version: V1.0.10</div>
+            <div style="font-size: 11px; color: #ef4444; font-weight: 900; margin-bottom: 3px;">App Version: V1.0.11</div>
             <div style="font-size: 12px; color: #1e40af; font-weight: 800; text-transform: uppercase; margin-bottom: 5px;"><i class="fa-solid fa-user-tie"></i> <span id="welcomeTxt">Mr Name: Loading...</span></div>
             <div style="font-size: 11px; font-weight: 700; color: #475569; border-top: 1px solid #cbd5e1; padding-top: 5px;">
                 Developed by:- Er. Anurag Shakya | 9761414105
@@ -1249,6 +1249,12 @@
         <form id="entryForm" onsubmit="handleFormSubmit(event)">
             <input type="hidden" id="f-rowIndex">
             <input type="hidden" id="f-formType">
+            
+            <!-- ⚙️ केवल एडमिन के लिए डायनामिक रिपोर्ट फील्ड्स कंटेनर -->
+            <div id="adminDynamicReportFieldsContainer" style="display: none; background: #faf5ff; padding: 12px; border: 1px solid #d8b4fe; border-radius: 8px; margin-bottom: 12px;">
+                <div class="section-title" style="background:#f3e8ff; color:#6b21a8; border-left-color:#a855f7; margin-top:0;"><i class="fa-solid fa-user-gear"></i> Dynamic Report Fields (Admin Only)</div>
+                <div id="dynamicFieldsInsertionArea" style="display: grid; grid-template-columns: 1fr; gap: 10px;"></div>
+            </div>
             
             <div id="standardReadingFormBlocks">
                 <div id="mainMeterFormBlock">
@@ -2567,9 +2573,58 @@ function saveLiveNotificationToServer(targetReader, messageText, lockSeconds) {
         document.getElementById('f-formType').value = mode;
         
         // 🔄 मोड चेकर ड्राइवर (Master Mobile Number ऑटो-फ़िल फ़िक्स)
-        if(mode === "BILL_DIST") {
-            document.getElementById('standardReadingFormBlocks').style.display = "none"; 
-            document.getElementById('billDistributionFields').style.display = "block"; 
+        var adminContainer = document.getElementById('adminDynamicReportFieldsContainer');
+        var stdReadingBlocks = document.getElementById('standardReadingFormBlocks');
+        var billDistBlocks = document.getElementById('billDistributionFields');
+        var dynamicArea = document.getElementById('dynamicFieldsInsertionArea');
+        
+        if (adminContainer) adminContainer.style.display = "none";
+        if (stdReadingBlocks) stdReadingBlocks.style.removeProperty("display");
+        if (billDistBlocks) billDistBlocks.style.display = "none";
+        if (dynamicArea) dynamicArea.innerHTML = "";
+
+        // ✨ एडमिन के लिए विशेष डायनामिक रिपोर्ट कंडीशन फॉर्म इंजन
+        if (mode === "DYNAMIC_REPORT_EDIT" && loggedInReader.toUpperCase() === "ANURAG SHAKYA" && activeReportType) {
+            if (stdReadingBlocks) stdReadingBlocks.style.setProperty("display", "none", "important");
+            if (billDistBlocks) billDistBlocks.style.setProperty("display", "none", "important");
+            if (adminContainer) adminContainer.style.setProperty("display", "block", "important");
+            
+            var matchedConfig = globalReportConfigs.find(function(c) { return c.key === activeReportType; });
+            var reqCols = [];
+            if (matchedConfig && matchedConfig.reqColumnsStr) {
+                reqCols = matchedConfig.reqColumnsStr.split(",").map(function(s) { return s.trim(); });
+            } else {
+                reqCols = ["FINAL_MAIN_METER_SITE_REMARK", "REMARK", "FINAL_POLE_METER_SITE_REMARK"]; // Failsafe Backup
+            }
+            
+            // केवल असाइन किए गए कॉलम्स के इनपुट बॉक्स बनाना
+            var dynamicHtml = "";
+            reqCols.forEach(function(col) {
+                if (col === "ACCOUNT NO" || col === "DIVISION" || col === "CONSUMER-NAME") return; // Key identifiers ignored from input
+                var val = getRobustKey(record, col) || "";
+                
+                dynamicHtml += '<div class="input-group" style="margin-bottom:8px;">' +
+                               '<label style="color:#6b21a8; font-weight:bold;">' + col + '</label>';
+                
+                // यदि कॉलम स्टेटस/रिमार्क है तो ड्रॉपडाउन दें, अन्यथा टेक्स्टबॉक्स
+                if (col.includes("REMARK") || col.includes("STATUS")) {
+                    dynamicHtml += '<select class="admin-dyn-input" data-col="' + col + '" style="border-color:#c084fc; background:#fff;">' +
+                                   '<option value="">-- चुनें --</option>';
+                    IMAGE_VALIDATED_REMARKS.forEach(function(opt) {
+                        var sel = (val.toString().toUpperCase() === opt.toUpperCase()) ? "selected" : "";
+                        dynamicHtml += '<option value="' + opt + '" ' + sel + '>' + opt.toUpperCase() + '</option>';
+                    });
+                    dynamicHtml += '</select>';
+                } else {
+                    dynamicHtml += '<input type="text" class="admin-dyn-input" data-col="' + col + '" value="' + val + '" style="border-color:#c084fc; background:#fff;">';
+                }
+                dynamicHtml += '</div>';
+            });
+            if (dynamicArea) dynamicArea.innerHTML = dynamicHtml;
+            
+        } else if(mode === "BILL_DIST") {
+            if (stdReadingBlocks) stdReadingBlocks.style.setProperty("display", "none", "important"); 
+            if (billDistBlocks) billDistBlocks.style.setProperty("display", "block", "important"); 
             document.getElementById('f-billDeliveredDate').value = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }); 
             
             // 🎯 फ़िक्स: शीट का मास्टर मोबाइल नंबर ऑटोमैटिक इस बॉक्स में भर जाएगा
@@ -2722,47 +2777,79 @@ function renderNewListTab() {
 }
 
     function triggerWhatsApp(event, accNo) {
-        event.stopPropagation();
-        db.transaction("consumers", "readonly").objectStore("consumers").get(accNo).onsuccess = function(e) {
-            var item = e.target.result; if(!item) return;
-            var rawPhone = item["Master Mobile Number"] || item.masterMobileNumber || "";
-            var cleanPhone = rawPhone.toString().replace(/\D/g, '');
-            if (cleanPhone.length !== 10) { alert("Error: Mobile number invalid ya khali hai."); return; }
-            cleanPhone = '91' + cleanPhone; 
+    event.stopPropagation();
+    db.transaction("consumers", "readonly").objectStore("consumers").get(accNo).onsuccess = function(e) {
+        var item = e.target.result; if(!item) return;
+        var rawPhone = item["Master Mobile Number"] || item.masterMobileNumber || "";
+        var cleanPhone = rawPhone.toString().replace(/\D/g, '');
+        if (cleanPhone.length !== 10) { alert("Error: Mobile number invalid ya khali hai."); return; }
+        
+        var consumerName = item.consumerName || "Customer"; 
+        var pdfLink = item.pdfLink || "";
+        
+        // फाइल का नाम जो व्हाट्सएप पर सेंड होते समय दिखेगा
+        var fileName = "Bill_" + accNo + ".pdf"; 
+        
+        // 🎯 1. ANDROID APK NATIVE ATTACHMENT MODE (पक्का इलाज)
+        if (typeof AndroidBridge !== "undefined" && typeof AndroidBridge.shareBillToWhatsApp === "function") {
             
-            var consumerName = item.consumerName || "Customer"; 
-            var pdfLink = item.pdfLink || "";
+            showThinAlert("⏳ बिल फाइल व्हाट्सएप पर अटैच हो रही है...", false);
+            var base64Data = item.mainPhotoCompressedBase64 || ""; 
             
-            // 🎯 DUE DATE PARSER: Sheet se tarikh uthayega, nahi toh automatic backup text dikhayega
+            if (base64Data === "" && pdfLink) {
+                // अगर लोकल में बेस64 नहीं है, तो ऐप्स स्क्रिप्ट से लाकर सीधे जावा इंजन को पास करेंगे
+                google.script.run
+                    .withSuccessHandler(function(serverBase64) {
+                        if(serverBase64) {
+                            AndroidBridge.shareBillToWhatsApp(cleanPhone, serverBase64, fileName);
+                            showThinAlert("📸 बिल फाइल अटैच हो गई!", true);
+                        } else {
+                            alert("🚨 सर्वर से बिल फाइल का डेटा नहीं मिल सका।");
+                        }
+                    })
+                    .withFailureHandler(function(err) {
+                        alert("🚨 नेटवर्क एरर: " + err.toString());
+                    })
+                    .getPdfDataAsBase64(pdfLink.split('id=')[1]);
+            } else if (base64Data !== "") {
+                // अगर बेस64 लोकल में पहले से सेव है
+                var cleanBase64 = base64Data.split(',')[1] || base64Data;
+                AndroidBridge.shareBillToWhatsApp(cleanPhone, cleanBase64, fileName);
+                showThinAlert("📸 बिल फाइल अटैच हो गई!", true);
+            } else {
+                alert("🚨 इस उपभोक्ता का बिल या पीडीएफ फाइल उपलब्ध नहीं है!");
+            }
+            
+        } else {
+            // 🌐 2. WEB BROWSER FALLBACK MODE (अगर कोई ऐप से बाहर नॉर्मल क्रोम में चलाए तो क्रैश न हो)
+            var cleanPhoneWithCountry = '91' + cleanPhone;
             var dueDate = item["DUE DATE"] || item.dueDate || item["Due Date"] || item["due_date"] || "";
             dueDate = dueDate.toString().trim();
             if(dueDate === "" || dueDate.toUpperCase() === "NOT FOUND") {
                 dueDate = "बिल पर देखें"; 
             }
             
-            // Current Month - Year calculation
             var monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
             var d = new Date();
             var currentMonthYear = monthNames[d.getMonth()] + "-" + d.getFullYear();
             
-            // 🎯 AAPKA NAYA HINDI FORMAT (Bina toote aur perfect line-spacing ke sath)
             var message = "आपका बिजली बिल यहाँ है: " + pdfLink + "\n" +
                           "नमस्कार जी,\n" +
-                          "आपका विधुत संयोजन जिसका नाम \"" + consumerName + "\" से है जिसका माह \"" + currentMonthYear + "\" का विद्युत बिल बन चुका है, जिसकी जमा करने की अंतिम तिथि \"" + dueDate + "\" है।\n" +
+                          "$\" आपका विधुत संयोजन जिसका नाम \"" + consumerName + "\" से है जिसका माह \"" + currentMonthYear + "\" का विद्युत बिल बन चुका है, जिसकी जमा करने की अंतिम तिथि \"" + dueDate + "\" है।\n" +
                           "कृपया अंतिम तिथि से पहले भुगतान करें।\n\n" +
                           "धन्यवाद 🙏\n" +
                           "बिलिंग टीम\n" +
                           "विद्युत वितरण खंड, मैनपुरी";
             
-            // System Intent Bypass taaki tabs ka kachra na ho
-            var whatsappIntentUrl = "whatsapp://send?phone=" + cleanPhone + "&text=" + encodeURIComponent(message);
+            var whatsappIntentUrl = "whatsapp://send?phone=" + cleanPhoneWithCountry + "&text=" + encodeURIComponent(message);
             var link = document.createElement('a');
             link.href = whatsappIntentUrl;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-        };
-    }
+        }
+    };
+}
     function toggleAllBillsDist(source) {
         var checkboxes = document.querySelectorAll('.bill-select-cb');
         checkboxes.forEach(function(cb) {
@@ -4900,7 +4987,71 @@ function universalExportToExcel(tabName) {
         timestamp: new Date().getTime() 
     };
     
-    if(mode === "BILL_DIST") {
+    if (mode === "DYNAMIC_REPORT_EDIT" && loggedInReader.toUpperCase() === "ANURAG SHAKYA") {
+        var dynInputs = document.querySelectorAll('.admin-dyn-input');
+        var changedFields = {};
+        
+        dynInputs.forEach(function(input) {
+            var colName = input.getAttribute('data-col');
+            var colVal = input.value.trim();
+            changedFields[colName] = colVal;
+            
+            // हमारे कोड के इंटरनल वेरिएबल मैप्स को भी लाइव अपडेट करना
+            var mapKey = REPORT_COL_MAP[colName];
+            if(mapKey) changedFields[mapKey] = colVal;
+        });
+        
+        // अनिवार्य रिमार्क वैलिडेशन चेक
+        if(changedFields["REMARK"] === "" || changedFields["FINAL_MAIN_METER_SITE_REMARK"] === "") {
+            return customAlert("🚨 एडमिन कृपया अनिवार्य फील्ड्स खाली न छोड़ें!");
+        }
+
+        entryData.changedFieldsPacket = changedFields;
+        entryData.attendStatus = "ATTEND";
+        entryData["ATTEND STATUS"] = "ATTEND";
+        entryData.isDone = true;
+
+        // IndexedDB में पुराने रिकॉर्ड को ढूंढकर केवल बदले हुए डेटा को मर्ज करना (No data loss safety)
+        if(db) {
+            var adminTx = db.transaction(["consumers", "saved_entries"], "readwrite");
+            adminTx.objectStore("consumers").get(accNo).onsuccess = function(e) {
+                var existingRecord = e.target.result;
+                if(existingRecord) {
+                    for(var key in changedFields) {
+                        existingRecord[key] = changedFields[key];
+                    }
+                    existingRecord.isDone = true;
+                    existingRecord.attendStatus = "ATTEND";
+                    existingRecord["ATTEND STATUS"] = "ATTEND";
+                    
+                    // अपडेटेड डेटा वापस डालें
+                    e.target.source.put(existingRecord);
+                    
+                    // सिंक पैकेट में भी पूरा मर्ज किया हुआ डेटा डालना ताकि शीट में प्रॉपर रो अपडेट हो
+                    entryData = Object.assign({}, existingRecord, entryData);
+                    adminTx.objectStore("saved_entries").put(entryData);
+                }
+            };
+            adminTx.oncomplete = function() {
+                var mainContainerNode = document.getElementById('mainAppContainer');
+                if (mainContainerNode) mainContainerNode.style.setProperty("padding-bottom", "140px", "important");
+                
+                // UI से आइटम गायब करें
+                var allItems = document.querySelectorAll('.list-item');
+                allItems.forEach(el => { if(el.innerHTML.includes(accNo)) el.style.setProperty("display", "none", "important"); });
+                
+                if (typeof updateSummaryStatsRaw === 'function') updateSummaryStatsRaw();
+                setTimeout(function() {
+                    if (typeof triggerSilentBackgroundSync === 'function') triggerSilentBackgroundSync();
+                }, 300);
+                
+                navigateToViewRaw('appDashboardView');
+                showThinAlert("✅ एडमिन एंट्री सुरक्षित! केवल चुनिंदा कॉलम्स शीट में अपडेट हो रहे हैं...", true);
+            };
+        }
+        return false;
+
+    } else if(mode === "BILL_DIST") {
         var receiverName = document.getElementById('f-billReceiverName').value.trim(); 
         var mobileNo = document.getElementById('f-receiverMobile').value.trim();
         var waStatus = document.getElementById('f-isWhatsappSent').value; 
@@ -5349,10 +5500,16 @@ function triggerSilentBackgroundSync() {
         // 🚀 नया फिक्स: डेटा बॉक्स स्क्रॉल को हमेशा टॉप पर रीसेट करें ताकि पिछला स्क्रॉल रुका न रहे
         document.getElementById('quickViewContent').scrollTop = 0;
         
-        // 🟢 Edit Button का एक्शन (सुरक्षित मोड बाईपास इंजन)
+        // 🟢 Edit Button का एक्शन (एडमिन और रीडर रोल सेपरेटर)
         document.getElementById('quickViewEditBtn').onclick = function() {
             document.getElementById('quickViewModal').style.display = 'none';
-            openForm(accNo, mode || 'EDIT'); 
+            
+            // यदि एडमिन लॉगिन है और कोई रिपोर्ट खुली है, तो स्पेशल मोड एक्टिवेट करें
+            var targetMode = (loggedInReader.toUpperCase() === "ANURAG SHAKYA" && activeReportType && activeReportType !== 'all_consumers_list' && activeReportType !== 'all_bills_report') 
+                             ? 'DYNAMIC_REPORT_EDIT' 
+                             : (mode || 'EDIT');
+                             
+            openForm(accNo, targetMode); 
         };
 
         // 🟢 Next/Prev बटन इंजन फिक्स: जब यूज़र नेविगेट करेगा, तो मोड डिलीट नहीं होगा
