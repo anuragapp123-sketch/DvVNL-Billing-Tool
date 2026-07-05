@@ -5,7 +5,7 @@
 <script>
   (function() {
     // ⚠️ अपना नया Deployment URL यहाँ पेस्ट करें
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxI4nJVxUVCm3-UyjamN3tZxJd6D6nG7tA3VvyhgiXBGgOgwT2Gmql8zwiROveUwzj3uw/exec";
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwshzsQkP2l2HFhqJLvRY9-U0v3_z3B8RrlXy0YKJR2Q1YUpTpQm3ws81aZXbQnQeMBIQ/exec";
 
     function createHandler(successCallback, failureCallback) {
       return new Proxy({}, {
@@ -881,7 +881,7 @@
         <div id="apkErrorLogger" style="display:none; margin-top:10px; padding:10px; background:#fef2f2; border:1px solid #fca5a5; border-radius:6px; color:#b91c1c; font-size:11px; font-weight:bold; text-align:left; word-break:break-all; white-space:pre-wrap;"></div>
         <div class="app-footer-branding" style="position: relative;">
             Developed by:- Anurag Shakya | 9761414105
-            <span style="display:block; margin-top:4px; font-size:10px; color:#ef4444; font-weight:900;">App Version: V1.0.12</span>
+            <span style="display:block; margin-top:4px; font-size:10px; color:#ef4444; font-weight:900;">App Version: V1.0.13</span>
         </div>
     </div>
     
@@ -1135,7 +1135,7 @@
             
             <div style="text-align: center; margin-top: 25px; padding-top: 15px; border-top: 1px dashed #cbd5e1; color: #64748b;">
                 <div style="font-size: 12px; font-weight: bold;">Developed by: Anurag Shakya</div>
-                <div style="font-size: 11px; color: #ef4444; font-weight: 900; margin-top: 4px;">App Version: V1.0.12</div>
+                <div style="font-size: 11px; color: #ef4444; font-weight: 900; margin-top: 4px;">App Version: V1.0.13</div>
             </div>
         </div>
 
@@ -1184,7 +1184,7 @@
         <div style="width: 100%; height: 40px; clear: both; display: block !important; visibility: hidden; pointer-events: none;"></div>
         
         <div class="card" style="background: rgba(255, 255, 255, 0.7); margin-bottom: 20px; text-align: center; border: 1px dashed #cbd5e1;">
-            <div style="font-size: 11px; color: #ef4444; font-weight: 900; margin-bottom: 3px;">App Version: V1.0.12</div>
+            <div style="font-size: 11px; color: #ef4444; font-weight: 900; margin-bottom: 3px;">App Version: V1.0.13</div>
             <div style="font-size: 12px; color: #1e40af; font-weight: 800; text-transform: uppercase; margin-bottom: 5px;"><i class="fa-solid fa-user-tie"></i> <span id="welcomeTxt">Mr Name: Loading...</span></div>
             <div style="font-size: 11px; font-weight: 700; color: #475569; border-top: 1px solid #cbd5e1; padding-top: 5px;">
                 Developed by:- Er. Anurag Shakya | 9761414105
@@ -4193,14 +4193,8 @@ function universalExportToExcel(tabName) {
         var targetFilename = filename + '.xlsx';
 
         if (typeof AndroidBridge !== "undefined" && AndroidBridge.processBase64Download) {
-            // Android Bridge ke methods aur parameters check karke sahi naam bhej rha hai
-            if (typeof AndroidBridge.processBase64DownloadWithFileName === "function") {
-                AndroidBridge.processBase64DownloadWithFileName(wbout, "excel", targetFilename);
-            } else if (AndroidBridge.processBase64Download.length >= 3) {
-                AndroidBridge.processBase64Download(wbout, "excel", targetFilename);
-            } else {
-                AndroidBridge.processBase64Download(wbout, "excel");
-            }
+            // 🎯 सीधे जावा के 3-पैरामीटर वाले मेथड को डायनामिक नाम पास करें
+            AndroidBridge.processBase64Download(wbout, "excel", targetFilename);
             showThinAlert("🎉 " + reportNameStr + " एक्सेल डाउनलोड शुरू हो गया है...", true);
         } else {
             var base64Data = "data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64," + wbout;
@@ -4319,11 +4313,9 @@ function universalExportToExcel(tabName) {
             var binary = '';
             for (var j = 0; j < uint8.byteLength; j++) { binary += String.fromCharCode(uint8[j]); }
             var base64String = btoa(binary);
-            if (AndroidBridge.processBase64Download.length >= 3) {
-                AndroidBridge.processBase64Download(base64String, "pdf", filename);
-            } else {
-                AndroidBridge.processBase64Download(base64String, "pdf");
-            }
+            
+            // 🎯 पीडीएफ के लिए भी तीसरा पैरामीटर (सही नाम) पास करें
+            AndroidBridge.processBase64Download(base64String, "pdf", filename);
             showThinAlert("🎉 Report PDF डाउनलोड होना शुरू हो गया है...", true);
         } else if (navigator.userAgent.match(/Android/i)) {
             var pdfBase64 = doc.output('datauristring');
@@ -5100,40 +5092,30 @@ function exportAllMRSummaryPDF() {
             if(dynamicFileNamePart.length > 50) { dynamicFileNamePart = dynamicFileNamePart.substring(0, 50) + "_Selected"; }
         }
         
-        // --- 🚀 [अचूक फिक्स]: एंड्रॉइड APK फ़ाइल नेम बायपास इंजन (Excel) ---
-        var wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'base64' });
-        var targetFilename = filename + '.xlsx';
+        // --- 🚀 [अचूक फिक्स]: एंड्रॉइड APK फ़ाइल नेम बायपास इंजन (PDF) ---
+        var filename = "All_MR_Summary_" + getFormattedDateTimeForFile() + ".pdf";
 
-        // कंप्यूटर और मोबाइल दोनों के लिए फ़ोर्स डाउनलोड लिंक इंजन (ताकि नाम कभी न बदले)
-        try {
-            var byteCharacters = atob(wbout);
-            var byteNumbers = new Array(byteCharacters.length);
-            for (var i = 0; i < byteCharacters.length; i++) {
-                byteNumbers[i] = byteCharacters.charCodeAt(i);
+        if (typeof AndroidBridge !== "undefined" && AndroidBridge.processBase64Download) {
+            var rawBase64 = doc.output('arraybuffer'); 
+            var uint8 = new Uint8Array(rawBase64); 
+            var binary = '';
+            for (var j = 0; j < uint8.byteLength; j++) { 
+                binary += String.fromCharCode(uint8[j]); 
             }
-            var byteArray = new Uint8Array(byteNumbers);
-            var blob = new Blob([byteArray], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
-            var blobUrl = URL.createObjectURL(blob);
+            var base64String = btoa(binary);
             
-            var link = document.createElement('a');
-            link.href = blobUrl;
-            link.download = targetFilename;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            
-            showThinAlert("🎉 " + reportNameStr + " एक्सेल डाउनलोड सफल!", true);
-            
-            // बैकअप के लिए नेटिव ब्रिज ट्रिगर (अगर ऐप को सिंक चाहिए हो)
-            if (typeof AndroidBridge !== "undefined" && AndroidBridge.processBase64Download) {
-                AndroidBridge.processBase64Download(wbout, "excel");
+            if (typeof AndroidBridge.processBase64DownloadWithFileName === "function") {
+                AndroidBridge.processBase64DownloadWithFileName(base64String, "pdf", filename);
+            } else if (AndroidBridge.processBase64Download.length >= 3) {
+                AndroidBridge.processBase64Download(base64String, "pdf", filename);
+            } else {
+                AndroidBridge.processBase64Download(base64String, "pdf");
             }
-        } catch(excelNativeErr) {
-            // फॉलबैक बेस64 डाउनलोड
-            var link = document.createElement('a');
-            link.href = "data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64," + wbout;
-            link.download = targetFilename;
-            link.click();
+            showThinAlert("🎉 ऑल एमआर समरी पीडीएफ डाउनलोड शुरू हो गया है...", true);
+        } else {
+            // कंप्यूटर/वेबव्यू बैकअप मोड
+            doc.save(filename);
+            showThinAlert("🎉 ऑल एमआर समरी पीडीएफ डाउनलोड सफल!", true);
         }
     };
 }
