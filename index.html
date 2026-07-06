@@ -5,7 +5,7 @@
 <script>
   (function() {
     // ⚠️ अपना नया Deployment URL यहाँ पेस्ट करें
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzhgG7DNjBKglNzf_TvfyGZEMNxLbm8TMZzi-_4uZrUhS2aBN-9eJKilyjON2Dx6yDBqg/exec";
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbytdv8D-BfOH97WOyuyP6eU05hI59uKvC23OoZ3uRoNIoJSc0xf9PPu_G5tDIX8PuQDeg/exec";
 
     function createHandler(successCallback, failureCallback) {
       return new Proxy({}, {
@@ -881,7 +881,7 @@
         <div id="apkErrorLogger" style="display:none; margin-top:10px; padding:10px; background:#fef2f2; border:1px solid #fca5a5; border-radius:6px; color:#b91c1c; font-size:11px; font-weight:bold; text-align:left; word-break:break-all; white-space:pre-wrap;"></div>
         <div class="app-footer-branding" style="position: relative;">
             Developed by:- Anurag Shakya | 9761414105
-            <span style="display:block; margin-top:4px; font-size:10px; color:#ef4444; font-weight:900;">App Version: V1.0.14</span>
+            <span style="display:block; margin-top:4px; font-size:10px; color:#ef4444; font-weight:900;">App Version: V1.0.15</span>
         </div>
     </div>
     
@@ -1135,7 +1135,7 @@
             
             <div style="text-align: center; margin-top: 25px; padding-top: 15px; border-top: 1px dashed #cbd5e1; color: #64748b;">
                 <div style="font-size: 12px; font-weight: bold;">Developed by: Anurag Shakya</div>
-                <div style="font-size: 11px; color: #ef4444; font-weight: 900; margin-top: 4px;">App Version: V1.0.14</div>
+                <div style="font-size: 11px; color: #ef4444; font-weight: 900; margin-top: 4px;">App Version: V1.0.15</div>
             </div>
         </div>
 
@@ -1184,7 +1184,7 @@
         <div style="width: 100%; height: 40px; clear: both; display: block !important; visibility: hidden; pointer-events: none;"></div>
         
         <div class="card" style="background: rgba(255, 255, 255, 0.7); margin-bottom: 20px; text-align: center; border: 1px dashed #cbd5e1;">
-            <div style="font-size: 11px; color: #ef4444; font-weight: 900; margin-bottom: 3px;">App Version: V1.0.14</div>
+            <div style="font-size: 11px; color: #ef4444; font-weight: 900; margin-bottom: 3px;">App Version: V1.0.15</div>
             <div style="font-size: 12px; color: #1e40af; font-weight: 800; text-transform: uppercase; margin-bottom: 5px;"><i class="fa-solid fa-user-tie"></i> <span id="welcomeTxt">Mr Name: Loading...</span></div>
             <div style="font-size: 11px; font-weight: 700; color: #475569; border-top: 1px solid #cbd5e1; padding-top: 5px;">
                 Developed by:- Er. Anurag Shakya | 9761414105
@@ -2903,7 +2903,21 @@ function renderNewListTab() {
         if (strictlyDone) { statusMatch = true; }
     }
                 
-                if (statusMatch && isReaderAllowed(getReaderName(item)) && divMatch) {
+                // 🚀 MR LOGIN BYPASS FIX: नाम मैचिंग को केस-इन्सेंसिटिव और ट्रिम सुरक्षित बनाना
+    var currentItemReader = (getReaderName(item) || "").toString().trim().toUpperCase();
+    var currentLoggedInUser = (loggedInReader || "").toString().trim().toUpperCase();
+    
+    // एडमिन के अलावा सामान्य MR के लिए नाम का सीधा और सुरक्षित मिलान
+    var isUserAuthorized = false;
+    if (currentLoggedInUser === "ANURAG SHAKYA") {
+        isUserAuthorized = isReaderAllowed(getReaderName(item)); // एडमिन के लिए पुराना ग्लोबल फ़िल्टर काम करेगा
+    } else {
+        // सामान्य MR लॉगिन पर अगर नाम मैच होता है या शीट में रीडर असाइंड है
+        isUserAuthorized = (currentItemReader === currentLoggedInUser && currentLoggedInUser !== "");
+    }
+
+    // अब यह कंडीशन प्रॉक्सी एनवायरनमेंट में भी कभी फ़ेल नहीं होगी
+    if (statusMatch && isUserAuthorized && divMatch) {
                     // ⚡ CRITICAL DEEP SCAN MAPPING ENGINE
                     var consumerAddress = getRobustKey(item, "ADDRESS") || "-";
                     var consumerMobile = getRobustKey(item, "Master Mobile Number") || "-";
