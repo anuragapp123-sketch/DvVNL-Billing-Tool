@@ -2871,32 +2871,37 @@ function renderNewListTab() {
             var allConsumers = ev.target.result || [];
             
             for (var i = 0; i < allConsumers.length; i++) {
-                var item = allConsumers[i] || {};
-                var rawStatus = (item.attendStatus !== null && item.attendStatus !== undefined) ? item.attendStatus.toString().toUpperCase().trim() : "";
-                var rawDistStatus = (item.distStatus || item["DISTRIBUTION STATUS"] || "").toString().toUpperCase().trim();
-                
-                var rawDiv = (item.division || item.DIVISION || ""); 
-                var itemDiv = (rawDiv !== null && rawDiv !== undefined) ? rawDiv.toString().toUpperCase().trim() : "";
-                var divMatch = (selectedDiv === "ALL" || selectedDiv === itemDiv); 
-                
-                var isLocallyDone = savedEntriesMap[item.accountNo]; 
-                var statusMatch = false;
-                
-                // ⚡ Failsafe Sheet Condition Checker
-                var configAllList = globalReportConfigs.find(function(c) { return c.key === 'all_consumers_list'; });
-                var matchesSheetCondition = true;
-                
-                if (configAllList && configAllList.conditionStr && configAllList.conditionStr.indexOf('=') !== -1) {
-                    matchesSheetCondition = evaluateCustomCondition(item, configAllList.conditionStr);
-                }
-                
-                var strictlyDone = (item.isDone === true || rawStatus === "ATTEND" || rawDistStatus === "DISTRIBUTED" || isLocallyDone);
+    var item = allConsumers[i] || {};
+    
+    // 🚀 APK एनवायरनमेंट के लिए क्रैश-प्रूफ की-मैपिंग ड्राइवर
+    var rawStatus = (getRobustKey(item, "ATTEND STATUS") || item.attendStatus || "").toString().toUpperCase().trim();
+    var rawDistStatus = (getRobustKey(item, "DISTRIBUTION STATUS") || item.distStatus || "").toString().toUpperCase().trim();
+    
+    var itemDiv = (getRobustKey(item, "DIVISION") || item.division || "").toString().toUpperCase().trim();
+    var divMatch = (selectedDiv === "ALL" || selectedDiv === itemDiv); 
+    
+    // 🎯 ReferenceError फिक्स: यहाँ चेक करें कि यह अकाउंट स्थानीय रूप से सेव है या नहीं
+    var isLocallyDone = savedEntriesMap && savedEntriesMap[item.accountNo]; 
+    
+    // ⚡ गिटहब एनवायरनमेंट बाईपास कंडीशन चेकर
+    var configAllList = globalReportConfigs.find(function(c) { return c.key === 'all_consumers_list'; });
+    var matchesSheetCondition = true;
+    
+    if (configAllList && configAllList.conditionStr && configAllList.conditionStr.indexOf('=') !== -1) {
+        matchesSheetCondition = evaluateCustomCondition(item, configAllList.conditionStr);
+    } else {
+        matchesSheetCondition = true; 
+    }
+    
+    // अब strictlyDone बिना किसी एरर के सही तरीके से ट्रू/फॉल्स रिटर्न करेगा
+    var strictlyDone = (item.isDone === true || item.isDone === "true" || rawStatus === "ATTEND" || rawStatus === "DONE" || rawDistStatus === "DISTRIBUTED" || isLocallyDone);
+    var statusMatch = false;
 
-                if(selectedStatus === "PENDING") { 
-                    if (!strictlyDone && matchesSheetCondition) { statusMatch = true; }
-                } else if(selectedStatus === "ATTEND") { 
-                    if (strictlyDone) { statusMatch = true; }
-                }
+    if (selectedStatus === "PENDING") { 
+        if (!strictlyDone && matchesSheetCondition) { statusMatch = true; }
+    } else if (selectedStatus === "ATTEND") { 
+        if (strictlyDone) { statusMatch = true; }
+    }
                 
                 if (statusMatch && isReaderAllowed(getReaderName(item)) && divMatch) {
                     // ⚡ CRITICAL DEEP SCAN MAPPING ENGINE
