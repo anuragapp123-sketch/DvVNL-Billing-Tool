@@ -5,7 +5,7 @@
 <script>
   (function() {
     // ⚠️ अपना नया Deployment URL यहाँ पेस्ट करें
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbytdv8D-BfOH97WOyuyP6eU05hI59uKvC23OoZ3uRoNIoJSc0xf9PPu_G5tDIX8PuQDeg/exec";
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxEQ6kw8S7SlYlU9RbcewK3bXDIoqICcgFUpzcN2mmF4ErZLcSIWLL2X100YW0fRnyGBg/exec";
 
     function createHandler(successCallback, failureCallback) {
       return new Proxy({}, {
@@ -1450,16 +1450,29 @@ var REPORT_COL_MAP = {
 
     function getReaderName(item) {
         if (!item) return ""; 
+        
+        // 🎯 पहली प्राथमिकता: सीधे आपके "VISIT LAST MONTH" कॉलम से नाम उठाएगा
+        if (item["VISIT LAST MONTH"] !== undefined && item["VISIT LAST MONTH"] !== null) {
+            return item["VISIT LAST MONTH"].toString().trim();
+        }
+        if (item.visitLastMonth !== undefined && item.visitLastMonth !== null) {
+            return item.visitLastMonth.toString().trim();
+        }
+        
+        // ⚡ गिटहब/प्रॉक्सी सेफ्टी: अगर गिटहब के कारण कॉलम का नाम बदलकर 'visitlastmonth' या छोटे अक्षरों में हो गया हो
+        for (var key in item) { 
+            if (item.hasOwnProperty(key)) {
+                var k = key.toString().replace(/[^a-zA-Z0-9]/g, '').toLowerCase(); 
+                if (k === "visitlastmonth") { 
+                    return item[key] ? item[key].toString().trim() : ""; 
+                } 
+            }
+        }
+        
+        // फॉलबैक बैकअप (अगर ऊपर कोई भी न मिले)
         if (item["MR NAME"]) return item["MR NAME"].toString().trim();
         if (item["METER READER NAME"]) return item["METER READER NAME"].toString().trim();
-        if (item.visitLastMonth) return item.visitLastMonth.toString().trim();
         
-        for (var key in item) { 
-            var k = key.replace(/[^a-zA-Z0-9]/g, '').toLowerCase(); 
-            if (k === "visitlastmonth" || k === "mrname" || k === "meterreadername" || k === "assineduserisspl") { 
-                return item[key] ? item[key].toString().trim() : ""; 
-            } 
-        }
         return "";
     }
     
