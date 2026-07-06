@@ -2889,7 +2889,7 @@ function renderNewListTab() {
             for (var i = 0; i < allConsumers.length; i++) {
     var item = allConsumers[i] || {};
     
-    // 🚀 APK एनवायरनमेंट के लिए क्रैश-प्रूफ की-मैपिंग ड्राइवर
+    // 🚀 APK/GitHub एनवायरनमेंट के लिए क्रैश-प्रूफ की-मैपिंग ड्राइवर
     var rawStatus = (getRobustKey(item, "ATTEND STATUS") || item.attendStatus || "").toString().toUpperCase().trim();
     var rawDistStatus = (getRobustKey(item, "DISTRIBUTION STATUS") || item.distStatus || "").toString().toUpperCase().trim();
     
@@ -2899,14 +2899,12 @@ function renderNewListTab() {
     // 🎯 ReferenceError फिक्स: यहाँ चेक करें कि यह अकाउंट स्थानीय रूप से सेव है या नहीं
     var isLocallyDone = savedEntriesMap && savedEntriesMap[item.accountNo]; 
     
-    // ⚡ गिटहब एनवायरनमेंट बाईपास कंडीशन चेकर
-    var configAllList = globalReportConfigs.find(function(c) { return c.key === 'all_consumers_list'; });
+    // ⚡ गिटहब एनवायरनमेंट बाईपास कंडीशन चेकर (Array Safety Fix)
+    var configAllList = Array.isArray(globalReportConfigs) ? globalReportConfigs.find(function(c) { return c.key === 'all_consumers_list'; }) : null;
     var matchesSheetCondition = true;
     
     if (configAllList && configAllList.conditionStr && configAllList.conditionStr.indexOf('=') !== -1) {
         matchesSheetCondition = evaluateCustomCondition(item, configAllList.conditionStr);
-    } else {
-        matchesSheetCondition = true; 
     }
     
     // अब strictlyDone बिना किसी एरर के सही तरीके से ट्रू/फॉल्स रिटर्न करेगा
@@ -2919,16 +2917,16 @@ function renderNewListTab() {
         if (strictlyDone) { statusMatch = true; }
     }
                 
-                // 🚀 MR LOGIN BYPASS FIX: नाम मैचिंग को केस-इन्सेंसिटिव और ट्रिम सुरक्षित बनाना
+    // 🚀 MR LOGIN BYPASS FIX: नाम मैचिंग को केस-इन्सेंसिटिव और ट्रिम सुरक्षित बनाना
     var currentItemReader = (getReaderName(item) || "").toString().trim().toUpperCase();
     var currentLoggedInUser = (loggedInReader || "").toString().trim().toUpperCase();
     
     // एडमिन के अलावा सामान्य MR के लिए नाम का सीधा और सुरक्षित मिलान
     var isUserAuthorized = false;
-    if (currentLoggedInUser === "ANURAG SHAKYA") {
-        isUserAuthorized = isReaderAllowed(getReaderName(item)); // एडमिन के लिए पुराना ग्लोबल फ़िल्टर काम करेगा
+    if (currentLoggedInUser === "ANURAG SHAKYA" || currentLoggedInUser === "ADMIN") {
+        isUserAuthorized = isReaderAllowed(currentItemReader); 
     } else {
-        // सामान्य MR लॉगिन पर अगर नाम मैच होता है या शीट में रीडर असाइंड है
+        // सामान्य MR लॉगिन पर अगर नाम मैच होता है
         isUserAuthorized = (currentItemReader === currentLoggedInUser && currentLoggedInUser !== "");
     }
 
