@@ -1792,14 +1792,26 @@ function saveLiveNotificationToServer(targetReader, messageText, lockSeconds) {
                 var tx = db.transaction("consumers", "readwrite"); 
                 var store = tx.objectStore("consumers"); 
                 store.clear();
-                bulkData.consumers.forEach(function(item) { store.put(item); });
-                appSearchDatabaseCache = null; // डाउनलोड पूरा होते ही सर्च कैशे साफ़ करें
-                
-                tx.oncomplete = function() {
-                    if(bulkData && bulkData.reportConfigs) {
-                        localStorage.setItem("app_report_configs_cache", JSON.stringify(bulkData.reportConfigs));
-                        globalReportConfigs = bulkData.reportConfigs;
-                    }
+bulkData.consumers.forEach(function(item) { store.put(item); });
+appSearchDatabaseCache = null; 
+
+tx.oncomplete = function() {
+    if(bulkData && bulkData.reportConfigs) {
+        // 🚀 गिटहब/APK प्रॉक्सी बाईपास: अगर डेटा स्ट्रिंग के रूप में लिपटा है तो उसे फ़ोर्स पार्स करें
+        var parsedConfigs = bulkData.reportConfigs;
+        if (typeof parsedConfigs === "string") {
+            try { parsedConfigs = JSON.parse(parsedConfigs); } catch(e) { console.error("Config parse err", e); }
+        }
+        
+        // एक और सुरक्षा कवच: यदि अभी भी ऑब्जेक्ट के अंदर डेटा हो
+        if (parsedConfigs && parsedConfigs.data !== undefined) {
+            parsedConfigs = parsedConfigs.data;
+        }
+        
+        // सुनिश्चित करें कि यह हमेशा एक Array ही रहे ताकि .find() या .filter() फेल न हो
+        globalReportConfigs = Array.isArray(parsedConfigs) ? parsedConfigs : [];
+        localStorage.setItem("app_report_configs_cache", JSON.stringify(globalReportConfigs));
+    }
                     var currentDateTimeStr = new Date().toLocaleString('en-IN');
                     localStorage.setItem("data_last_updated_" + loggedInReader, currentDateTimeStr);
                     localStorage.setItem("last_sync_time_ms_" + loggedInReader, new Date().getTime()); 
@@ -2115,9 +2127,13 @@ function saveLiveNotificationToServer(targetReader, messageText, lockSeconds) {
     var selectedLoadCat = document.getElementById('billLoadCategoryFilter') ? document.getElementById('billLoadCategoryFilter').value : "10";
     
     try {
-        var cachedConfigs = localStorage.getItem("app_report_configs_cache");
-        if(cachedConfigs) globalReportConfigs = JSON.parse(cachedConfigs);
-    } catch(e){}
+    var cachedConfigs = localStorage.getItem("app_report_configs_cache");
+    if(cachedConfigs) {
+        var tempCfg = JSON.parse(cachedConfigs);
+        if (typeof tempCfg === "string") tempCfg = JSON.parse(tempCfg);
+        globalReportConfigs = Array.isArray(tempCfg) ? tempCfg : [];
+    }
+} catch(e){}
 
     getAdminDashboardDataAsync(function(res) {
         if (!res || !res.reports) return;
