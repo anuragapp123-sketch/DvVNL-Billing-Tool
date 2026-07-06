@@ -881,7 +881,7 @@
         <div id="apkErrorLogger" style="display:none; margin-top:10px; padding:10px; background:#fef2f2; border:1px solid #fca5a5; border-radius:6px; color:#b91c1c; font-size:11px; font-weight:bold; text-align:left; word-break:break-all; white-space:pre-wrap;"></div>
         <div class="app-footer-branding" style="position: relative;">
             Developed by:- Anurag Shakya | 9761414105
-            <span style="display:block; margin-top:4px; font-size:10px; color:#ef4444; font-weight:900;">App Version: V1.0.15</span>
+            <span style="display:block; margin-top:4px; font-size:10px; color:#ef4444; font-weight:900;">App Version: V1.0.16</span>
         </div>
     </div>
     
@@ -1135,7 +1135,7 @@
             
             <div style="text-align: center; margin-top: 25px; padding-top: 15px; border-top: 1px dashed #cbd5e1; color: #64748b;">
                 <div style="font-size: 12px; font-weight: bold;">Developed by: Anurag Shakya</div>
-                <div style="font-size: 11px; color: #ef4444; font-weight: 900; margin-top: 4px;">App Version: V1.0.15</div>
+                <div style="font-size: 11px; color: #ef4444; font-weight: 900; margin-top: 4px;">App Version: V1.0.16</div>
             </div>
         </div>
 
@@ -1184,7 +1184,7 @@
         <div style="width: 100%; height: 40px; clear: both; display: block !important; visibility: hidden; pointer-events: none;"></div>
         
         <div class="card" style="background: rgba(255, 255, 255, 0.7); margin-bottom: 20px; text-align: center; border: 1px dashed #cbd5e1;">
-            <div style="font-size: 11px; color: #ef4444; font-weight: 900; margin-bottom: 3px;">App Version: V1.0.15</div>
+            <div style="font-size: 11px; color: #ef4444; font-weight: 900; margin-bottom: 3px;">App Version: V1.0.16</div>
             <div style="font-size: 12px; color: #1e40af; font-weight: 800; text-transform: uppercase; margin-bottom: 5px;"><i class="fa-solid fa-user-tie"></i> <span id="welcomeTxt">Mr Name: Loading...</span></div>
             <div style="font-size: 11px; font-weight: 700; color: #475569; border-top: 1px solid #cbd5e1; padding-top: 5px;">
                 Developed by:- Er. Anurag Shakya | 9761414105
@@ -2896,25 +2896,37 @@ function renderNewListTab() {
     var itemDiv = (getRobustKey(item, "DIVISION") || item.division || "").toString().toUpperCase().trim();
     var divMatch = (selectedDiv === "ALL" || selectedDiv === itemDiv); 
     
-    // 🎯 ReferenceError फिक्स: यहाँ चेक करें कि यह अकाउंट स्थानीय रूप से सेव है या नहीं
+    // 🎯 ReferenceError फिक्स: स्थानीय रूप से सेव ड्राफ्ट की जाँच
     var isLocallyDone = savedEntriesMap && savedEntriesMap[item.accountNo]; 
     
-    // ⚡ गिटहब एनवायरनमेंट बाईपास कंडीशन चेकर (Array Safety Fix)
-    var configAllList = Array.isArray(globalReportConfigs) ? globalReportConfigs.find(function(c) { return c.key === 'all_consumers_list'; }) : null;
+    // ⚡ गिटहब/प्रॉक्सी एनवायरनमेंट कैशे सेफ्टी कवच
+    if (!globalReportConfigs || !Array.isArray(globalReportConfigs) || globalReportConfigs.length === 0) {
+        try {
+            var apkCachedConfigs = localStorage.getItem("app_report_configs_cache");
+            if (apkCachedConfigs) globalReportConfigs = JSON.parse(apkCachedConfigs);
+        } catch(e) { console.error("Cache recovery failed", e); }
+    }
+    
+    var configAllList = (globalReportConfigs && Array.isArray(globalReportConfigs)) ? globalReportConfigs.find(function(c) { return c.key === 'all_consumers_list'; }) : null;
     var matchesSheetCondition = true;
     
+    // यदि कॉन्फ़िगरेशन मिल जाए तो कंडीशन जांचें, अन्यथा गिटहब बाईपास मोड में इसे डिफ़ॉल्ट रूप से True रखें
     if (configAllList && configAllList.conditionStr && configAllList.conditionStr.indexOf('=') !== -1) {
         matchesSheetCondition = evaluateCustomCondition(item, configAllList.conditionStr);
     }
     
-    // अब strictlyDone बिना किसी एरर के सही तरीके से ट्रू/फॉल्स रिटर्न करेगा
     var strictlyDone = (item.isDone === true || item.isDone === "true" || rawStatus === "ATTEND" || rawStatus === "DONE" || rawDistStatus === "DISTRIBUTED" || isLocallyDone);
     var statusMatch = false;
 
+    // 🎯 पेंडिंग और अटेंड फ़िल्टर रिकवरी इंजन
     if (selectedStatus === "PENDING") { 
-        if (!strictlyDone && matchesSheetCondition) { statusMatch = true; }
+        if (!strictlyDone && matchesSheetCondition) { 
+            statusMatch = true; 
+        }
     } else if (selectedStatus === "ATTEND") { 
-        if (strictlyDone) { statusMatch = true; }
+        if (strictlyDone) { 
+            statusMatch = true; 
+        }
     }
                 
     // 🚀 MR LOGIN BYPASS FIX: नाम मैचिंग को केस-इन्सेंसिटिव और ट्रिम सुरक्षित बनाना
