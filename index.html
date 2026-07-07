@@ -113,6 +113,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
     <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <style>
     /* 🎨 NAVIGATION & DYNAMIC MULTI-THEME ENGINE */
@@ -678,9 +679,9 @@
         color: white; 
         box-shadow: 0 10px 15px -3px rgba(30, 64, 175, 0.2); 
     }
-    .app-top-header span { font-weight: 700; font-size: 14px; }
-    .header-icon-btn { color: #facc15; background: none; border: none; cursor: pointer; font-size: 18px; padding: 0 8px; }
-    .header-icon-btn.logout { color: #fda4af; font-size: 16px; margin-left: 10px;}
+    .app-top-header span { font-weight: 900; font-size: 11.5px !important; letter-spacing: 0.2px; }
+    .header-icon-btn { color: #facc15; background: none; border: none; cursor: pointer; font-size: 15px; padding: 0 4px; }
+    .header-icon-btn.logout { color: #fda4af; font-size: 14px; margin-left: 2px;}
     .login-logo-container { text-align: center; margin-bottom: 15px; }
     .login-logo-container i { font-size: 45px; color: #4f46e5; width: 90px; height: 90px; line-height: 84px; border-radius: 50%; border: 3px solid #e2e8f0; background: white; box-shadow: 0 4px 6px rgba(0,0,0,0.1); display: inline-block; }
     
@@ -881,7 +882,7 @@
         <div id="apkErrorLogger" style="display:none; margin-top:10px; padding:10px; background:#fef2f2; border:1px solid #fca5a5; border-radius:6px; color:#b91c1c; font-size:11px; font-weight:bold; text-align:left; word-break:break-all; white-space:pre-wrap;"></div>
         <div class="app-footer-branding" style="position: relative;">
             Developed by:- Anurag Shakya | 9761414105
-            <span style="display:block; margin-top:4px; font-size:10px; color:#ef4444; font-weight:900;">App Version: V1.0.16</span>
+            <span style="display:block; margin-top:4px; font-size:10px; color:#ef4444; font-weight:900;">App Version: V1.0.17</span>
         </div>
     </div>
     
@@ -890,18 +891,29 @@
         <!-- 🎯 अल्टीमेट फिक्स: स्टेटस बार और कैमरे के लिए ऊपर 35px का फिक्स खाली स्पेस -->
         <div style="width: 100%; height: 35px; display: block; clear: both; pointer-events: none;"></div>
 
-        <div class="app-top-header" style="padding: 14px 16px !important; margin: 0 -8px 12px -8px !important; border-radius: 0 0 12px 12px !important;">
-            <div style="display: flex; align-items: center;">
-                <span style="font-size: 15px; font-weight: 900; color: white; letter-spacing: 0.5px;"><i class="fa-solid fa-bolt" style="color: #facc15; margin-right: 5px;"></i> DvVNL Billing</span>
+        <div class="app-top-header" style="position: relative; padding: 10px 8px !important; margin: 0 -8px 12px -8px !important; border-radius: 0 0 12px 12px !important; z-index: 10005; display: flex !important; justify-content: space-between !important; align-items: center !important; gap: 4px;">
+            
+            <div style="display: flex; align-items: center; gap: 6px; flex: 1; min-width: 0;">
+                <button onclick="toggleReportSidebar(true)" class="header-icon-btn" style="color: white; font-size: 16px; padding: 0 2px; flex-shrink: 0;"><i class="fa-solid fa-bars"></i></button>
+                
+                <span style="font-size: 11.5px !important; font-weight: 900; color: white; letter-spacing: 0.2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: inline-flex; align-items: center; gap: 3px; flex-shrink: 0;">
+                    <i class="fa-solid fa-bolt" style="color: #facc15;"></i> DvVNL Billing
+                </span>
+                
+                <button id="headerFilterBtn" onclick="toggleHeaderFilterDropdown(event)" class="header-icon-btn" style="color: #facc15; font-size: 11px !important; display: none; background: rgba(255,255,255,0.15); padding: 4px 6px !important; border-radius: 4px; white-space: nowrap; flex-shrink: 0; margin-left: 2px; line-height: 1;">
+                    <i class="fa-solid fa-filter" style="font-size: 10px;"></i> फ़िल्टर <i class="fa-solid fa-caret-down" style="font-size: 8px;"></i>
+                </button>
+
+                <div id="headerFilterDropdownContent" style="display: none; position: absolute; top: 100%; left: 8px; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px; max-height: 280px; width: 220px; overflow-y: auto; z-index: 1010; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.3); -webkit-overflow-scrolling: touch; margin-top: 2px;">
+                    <div id="headerReaderCheckboxesContainer" style="display: flex; flex-direction: column; gap: 4px;"></div>
+                </div>
             </div>
-            <div>
-                <button onclick="syncOfflineDataToServer()" class="header-icon-btn" title="Sync Manual Entry to Server" style="color: #10b981; font-size: 19px;"><i class="fa-solid fa-cloud-arrow-up"></i></button>
-                <button onclick="forceAppCodeUpdate()" class="header-icon-btn" title="Download New App Update" style="color: #facc15; font-size: 17px; margin-left: 6px;"><i class="fa-solid fa-cloud-arrow-down"></i></button>
-                <button onclick="logoutSafely()" class="header-icon-btn logout" title="Logout"><i class="fa-solid fa-power-off"></i></button>
-                <!-- 🎨 थीम बदलने का प्रीमियम बटन -->
-<button onclick="changeAppThemeNext()" class="header-icon-btn" title="Change App Color" style="color: #facc15; font-size: 18px; margin-right: 4px;">
-    <i class="fa-solid fa-palette"></i>
-</button>
+            
+            <div style="display: flex; align-items: center; gap: 8px; flex-shrink: 0;">
+                <button onclick="syncOfflineDataToServer()" class="header-icon-btn" title="Sync Manual Entry to Server" style="color: #10b981; font-size: 16px; padding: 2px;"><i class="fa-solid fa-cloud-arrow-up"></i></button>
+                <button onclick="changeAppThemeNext()" class="header-icon-btn" title="Change App Color" style="color: #facc15; font-size: 15px; padding: 2px;"><i class="fa-solid fa-palette"></i></button>
+                <button onclick="forceAppCodeUpdate()" class="header-icon-btn" title="Download New App Update" style="color: #facc15; font-size: 15px; padding: 2px;"><i class="fa-solid fa-cloud-arrow-down"></i></button>
+                <button onclick="logoutSafely()" class="header-icon-btn logout" title="Logout" style="color: #fda4af; font-size: 14px; padding: 2px; margin-left: 2px;"><i class="fa-solid fa-power-off"></i></button>
             </div>
         </div>
 
@@ -1010,17 +1022,96 @@
             <!-- 🟢 LAST UPDATED LABEL: अब यह हमेशा सबसे टॉप पर दिखाई देगा -->
             <div id="lastUpdatedLabel" style="text-align:center; font-size:11px; font-weight:800; margin-bottom:10px; color:#1e40af; background:#eff6ff; padding:6px; border-radius:8px; border:1px solid #bfdbfe; letter-spacing: 0.5px; text-transform: uppercase;">Last Updated:- Not Downloaded Yet</div>
 
-            <!-- 🟢 न्यू सब-टैब नेविगेशन बार (अपडेटेड 4 छोटे टैब्स) -->
-            <div style="display: flex; background: #e2e8f0; padding: 4px; border-radius: 8px; margin-bottom: 12px; gap: 4px; flex-wrap: nowrap; overflow-x: auto;">
-                <button id="sub-tab-cards-btn" onclick="switchSubSummary('cards')" style="flex: 1; padding: 8px 4px; border: none; border-radius: 6px; font-weight: 900; font-size: 11px; cursor: pointer; background: #1e40af; color: white; transition: 0.2s; white-space: nowrap;"><i class="fa-solid fa-chart-simple"></i> डैशबोर्ड</button>
-                <button id="sub-tab-table-btn" onclick="switchSubSummary('table')" style="flex: 1; padding: 8px 4px; border: none; border-radius: 6px; font-weight: 900; font-size: 11px; cursor: pointer; background: transparent; color: #475569; transition: 0.2s; white-space: nowrap;"><i class="fa-solid fa-list-check"></i> Reports</button>
-                <button id="sub-tab-bills-btn" onclick="openReportRowDirect('all_bills_report')" style="flex: 1; padding: 8px 4px; border: none; border-radius: 6px; font-weight: 900; font-size: 11px; cursor: pointer; background: transparent; color: #475569; transition: 0.2s; white-space: nowrap;"><i class="fa-solid fa-file-invoice-dollar"></i> All Bills</button>
-                <button id="sub-tab-consumers-btn" onclick="openReportRowDirect('all_consumers_list')" style="flex: 1; padding: 8px 4px; border: none; border-radius: 6px; font-weight: 900; font-size: 11px; cursor: pointer; background: transparent; color: #475569; transition: 0.2s; white-space: nowrap;"><i class="fa-solid fa-users"></i> Consumers</button>
+            <div style="display: flex; background: #e2e8f0; padding: 5px; border-radius: 8px; margin-bottom: 12px; gap: 6px; flex-wrap: nowrap; overflow-x: auto; align-items: center; -webkit-overflow-scrolling: touch; scrollbar-width: none;">
+                <style>
+                    /* स्क्रॉलबार डिज़ाइन को अदृश्य और साफ रखने के लिए */
+                    div::-webkit-scrollbar { display: none !important; }
+                    .sub-tab-shared-style {
+                        padding: 8px 12px !important;
+                        border: none !important;
+                        border-radius: 6px !important;
+                        font-weight: 900 !important;
+                        font-size: 11px !important;
+                        cursor: pointer !important;
+                        transition: all 0.2s ease-in-out !important;
+                        white-space: nowrap !important;
+                        display: inline-flex !important;
+                        align-items: center !important;
+                        justify-content: center !important;
+                        gap: 5px !important;
+                        height: 32px !important;
+                        line-height: 1 !important;
+                    }
+                </style>
+                <button id="sub-tab-cards-btn" class="sub-tab-shared-style" onclick="switchSubSummary('cards')" style="background: #1e40af; color: white;">
+                    <i class="fa-solid fa-chart-simple"></i> डैशबोर्ड
+                </button>
+                <button id="sub-tab-analytics-btn" class="sub-tab-shared-style" onclick="switchSubSummary('analytics')" style="background: transparent; color: #475569;">
+                    <i class="fa-solid fa-chart-pie"></i> Analytics
+                </button>
+                <button id="sub-tab-table-btn" class="sub-tab-shared-style" onclick="switchSubSummary('table')" style="background: transparent; color: #475569;">
+                    <i class="fa-solid fa-list-check"></i> Reports
+                </button>
+                <button id="sub-tab-bills-btn" class="sub-tab-shared-style" onclick="openReportRowDirect('all_bills_report')" style="background: transparent; color: #475569;">
+                    <i class="fa-solid fa-file-invoice-dollar"></i> All Bills
+                </button>
+                <button id="sub-tab-consumers-btn" class="sub-tab-shared-style" onclick="openReportRowDirect('all_consumers_list')" style="background: transparent; color: #475569;">
+                    <i class="fa-solid fa-users"></i> Consumers
+                </button>
             </div>
             
-            <!-- 🟢 सब-टैब 1: केवल समरी कार्ड्स ब्लॉक -->
             <div id="sub-view-cards" style="display: block;">
                 <div class="stats-grid" id="summaryGridToPrint"></div>
+            </div>
+
+            <!-- 📊 नया सब-टैब 1.5: एनालिटिक्स विज़ुअल चार्ट्स एवं पेंडेंसी मैट्रिक्स ब्लॉक -->
+            <div id="sub-view-analytics" style="display: none;">
+                <div class="flex-row-btns" style="margin-bottom: 8px;">
+                    <button onclick="exportAnalyticsReportPDF()" class="btn pdf-bg" style="font-size:12px; padding:10px;"><i class="fa-solid fa-file-pdf"></i> Download Analytics Report (PDF)</button>
+                </div>
+                <div class="card" id="analyticsLiveChartEngine" style="background:#fff; padding:12px; margin-bottom:10px; display: grid; grid-template-columns: 1fr; gap: 15px; height: auto;">
+                    <div style="background:#f8fafc; padding:12px; border:1px solid #e2e8f0; border-radius:8px; min-height:200px;">
+                        <canvas id="chartMainMeterAnalytics"></canvas>
+                    </div>
+                    <div style="background:#f8fafc; padding:12px; border:1px solid #e2e8f0; border-radius:8px; min-height:200px;">
+                        <canvas id="chartPoleMeterAnalytics"></canvas>
+                    </div>
+                    <div style="background:#f8fafc; padding:12px; border:1px solid #e2e8f0; border-radius:8px; min-height:200px;">
+                        <canvas id="chartBillDistAnalytics"></canvas>
+                    </div>
+                </div>
+                <div class="card" style="padding:10px; overflow-x:auto;">
+                    <h4 style="font-size:12px; color:var(--theme-primary); margin-bottom:6px; text-transform:uppercase;"><i class="fa-solid fa-table-list"></i> Reader Wise Pendency Matrix</h4>
+                    <!-- 🎯 सभी 19 विशिष्ट कॉलम्स के साथ पूरी तरह फिक्स हेडर टेबल -->
+                    <table class="summary-table" id="analyticsMatrixTable" style="font-size:10px; width:100%; white-space: nowrap;">
+                        <thead>
+                            <tr style="font-size:9.5px; background: var(--theme-table-th);">
+                                <th style="padding:6px 4px; position:sticky; left:0; background:inherit; z-index:6; text-align:left;">रीडर नाम</th>
+                                <th style="padding:6px 2px; text-align:center;">Prev Day Visit</th>
+                                <th style="padding:6px 2px; text-align:center;">Main Pnd</th>
+                                <th style="padding:6px 2px; text-align:center;">Main MRI Up</th>
+                                <th style="padding:6px 2px; text-align:center;">Main MRI NotUp</th>
+                                <th style="padding:6px 2px; text-align:center;">Main LS Avail %</th>
+                                <th style="padding:6px 2px; text-align:center;">Main LS NotAvail</th>
+                                <th style="padding:6px 2px; text-align:center;">Main Exception</th>
+                                <th style="padding:6px 2px; text-align:center;">Main Manual</th>
+                                <th style="padding:6px 2px; text-align:center;">Pole Pnd</th>
+                                <th style="padding:6px 2px; text-align:center;">Pole MRI Up</th>
+                                <th style="padding:6px 2px; text-align:center;">Pole MRI NotUp</th>
+                                <th style="padding:6px 2px; text-align:center;">Pole LS Avail %</th>
+                                <th style="padding:6px 2px; text-align:center;">Pole LS NotAvail</th>
+                                <th style="padding:6px 2px; text-align:center;">Pole Exception</th>
+                                <th style="padding:6px 2px; text-align:center;">Pole Manual</th>
+                                <th style="padding:6px 2px; text-align:center;">No Mtr Site</th>
+                                <th style="padding:6px 2px; text-align:center;">Bill Upload</th>
+                                <th style="padding:6px 2px; text-align:center;">Tower/Apco Pnd</th>
+                                <th style="padding:6px 2px; text-align:center;">Bill Dist Pnd</th>
+                                <th style="padding:6px 2px; text-align:center;">Done %</th>
+                            </tr>
+                        </thead>
+                        <tbody id="analyticsMatrixTableBody"></tbody>
+                    </table>
+                </div>
             </div>
             
             <!-- 🟢 सब-टैब 2: केवल रिपोर्ट लिस्ट ब्लॉक -->
@@ -1113,13 +1204,15 @@
                 </div>
             </div>
 
-            <!-- 🛠️ केवल एडमिन के लिए साइडबार मेनू पैनल -->
+            <!-- 🛠️ केवल एडमिन के लिए साइडबार मेनू पैनल (विजिट्स बटन के साथ फिक्स) -->
             <div id="sidebarAdminControlSection" style="display: none; margin-bottom: 15px; background: #faf5ff; border: 1px solid #e9d5ff; padding: 10px; border-radius: 8px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);">
                 <div style="font-size: 11px; font-weight: 900; color: #6b21a8; text-transform: uppercase; margin-bottom: 8px; border-bottom: 1px dashed #c084fc; padding-bottom: 4px;"><i class="fa-solid fa-user-shield"></i> Admin Control Panel</div>
                 <div style="display: flex; flex-direction: column; gap: 6px;">
-                    <button onclick="switchTab('filter'); toggleReportSidebar(false);" class="report-menu-btn" style="margin-bottom:0; padding:10px; background:#ffffff; border-color:#d8b4fe; color:#6b21a8;"><span style="font-weight:700;"><i class="fa-solid fa-filter" style="color:#7c3aed; margin-right:6px;"></i> ग्लोबल फ़िल्टर पैनल</span><i class="fa-solid fa-chevron-right" style="font-size:10px; color:#c084fc;"></i></button>
                     <button onclick="switchTab('notifyadmin'); toggleReportSidebar(false);" class="report-menu-btn" style="margin-bottom:0; padding:10px; background:#ffffff; border-color:#d8b4fe; color:#6b21a8;"><span style="font-weight:700;"><i class="fa-solid fa-paper-plane" style="color:#7c3aed; margin-right:6px;"></i> लाइव सूचना सेंडर</span><i class="fa-solid fa-chevron-right" style="font-size:10px; color:#c084fc;"></i></button>
                     <button onclick="switchTab('configmaker'); toggleReportSidebar(false);" class="report-menu-btn" style="margin-bottom:0; padding:10px; background:#ffffff; border-color:#d8b4fe; color:#6b21a8;"><span style="font-weight:700;"><i class="fa-solid fa-sliders" style="color:#7c3aed; margin-right:6px;"></i> रिपोर्ट कन्फिग मेकर</span><i class="fa-solid fa-chevron-right" style="font-size:10px; color:#c084fc;"></i></button>
+                    
+                    <!-- 🎯 विजिट्स का असली HTML बटन वापस जोड़ा गया -->
+                    <button id="btn-tab-visitdata" onclick="switchTab('visitdata'); toggleReportSidebar(false);" class="report-menu-btn" style="margin-bottom:0; padding:10px; background:#ffffff; border-color:#cbd5e1; color:#334155;"><span style="font-weight:700;"><i class="fa-solid fa-map-location-dot" style="color:#3b82f6; margin-right:6px;"></i> सम्पूर्ण विजिट्स डेटा</span><i class="fa-solid fa-chevron-right" style="font-size:10px; color:#cbd5e1;"></i></button>
                 </div>
             </div>
             
@@ -1135,7 +1228,7 @@
             
             <div style="text-align: center; margin-top: 25px; padding-top: 15px; border-top: 1px dashed #cbd5e1; color: #64748b;">
                 <div style="font-size: 12px; font-weight: bold;">Developed by: Anurag Shakya</div>
-                <div style="font-size: 11px; color: #ef4444; font-weight: 900; margin-top: 4px;">App Version: V1.0.16</div>
+                <div style="font-size: 11px; color: #ef4444; font-weight: 900; margin-top: 4px;">App Version: V1.0.17</div>
             </div>
         </div>
 
@@ -1184,7 +1277,7 @@
         <div style="width: 100%; height: 40px; clear: both; display: block !important; visibility: hidden; pointer-events: none;"></div>
         
         <div class="card" style="background: rgba(255, 255, 255, 0.7); margin-bottom: 20px; text-align: center; border: 1px dashed #cbd5e1;">
-            <div style="font-size: 11px; color: #ef4444; font-weight: 900; margin-bottom: 3px;">App Version: V1.0.16</div>
+            <div style="font-size: 11px; color: #ef4444; font-weight: 900; margin-bottom: 3px;">App Version: V1.0.17</div>
             <div style="font-size: 12px; color: #1e40af; font-weight: 800; text-transform: uppercase; margin-bottom: 5px;"><i class="fa-solid fa-user-tie"></i> <span id="welcomeTxt">Mr Name: Loading...</span></div>
             <div style="font-size: 11px; font-weight: 700; color: #475569; border-top: 1px solid #cbd5e1; padding-top: 5px;">
                 Developed by:- Er. Anurag Shakya | 9761414105
@@ -1193,47 +1286,21 @@
         
         <div style="width: 100%; height: 20px; clear: both; display: block !important; visibility: hidden; pointer-events: none;"></div>
 
+    <!-- 📱 इमेज के अनुसार केवल 3 बटन्स वाला साफ और सुंदर बॉटम बार -->
     <div class="tab-bar">
-            <button class="tab-btn active" id="btn-tab-summary" onclick="switchTab('summary')">
-                <i class="fa-solid fa-house"></i>
-                <span>होम</span>
-            </button>
-            <button class="tab-btn" id="btn-tab-list" onclick="switchTab('list')">
-                <i class="fa-solid fa-users"></i>
-                <span>उपभोक्ता</span>
-            </button>
-            <button class="tab-btn" id="btn-tab-billdist" onclick="switchTab('billdist')">
-                <i class="fa-solid fa-file-invoice-dollar"></i>
-                <span>बिल वितरण</span>
-            </button>
-            <button class="tab-btn" id="btn-tab-visitdata" onclick="switchTab('visitdata')" style="display:none;">
-                <i class="fa-solid fa-map-location-dot"></i>
-                <span>विजिट्स</span>
-            </button>
-            
-            <!-- 📢 नया सूचना टैब (केवल एडमिन के लिए) -->
-            <button class="tab-btn admin-green" id="btn-tab-notifyadmin" onclick="switchTab('notifyadmin')" style="display:none;">
-                <i class="fa-solid fa-paper-plane"></i>
-                <span>सूचना</span>
-            </button>
-            
-            <!-- 🔍 नया फ़िल्ट<!-- 🔍 नया फ़िल्टर टैब (केवल एडमिन के लिए) -->
-            <button class="tab-btn admin-green" id="btn-tab-filter" onclick="switchTab('filter')" style="display:none;">
-                <i class="fa-solid fa-filter"></i>
-                <span>फ़िल्टर</span>
-            </button>
-
-            <!-- ⚙️ नया कन्फिग जनरेटर टैब (केवल एडमिन के लिए) -->
-            <button class="tab-btn admin-green" id="btn-tab-configmaker" onclick="switchTab('configmaker')" style="display:none;">
-                <i class="fa-solid fa-sliders"></i>
-                <span>कन्फिग</span>
-            </button>
-        </div>
-            <button class="tab-btn admin-green" id="btn-tab-filter" onclick="switchTab('filter')" style="display:none;">
-                <i class="fa-solid fa-filter"></i>
-                <span>फ़िल्टर</span>
-            </button>
-        </div>
+        <button class="tab-btn active" id="btn-tab-summary" onclick="switchTab('summary')">
+            <i class="fa-solid fa-house"></i>
+            <span>होम</span>
+        </button>
+        <button class="tab-btn" id="btn-tab-list" onclick="switchTab('list')">
+            <i class="fa-solid fa-users"></i>
+            <span>उपभोक्ता</span>
+        </button>
+        <button class="tab-btn" id="btn-tab-billdist" onclick="switchTab('billdist')">
+            <i class="fa-solid fa-file-invoice-dollar"></i>
+            <span>बिल वितरण</span>
+        </button>
+    </div>
     </div>
     
     <div id="formView" class="card" style="display: none;">
@@ -1883,96 +1950,149 @@ tx.oncomplete = function() {
 }
 
     function buildAdminMultiSelectCheckbox(consumersList) {
-        setTimeout(function() {
-            var selectNode = document.getElementById('adminMultiReaderSelect'); 
-            var filterTabBtn = document.getElementById('btn-tab-filter');
-            var visitTabBtn = document.getElementById('btn-tab-visitdata');
-            var notifyTabBtn = document.getElementById('btn-tab-notifyadmin');
+    setTimeout(function() {
+        var selectNode = document.getElementById('adminMultiReaderSelect'); 
+        var filterTabBtn = document.getElementById('btn-tab-filter');
+        var visitTabBtn = document.getElementById('btn-tab-visitdata');
+        var notifyTabBtn = document.getElementById('btn-tab-notifyadmin');
+        var configTabBtn = document.getElementById('btn-tab-configmaker');
 
-            if (!loggedInReader || loggedInReader.toUpperCase() !== "ANURAG SHAKYA") { 
-                if(filterTabBtn) filterTabBtn.style.setProperty("display", "none", "important"); 
-                if(visitTabBtn) visitTabBtn.style.setProperty("display", "none", "important"); 
-                if(notifyTabBtn) notifyTabBtn.style.setProperty("display", "none", "important"); 
-                return; 
-            }
-            
-            if(filterTabBtn) filterTabBtn.style.setProperty("display", "flex", "important"); 
-            if(visitTabBtn) visitTabBtn.style.setProperty("display", "flex", "important");
-            if(notifyTabBtn) notifyTabBtn.style.setProperty("display", "flex", "important");
-            
-            if (selectNode) {
-                selectNode.style.cssText = "display: flex !important; flex-direction: column !important; gap: 4px !important; width: 100% !important; max-height: 60vh !important; overflow-y: auto !important; padding: 10px !important; background: #ffffff !important; border: 1px solid #cbd5e1 !important; border-radius: 6px !important; box-sizing: border-box !important;";
-            }
-            
-            var dataArray = consumersList || [];
-            var readerSet = new Set(); 
-            var readerPhoneMap = {}; 
-            
-            dataArray.forEach(function(item) { 
-                var rn = getReaderName(item); 
-                if(rn && rn.trim() !== "") {
-                    var cleanName = rn.trim().toUpperCase();
-                    readerSet.add(cleanName); 
-                    var phone = item.readerMasterPhone || item["MR MOBILE NO."] || item["MR MOBILE NO"] || item["Master Mobile Number"] || "";
-                    if (phone && !readerPhoneMap[cleanName]) {
-                        readerPhoneMap[cleanName] = phone;
-                    }
+        // 🎯 फ़िल्टर लॉक फिक्स: एडमिन स्क्रीन पर बटन को परमानेंट विज़िबल रखना
+        var headerFilterBtn = document.getElementById('headerFilterBtn');
+        var headerContainer = document.getElementById('headerReaderCheckboxesContainer');
+        
+        if (loggedInReader && (loggedInReader.toUpperCase() === "ANURAG SHAKYA" || loggedInReader.toUpperCase() === "ADMIN")) {
+            if(headerFilterBtn) headerFilterBtn.style.setProperty("display", "inline-block", "important");
+        } else {
+            if(headerFilterBtn) headerFilterBtn.style.setProperty("display", "none", "important");
+            if(filterTabBtn) filterTabBtn.style.setProperty("display", "none", "important"); 
+            if(visitTabBtn) visitTabBtn.style.setProperty("display", "none", "important"); 
+            if(notifyTabBtn) notifyTabBtn.style.setProperty("display", "none", "important"); 
+            if(configTabBtn) configTabBtn.style.setProperty("display", "none", "important"); 
+            return; 
+        }
+        
+        if(filterTabBtn) filterTabBtn.style.setProperty("display", "flex", "important"); 
+        if(visitTabBtn) visitTabBtn.style.setProperty("display", "flex", "important");
+        if(notifyTabBtn) notifyTabBtn.style.setProperty("display", "flex", "important");
+        if(configTabBtn) configTabBtn.style.setProperty("display", "flex", "important");
+        
+        var dataArray = consumersList || [];
+        var readerSet = new Set(); 
+        var readerPhoneMap = {}; 
+        
+        dataArray.forEach(function(item) { 
+            var rn = getReaderName(item); 
+            if(rn && rn.trim() !== "") {
+                var cleanName = rn.trim().toUpperCase();
+                readerSet.add(cleanName); 
+                var phone = item.readerMasterPhone || item["MR MOBILE NO."] || item["MR MOBILE NO"] || item["Master Mobile Number"] || "";
+                if (phone && !readerPhoneMap[cleanName]) {
+                    readerPhoneMap[cleanName] = phone;
                 }
-            });
-            
-            if (readerSet.size === 0) {
-                console.log("Readers list temporary empty or downloading in background...");
-                return;
             }
+        });
+        
+        if (readerSet.size === 0) return;
 
-            var html = "";
+        // 📱 ग्रिड आधारित एक्सेल स्टाइल ड्रॉपडाउन लॉन्चर (चेकबॉक्स एक सीध में लॉक रहेंगे)
+        var currentSelections = adminSelectedReaders.length > 0 ? adminSelectedReaders : Array.from(readerSet);
+        adminSelectedReaders = [];
 
-            html += "<label style='display: inline-flex; flex-direction: row; align-items: center; justify-content: flex-start; gap: 8px; background: #dcfce7; padding: 6px 10px; border: 1px solid #22c55e; border-radius: 4px; font-weight: 800; color: #166534; cursor: pointer; margin-bottom: 6px; width: max-content; max-width: 100%; box-sizing: border-box; text-align: left;'>" + 
-                    "<input type='checkbox' id='adminSelectAll' checked onchange='toggleAllAdminReaders(this); event.stopPropagation();' onclick='event.stopPropagation();' style='width: 14px; height: 14px; cursor: pointer; margin: 0; flex-shrink: 0;'> " + 
-                    "<div style='font-size: 13px; font-weight: 800; text-align: left; white-space: nowrap;'>📢 SELECT ALL METER READERS</div>" +
-                    "</label>";
+        var html = "<label style='display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 8px; font-weight: bold; color: #1e40af; border-bottom: 1px solid #e2e8f0; padding-bottom: 6px; margin-bottom: 6px; font-size: 11px; text-align: left !important; width: 100%; box-sizing: border-box;'>" +
+                   "<input type='checkbox' id='headerFilterSelectAll' checked onchange='toggleAllHeaderReaders(this)' style='margin:0; flex-shrink:0;'>" +
+                   "<span style='text-align: left !important;'>SELECT ALL (EXCEL FILTER)</span>" +
+                   "</label>";
+
+        var idx = 0;
+        Array.from(readerSet).sort().forEach(function(reader) { 
+            var isChecked = currentSelections.includes(reader) ? "checked" : "";
+            var safeReader = reader || "UNKNOWN";
+            var phoneNo = readerPhoneMap[safeReader] || ""; 
             
-            var currentSelections = adminSelectedReaders.length > 0 ? adminSelectedReaders : Array.from(readerSet);
-            adminSelectedReaders = [];
+            var waBtn = "<button onclick=\"sendReaderPendencyWhatsApp(event, '" + safeReader + "', '" + phoneNo + "')\" style='background: none; border: none; color: #25D366; font-size: 14px; cursor: pointer; padding: 0; display: inline-flex; align-items: center; margin-left: 6px; flex-shrink: 0;' title='Send Pendency'><i class='fa-brands fa-whatsapp'></i></button>";
 
-            var idx = 0;
-            readerSet.forEach(function(reader) { 
-                var isChecked = currentSelections.includes(reader) ? "checked" : "";
-                var safeReader = reader || "UNKNOWN";
-                var phoneNo = readerPhoneMap[safeReader] || ""; 
-                
-                var waBtn = "<button onclick=\"sendReaderPendencyWhatsApp(event, '" + safeReader + "', '" + phoneNo + "')\" style='background: none; border: none; color: #25D366; font-size: 18px; cursor: pointer; padding: 0; display: inline-flex; align-items: center; margin-left: 4px; flex-shrink: 0;' title='Send Pendency'><i class='fa-brands fa-whatsapp'></i></button>";
-
-                html += "<label style='display: inline-flex; flex-direction: row; align-items: center; justify-content: flex-start; gap: 8px; background: transparent; padding: 5px 8px; border: none; cursor: pointer; width: max-content; max-width: 100%; box-sizing: border-box; text-align: left; margin-bottom: 2px; transition: background 0.1s;' onclick=\"var cb=document.getElementById('adm-cb-" + idx + "'); if(cb) { cb.checked=!cb.checked; applyAdminReaderFilter(); }\">" +
-                        "<input type='checkbox' id='adm-cb-" + idx + "' class='adm-reader-cb' value='" + safeReader + "' " + isChecked + " onchange='applyAdminReaderFilter(); event.stopPropagation();' onclick='event.stopPropagation();' style='width: 14px; height: 14px; cursor: pointer; margin: 0; flex-shrink: 0;'>\n" + 
-                        "<div style='font-size: 13px; font-weight: 700; color: #0f172a; text-align: left; white-space: nowrap; display: flex; align-items: center; gap: 6px;'> " + 
-                        "<span>" + safeReader + "</span>" + 
-                        waBtn + 
-                        "</div>" +
-                        "</label>"; 
-                
-                if(isChecked) adminSelectedReaders.push(safeReader); 
-                idx++;
-            });
+            html += "<label style='display: grid; grid-template-columns: auto 1fr; align-items: start; gap: 8px; font-size: 11.5px; padding: 4px 0; cursor: pointer; color: #334155; font-weight: 600; text-align: left !important; width: 100%; box-sizing: border-box;' onclick=\"event.stopPropagation();\">" +
+                    "<input type='checkbox' id='adm-cb-" + idx + "' class='header-reader-cb' value='" + safeReader + "' " + isChecked + " onchange='applyHeaderReaderFilter(); event.stopPropagation();' style='margin: 0; margin-top: 2px; flex-shrink: 0;'>" +
+                    "<div style='text-align: left !important; white-space: normal; word-break: break-word; line-height: 1.3; display: flex; align-items: center; gap: 4px;'>" + 
+                    "<span>" + safeReader + "</span>" + 
+                    waBtn + 
+                    "</div>" +
+                    "</label>"; 
             
-            if (selectNode) selectNode.innerHTML = html;
-            
-            var selectAllNode = document.getElementById('adminSelectAll');
-            if(selectAllNode) selectAllNode.checked = (adminSelectedReaders.length === readerSet.size && readerSet.size > 0);
+            if(isChecked) adminSelectedReaders.push(safeReader); 
+            idx++;
+        });
+        
+        if (headerContainer) headerContainer.innerHTML = html;
+        
+        var selectAllNode = document.getElementById('headerFilterSelectAll');
+        if(selectAllNode) selectAllNode.checked = (adminSelectedReaders.length === readerSet.size && readerSet.size > 0);
 
-            var notifyCheckboxesContainer = document.getElementById('notifyReaderCheckboxesContainer');
-            if (notifyCheckboxesContainer) {
-                var cbHtml = "";
-                cbHtml += "<label style='display: inline-flex; flex-direction: row; align-items: center; justify-content: flex-start; gap: 8px; background: #eff6ff; padding: 6px 10px; border: 1px solid #bfdbfe; border-radius: 4px; font-weight: 800; color: #1e40af; cursor: pointer; margin-bottom: 4px; width: max-content; max-width: 100%; box-sizing: border-box; text-align: left;'><input type='checkbox' id='notifyTargetMasterSelectAll' onchange='toggleAllNotifyReaders(this)' style='width: 14px; height: 14px; cursor:pointer; margin: 0; flex-shrink: 0;' " + (selectAllNode && selectAllNode.checked ? "checked" : "") + "><div style='font-size: 13px; font-weight: 800; text-align: left; color: #1e40af; white-space: nowrap;'>📢 SELECT ALL (सभी लड़के)</div></label>";
-                
-                readerSet.forEach(function(r) {
-                    cbHtml += "<label style='display: inline-flex; flex-direction: row; align-items: center; justify-content: flex-start; gap: 8px; background: transparent; padding: 5px 8px; border: none; cursor: pointer; width: max-content; max-width: 100%; box-sizing: border-box; text-align: left; margin-bottom: 2px; transition: background 0.1s;' onclick='if(typeof updateNotifyDropdownLabelText === \"function\") updateNotifyDropdownLabelText();' onmouseover='this.style.background=\"#f1f5f9\"' onmouseout='this.style.background=\"transparent\"'><input type='checkbox' class='notify-reader-cb' value='" + r + "' onchange='if(typeof updateNotifyDropdownLabelText === \"function\") updateNotifyDropdownLabelText();' onclick='event.stopPropagation();' style='width: 14px; height: 14px; cursor:pointer; margin: 0; flex-shrink: 0;'><div style='font-size: 13px; font-weight: 700; color: #0f172a; text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;'> " + r + "</div></label>";
-                });
-                notifyCheckboxesContainer.innerHTML = cbHtml;
-                if(typeof window.updateNotifyDropdownLabelText === 'function') window.updateNotifyDropdownLabelText();
+        // स्क्रीन पर कहीं भी बाहर क्लिक करने पर ड्रॉपडाउन बंद करने का सुरक्षा कवच
+        document.addEventListener('click', function(event) {
+            var box = document.getElementById('headerFilterDropdownContent');
+            if(box && !event.target.closest('#headerFilterBtn') && !event.target.closest('#headerFilterDropdownContent')) {
+                box.style.display = 'none';
             }
-        }, 10);
+        });
+
+        // सूचना टैब (Admin Notification Setup)
+        var notifyCheckboxesContainer = document.getElementById('notifyReaderCheckboxesContainer');
+        if (notifyCheckboxesContainer) {
+            var cbHtml = "<label style='display: inline-flex; flex-direction: row; align-items: center; justify-content: flex-start; gap: 8px; background: #eff6ff; padding: 6px 10px; border: 1px solid #bfdbfe; border-radius: 4px; font-weight: 800; color: #1e40af; cursor: pointer; margin-bottom: 4px; width: max-content; max-width: 100%; box-sizing: border-box; text-align: left;'><input type='checkbox' id='notifyTargetMasterSelectAll' onchange='toggleAllNotifyReaders(this)' style='width: 14px; height: 14px; cursor:pointer; margin: 0; flex-shrink: 0;' " + (selectAllNode && selectAllNode.checked ? "checked" : "") + "><div style='font-size: 13px; font-weight: 800; text-align: left; color: #1e40af; white-space: nowrap;'>📢 SELECT ALL (सभी लड़के)</div></label>";
+            
+            readerSet.forEach(function(r) {
+                cbHtml += "<label style='display: inline-flex; flex-direction: row; align-items: center; justify-content: flex-start; gap: 8px; background: transparent; padding: 5px 8px; border: none; cursor: pointer; width: max-content; max-width: 100%; box-sizing: border-box; text-align: left; margin-bottom: 2px; transition: background 0.1s;' onclick='if(typeof updateNotifyDropdownLabelText === \"function\") updateNotifyDropdownLabelText();' onmouseover='this.style.background=\"#f1f5f9\"' onmouseout='this.style.background=\"transparent\"'><input type='checkbox' class='notify-reader-cb' value='" + r + "' onchange='if(typeof updateNotifyDropdownLabelText === \"function\") updateNotifyDropdownLabelText();' onclick='event.stopPropagation();' style='width: 14px; height: 14px; cursor:pointer; margin: 0; flex-shrink: 0;'><div style='font-size: 13px; font-weight: 700; color: #0f172a; text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;'> " + r + "</div></label>";
+            });
+            notifyCheckboxesContainer.innerHTML = cbHtml;
+            if(typeof window.updateNotifyDropdownLabelText === 'function') window.updateNotifyDropdownLabelText();
+        }
+    }, 10);
+}
+// 🎯 हेडर पट्टी एक्सेल-स्टाइल फ़िल्टर को खोलने और बंद करने का कोर ड्राइवर
+function toggleHeaderFilterDropdown(e) {
+    if (e) e.stopPropagation(); // क्लिक इवेंट को बाहर जाने से रोकें
+    var box = document.getElementById('headerFilterDropdownContent');
+    if (!box) return;
+    
+    // यदि बंद है तो खोलें, खुला है तो बंद करें
+    if (box.style.display === 'none' || box.style.display === '') {
+        box.style.setProperty("display", "block", "important");
+    } else {
+        box.style.setProperty("display", "none", "important");
     }
+}
+// 🎯 एक्सेल-फ़िल्टर के 'Select All' चेकबॉक्स को ग्लोबली बाइंड करने का इंजन
+window.toggleAllHeaderReaders = function(masterEl) {
+    var cbs = document.querySelectorAll('.header-reader-cb');
+    adminSelectedReaders = [];
+    cbs.forEach(function(cb) {
+        cb.checked = masterEl.checked;
+        if(masterEl.checked) {
+            adminSelectedReaders.push(cb.value);
+        }
+    });
+    // डेटा व्यू और काउंटर्स को तुरंत री-फ्रेश करें
+    if (typeof refreshActiveDataViews === 'function') refreshActiveDataViews();
+};
+
+// 🎯 इंडिविजुअल रीडर चेकबॉक्स फ़िल्टर को ग्लोबली बाइंड करने का इंजन
+window.applyHeaderReaderFilter = function() {
+    var cbs = document.querySelectorAll('.header-reader-cb');
+    adminSelectedReaders = [];
+    cbs.forEach(function(cb) { 
+        if(cb.checked) adminSelectedReaders.push(cb.value); 
+    });
+    
+    var selectAll = document.getElementById('headerFilterSelectAll');
+    if(selectAll) {
+        selectAll.checked = (adminSelectedReaders.length === cbs.length);
+    }
+    
+    // डेटा व्यू और काउंटर्स को तुरंत री-फ्रेश करें
+    if (typeof refreshActiveDataViews === 'function') refreshActiveDataViews();
+};
 
     // 🟢 फिक्स: एडमिन पैनल से लाइव नोटिफिकेशन भेजने का मैकेनिज्म (पूर्णतः सुधरा हुआ रूप)
     function sendLiveNotificationFromAdmin() {
@@ -2398,13 +2518,22 @@ if (config.key !== 'all_consumers_list' && config.key !== 'all_bills_report' && 
             if(btns[k]) { btns[k].style.background = 'transparent'; btns[k].style.color = '#475569'; }
         }
 
+        var analyticsView = document.getElementById('sub-view-analytics');
         if(subTabName === 'cards') {
             if(cardsView) cardsView.style.display = 'block';
             if(tableView) tableView.style.display = 'none';
+            if(analyticsView) analyticsView.style.display = 'none';
             if(btns['cards']) { btns['cards'].style.background = 'linear-gradient(90deg, #1e40af, #6b21a8)'; btns['cards'].style.color = 'white'; }
+        } else if(subTabName === 'analytics') {
+            if(cardsView) cardsView.style.display = 'none';
+            if(tableView) tableView.style.display = 'none';
+            if(analyticsView) analyticsView.style.display = 'block';
+            if(btns['analytics']) { btns['analytics'].style.background = 'linear-gradient(90deg, #1e40af, #6b21a8)'; btns['analytics'].style.color = 'white'; }
+            setTimeout(renderAnalyticsDashboardEngine, 50); // चार्ट री-ड्रॉ ड्राइवर
         } else if(subTabName === 'table') {
             if(cardsView) cardsView.style.display = 'none';
             if(tableView) tableView.style.display = 'block';
+            if(analyticsView) analyticsView.style.display = 'none';
             if(btns['table']) { btns['table'].style.background = 'linear-gradient(90deg, #1e40af, #6b21a8)'; btns['table'].style.color = 'white'; }
         } else {
             // यदि All Bills या All Consumers डायरेक्ट खुला हो
@@ -2504,25 +2633,23 @@ if (config.key !== 'all_consumers_list' && config.key !== 'all_bills_report' && 
         var sidebarName = document.getElementById('sidebarMrName');
         if(sidebarName) sidebarName.innerText = toTitleProperCase(loggedInReader);
         
-        var filterTabBtn = document.getElementById('btn-tab-filter');
+        // 🛠️ एडमिन पैनल विज़िबिलिटी कंट्रोल ड्राइवर (विजिट्स टैब फिक्स)
+        var btnAllMrPdfSummary = document.getElementById('btnAllMrPdfSummary');
+        var sidebarAdminSec = document.getElementById('sidebarAdminControlSection');
         var visitTabBtn = document.getElementById('btn-tab-visitdata');
-        var notifyTabBtn = document.getElementById('btn-tab-notifyadmin');
-        var configTabBtn = document.getElementById('btn-tab-configmaker');
         
-        var btnAllMrPdfSummary = document.getElementById('btnAllMrPdfSummary');
-        var btnAllMrPdfSummary = document.getElementById('btnAllMrPdfSummary');
         if(!loggedInReader || loggedInReader.toUpperCase() !== "ANURAG SHAKYA") { 
-            if(filterTabBtn) filterTabBtn.style.setProperty("display", "none", "important");
-            if(visitTabBtn) visitTabBtn.style.setProperty("display", "none", "important");
-            if(notifyTabBtn) notifyTabBtn.style.setProperty("display", "none", "important");
-            if(configTabBtn) configTabBtn.style.setProperty("display", "none", "important");
             if(btnAllMrPdfSummary) btnAllMrPdfSummary.style.display = "none";
+            if(sidebarAdminSec) sidebarAdminSec.style.setProperty("display", "none", "important");
+            if(visitTabBtn) visitTabBtn.style.setProperty("display", "none", "important");
         } else {
-            if(filterTabBtn) filterTabBtn.style.setProperty("display", "flex", "important");
-            if(visitTabBtn) visitTabBtn.style.setProperty("display", "flex", "important");
-            if(notifyTabBtn) notifyTabBtn.style.setProperty("display", "flex", "important");
-            if(configTabBtn) configTabBtn.style.setProperty("display", "flex", "important");
             if(btnAllMrPdfSummary) btnAllMrPdfSummary.style.display = "inline-flex";
+            if(sidebarAdminSec) sidebarAdminSec.style.setProperty("display", "block", "important");
+            
+            // 🎯 चूंकि बटन सीधे HTML में एडमिन सेक्शन के अंदर सेट है, इसलिए यहाँ सिर्फ उसे विज़िबल (On) करना है
+            if(visitTabBtn) {
+                visitTabBtn.style.setProperty("display", "flex", "important");
+            }
         }
         
         navigateToViewRaw('appDashboardView');
@@ -2617,20 +2744,38 @@ function executeFastCacheSearch(searchKeywords, allData, container, containerId)
             } else {
                 var isPoleType = activeReportType.toLowerCase().includes("pole") || activeReportType === 'rep13';
                 var mtrNoLabel = isPoleType ? poleMtrNo : mainMtrNo;
+                var divisionDisplay = item.division || item.DIVISION || "";
                 
-                matchedItemsHtml.push(
-                    '<div class="list-item" style="border-left-color:#334155; flex-direction:column; align-items:stretch;" onclick="toggleVisitAccordion(\'' + accNo + '\', \'FULL\')">' +
-                    '<div style="display:flex; justify-content:space-between; width:100%;">' +
-                    '<div style="text-align:left;">' +
-                    '<div class="c-name">' + item.consumerName + '</div>' +
-                    '<div class="c-acc">A/C: ' + accNo + ' | Mob: ' + mob + '</div>' +
-                    '<div class="c-mtr">' + (isPoleType ? "P-Mtr: " : "M-Mtr: ") + mtrNoLabel + '</div>' +
-                    '</div>' +
-                    '<div style="color:#64748b;"><i class="fa-solid fa-chevron-down"></i></div>' +
-                    '</div>' +
-                    '<div id="visit_acc_' + accNo + '" class="accordion-content"></div>' +
-                    '</div>'
-                );
+                // अगर कोई रिपोर्ट एक्टिव है तो एकॉर्डियन खुलेगा, लेकिन सामान्य उपभोक्ता/विजिट टैब में क्विक व्यू खुलेगा
+                if (activeReportType && activeReportType !== 'all_consumers_list') {
+                    matchedItemsHtml.push(
+                        '<div class="list-item" style="border-left-color:#334155; flex-direction:column; align-items:stretch;" onclick="toggleReportAccordion(\'' + accNo + '\', \'STANDARD\')">' +
+                        '<div style="display:flex; justify-content:space-between; width:100%;">' +
+                        '<div style="text-align:left;">' +
+                        '<div class="c-name">' + item.consumerName + '</div>' +
+                        '<div class="c-acc">A/C: ' + accNo + ' | Mob: ' + mob + '</div>' +
+                        '<div class="c-mtr">' + (isPoleType ? "P-Mtr: " : "M-Mtr: ") + mtrNoLabel + '</div>' +
+                        '</div>' +
+                        '<div style="color:#64748b;"><i class="fa-solid fa-chevron-down"></i></div>' +
+                        '</div>' +
+                        '<div id="rep_acc_' + accNo + '" class="accordion-content"></div>' +
+                        '</div>'
+                    );
+                } else {
+                    // उपभोक्ता टैब के लिए परफेक्ट क्विक व्यू फ़िक्स
+                    matchedItemsHtml.push(
+                        '<div class="list-item" onclick="openQuickViewModal(\'' + accNo + '\', \'STANDARD\')">' +
+                        '<div style="width: 75%; text-align: left;">' +
+                        '<div class="c-name">' + item.consumerName + '</div>' +
+                        '<div class="c-acc">A/C: ' + accNo + ' | Mob: ' + mob + '</div>' +
+                        '<div class="c-addr"><b>पता:</b> ' + addr + '</div>' +
+                        '<div class="c-mtr">M-Mtr: ' + mainMtrNo + ' | P-Mtr: ' + poleMtrNo + '</div>' +
+                        '</div>' +
+                        '<div style="text-align:right; width: 25%; flex-shrink: 0; display:flex; flex-direction:column; align-items:flex-end; justify-content:center;">' +
+                        '<div style="font-size:10px; font-weight:bold; color:#4338ca; background:#e0e7ff; padding:2px 6px; border-radius:4px;">' + divisionDisplay + '</div>' +
+                        '</div></div>'
+                    );
+                }
             }
         }
     }
@@ -4154,8 +4299,12 @@ if(isReaderAllowed(getReaderName(item)) && !parseTrue(item.isDone) && !savedEntr
                 var pdfBtn = (isBillingMode && item.pdfLink) ? '<a href="' + item.pdfLink + '" target="_blank" class="pdf-icon" style="margin-top:5px; align-self:flex-end;" onclick="event.stopPropagation();"><i class="fa-solid fa-file-pdf"></i></a>' : '';
 
                 var uiStatusText = "";
+                var waBtn = ""; // वॉट्सएप बटन होल्डर
+                
                 if (isBillingMode) {
                     uiStatusText = "Upld: " + (itemRem !== "NOT UPLOADED" ? itemRem : "N/A");
+                    // 🎯 फिक्स: सभी सब-रिपोर्ट्स की लिस्ट में बिल वितरण जैसा लाइव वॉट्सएप शेयरिंग बटन जोड़ा गया
+                    waBtn = item.pdfLink ? '<button class="whatsapp-icon" onclick="event.stopPropagation(); triggerWhatsApp(event, \'' + item.accountNo + '\')" style="display: inline-flex; align-items: center; justify-content: center; color: #25D366; font-size: 20px; border: none; background: none; cursor: pointer; padding: 3px;"><i class="fa-brands fa-whatsapp"></i></button>' : '';
                 } else {
                     uiStatusText = "Rem: " + itemRem;
                 }
@@ -4164,14 +4313,14 @@ if(isReaderAllowed(getReaderName(item)) && !parseTrue(item.isDone) && !savedEntr
                     '<div class="list-item" style="border-left-color: #4f46e5; align-items:center;" ' +
                     'onclick="openQuickViewModal(\'' + item.accountNo + '\', \'' + (isBillingMode ? "BILL_DIST" : "STANDARD") + '\')">' +
                     cbHtml +
-                    '<div style="flex: 1; text-align: left;">' +
+                    '<div style="flex: 1; text-align: left; padding: 0 4px;">' +
                     '<div class="c-name">' + item.consumerName + printBadge + '</div>' +
                     '<div class="c-acc">A/C: ' + item.accountNo + '</div>' +
                     '<div class="c-mtr">' + (isPoleType ? "P-Mtr: " : "M-Mtr: ") + (isPoleType ? item.lastPmNo : item.lastMmNo||"") + '</div>' +
                     '</div>' +
-                    '<div style="text-align:right; width: 35%; flex-shrink: 0; display:flex; flex-direction:column; align-items:flex-end;">' +
-                    '<div class="c-stat" style="color:#b45309; font-size:11px; font-weight:bold;">' + uiStatusText + '</div>' +
-                    pdfBtn +
+                    '<div style="text-align:right; width: 35%; flex-shrink: 0; display:flex; flex-direction:column; align-items:flex-end; justify-content:center;">' +
+                    '<div class="c-stat" style="color:#b45309; font-size:11px; font-weight:bold; margin-bottom:4px;">' + uiStatusText + '</div>' +
+                    '<div style="display:flex; gap:6px; align-items:center;" onclick="event.stopPropagation();">' + pdfBtn + waBtn + '</div>' +
                     '</div></div>'
                 );
             }
@@ -5581,8 +5730,19 @@ function exportAllMRSummaryPDF() {
                 if (activeReportType && typeof applyRemarkGroupFilter === 'function') applyRemarkGroupFilter();
             }, 100);
             
-            // स्क्रीन बदलें और सूचना दें
-            navigateToViewRaw('appDashboardView');
+            // 🎯 ब्लैंक स्क्रीन फिक्स: फॉर्म बंद करके वापस उसी एक्टिव रिपोर्ट या डैशबोर्ड पर लाएं
+            if (activeReportType && activeReportType !== "") {
+                // अगर किसी रिपोर्ट के अंदर से एंट्री की थी, तो वापस उसी रिपोर्ट को री-फ्रेश करके खोलें
+                document.getElementById('formView').style.setProperty("display", "none", "important");
+                document.getElementById('reportDetailContainer').style.setProperty("display", "block", "important");
+                if (typeof applyRemarkGroupFilter === 'function') {
+                    applyRemarkGroupFilter(); // बचे हुए कंज्यूमर्स की लिस्ट लाइव अपडेट होगी
+                }
+            } else {
+                // अगर सामान्य लिस्ट से एंट्री की थी, तो डैशबोर्ड पर भेजें
+                navigateToViewRaw('appDashboardView');
+            }
+            
             showThinAlert("✅ एंट्री सुरक्षित! शीट में डेटा भेजा जा रहा है...", true);
         };
     };
@@ -6383,6 +6543,258 @@ document.addEventListener("DOMContentLoaded", function() {
             showThinAlert("🚀 कोड सफलतापूर्वक जनरेट हो गया है!", true);
         }
     };
+    // 📊 वैश्विक चार्ट इंस्टेंस होल्डर्स (3 स्प्लिट आसान इंजन)
+var chartInstanceMainMeter = null;
+var chartInstancePoleMeter = null;
+var chartInstanceBillDist = null;
+
+// 📈 100% डायनामिक शीट-ड्रिवन 3-चार्ट एनालिटिक्स इंजन
+function renderAnalyticsDashboardEngine() {
+    if (!db) return;
+    
+    if (!globalReportConfigs || !Array.isArray(globalReportConfigs) || globalReportConfigs.length === 0) {
+        try {
+            var apkCachedConfigs = localStorage.getItem("app_report_configs_cache");
+            if (apkCachedConfigs) globalReportConfigs = JSON.parse(apkCachedConfigs);
+        } catch(e) { console.error("Config load error", e); }
+    }
+
+    var dynamicMatrixCols = [];
+    if (Array.isArray(globalReportConfigs)) {
+        dynamicMatrixCols = globalReportConfigs.filter(function(c) {
+            return c.reportGroup && c.reportGroup.trim().toUpperCase() === "ANALYTICS_MATRIX";
+        });
+    }
+
+    var tx = db.transaction("consumers", "readonly");
+    tx.objectStore("consumers").getAll().onsuccess = function(e) {
+        var allData = e.target.result || [];
+        var readerMatrix = {};
+        
+        allData.forEach(function(item) {
+            var rName = getReaderName(item);
+            if (!rName) return;
+            rName = rName.trim().toUpperCase();
+            if (!isReaderAllowed(rName)) return; // ग्लोबल एक्सेल फ़िल्टर सिंक Check
+
+            if (!readerMatrix[rName]) {
+                readerMatrix[rName] = { 
+                    total: 0, done: 0,
+                    mainMriPnd: 0, mainLsPnd: 0, mainExcPnd: 0,
+                    poleMriPnd: 0, poleLsPnd: 0, poleExcPnd: 0,
+                    billPnd: 0, billDistPnd: 0,
+                    dynamicCounts: {} 
+                };
+                dynamicMatrixCols.forEach(function(c) {
+                    readerMatrix[rName].dynamicCounts[c.key] = 0;
+                });
+            }
+            
+            var m = readerMatrix[rName];
+            m.total++;
+            
+            var rStatus = (item.attendStatus || "").toString().toUpperCase().trim();
+            var dStatus = (item.distStatus || "").toString().toUpperCase().trim();
+
+            if (parseTrue(item.isDone) || rStatus === "ATTEND" || dStatus === "DISTRIBUTED") {
+                m.done++;
+            }
+
+            // 🎯 चार्ट ट्रैकिंग: रीयल-टाइम पेंडेंसी वेरिएबल्स कैलकुलेशन
+            if (!parseTrue(item.isDone) && rStatus !== "ATTEND") {
+                if (parseTrue(item.isMainMeterMriPending)) m.mainMriPnd++;
+                if (parseTrue(item.isMriButNoLoadSurveyMain)) m.mainLsPnd++;
+                if (parseTrue(item.isMainMeterFieldException)) m.mainExcPnd++;
+
+                if (parseTrue(item.isPoleMeterMriPending)) m.poleMriPnd++;
+                if (parseTrue(item.isMriButNoLoadSurveyPole)) m.poleLsPnd++;
+                if (parseTrue(item.isPoleMeterFieldException)) m.poleExcPnd++;
+            }
+            if (parseTrue(item.isBilledButNoBillAvailable) || parseTrue(item.isBillAvailableButPrintPending)) m.billPnd++;
+            if ((item.forBillDist === "YES" || getRobustKey(item, "FOR_BILL DISTRIBUTION") === "YES") && dStatus !== "DISTRIBUTED") m.billDistPnd++;
+
+            // शीट आधारित कॉन्फ़िगरेशन इवैल्यूएटर
+            dynamicMatrixCols.forEach(function(config) {
+                if (typeof evaluateCustomCondition === 'function' && evaluateCustomCondition(item, config.conditionStr)) {
+                    m.dynamicCounts[config.key]++;
+                }
+            });
+        });
+
+        // 🧱 19-कॉलम लाइव ग्रिड डेटा री-बिल्डर
+        var tableNode = document.getElementById('analyticsMatrixTable');
+        if (!tableNode) return;
+
+        var headerHtml = "<tr style='font-size:9.5px; background: var(--theme-table-th); white-space: nowrap;'>";
+        headerHtml += "<th style='padding:6px 4px; position:sticky; left:0; background:inherit; z-index:6; text-align:left;'>Reader Name</th>";
+        dynamicMatrixCols.forEach(function(c) { headerHtml += "<th style='padding:6px 4px; text-align:center;'> " + (c.name || c.key) + "</th>"; });
+        headerHtml += "<th style='padding:6px 4px; text-align:center;'>Done %</th></tr>";
+        tableNode.querySelector('thead').innerHTML = headerHtml;
+
+        var matrixHtml = "";
+        var chartLabels = [];
+        var mainMriArr = [], mainLsArr = [], mainExcArr = [];
+        var poleMriArr = [], poleLsArr = [], poleExcArr = [];
+        var billArr = [], billDistArr = [];
+
+        var sortedReaders = Object.keys(readerMatrix).sort();
+        sortedReaders.forEach(function(name) {
+            var m = readerMatrix[name];
+            var donePct = m.total > 0 ? Math.round((m.done / m.total) * 100) : 0;
+
+            matrixHtml += "<tr style='border-bottom:1px solid #cbd5e1; white-space: nowrap;'>";
+            matrixHtml += "<td style='font-weight:bold; color:#0f172a; position:sticky; left:0; background:#fff; z-index:5; min-width:95px; text-align:left;'> " + name + "</td>";
+            
+            dynamicMatrixCols.forEach(function(c) {
+                var cellVal = m.dynamicCounts[c.key] || 0;
+                var cellStyle = cellVal > 0 ? "font-weight:bold; color:#ef4444;" : "color:#64748b;";
+                matrixHtml += "<td style='text-align:center; " + cellStyle + "'>" + cellVal + "</td>";
+            });
+
+            matrixHtml += "<td style='text-align:center; background:#dcfce7;'><span style='color:#15803d; font-weight:900;'> " + donePct + "%</span></td>";
+            matrixHtml += "</tr>";
+
+            // चार्ट एरे में डेटा ट्रांसफर
+            chartLabels.push(name.substring(0, 8));
+            mainMriArr.push(m.mainMriPnd); mainLsArr.push(m.mainLsPnd); mainExcArr.push(m.mainExcPnd);
+            poleMriArr.push(m.poleMriPnd); poleLsArr.push(m.poleLsPnd); poleExcArr.push(m.poleExcPnd);
+            billArr.push(m.billPnd); billDistArr.push(m.billDistPnd);
+        });
+        document.getElementById('analyticsMatrixTableBody').innerHTML = matrixHtml;
+
+        // 📈 Chart.js इंजन रेंडरिंग (3 आसान और अलग-अलग बार चार्ट्स)
+        if(chartInstanceMainMeter) chartInstanceMainMeter.destroy();
+        if(chartInstancePoleMeter) chartInstancePoleMeter.destroy();
+        if(chartInstanceBillDist) chartInstanceBillDist.destroy();
+
+        var chartOptions = { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { boxWidth: 10, font: { size: 9, weight: 'bold' } } } }, scales: { x: { stacked: true, ticks: { font: { size: 8, weight: 'bold' } } }, y: { stacked: true, ticks: { font: { size: 8 } } } } };
+
+        // चार्ट 1: मेन मीटर पेंडेंसी
+        chartInstanceMainMeter = new Chart(document.getElementById('chartMainMeterAnalytics'), {
+            type: 'bar',
+            data: { labels: chartLabels, datasets: [{ label: 'MRI Pending', data: mainMriArr, backgroundColor: '#7c3aed' }, { label: 'Load Survey Pending', data: mainLsArr, backgroundColor: '#ec4899' }, { label: 'Exceptions / Defective', data: mainExcArr, backgroundColor: '#f59e0b' }] },
+            options: { ...chartOptions, plugins: { ...chartOptions.plugins, title: { display: true, text: '⚡ MAIN METER PENDENCY STATUS', font: { size: 11, weight: 'bold' }, color: '#1e3a8a' } } }
+        });
+
+        // चार्ट 2: पोल मीटर पेंडेंसी
+        chartInstancePoleMeter = new Chart(document.getElementById('chartPoleMeterAnalytics'), {
+            type: 'bar',
+            data: { labels: chartLabels, datasets: [{ label: 'MRI Pending', data: poleMriArr, backgroundColor: '#06b6d4' }, { label: 'Load Survey Pending', data: poleLsArr, backgroundColor: '#14b8a6' }, { label: 'Exceptions / Defective', data: poleExcArr, backgroundColor: '#ef4444' }] },
+            options: { ...chartOptions, plugins: { ...chartOptions.plugins, title: { display: true, text: '🪡 POLE METER PENDENCY STATUS', font: { size: 11, weight: 'bold' }, color: '#1e3a8a' } } }
+        });
+
+        // चार्ट 3: बिलिंग एवं वितरण पेंडेंसी
+        chartInstanceBillDist = new Chart(document.getElementById('chartBillDistAnalytics'), {
+            type: 'bar',
+            data: { labels: chartLabels, datasets: [{ label: 'No Bill / Print Pending', data: billArr, backgroundColor: '#3b82f6' }, { label: 'Distribution Pending', data: billDistArr, backgroundColor: '#10b981' }] },
+            options: { ...chartOptions, plugins: { ...chartOptions.plugins, title: { display: true, text: '📦 BILLING & DISTRIBUTION STATUS', font: { size: 11, weight: 'bold' }, color: '#1e3a8a' } } }
+        });
+    };
+}
+
+// 🖨️ अल्ट्रा-एचडी विज़ुअल चार्ट्स एक्सपोर्ट इंजन (फुल-पेज विड्थ एवं नो-ब्लर फ़िक्स)
+function exportAnalyticsReportPDF() {
+    if (typeof window.jspdf === 'undefined') return alert("PDF Library load nahi hui!");
+    
+    // A2 Landscape Page dimensions: 1684 pt x 1190 pt
+    var doc = new window.jspdf.jsPDF('l', 'pt', 'a2'); 
+    var pdfPageWidth = 1684;
+    
+    // मेन टाइटल हेडर
+    doc.setFontSize(26); doc.setTextColor(30, 58, 138); doc.setFont("Helvetica", "bold");
+    doc.text("DVVNL BILLING - ADVANCED PENDENCY ANALYTICS REPORT", 40, 50);
+    
+    doc.setFontSize(12); doc.setTextColor(100, 116, 139); doc.setFont("Helvetica", "normal");
+    doc.text("Generated Date & Time: " + getPrintableDateTime() + "  |  Prepared By: Er. Anurag Shakya (Admin Panel)", 40, 72);
+    
+    var nextStartY = 95; 
+    
+    try {
+        var mainCanvas = document.getElementById('chartMainMeterAnalytics');
+        var poleCanvas = document.getElementById('chartPoleMeterAnalytics');
+        var billCanvas = document.getElementById('chartBillDistAnalytics');
+        
+        if(mainCanvas && poleCanvas && billCanvas) {
+            
+            // 🎯 एचडी मैट्रिक्स इंजन: कैनवास को हाई-रिज़ॉल्यूशन ऑफस्क्रीन कैनवास पर 3x स्केल करके रेंडर करना ताकि ब्लर होना बंद हो जाए
+            var processCanvasHD = function(srcCanvas) {
+                var scaleFactor = 3; // 3 गुना ज्यादा पिक्सल (Ultra HD Quality)
+                var hdCanvas = document.createElement("canvas");
+                hdCanvas.width = srcCanvas.width * scaleFactor;
+                hdCanvas.height = srcCanvas.height * scaleFactor;
+                
+                var hdCtx = hdCanvas.getContext("2d");
+                hdCtx.fillStyle = "#FFFFFF"; 
+                hdCtx.fillRect(0, 0, hdCanvas.width, hdCanvas.height);
+                
+                // इमेज को पिक्सलेट होने से रोकने के लिए स्मूथिंग इंजन ऑन करें
+                hdCtx.imageSmoothingEnabled = true;
+                hdCtx.imageSmoothingQuality = 'high';
+                
+                hdCtx.scale(scaleFactor, scaleFactor);
+                hdCtx.drawImage(srcCanvas, 0, 0);
+                return hdCanvas.toDataURL('image/jpeg', 1.0);
+            };
+            
+            // 🎯 फुल-पेज विड्थ कैलकुलेशन: 1684pt में से दोनों तरफ 40pt मार्जिन छोड़कर 1604pt की पूरी चौड़ाई लॉक की
+            var fullPageChartW = pdfPageWidth - 80; // 1604 pt (पूरी चौड़ाई)
+            var optimalChartH = 250;               // पर्याप्त ऊंचाई जिससे बार्स साफ दिखें
+            var gapBetweenCharts = 25;
+
+            doc.addImage(processCanvasHD(mainCanvas), 'JPEG', 40, nextStartY, fullPageChartW, optimalChartH);
+            nextStartY += optimalChartH + gapBetweenCharts;
+
+            doc.addImage(processCanvasHD(poleCanvas), 'JPEG', 40, nextStartY, fullPageChartW, optimalChartH);
+            nextStartY += optimalChartH + gapBetweenCharts;
+
+            doc.addImage(processCanvasHD(billCanvas), 'JPEG', 40, nextStartY, fullPageChartW, optimalChartH);
+            nextStartY += optimalChartH + 45; // डेटा टेबल के लिए स्पेस पैडिंग
+        }
+    } catch(err) { 
+        console.error("PDF High-Res Chart processing failed:", err); 
+        nextStartY = 350; 
+    }
+
+    // शीट से लाइव हेडर ऐरे ऑटोमैटिक सिंक करना
+    var dynamicMatrixCols = [];
+    if (Array.isArray(globalReportConfigs)) {
+        dynamicMatrixCols = globalReportConfigs.filter(function(c) {
+            return c.reportGroup && c.reportGroup.trim().toUpperCase() === "ANALYTICS_MATRIX";
+        });
+    }
+    
+    // परफेक्ट इंग्लिश हेडर अलाइनमेंट (Reader Name फिक्स)
+    var customPdfHeaders = ["Reader Name"];
+    dynamicMatrixCols.forEach(function(c) { customPdfHeaders.push(c.name || c.key); });
+    customPdfHeaders.push("Done %");
+
+    // डेटा ग्रिड टेबल जेनरेटर
+    doc.autoTable({
+        html: '#analyticsMatrixTable',
+        startY: nextStartY,
+        theme: 'grid',
+        head: [customPdfHeaders],
+        styles: { fontSize: 10, halign: 'center', cellPadding: 7, textColor: [0, 0, 0] },
+        headStyles: { fillColor: [15, 23, 42], textColor: [255, 255, 255], fontStyle: 'bold', fontSize: 10.5 },
+        columnStyles: { 0: { halign: 'left', fontStyle: 'bold', fillColor: [248, 250, 252], cellWidth: 130 } },
+        didParseCell: function(data) {
+            if(data.section === 'body' && data.column.index === customPdfHeaders.length - 1) {
+                data.cell.styles.fontStyle = 'bold';
+                data.cell.styles.fillColor = [220, 252, 231];
+            }
+        }
+    });
+    
+    var filename = "Master_Pendency_Analytics_Matrix_" + getFormattedDateTimeForFile() + ".pdf";
+    if (typeof AndroidBridge !== "undefined" && AndroidBridge.processBase64Download) {
+        var rawBase64 = doc.output('arraybuffer');
+        var uint8 = new Uint8Array(rawBase64); var binary = '';
+        for (var j = 0; j < uint8.byteLength; j++) { binary += String.fromCharCode(uint8[j]); }
+        AndroidBridge.processBase64Download(btoa(binary), "pdf", filename);
+    } else {
+        doc.save(filename);
+    }
+}
 // 🟢 नया फंक्शन: टेक्स्ट बॉक्स के डेटा को डायरेक्ट क्लीन शीट कंडीशन फॉर्मेट में बदलना
     window.generateSheetConfigString = function() {
         var inputNode = document.getElementById('cfgCustomInputTextArea');
