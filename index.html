@@ -5,7 +5,7 @@
 <script>
   (function() {
     // ⚠️ अपना नया Deployment URL यहाँ पेस्ट करें
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzKAX52FngBgDXx-ytElcM25I9jrJYQGjZVuB8Vsf03csG0aLG7VyMm3rNA0orMTiDTTg/exec";
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyETumN1YYrhKa07w2tqkBfvljFNJILR7hifl5iwU2cfYeMNh_1e5rDwTDtIeGjeCcr-Q/exec";
 
     function createHandler(successCallback, failureCallback) {
       return new Proxy({}, {
@@ -2301,6 +2301,7 @@ window.applyHeaderReaderFilter = function() {
         var mainMeterGroupHtml = [];
         var poleMeterGroupHtml = [];
         var billDistGroupHtml = [];
+        var menuHtmlBuffer = []; // ✅ FIXED: menuHtmlBuffer को यहाँ डिफाइन कर दिया गया है ताकि एरर न आए
 
         // 1. General Stats (सामान्य क्रेडेंशियल्स)
         generalGroupHtml.push('<div class="stat-card" style="background: #eff6ff; border-left: 5px solid #1d4ed8;"><div class="stat-val" style="color: #1e40af;">' + total + '</div><div class="stat-lbl" style="color: #1e40af;">Total Allotted</div></div>');
