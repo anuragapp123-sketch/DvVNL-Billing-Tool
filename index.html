@@ -5,7 +5,7 @@
 <script>
   (function() {
     // ⚠️ अपना नया Deployment URL यहाँ पेस्ट करें
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwy5dEeY-g8vfI9G6q9GfNdp6KL4co792JhQXJr5IftHTeg1d3kovMrJpcY9Xjnm49Dvg/exec";
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx-jprAEQpn6C56dkjeoazWiQGQWQjlZ7JRLBsKriVEbFTJuP5uBq3gLunGvi3rT5j32A/exec";
 
     function createHandler(successCallback, failureCallback) {
       return new Proxy({}, {
@@ -882,7 +882,7 @@
         <div id="apkErrorLogger" style="display:none; margin-top:10px; padding:10px; background:#fef2f2; border:1px solid #fca5a5; border-radius:6px; color:#b91c1c; font-size:11px; font-weight:bold; text-align:left; word-break:break-all; white-space:pre-wrap;"></div>
         <div class="app-footer-branding" style="position: relative;">
             Developed by:- Anurag Shakya | 9761414105
-            <span style="display:block; margin-top:4px; font-size:10px; color:#ef4444; font-weight:900;">App Version: V1.0.18</span>
+            <span style="display:block; margin-top:4px; font-size:10px; color:#ef4444; font-weight:900;">App Version: V1.0.19</span>
         </div>
     </div>
     
@@ -1069,16 +1069,18 @@
                 <div class="flex-row-btns" style="margin-bottom: 8px;">
                     <button onclick="exportAnalyticsReportPDF()" class="btn pdf-bg" style="font-size:12px; padding:10px;"><i class="fa-solid fa-file-pdf"></i> Download Analytics Report (PDF)</button>
                 </div>
-                <div class="card" id="analyticsLiveChartEngine" style="background:#fff; padding:12px; margin-bottom:10px; display: grid; grid-template-columns: 1fr; gap: 15px; height: auto;">
-                    <div style="background:#f8fafc; padding:12px; border:1px solid #e2e8f0; border-radius:8px; min-height:200px;">
-                        <canvas id="chartMainMeterAnalytics"></canvas>
-                    </div>
-                    <div style="background:#f8fafc; padding:12px; border:1px solid #e2e8f0; border-radius:8px; min-height:200px;">
-                        <canvas id="chartPoleMeterAnalytics"></canvas>
-                    </div>
-                    <div style="background:#f8fafc; padding:12px; border:1px solid #e2e8f0; border-radius:8px; min-height:200px;">
-                        <canvas id="chartBillDistAnalytics"></canvas>
-                    </div>
+                <!-- 🎯 FIX: display: flex करके तीनों चार्ट्स को मोबाइल और डेस्कटॉप पर एक ही लाइन में लाने का परमानेंट यूआई ब्लॉक -->
+<div class="card" id="analyticsLiveChartEngine" style="background:#fff; padding:12px; margin-bottom:10px; display: flex; flex-direction: row; justify-content: space-between; gap: 12px; height: auto; width: 100%; box-sizing: border-box; overflow-x: auto;">
+                    <!-- 🎯 FIX: flex-basis: 33% से तीनों डोनट बॉक्स को गणितीय रूप से एक सीध में बराबर चौड़ाई देना -->
+    <div style="background:#f8fafc; padding:8px; border:1px solid #e2e8f0; border-radius:8px; height:280px; flex: 1; flex-basis: 33%; min-width: 0; box-sizing: border-box;">
+        <canvas id="chartMainMeterAnalytics"></canvas>
+    </div>
+    <div style="background:#f8fafc; padding:8px; border:1px solid #e2e8f0; border-radius:8px; height:280px; flex: 1; flex-basis: 33%; min-width: 0; box-sizing: border-box;">
+        <canvas id="chartPoleMeterAnalytics"></canvas>
+    </div>
+    <div style="background:#f8fafc; padding:8px; border:1px solid #e2e8f0; border-radius:8px; height:280px; flex: 1; flex-basis: 33%; min-width: 0; box-sizing: border-box;">
+        <canvas id="chartBillDistAnalytics"></canvas>
+    </div>
                 </div>
                 <div class="card" style="padding:10px; overflow-x:auto;">
                     <h4 style="font-size:12px; color:var(--theme-primary); margin-bottom:6px; text-transform:uppercase;"><i class="fa-solid fa-table-list"></i> Reader Wise Pendency Matrix</h4>
@@ -1228,7 +1230,7 @@
             
             <div style="text-align: center; margin-top: 25px; padding-top: 15px; border-top: 1px dashed #cbd5e1; color: #64748b;">
                 <div style="font-size: 12px; font-weight: bold;">Developed by: Anurag Shakya</div>
-                <div style="font-size: 11px; color: #ef4444; font-weight: 900; margin-top: 4px;">App Version: V1.0.18</div>
+                <div style="font-size: 11px; color: #ef4444; font-weight: 900; margin-top: 4px;">App Version: V1.0.19</div>
             </div>
         </div>
 
@@ -1277,7 +1279,7 @@
         <div style="width: 100%; height: 40px; clear: both; display: block !important; visibility: hidden; pointer-events: none;"></div>
         
         <div class="card" style="background: rgba(255, 255, 255, 0.7); margin-bottom: 20px; text-align: center; border: 1px dashed #cbd5e1;">
-            <div style="font-size: 11px; color: #ef4444; font-weight: 900; margin-bottom: 3px;">App Version: V1.0.18</div>
+            <div style="font-size: 11px; color: #ef4444; font-weight: 900; margin-bottom: 3px;">App Version: V1.0.19</div>
             <div style="font-size: 12px; color: #1e40af; font-weight: 800; text-transform: uppercase; margin-bottom: 5px;"><i class="fa-solid fa-user-tie"></i> <span id="welcomeTxt">Mr Name: Loading...</span></div>
             <div style="font-size: 11px; font-weight: 700; color: #475569; border-top: 1px solid #cbd5e1; padding-top: 5px;">
                 Developed by:- Er. Anurag Shakya | 9761414105
@@ -2290,25 +2292,27 @@ window.applyHeaderReaderFilter = function() {
             if(isVisitDateMatch(item.finalVisitDate, 1)) yest++;
         });
 
-        // 🔵 HIGH-CONTRAST SOLID THEME CARDS ENGINE
-        var colorPalette = ["#dc2626", "#6b21a8", "#b45309", "#0369a1", "#db2777", "#15803d", "#1d4ed8", "#9a3412"];
+        // 🔵 100% डायनामिक बायफर्केशन (Bifurcation) लेआउट इंजन (🎯 FIX)
+        var colorPalette = ["#7c3aed", "#ec4899", "#f59e0b", "#06b6d4", "#14b8a6", "#ef4444", "#3b82f6", "#10b981"];
         var colorIdx = 0;
-        var cardsHtml = [];
+        
+        // अलग-अलग सेक्शन्स के लिए बफ़र्स
+        var generalGroupHtml = [];
+        var mainMeterGroupHtml = [];
+        var poleMeterGroupHtml = [];
+        var billDistGroupHtml = [];
 
-        // 1. Total Allotted Card (गहरा रॉयल ब्लू)
-        cardsHtml.push('<div class="stat-card" style="background: #eff6ff; border-left: 5px solid #1d4ed8;"><div class="stat-val" style="color: #1e40af;">' + total + '</div><div class="stat-lbl" style="color: #1e40af;">Total Allotted</div></div>');
-
-        // 2. Visit Done Card (गहरा सॉलिड ग्रीन)
-        cardsHtml.push('<div class="stat-card" style="background: #f0fdf4; border-left: 5px solid #16a34a;"><div class="stat-val" style="color: #15803d;">' + done + '</div><div class="stat-lbl" style="color: #15803d;">Visit Done</div></div>');
-
-        // 3. Visit Pending Card (गहरा डार्क रेड)
+        // 1. General Stats (सामान्य क्रेडेंशियल्स)
+        generalGroupHtml.push('<div class="stat-card" style="background: #eff6ff; border-left: 5px solid #1d4ed8;"><div class="stat-val" style="color: #1e40af;">' + total + '</div><div class="stat-lbl" style="color: #1e40af;">Total Allotted</div></div>');
+        generalGroupHtml.push('<div class="stat-card" style="background: #f0fdf4; border-left: 5px solid #16a34a;"><div class="stat-val" style="color: #15803d;">' + done + '</div><div class="stat-lbl" style="color: #15803d;">Visit Done</div></div>');
         var pendingVisits = total - done;
-        cardsHtml.push('<div class="stat-card" style="background: #fff1f2; border-left: 5px solid #e11d48;"><div class="stat-val" style="color: #9f1239;">' + pendingVisits + '</div><div class="stat-lbl" style="color: #9f1239;">Visit Pending</div></div>');
+        generalGroupHtml.push('<div class="stat-card" style="background: #fff1f2; border-left: 5px solid #e11d48;"><div class="stat-val" style="color: #9f1239;">' + pendingVisits + '</div><div class="stat-lbl" style="color: #9f1239;">Visit Pending</div></div>');
+        generalGroupHtml.push('<div class="stat-card" style="background: #faf5ff; border-left: 5px solid #7c3aed;"><div class="stat-val" style="color: #6b21a8;">' + today + '</div><div class="stat-lbl" style="color: #6b21a8;">Today Visit</div></div>');
+        
+        // ऑफ़लाइन सेव्ड को भी जनरल स्टेट्स में रख रहे हैं
+        generalGroupHtml.push('<div class="stat-card" onclick="syncOfflineDataToServer()" style="background: #f0fdf4; border-left: 5px solid #059669;"><div class="stat-val" style="color: #047857;"><span id="st-local-saved">0</span></div><div class="stat-lbl" style="color: #047857;">Offline Saved</div></div>');
 
-        // 4. Today Visit Card (डीप पर्पल)
-        cardsHtml.push('<div class="stat-card" style="background: #faf5ff; border-left: 5px solid #7c3aed;"><div class="stat-val" style="color: #6b21a8;">' + today + '</div><div class="stat-lbl" style="color: #6b21a8;">Today Visit</div></div>');
-
-        // 5. Dynamic Config Cards
+        // 2. डायनामिक शीट कॉन्फ़िगरेशन से कार्ड्स को फ़िल्टर करके उनके सही सेक्शन्स में डालना
         if (Array.isArray(globalReportConfigs)) {
             globalReportConfigs.forEach(function(config) {
                 var userRole = loggedInReader.toUpperCase();
@@ -2316,23 +2320,68 @@ window.applyHeaderReaderFilter = function() {
                 
                 if (config.reportGroup && config.reportGroup.trim().toUpperCase() === "TOP_CARD") {
                     var matchedItems = filteredData.filter(function(item) {
-                        // 🔥 FIX: अब 'ATTEND' को जबरदस्ती नहीं छिपाएंगे! केवल ऐप में सेव (Offline Local) किये गए डेटा को छिपाएंगे ताकि Google Sheet की कंडीशन 100% काम करे।
                         if (item.isDone === true || item.isDone === "true") return false;
                         return evaluateCustomCondition(item, config.conditionStr); 
                     });
+                    
                     var currentCardColor = colorPalette[colorIdx % colorPalette.length];
                     colorIdx++;
                     
-                    cardsHtml.push('<div class="stat-card" style="background: ' + currentCardColor + '0d; border-left: 5px solid ' + currentCardColor + ';" onclick="openReportRowDirect(\'' + config.key + '\')"><div class="stat-val" style="color: ' + currentCardColor + ';">' + matchedItems.length + '</div><div class="stat-lbl" style="color: ' + currentCardColor + '; font-weight: 900;">' + config.name + '</div></div>');
+                    var cardString = '<div class="stat-card" style="background: ' + currentCardColor + '0d; border-left: 5px solid ' + currentCardColor + ';" onclick="openReportRowDirect(\'' + config.key + '\')"><div class="stat-val" style="color: ' + currentCardColor + ';">' + matchedItems.length + '</div><div class="stat-lbl" style="color: ' + currentCardColor + '; font-weight: 900;">' + config.name + '</div></div>';
+                    
+                    var configKeyClean = config.key.toLowerCase();
+                    // नाम या की-आईडी के आधार पर सही सेक्शन्स में विभाजन
+                    if (configKeyClean.includes("main") || configKeyClean.includes("mm")) {
+                        mainMeterGroupHtml.push(cardString);
+                    } else if (configKeyClean.includes("pole") || configKeyClean.includes("pm")) {
+                        poleMeterGroupHtml.push(cardString);
+                    } else if (configKeyClean.includes("bill") || configKeyClean.includes("dist")) {
+                        billDistGroupHtml.push(cardString);
+                    } else {
+                        mainMeterGroupHtml.push(cardString); // फॉलबैक
+                    }
                 }
             });
         }
 
-        // 6. Bill Distribution Card (गहरा बर्न ऑरेंज)
-        cardsHtml.push('<div class="stat-card" style="background: #fffbeb; border-left: 5px solid #d97706;" onclick="switchTab(\'billdist\')"><div class="stat-val" style="color: #b45309;">' + billP + '</div><div class="stat-lbl" style="color: #b45309;">Bill Dist Pending</div></div>');
+        // बिल डिस्ट्रीब्यूशन पेंडेंसी को बिल वाले सेक्शन में पुश करना
+        billDistGroupHtml.push('<div class="stat-card" style="background: #fffbeb; border-left: 5px solid #d97706;" onclick="switchTab(\'billdist\')"><div class="stat-val" style="color: #b45309;">' + billP + '</div><div class="stat-lbl" style="color: #b45309;">Bill Dist Pending</div></div>');
 
-        // 7. Offline Saved Card (गहरा फॉरेस्ट ग्रीन)
-        cardsHtml.push('<div class="stat-card" onclick="syncOfflineDataToServer()" style="background: #f0fdf4; border-left: 5px solid #059669;"><div class="stat-val" style="color: #047857;"><span id="st-local-saved">0</span></div><div class="stat-lbl" style="color: #047857;">Offline Saved</div></div>');
+        // 🛠️ डार्क थीम हेडर और डेस्कटॉप रिस्पॉन्सिव ग्रुपिंग इंजन (🎯 FIX)
+        var finalDashboardHtml = [];
+        
+        // एक कॉमन फंक्शन जो हेडिंग पट्टी को डार्क प्रीमियम लुक देगा और उसके नीचे के कार्ड्स को एक अलग ग्रिड में पैक करेगा
+        var wrapGroupSection = function(titleText, cardsContent, iconClass, baseColor) {
+            if (!cardsContent || cardsContent.length === 0) return "";
+            
+            // डार्क हाई-कंट्रास्ट पट्टी डिज़ाइन
+            var headerHtml = '<div class="section-title" style="width: 100% !important; margin: 15px 0 10px 0 !important; background: ' + baseColor + ' !important; color: #ffffff !important; font-weight: 900 !important; font-size: 13px !important; border-left: 6px solid rgba(0,0,0,0.4) !important; padding: 10px 14px !important; border-radius: 6px !important; box-shadow: 0 4px 6px rgba(0,0,0,0.15) !important; display: block !important; clear: both !important;">' +
+                             '<i class="' + iconClass + '" style="margin-right: 8px;"></i> ' + titleText + '</div>';
+            
+            // कंप्यूटर व्यू के लिए सब-ग्रिड ताकि कार्ड्स अपनी-अपनी कतार में पूरी चौड़ाई लें
+            var subGridHtml = '<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 8px; width: 100%; box-sizing: border-box; clear: both;">' + cardsContent.join('') + '</div>';
+            
+            return headerHtml + subGridHtml;
+        };
+
+        // 1. रो 1: General Group (डार्क स्लेट थीम)
+        finalDashboardHtml.push(wrapGroupSection("GENERAL VISIT STATISTICS", generalGroupHtml, "fa-solid fa-chart-simple", "#1e293b"));
+        
+        // 2. रो 2: Main Meter Group (डार्क रॉयल ब्लू थीम)
+        finalDashboardHtml.push(wrapGroupSection("MAIN METER STATUS", mainMeterGroupHtml, "fa-solid fa-bolt", "#1e40af"));
+        
+        // 3. रो 3: Pole Meter Group (डार्क टील/ग्रीन थीम)
+        finalDashboardHtml.push(wrapGroupSection("POLE METER STATUS", poleMeterGroupHtml, "fa-solid fa-box-tissue", "#0f766e"));
+        
+        // 4. रो 4: Bill Distribution Group (डार्क बर्न ऑरेंज थीम)
+        finalDashboardHtml.push(wrapGroupSection("BILLING & DISTRIBUTION STATUS", billDistGroupHtml, "fa-solid fa-file-invoice-dollar", "#c2410c"));
+
+        // पैरेंट नोड को ग्रिड से हटाकर ब्लॉक लेआउट देना ताकि कंप्यूटर व्यू का बिखराव रुक जाए
+        var statsGridNode = document.getElementById('summaryGridToPrint');
+        if (statsGridNode) {
+            statsGridNode.style.setProperty("display", "block", "important");
+            statsGridNode.innerHTML = finalDashboardHtml.join('');
+        }
 
         var statsGridNode = document.getElementById('summaryGridToPrint');
         if (statsGridNode) {
@@ -2378,8 +2427,8 @@ window.applyHeaderReaderFilter = function() {
         var totalReportsPendencyCount = 0;
         var currentSummaryGroup = "";
 
-        // 🎯 CRITICAL FIX: पुराने हार्डकोडेड फिल्टर को हटा दिया गया है ताकि dynamic Report Group (MAIN TAB, BILL DIST TAB) सही से रेंडर हो सकें
-        res.reports = []; 
+        // 🎯 FIX: यहाँ res.reports = []; को हटा दिया गया है ताकि ANALYTICS_MATRIX का डेटा क्रैश न हो
+        if (!res.reports) { res.reports = []; } 
 
         if (Array.isArray(globalReportConfigs)) {
             globalReportConfigs.forEach(function(config) {
@@ -2407,8 +2456,9 @@ window.applyHeaderReaderFilter = function() {
                 // ✅ इसकी जगह पर यह नया कोड बदल दीजिए:
 var isTopCard = config.reportGroup && config.reportGroup.trim().toUpperCase() === "TOP_CARD";
 
-// 🎯 FIX: 'all_consumers_list' और 'all_bills_report' को यहाँ टेबल में रेंडर होने से सख्ती से रोका गया है
-if (config.key !== 'all_consumers_list' && config.key !== 'all_bills_report' && config.key !== 'bill_dist_pending' && !isTopCard) {
+// 🎯 FIX: 'all_consumers_list', 'all_bills_report' और 'ANALYTICS_MATRIX' तीनों को नीचे लिस्ट में रेंडर होने से सख्ती से रोका गया है
+var groupNameStr = (config.reportGroup || "").toUpperCase().trim();
+if (config.key !== 'all_consumers_list' && config.key !== 'all_bills_report' && config.key !== 'bill_dist_pending' && groupNameStr !== 'ANALYTICS_MATRIX' && !isTopCard) {
     
     // ग्रुप नेम को सही फॉर्मेट में सेट करें
     var groupName = (config.reportGroup || "OTHER REPORTS").toUpperCase().trim();
@@ -5735,17 +5785,22 @@ function exportAllMRSummaryPDF() {
                 if (activeReportType && typeof applyRemarkGroupFilter === 'function') applyRemarkGroupFilter();
             }, 100);
             
-            // 🎯 ब्लैंक स्क्रीन फिक्स: फॉर्म बंद करके वापस उसी एक्टिव रिपोर्ट या डैशबोर्ड पर लाएं
+            // 🎯 ULTIMATE BLANK SCREEN FIX: एंट्री सेव होने के बाद सही पैरेंट व्यू और एक्टिव टैब को लाइव रीस्टोर करना
+            document.getElementById('formView').style.setProperty("display", "none", "important");
+            
             if (activeReportType && activeReportType !== "") {
-                // अगर किसी रिपोर्ट के अंदर से एंट्री की थी, तो वापस उसी रिपोर्ट को री-फ्रेश करके खोलें
-                document.getElementById('formView').style.setProperty("display", "none", "important");
+                // नियम 1: अगर किसी रिपोर्ट के अंदर से एंट्री की थी, तो वापस उसी रिपोर्ट व्यू को रिफ्रेश करें
+                document.getElementById('appDashboardView').style.setProperty("display", "block", "important");
                 document.getElementById('reportDetailContainer').style.setProperty("display", "block", "important");
-                if (typeof applyRemarkGroupFilter === 'function') {
-                    applyRemarkGroupFilter(); // बचे हुए कंज्यूमर्स की लिस्ट लाइव अपडेट होगी
-                }
+                if (typeof applyRemarkGroupFilter === 'function') { applyRemarkGroupFilter(); }
             } else {
-                // अगर सामान्य लिस्ट से एंट्री की थी, तो डैशबोर्ड पर भेजें
-                navigateToViewRaw('appDashboardView');
+                // नियम 2: अगर उपभोक्ता या बिल वितरण टैब से एंट्री की थी, तो सेव्ड स्टेट रिकवर करके उसी टैब पर भेजें
+                var lastActiveTab = localStorage.getItem("app_current_tab_state_" + loggedInReader) || "summary";
+                if (typeof switchTab === 'function') {
+                    switchTab(lastActiveTab); 
+                } else {
+                    navigateToViewRaw('appDashboardView');
+                }
             }
             
             showThinAlert("✅ एंट्री सुरक्षित! शीट में डेटा भेजा जा रहा है...", true);
@@ -6173,22 +6228,22 @@ function quickViewNavigate(direction) {
         }
     }, 1000);
 </script>
-<div id="quickViewModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15, 23, 42, 0.7); z-index:99999; align-items:center; justify-content:center; backdrop-filter:blur(3px);">
-        <div id="qvSwipeBox" style="background:#ffffff; width:95%; max-width:600px; max-height:85vh; overflow-y:auto; border-radius:12px; position:relative; padding:25px 15px; box-shadow:0 20px 25px -5px rgba(0,0,0,0.2); transition: transform 0.2s;">
-            
-            <button onclick="document.getElementById('quickViewModal').style.display='none'" style="position:absolute; top:-15px; right:-10px; background:#ef4444; border:2px solid #fff; color:white; border-radius:50%; width:35px; height:35px; font-size:16px; cursor:pointer; box-shadow:0 4px 6px rgba(0,0,0,0.2); z-index:10;"><i class="fa-solid fa-xmark"></i></button>
+<div id="quickViewModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15, 23, 42, 0.75); z-index:99999; align-items:center; justify-content:center; backdrop-filter:blur(4px); box-sizing: border-box; padding: 10px;">
+    <div id="qvSwipeBox" style="background:#ffffff; width:100%; max-width:480px; height:90vh; max-height:92vh; display:flex; flex-direction:column; border-radius:16px; position:relative; padding:20px 24px 30px 24px; box-shadow:0 25px 50px -12px rgba(0,0,0,0.3); transition: transform 0.2s; box-sizing: border-box;">
+        
+        <button onclick="document.getElementById('quickViewModal').style.display='none'" style="position:absolute; top:12px; right:12px; background:#ef4444; border:2px solid #fff; color:white; border-radius:50%; width:32px; height:32px; font-size:14px; cursor:pointer; box-shadow:0 4px 10px rgba(239,68,68,0.3); z-index:15; display:flex; align-items:center; justify-content:center;"><i class="fa-solid fa-xmark"></i></button>
 
-            <h3 style="margin:0 0 15px 0; color:#1e3a8a; border-bottom:2px solid #e2e8f0; padding-bottom:8px; font-size:18px; text-align:center;"><i class="fa-solid fa-user-check"></i> Consumer Details</h3>
-            
-            <div id="quickViewContent" style="display:grid; grid-template-columns:90px minmax(0, 1fr); gap:12px; align-items:center; margin-bottom: 20px;">
-                </div>
-
-            <button id="quickViewEditBtn" onclick="" style="position:absolute; bottom:-15px; right:-10px; background:#10b981; color:white; border:2px solid #fff; border-radius:50%; width:50px; height:50px; font-size:20px; cursor:pointer; box-shadow:0 4px 6px rgba(0,0,0,0.2); z-index:10;" title="Edit Offline Form"><i class="fa-solid fa-pen-to-square"></i></button>
-
-            <button onclick="quickViewNavigate(-1)" style="position:absolute; top:50%; left:-20px; transform:translateY(-50%); background:#f59e0b; color:#fff; border:2px solid #fff; border-radius:50%; width:40px; height:40px; font-size:16px; cursor:pointer; box-shadow:0 4px 6px rgba(0,0,0,0.2); z-index:10;"><i class="fa-solid fa-chevron-left"></i></button>
-            <button onclick="quickViewNavigate(1)" style="position:absolute; top:50%; right:-20px; transform:translateY(-50%); background:#f59e0b; color:#fff; border:2px solid #fff; border-radius:50%; width:40px; height:40px; font-size:16px; cursor:pointer; box-shadow:0 4px 6px rgba(0,0,0,0.2); z-index:10;"><i class="fa-solid fa-chevron-right"></i></button>
+        <h3 style="margin:0 0 15px 0; color:#1e3a8a; border-bottom:2px solid #e2e8f0; padding-bottom:10px; font-size:17px; font-weight:900; text-align:center; text-transform:uppercase; letter-spacing:0.5px; padding-right:20px;"><i class="fa-solid fa-user-check"></i> Consumer Details</h3>
+        
+        <div id="quickViewContent" style="display:grid; grid-template-columns:85px minmax(0, 1fr); gap:12px 10px; align-items:start; margin-bottom:10px; overflow-y:auto; flex:1; padding-right:4px; box-sizing: border-box;-webkit-overflow-scrolling: touch;">
         </div>
+
+        <button id="quickViewEditBtn" onclick="" style="position:absolute; bottom:15px; right:20px; background:#10b981; color:white; border:2px solid #fff; border-radius:50%; width:48px; height:48px; font-size:18px; cursor:pointer; box-shadow:0 6px 15px rgba(16,185,129,0.4); z-index:15; display:flex; align-items:center; justify-content:center;" title="Edit Offline Form"><i class="fa-solid fa-pen-to-square"></i></button>
+
+        <button onclick="quickViewNavigate(-1)" style="position:absolute; top:50%; left:6px; transform:translateY(-50%); background:rgba(245,158,11,0.95); color:#fff; border:2px solid #fff; border-radius:50%; width:36px; height:30px; font-size:14px; cursor:pointer; box-shadow:0 4px 8px rgba(0,0,0,0.15); z-index:15; display:flex; align-items:center; justify-content:center;"><i class="fa-solid fa-chevron-left"></i></button>
+        <button onclick="quickViewNavigate(1)" style="position:absolute; top:50%; right:6px; transform:translateY(-50%); background:rgba(245,158,11,0.95); color:#fff; border:2px solid #fff; border-radius:50%; width:36px; height:30px; font-size:14px; cursor:pointer; box-shadow:0 4px 8px rgba(0,0,0,0.15); z-index:15; display:flex; align-items:center; justify-content:center;"><i class="fa-solid fa-chevron-right"></i></button>
     </div>
+</div>
     
     <div id="customDialogOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15,23,42,0.8); z-index:999999; align-items:center; justify-content:center; backdrop-filter:blur(4px);">
         <div style="background:#ffffff; width:90%; max-width:450px; max-height:85vh; overflow-y:auto; border-radius:16px; padding:30px 20px; text-align:center; box-shadow:0 25px 50px -12px rgba(0,0,0,0.5); display:flex; flex-direction:column; overscroll-behavior: contain;">
@@ -6626,13 +6681,20 @@ function renderAnalyticsDashboardEngine() {
             });
         });
 
-        // 🧱 19-कॉलम लाइव ग्रिड डेटा री-बिल्डर
+        // 🧱 19-कॉलम लाइव ग्रिड डेटा री-बिल्डर (🎯 FIX: शीट के नए 'Report Names' को लाइव हेडर में दिखाना)
         var tableNode = document.getElementById('analyticsMatrixTable');
         if (!tableNode) return;
 
         var headerHtml = "<tr style='font-size:9.5px; background: var(--theme-table-th); white-space: nowrap;'>";
         headerHtml += "<th style='padding:6px 4px; position:sticky; left:0; background:inherit; z-index:6; text-align:left;'>Reader Name</th>";
-        dynamicMatrixCols.forEach(function(c) { headerHtml += "<th style='padding:6px 4px; text-align:center;'> " + (c.name || c.key) + "</th>"; });
+        
+        // c.name की जगह सीधे globalReportConfigs से मैच करके शीट का असली 'Report Names' उठाएगा
+        dynamicMatrixCols.forEach(function(c) { 
+            var matchedConfig = globalReportConfigs.find(function(cfg) { return cfg.key === c.key; });
+            var finalDisplayName = matchedConfig ? (matchedConfig.name || c.name || c.key) : (c.name || c.key);
+            headerHtml += "<th style='padding:6px 4px; text-align:center;'> " + finalDisplayName + "</th>"; 
+        });
+        
         headerHtml += "<th style='padding:6px 4px; text-align:center;'>Done %</th></tr>";
         tableNode.querySelector('thead').innerHTML = headerHtml;
 
@@ -6659,11 +6721,24 @@ function renderAnalyticsDashboardEngine() {
             matrixHtml += "<td style='text-align:center; background:#dcfce7;'><span style='color:#15803d; font-weight:900;'> " + donePct + "%</span></td>";
             matrixHtml += "</tr>";
 
-            // चार्ट एरे में डेटा ट्रांसफर
+            // 🎯 FIX: शीट की नई Key/ID के आधार पर तीनों चार्ट्स (Main, Pole, Bill) को लाइव मैप करना
             chartLabels.push(name.substring(0, 8));
-            mainMriArr.push(m.mainMriPnd); mainLsArr.push(m.mainLsPnd); mainExcArr.push(m.mainExcPnd);
-            poleMriArr.push(m.poleMriPnd); poleLsArr.push(m.poleLsPnd); poleExcArr.push(m.poleExcPnd);
-            billArr.push(m.billPnd); billDistArr.push(m.billDistPnd);
+            
+            // 1. मेन मीटर चार्ट डेटा मैपिंग
+            mainMriArr.push(m.dynamicCounts['main_mri_pending'] || 0); 
+            mainLsArr.push(m.dynamicCounts['mri_no_survey_main'] || 0); 
+            mainExcArr.push(m.dynamicCounts['main_field_exception'] || 0);
+            
+            // 2. पोल मीटर चार्ट डेटा मैपिंग
+            poleMriArr.push(m.dynamicCounts['pole_mri_pending'] || 0); 
+            poleLsArr.push(m.dynamicCounts['pole_ls_not_avail'] || 0); 
+            poleExcArr.push(m.dynamicCounts['pole_field_exception'] || 0);
+            
+            // 3. बिलिंग, डिस्ट्रीब्यूशन और डिलीवर्ड चार्ट डेटा मैपिंग (🎯 FIX)
+            billArr.push(m.dynamicCounts['bill_upload_status'] || 0); 
+            billDistArr.push(m.dynamicCounts['bill_dist_pending'] || 0);
+            if (!window.billDeliveredArr) { window.billDeliveredArr = []; }
+            window.billDeliveredArr.push(m.dynamicCounts['bill_delivered_status'] || 0);
         });
         document.getElementById('analyticsMatrixTableBody').innerHTML = matrixHtml;
 
@@ -6674,25 +6749,79 @@ function renderAnalyticsDashboardEngine() {
 
         var chartOptions = { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { boxWidth: 10, font: { size: 9, weight: 'bold' } } } }, scales: { x: { stacked: true, ticks: { font: { size: 8, weight: 'bold' } } }, y: { stacked: true, ticks: { font: { size: 8 } } } } };
 
-        // चार्ट 1: मेन मीटर पेंडेंसी
+        // 📊 पाई चार्ट के अंदर लाइव काउंट (Number) ड्रा करने वाला एडवांस्ड इन-बिल्ट इंजन
+        var pieChartOptions = { 
+            responsive: true, 
+            maintainAspectRatio: false, 
+            plugins: { 
+                legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10, weight: 'bold' } } } 
+            },
+            // 🎯 कमाल की ट्रिक: चार्ट बनने के बाद उसके स्लाइस के अंदर नंबर लिखने का लॉजिक
+            animation: {
+                onComplete: function() {
+                    var chartInstance = this;
+                    var ctx = chartInstance.ctx;
+                    ctx.font = Chart.helpers.fontString(12, 'bold', 'Helvetica');
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+
+                    chartInstance.data.datasets.forEach(function(dataset, i) {
+                        var meta = chartInstance.getDatasetMeta(i);
+                        meta.data.forEach(function(element, index) {
+                            var dataString = dataset.data[index].toString();
+                            // यदि काउंट 0 है, तो चार्ट को साफ़ रखने के लिए उसे नहीं दिखाएंगे
+                            if (dataString !== "0") {
+                                ctx.fillStyle = '#FFFFFF'; // नंबर का रंग सफ़ेद (High Contrast)
+                                var position = element.tooltipPosition();
+                                // चार्ट के स्लाइस के केंद्र (Center) में नंबर प्रिंट करना
+                                ctx.fillText(dataString, position.x, position.y);
+                            }
+                        });
+                    });
+                }
+            }
+        };
+
+        // 🎯 कुल एरे वैल्यूज का सम (Total) निकालने का क्विक मैकेनिज्म
+        var sumArray = function(arr) { return arr.reduce(function(a, b) { return a + b; }, 0); };
+
+        // चार्ट 1: मेन मीटर पेंडेंसी (Pie / Doughnut Mode)
         chartInstanceMainMeter = new Chart(document.getElementById('chartMainMeterAnalytics'), {
-            type: 'bar',
-            data: { labels: chartLabels, datasets: [{ label: 'MRI Pending', data: mainMriArr, backgroundColor: '#7c3aed' }, { label: 'Load Survey Pending', data: mainLsArr, backgroundColor: '#ec4899' }, { label: 'Exceptions / Defective', data: mainExcArr, backgroundColor: '#f59e0b' }] },
-            options: { ...chartOptions, plugins: { ...chartOptions.plugins, title: { display: true, text: '⚡ MAIN METER PENDENCY STATUS', font: { size: 11, weight: 'bold' }, color: '#1e3a8a' } } }
+            type: 'doughnut', // 'pie' भी लिख सकते हैं, लेकिन 'doughnut' मोबाइल पर ज्यादा प्रोफेशनल दिखता है
+            data: { 
+                labels: ['MRI Pending', 'Load Survey Pending', 'Exceptions / Defective'], 
+                datasets: [{ 
+                    data: [sumArray(mainMriArr), sumArray(mainLsArr), sumArray(mainExcArr)], 
+                    backgroundColor: ['#7c3aed', '#ec4899', '#f59e0b'] 
+                }] 
+            },
+            options: { ...pieChartOptions, plugins: { ...pieChartOptions.plugins, title: { display: true, text: '⚡ MAIN METER TOTAL PENDENCY BREAKUP', font: { size: 12, weight: 'bold' }, color: '#1e3a8a' } } }
         });
 
-        // चार्ट 2: पोल मीटर पेंडेंसी
+        // चार्ट 2: पोल मीटर पेंडेंसी (Pie / Doughnut Mode)
         chartInstancePoleMeter = new Chart(document.getElementById('chartPoleMeterAnalytics'), {
-            type: 'bar',
-            data: { labels: chartLabels, datasets: [{ label: 'MRI Pending', data: poleMriArr, backgroundColor: '#06b6d4' }, { label: 'Load Survey Pending', data: poleLsArr, backgroundColor: '#14b8a6' }, { label: 'Exceptions / Defective', data: poleExcArr, backgroundColor: '#ef4444' }] },
-            options: { ...chartOptions, plugins: { ...chartOptions.plugins, title: { display: true, text: '🪡 POLE METER PENDENCY STATUS', font: { size: 11, weight: 'bold' }, color: '#1e3a8a' } } }
+            type: 'doughnut', 
+            data: { 
+                labels: ['MRI Pending', 'Load Survey Pending', 'Exceptions / Defective'], 
+                datasets: [{ 
+                    data: [sumArray(poleMriArr), sumArray(poleLsArr), sumArray(poleExcArr)], 
+                    backgroundColor: ['#06b6d4', '#14b8a6', '#ef4444'] 
+                }] 
+            },
+            options: { ...pieChartOptions, plugins: { ...pieChartOptions.plugins, title: { display: true, text: '🪡 POLE METER TOTAL PENDENCY BREAKUP', font: { size: 12, weight: 'bold' }, color: '#1e3a8a' } } }
         });
 
-        // चार्ट 3: बिलिंग एवं वितरण पेंडेंसी
+        // चार्ट 3: बिलिंग, डिस्ट्रीब्यूशन और डिलीवर्ड का कंबाइंड डोनट चार्ट (🎯 FIX)
         chartInstanceBillDist = new Chart(document.getElementById('chartBillDistAnalytics'), {
-            type: 'bar',
-            data: { labels: chartLabels, datasets: [{ label: 'No Bill / Print Pending', data: billArr, backgroundColor: '#3b82f6' }, { label: 'Distribution Pending', data: billDistArr, backgroundColor: '#10b981' }] },
-            options: { ...chartOptions, plugins: { ...chartOptions.plugins, title: { display: true, text: '📦 BILLING & DISTRIBUTION STATUS', font: { size: 11, weight: 'bold' }, color: '#1e3a8a' } } }
+            type: 'doughnut', 
+            data: { 
+                labels: ['Bill Upload Status', 'Distribution Pending', 'Bill Delivered Status'], 
+                datasets: [{ 
+                    data: [sumArray(billArr), sumArray(billDistArr), sumArray(window.billDeliveredArr || [])], 
+                    backgroundColor: ['#3b82f6', '#10b981', '#1e3a8a'] 
+                }] 
+            },
+            options: { ...pieChartOptions, plugins: { ...pieChartOptions.plugins, title: { display: true, text: '📦 BILLING, DIST & DELIVERY TOTAL BREAKUP', font: { size: 12, weight: 'bold' }, color: '#1e3a8a' } } }
         });
     };
 }
@@ -6741,19 +6870,29 @@ function exportAnalyticsReportPDF() {
                 return hdCanvas.toDataURL('image/jpeg', 1.0);
             };
             
-            // 🎯 फुल-पेज विड्थ कैलकुलेशन: 1684pt में से दोनों तरफ 40pt मार्जिन छोड़कर 1604pt की पूरी चौड़ाई लॉक की
-            var fullPageChartW = pdfPageWidth - 80; // 1604 pt (पूरी चौड़ाई)
-            var optimalChartH = 250;               // पर्याप्त ऊंचाई जिससे बार्स साफ दिखें
-            var gapBetweenCharts = 25;
+            // 🎯 FIX: तीनों डोनट/पाई चार्ट्स को PDF प्रिंट में एक ही लाइन (कतार) में सेट करना
+            var marginX = 40;                        // बाईं और दाईं ओर का मार्जिन
+            var totalAvailableW = pdfPageWidth - (marginX * 2); // कुल उपलब्ध चौड़ाई (1604 pt)
+            var gapX = 30;                           // चार्ट्स के बीच की दूरी
+            
+            // 3 चार्ट्स के लिए सटीक चौड़ाई की गणना (1604 - 60) / 3 = ~514pt प्रत्येक चार्ट
+            var singleChartW = Math.floor((totalAvailableW - (gapX * 2)) / 3); 
+            var optimalChartH = 340;                 // गोल पाई चार्ट के लिए परफेक्ट वर्टिकल हाइट
 
-            doc.addImage(processCanvasHD(mainCanvas), 'JPEG', 40, nextStartY, fullPageChartW, optimalChartH);
-            nextStartY += optimalChartH + gapBetweenCharts;
+            // 1. पहला चार्ट (Main Meter) - सबसे बाईं तरफ
+            var x1 = marginX;
+            doc.addImage(processCanvasHD(mainCanvas), 'JPEG', x1, nextStartY, singleChartW, optimalChartH);
 
-            doc.addImage(processCanvasHD(poleCanvas), 'JPEG', 40, nextStartY, fullPageChartW, optimalChartH);
-            nextStartY += optimalChartH + gapBetweenCharts;
+            // 2. दूसरा चार्ट (Pole Meter) - बिल्कुल बीच में
+            var x2 = x1 + singleChartW + gapX;
+            doc.addImage(processCanvasHD(poleCanvas), 'JPEG', x2, nextStartY, singleChartW, optimalChartH);
 
-            doc.addImage(processCanvasHD(billCanvas), 'JPEG', 40, nextStartY, fullPageChartW, optimalChartH);
-            nextStartY += optimalChartH + 45; // डेटा टेबल के लिए स्पेस पैडिंग
+            // 3. तीसरा चार्ट (Billing & Dist) - सबसे दाईं तरफ
+            var x3 = x2 + singleChartW + gapX;
+            doc.addImage(processCanvasHD(billCanvas), 'JPEG', x3, nextStartY, singleChartW, optimalChartH);
+
+            // अगली रो (डेटा टेबल) के लिए Y-एक्सिस को चार्ट की ऊंचाई के नीचे ढकेलें
+            nextStartY += optimalChartH + 50;
         }
     } catch(err) { 
         console.error("PDF High-Res Chart processing failed:", err); 
