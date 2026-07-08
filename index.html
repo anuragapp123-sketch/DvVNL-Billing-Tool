@@ -5,7 +5,7 @@
 <script>
   (function() {
     // ⚠️ अपना नया Deployment URL यहाँ पेस्ट करें
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx-jprAEQpn6C56dkjeoazWiQGQWQjlZ7JRLBsKriVEbFTJuP5uBq3gLunGvi3rT5j32A/exec";
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzKAX52FngBgDXx-ytElcM25I9jrJYQGjZVuB8Vsf03csG0aLG7VyMm3rNA0orMTiDTTg/exec";
 
     function createHandler(successCallback, failureCallback) {
       return new Proxy({}, {
@@ -2383,11 +2383,6 @@ window.applyHeaderReaderFilter = function() {
             statsGridNode.innerHTML = finalDashboardHtml.join('');
         }
 
-        var statsGridNode = document.getElementById('summaryGridToPrint');
-        if (statsGridNode) {
-            statsGridNode.innerHTML = cardsHtml.join('');
-        }
-
         // 🟢 ऑफलाइन सेव काउंटर और सिंक बॉक्स को लाइव अपडेट करने वाला नया फंक्शन
         function checkSyncStatus() {
             if (!db) return;
@@ -2421,68 +2416,71 @@ window.applyHeaderReaderFilter = function() {
         // इस फ़ंक्शन को तुरंत रन करें ताकि लोड होते ही काउंटर अपडेट हो जाए
         checkSyncStatus();
 
-        // --- Watchlist Table Engine ---
+        // =========================================================================
+        // 🎯 FIX: WATCHLIST TABLE ENGINE (क्रैश-प्रूफ लाइव वॉचलिस्ट)
+        // =========================================================================
         var tableHtmlBuffer = [];
-        var menuHtmlBuffer = [];
         var totalReportsPendencyCount = 0;
         var currentSummaryGroup = "";
-
-        // 🎯 FIX: यहाँ res.reports = []; को हटा दिया गया है ताकि ANALYTICS_MATRIX का डेटा क्रैश न हो
-        if (!res.reports) { res.reports = []; } 
 
         if (Array.isArray(globalReportConfigs)) {
             globalReportConfigs.forEach(function(config) {
                 var userRole = loggedInReader.toUpperCase();
                 if (config.target === "ADMIN" && userRole !== "ANURAG SHAKYA") return;
                 
-                // 'bill_dist_pending' को स्किप लिस्ट में रखेंगे क्योंकि वह केवल होम कार्ड और 'बिल वितरण' मेनू टैब के लिए है
-                if (config.key === 'bill_dist_pending') return;
+                // मास्टर लिस्ट्स को नीचे रेंडर होने से रोकना
+                if (config.key === 'all_consumers_list' || config.key === 'all_bills_report' || config.key === 'bill_dist_pending') return;
 
-                var matchedItems = filteredData.filter(function(item) {
-                    // डैशबोर्ड के वॉचलिस्ट में भी केवल लोकल ऑफलाइन सेव को छिपाएंगे
+                var watchlistItems = filteredData.filter(function(item) {
                     if (item.isDone === true || item.isDone === "true") return false;
                     return evaluateCustomCondition(item, config.conditionStr);
                 });
 
-                res.reports.push({
-                    key: config.key,
-                    name: config.name,
-                    data: matchedItems,
-                    isBilling: (config.key.includes("bill") || config.key.includes("dist") || (config.reportGroup && config.reportGroup.toUpperCase().includes("BILL")))
-                });
+                var groupNameStr = (config.reportGroup || "").toUpperCase().trim();
+                var isTopCard = groupNameStr === "TOP_CARD";
+                var isAnalyticsMatrix = groupNameStr === "ANALYTICS_MATRIX";
 
-                REPORT_NAMES[config.key] = config.name; 
-
-                // ✅ इसकी जगह पर यह नया कोड बदल दीजिए:
-var isTopCard = config.reportGroup && config.reportGroup.trim().toUpperCase() === "TOP_CARD";
-
-// 🎯 FIX: 'all_consumers_list', 'all_bills_report' और 'ANALYTICS_MATRIX' तीनों को नीचे लिस्ट में रेंडर होने से सख्ती से रोका गया है
-var groupNameStr = (config.reportGroup || "").toUpperCase().trim();
-if (config.key !== 'all_consumers_list' && config.key !== 'all_bills_report' && config.key !== 'bill_dist_pending' && groupNameStr !== 'ANALYTICS_MATRIX' && !isTopCard) {
-    
-    // ग्रुप नेम को सही फॉर्मेट में सेट करें
-    var groupName = (config.reportGroup || "OTHER REPORTS").toUpperCase().trim();
+                // केवल PENDENCY ग्रुप्स को ही नीचे दिखाना
+                if (!isTopCard && !isAnalyticsMatrix) {
+                    var groupName = config.reportGroup || "OTHER REPORTS";
                     
-                    if (groupName !== currentSummaryGroup) {
+                    // ग्रुप हेडिंग पट्टी (Section Title)
+                    if (groupName.toUpperCase().trim() !== currentSummaryGroup) {
                         tableHtmlBuffer.push(
                             '<tr style="background-color: #f1f5f9; border-top: 2px solid #cbd5e1; border-bottom: 1px solid #cbd5e1;">' +
                             '<td colspan="2" style="font-weight: 900; color: #1e40af; font-size: 11px; text-transform: uppercase; padding: 6px 8px; letter-spacing: 0.5px;"><i class="fa-solid fa-layer-group"></i> ' + groupName + '</td>' +
                             '</tr>'
                         );
-                        currentSummaryGroup = groupName;
+                        currentSummaryGroup = groupName.toUpperCase().trim();
                     }
 
-                    var badgeClass = (matchedItems.length === 0) ? "badge-count zero" : "badge-count alert";
+                    // इंडिविजुअल रिपोर्ट और उसका पेंडेंसी काउंट
+                    var badgeClass = (watchlistItems.length === 0) ? "badge-count zero" : "badge-count alert";
+                    var displayName = config.name || config.reportNames || config.key;
                     tableHtmlBuffer.push(
                         '<tr onclick="openReportRowDirect(\'' + config.key + '\')">' +
-                        '<td style="padding-left: 12px; border-left: 4px solid ' + (matchedItems.length > 0 ? '#3b82f6' : 'transparent') + ';">' + config.name + '</td>' +
-                        '<td style="text-align: center; vertical-align: middle;"><span class="' + badgeClass + '" style="font-size:11px; padding:3px 8px;">' + matchedItems.length + '</span></td>' +
+                        '<td style="padding-left: 12px; border-left: 4px solid ' + (watchlistItems.length > 0 ? '#1e40af' : 'transparent') + '; font-weight:700; color:#0f172a; font-size: 12px;">' + displayName + '</td>' +
+                        '<td style="text-align: center; vertical-align: middle;"><span class="' + badgeClass + '" style="font-size:11px; padding:3px 8px; font-weight:bold;">' + watchlistItems.length + '</span></td>' +
                         '</tr>'
                     );
-                    totalReportsPendencyCount += matchedItems.length;
+                    totalReportsPendencyCount += watchlistItems.length;
                 }
             }); 
         }
+
+        // HTML में डेटा रेंडर करना
+        var tableBodyNode = document.getElementById('dynamicWatchlistTableBody');
+        if(tableBodyNode) {
+            tableBodyNode.innerHTML = tableHtmlBuffer.length === 0 ? '<tr><td colspan="2" style="text-align:center; padding:15px; color:#64748b; font-weight:bold;">कोई पेंडेंसी रिपोर्ट नहीं मिली।</td></tr>' : tableHtmlBuffer.join('');
+        }
+        
+        // टोटल काउंट बैज अपडेट करना
+        var nodeReports = document.getElementById('count-reports');
+        if(nodeReports) { 
+            nodeReports.innerText = totalReportsPendencyCount; 
+            setCountBadgeColor('count-reports', totalReportsPendencyCount); 
+        }
+        // =========================================================================
         
         menuHtmlBuffer.push('<div class="section-title" style="background:#eff6ff; color:#1e40af; border-left:4px solid #3b82f6; text-align:center;"><i class="fa-solid fa-info-circle"></i> Use Home Dashboard tabs for Reports</div>');
 
