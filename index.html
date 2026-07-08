@@ -882,7 +882,7 @@
         <div id="apkErrorLogger" style="display:none; margin-top:10px; padding:10px; background:#fef2f2; border:1px solid #fca5a5; border-radius:6px; color:#b91c1c; font-size:11px; font-weight:bold; text-align:left; word-break:break-all; white-space:pre-wrap;"></div>
         <div class="app-footer-branding" style="position: relative;">
             Developed by:- Anurag Shakya | 9761414105
-            <span style="display:block; margin-top:4px; font-size:10px; color:#ef4444; font-weight:900;">App Version: V1.0.17</span>
+            <span style="display:block; margin-top:4px; font-size:10px; color:#ef4444; font-weight:900;">App Version: V1.0.18</span>
         </div>
     </div>
     
@@ -1228,7 +1228,7 @@
             
             <div style="text-align: center; margin-top: 25px; padding-top: 15px; border-top: 1px dashed #cbd5e1; color: #64748b;">
                 <div style="font-size: 12px; font-weight: bold;">Developed by: Anurag Shakya</div>
-                <div style="font-size: 11px; color: #ef4444; font-weight: 900; margin-top: 4px;">App Version: V1.0.17</div>
+                <div style="font-size: 11px; color: #ef4444; font-weight: 900; margin-top: 4px;">App Version: V1.0.18</div>
             </div>
         </div>
 
@@ -1277,7 +1277,7 @@
         <div style="width: 100%; height: 40px; clear: both; display: block !important; visibility: hidden; pointer-events: none;"></div>
         
         <div class="card" style="background: rgba(255, 255, 255, 0.7); margin-bottom: 20px; text-align: center; border: 1px dashed #cbd5e1;">
-            <div style="font-size: 11px; color: #ef4444; font-weight: 900; margin-bottom: 3px;">App Version: V1.0.17</div>
+            <div style="font-size: 11px; color: #ef4444; font-weight: 900; margin-bottom: 3px;">App Version: V1.0.18</div>
             <div style="font-size: 12px; color: #1e40af; font-weight: 800; text-transform: uppercase; margin-bottom: 5px;"><i class="fa-solid fa-user-tie"></i> <span id="welcomeTxt">Mr Name: Loading...</span></div>
             <div style="font-size: 11px; font-weight: 700; color: #475569; border-top: 1px solid #cbd5e1; padding-top: 5px;">
                 Developed by:- Er. Anurag Shakya | 9761414105
@@ -2369,7 +2369,7 @@ window.applyHeaderReaderFilter = function() {
             }
         }
 
-        // इस फंक्शन को तुरंत रन करें ताकि लोड होते ही काउंटर अपडेट हो जाए
+        // इस फ़ंक्शन को तुरंत रन करें ताकि लोड होते ही काउंटर अपडेट हो जाए
         checkSyncStatus();
 
         // --- Watchlist Table Engine ---
@@ -2378,17 +2378,19 @@ window.applyHeaderReaderFilter = function() {
         var totalReportsPendencyCount = 0;
         var currentSummaryGroup = "";
 
-        res.reports = res.reports.filter(r => r.key === 'all_consumers_list' || r.key === 'all_bills_report');
+        // 🎯 CRITICAL FIX: पुराने हार्डकोडेड फिल्टर को हटा दिया गया है ताकि dynamic Report Group (MAIN TAB, BILL DIST TAB) सही से रेंडर हो सकें
+        res.reports = []; 
 
         if (Array.isArray(globalReportConfigs)) {
             globalReportConfigs.forEach(function(config) {
                 var userRole = loggedInReader.toUpperCase();
                 if (config.target === "ADMIN" && userRole !== "ANURAG SHAKYA") return;
                 
-                if (config.key === 'all_consumers_list' || config.key === 'all_bills_report' || config.key === 'bill_dist_pending') return;
+                // 'bill_dist_pending' को स्किप लिस्ट में रखेंगे क्योंकि वह केवल होम कार्ड और 'बिल वितरण' मेनू टैब के लिए है
+                if (config.key === 'bill_dist_pending') return;
 
                 var matchedItems = filteredData.filter(function(item) {
-                    // 🔥 FIX: डैशबोर्ड के वॉचलिस्ट में भी केवल लोकल ऑफलाइन सेव को छिपाएंगे
+                    // डैशबोर्ड के वॉचलिस्ट में भी केवल लोकल ऑफलाइन सेव को छिपाएंगे
                     if (item.isDone === true || item.isDone === "true") return false;
                     return evaluateCustomCondition(item, config.conditionStr);
                 });
@@ -2397,15 +2399,19 @@ window.applyHeaderReaderFilter = function() {
                     key: config.key,
                     name: config.name,
                     data: matchedItems,
-                    isBilling: (config.key.includes("bill") || config.key.includes("dist"))
+                    isBilling: (config.key.includes("bill") || config.key.includes("dist") || (config.reportGroup && config.reportGroup.toUpperCase().includes("BILL")))
                 });
 
                 REPORT_NAMES[config.key] = config.name; 
 
-                var isTopCard = config.reportGroup && config.reportGroup.trim().toUpperCase() === "TOP_CARD";
-// 🎯 फिक्स: यहाँ 'bill_dist_pending' को भी स्किप लिस्ट में जोड़ दिया गया है ताकि यह टेबल में न आए
+                // ✅ इसकी जगह पर यह नया कोड बदल दीजिए:
+var isTopCard = config.reportGroup && config.reportGroup.trim().toUpperCase() === "TOP_CARD";
+
+// 🎯 FIX: 'all_consumers_list' और 'all_bills_report' को यहाँ टेबल में रेंडर होने से सख्ती से रोका गया है
 if (config.key !== 'all_consumers_list' && config.key !== 'all_bills_report' && config.key !== 'bill_dist_pending' && !isTopCard) {
-                    var groupName = config.reportGroup || "OTHER REPORTS";
+    
+    // ग्रुप नेम को सही फॉर्मेट में सेट करें
+    var groupName = (config.reportGroup || "OTHER REPORTS").toUpperCase().trim();
                     
                     if (groupName !== currentSummaryGroup) {
                         tableHtmlBuffer.push(
@@ -2459,7 +2465,6 @@ if (config.key !== 'all_consumers_list' && config.key !== 'all_bills_report' && 
             }
         } 
         
-
         var nodeVisit = document.getElementById('count-visitdata');
         if(nodeVisit) { nodeVisit.innerText = total; setCountBadgeColor('count-visitdata', total); }
     });
