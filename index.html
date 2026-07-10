@@ -539,7 +539,7 @@
         gap: 4px; 
     }
     .tab-btn i { font-size: 18px; transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); color: #94a3b8; }
-    .tab-btn span { font-size: 9.5px; text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 3px; font-weight: 700; color: #cbd5e1; }
+    .tab-btn span { font-size: 8.5px; text-transform: uppercase; letter-spacing: 0.2px; display: flex; align-items: center; gap: 3px; font-weight: 700; color: #cbd5e1; white-space: nowrap; }
     
     /* 🎯 फिक्स: एक्टिव होने पर बैकग्राउंड और बॉर्डर को डायनामिक थीम से लिंक किया */
     .tab-btn.active { 
@@ -882,7 +882,7 @@
         <div id="apkErrorLogger" style="display:none; margin-top:10px; padding:10px; background:#fef2f2; border:1px solid #fca5a5; border-radius:6px; color:#b91c1c; font-size:11px; font-weight:bold; text-align:left; word-break:break-all; white-space:pre-wrap;"></div>
         <div class="app-footer-branding" style="position: relative;">
             Developed by:- Anurag Shakya | 9761414105
-            <span style="display:block; margin-top:4px; font-size:10px; color:#ef4444; font-weight:900;">App Version: V1.0.19</span>
+            <span style="display:block; margin-top:4px; font-size:10px; color:#ef4444; font-weight:900;">App Version: V1.0.20</span>
         </div>
     </div>
     
@@ -1055,8 +1055,8 @@
                 <button id="sub-tab-bills-btn" class="sub-tab-shared-style" onclick="openReportRowDirect('all_bills_report')" style="background: transparent; color: #475569;">
                     <i class="fa-solid fa-file-invoice-dollar"></i> All Bills
                 </button>
-                <button id="sub-tab-consumers-btn" class="sub-tab-shared-style" onclick="openReportRowDirect('all_consumers_list')" style="background: transparent; color: #475569;">
-                    <i class="fa-solid fa-users"></i> Consumers
+                <button id="sub-tab-consumers-btn" class="sub-tab-shared-style" onclick="openReportRowDirect('Visit_Data_Consumers')" style="background: transparent; color: #475569;">
+                    <i class="fa-solid fa-users"></i> All Consumers
                 </button>
             </div>
             
@@ -1154,28 +1154,26 @@
         <i class="fa-solid fa-file-pdf"></i> Bill Merge
     </button>
 </div>
-    
-    <!-- नया फिल्टर यहाँ जोड़ा गया है -->
-    <div class="compact-filter-row" style="margin-bottom: 10px; display:flex; flex-wrap:wrap; gap:10px;">
-        <select id="billLoadCategoryFilter" style="flex:1; min-width:120px; font-weight:bold; color:#4f46e5; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px;" onchange="renderBillDistributionList()">
-            <option value="ALL">सभी लोड (All Load)</option>
-            <option value="5">5 KW</option>
-                        <option value="10" selected>10 KW</option>
-        </select>
-        <select id="billDistWaFilter" style="flex:1; min-width:120px; font-weight:bold; color:#059669; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px;" onchange="renderBillDistributionList()">
-            <option value="ALL">WhatsApp: All</option>
-            <option value="YES">WhatsApp: YES</option>
-            <option value="NO">WhatsApp: NO</option>
-        </select>
-        <div style="background: white; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px; display: flex; align-items: center; width:100%; justify-content:center; gap: 8px;">
-            <input type="checkbox" id="selectAllBillsDist" onchange="toggleAllBillsDist(this)" style="width: 18px; height: 18px; cursor: pointer; margin:0;">
-            <label for="selectAllBillsDist" style="margin:0; font-weight:bold; color:#0f172a; cursor:pointer;">उपलब्ध सभी PDF एक साथ चुनें (Select All)</label>
+    <!-- 🚀 अल्टीमेट कॉम्पैक्ट रो: सर्च बार और सारे फिल्टर्स अब एक ही लाइन में पूरी तरह फिट हैं -->
+    <div style="display: flex; flex-direction: row; align-items: center; justify-content: space-between; gap: 4px; margin-bottom: 8px; width: 100%; box-sizing: border-box;">
+        <div style="position: relative; flex: 2; min-width: 0; display: flex; align-items: center; height: 32px;">
+            <input type="text" id="billSearchBar" style="width: 100%; padding: 6px 28px 6px 8px; font-size: 12px; height: 32px; border: 1px solid #cbd5e1; border-radius: 6px; background: #ffffff;" placeholder="🔍 खोजें..." onkeyup="universalListSearch('billSearchBar', 'billDistributionContainer')">
+            <i class="fa-solid fa-microphone" onclick="startVoiceSearch('billSearchBar', 'billDistributionContainer')" style="position: absolute; right: 8px; color: #1e40af; cursor: pointer; font-size: 13px; padding: 4px; z-index: 10;"></i>
         </div>
-    </div>
-
-    <div style="position: relative; width: 100%; display: flex; align-items: center; margin-bottom: 8px;">
-        <input type="text" id="billSearchBar" style="width: 100%; padding-right: 35px;" placeholder="🔍 बिल खोजें..." onkeyup="universalListSearch('billSearchBar', 'billDistributionContainer')">
-        <i class="fa-solid fa-microphone" onclick="startVoiceSearch('billSearchBar', 'billDistributionContainer')" style="position: absolute; right: 12px; color: #1e40af; cursor: pointer; font-size: 15px; padding: 5px; z-index: 10;"></i>
+        <select id="billLoadCategoryFilter" style="flex: 1; font-weight: bold; color: #4f46e5; padding: 0 2px; font-size: 11px; border: 1px solid #cbd5e1; border-radius: 6px; height: 32px; background: #fff;" onchange="renderBillDistributionList()">
+            <option value="ALL">Load: All</option>
+            <option value="5">5 KW</option>
+            <option value="10" selected>10 KW</option>
+        </select>
+        <select id="billDistWaFilter" style="flex: 1; font-weight: bold; color: #059669; padding: 0 2px; font-size: 11px; border: 1px solid #cbd5e1; border-radius: 6px; height: 32px; background: #fff;" onchange="renderBillDistributionList()">
+            <option value="ALL">WA: All</option>
+            <option value="YES">WA: YES</option>
+            <option value="NO">WA: NO</option>
+        </select>
+        <div style="background: white; border: 1px solid #cbd5e1; border-radius: 6px; padding: 0 4px; display: flex; align-items: center; justify-content: center; gap: 2px; height: 32px; flex: 1; min-width: 0; white-space: nowrap;">
+            <input type="checkbox" id="selectAllBillsDist" onchange="toggleAllBillsDist(this)" style="width: 13px; height: 14px; cursor: pointer; margin: 0; flex-shrink: 0;">
+            <label for="selectAllBillsDist" style="margin: 0; font-weight: bold; color: #0f172a; cursor: pointer; font-size: 10px; text-overflow: ellipsis; overflow: hidden;">All</label>
+        </div>
     </div>
     <h3 style="font-size: 13px; margin: 5px 0 8px 2px; color: #b45309; font-weight: bold; display: flex; align-items: center; gap: 6px;">📦 बिल वितरण सूची: <span id="count-billdist" class="badge-count zero">0</span></h3>
     <div id="billDistributionContainer"></div>
@@ -1206,15 +1204,12 @@
                 </div>
             </div>
 
-            <!-- 🛠️ केवल एडमिन के लिए साइडबार मेनू पैनल (विजिट्स बटन के साथ फिक्स) -->
+            <!-- 🛠️ केवल एडमिन के लिए साइडबार मेनू पैनल (VisiT_Data बटन यहाँ से हटा दिया गया है) -->
             <div id="sidebarAdminControlSection" style="display: none; margin-bottom: 15px; background: #faf5ff; border: 1px solid #e9d5ff; padding: 10px; border-radius: 8px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);">
                 <div style="font-size: 11px; font-weight: 900; color: #6b21a8; text-transform: uppercase; margin-bottom: 8px; border-bottom: 1px dashed #c084fc; padding-bottom: 4px;"><i class="fa-solid fa-user-shield"></i> Admin Control Panel</div>
                 <div style="display: flex; flex-direction: column; gap: 6px;">
                     <button onclick="switchTab('notifyadmin'); toggleReportSidebar(false);" class="report-menu-btn" style="margin-bottom:0; padding:10px; background:#ffffff; border-color:#d8b4fe; color:#6b21a8;"><span style="font-weight:700;"><i class="fa-solid fa-paper-plane" style="color:#7c3aed; margin-right:6px;"></i> लाइव सूचना सेंडर</span><i class="fa-solid fa-chevron-right" style="font-size:10px; color:#c084fc;"></i></button>
                     <button onclick="switchTab('configmaker'); toggleReportSidebar(false);" class="report-menu-btn" style="margin-bottom:0; padding:10px; background:#ffffff; border-color:#d8b4fe; color:#6b21a8;"><span style="font-weight:700;"><i class="fa-solid fa-sliders" style="color:#7c3aed; margin-right:6px;"></i> रिपोर्ट कन्फिग मेकर</span><i class="fa-solid fa-chevron-right" style="font-size:10px; color:#c084fc;"></i></button>
-                    
-                    <!-- 🎯 विजिट्स का असली HTML बटन वापस जोड़ा गया -->
-                    <button id="btn-tab-visitdata" onclick="switchTab('visitdata'); toggleReportSidebar(false);" class="report-menu-btn" style="margin-bottom:0; padding:10px; background:#ffffff; border-color:#cbd5e1; color:#334155;"><span style="font-weight:700;"><i class="fa-solid fa-map-location-dot" style="color:#3b82f6; margin-right:6px;"></i> सम्पूर्ण विजिट्स डेटा</span><i class="fa-solid fa-chevron-right" style="font-size:10px; color:#cbd5e1;"></i></button>
                 </div>
             </div>
             
@@ -1230,7 +1225,7 @@
             
             <div style="text-align: center; margin-top: 25px; padding-top: 15px; border-top: 1px dashed #cbd5e1; color: #64748b;">
                 <div style="font-size: 12px; font-weight: bold;">Developed by: Anurag Shakya</div>
-                <div style="font-size: 11px; color: #ef4444; font-weight: 900; margin-top: 4px;">App Version: V1.0.19</div>
+                <div style="font-size: 11px; color: #ef4444; font-weight: 900; margin-top: 4px;">App Version: V1.0.20</div>
             </div>
         </div>
 
@@ -1242,27 +1237,25 @@
                     <button onclick="universalExportToExcel('reports')" class="export-btn excel-bg"><i class="fa-solid fa-file-excel"></i></button>
                     <button onclick="generateUniversalPDF('reports')" class="export-btn pdf-bg"><i class="fa-solid fa-file-pdf"></i></button>
                 </div>
-                <div style="position: relative; width: 100%; display: flex; align-items: center; margin-bottom: 8px;">
-                    <input type="text" id="reportSearchBar" style="width: 100%; padding-right: 35px;" placeholder="🔍 इस रिपोर्ट में खोजें..." onkeyup="universalListSearch('reportSearchBar', 'reportListContainer')">
-                    <i class="fa-solid fa-microphone" onclick="startVoiceSearch('reportSearchBar', 'reportListContainer')" style="position: absolute; right: 12px; color: #1e40af; cursor: pointer; font-size: 15px; padding: 5px; z-index: 10;"></i>
-                </div>
-                
-                <div id="reportBillFilters" style="display:none; flex-direction:column; gap:10px; margin-bottom:10px;">
-                    <div style="display:flex; gap:10px;">
-                        <select id="reportLoadCategoryFilter" style="flex:1; font-weight:bold; color:#4f46e5; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px;" onchange="applyRemarkGroupFilter()">
-                            <option value="ALL">सभी लोड (All Load)</option>
-                            <option value="5">5 KW</option>
-                            <option value="10">10 KW</option>
-                        </select>
-                        <select id="reportWaFilter" style="flex:1; font-weight:bold; color:#059669; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px;" onchange="applyRemarkGroupFilter()">
-                            <option value="ALL">WhatsApp: All</option>
-                            <option value="YES">WhatsApp: YES</option>
-                            <option value="NO">WhatsApp: NO</option>
-                        </select>
+                <!-- 🚀 अल्टीमेट कॉम्पैक्ट रो: रिपोर्ट्स व्यू के अंदर भी सर्च बार और फिल्टर्स अब एक सिंगल लाइन बार में सिंक हैं -->
+                <div id="reportBillFilters" style="display: none; flex-direction: row; align-items: center; justify-content: space-between; gap: 4px; margin-bottom: 8px; width: 100%; box-sizing: border-box;">
+                    <div style="position: relative; flex: 2; min-width: 0; display: flex; align-items: center; height: 32px;">
+                        <input type="text" id="reportSearchBar" style="width: 100%; padding: 6px 28px 6px 8px; font-size: 12px; height: 32px; border: 1px solid #cbd5e1; border-radius: 6px; background: #ffffff;" placeholder="🔍 खोजें..." onkeyup="universalListSearch('reportSearchBar', 'reportListContainer')">
+                        <i class="fa-solid fa-microphone" onclick="startVoiceSearch('reportSearchBar', 'reportListContainer')" style="position: absolute; right: 8px; color: #1e40af; cursor: pointer; font-size: 13px; padding: 4px; z-index: 10;"></i>
                     </div>
-                    <div style="background: white; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px; display: flex; align-items: center; justify-content:center; gap: 8px;">
-                        <input type="checkbox" id="selectAllBillsReport" onchange="toggleAllBillsDist(this)" style="width: 18px; height: 18px; cursor: pointer; margin:0;">
-                        <label for="selectAllBillsReport" style="margin:0; font-weight:bold; color:#0f172a; cursor:pointer;">उपलब्ध सभी PDF एक साथ चुनें (Select All)</label>
+                    <select id="reportLoadCategoryFilter" style="flex: 1; font-weight: bold; color: #4f46e5; padding: 0 2px; font-size: 11px; border: 1px solid #cbd5e1; border-radius: 6px; height: 32px; background: #fff;" onchange="applyRemarkGroupFilter()">
+                        <option value="ALL">Load: All</option>
+                        <option value="5">5 KW</option>
+                        <option value="10">10 KW</option>
+                    </select>
+                    <select id="reportWaFilter" style="flex: 1; font-weight: bold; color: #059669; padding: 0 2px; font-size: 11px; border: 1px solid #cbd5e1; border-radius: 6px; height: 32px; background: #fff;" onchange="applyRemarkGroupFilter()">
+                        <option value="ALL">WA: All</option>
+                        <option value="YES">WA: YES</option>
+                        <option value="NO">WA: NO</option>
+                    </select>
+                    <div style="background: white; border: 1px solid #cbd5e1; border-radius: 6px; padding: 0 4px; display: flex; align-items: center; justify-content: center; gap: 2px; height: 32px; flex: 1; min-width: 0; white-space: nowrap;">
+                        <input type="checkbox" id="selectAllBillsReport" onchange="toggleAllBillsDist(this)" style="width: 13px; height: 14px; cursor: pointer; margin: 0; flex-shrink: 0;">
+                        <label for="selectAllBillsReport" style="margin: 0; font-weight: bold; color: #0f172a; cursor: pointer; font-size: 10px; text-overflow: ellipsis; overflow: hidden;">All</label>
                     </div>
                 </div>
 
@@ -1279,7 +1272,7 @@
         <div style="width: 100%; height: 40px; clear: both; display: block !important; visibility: hidden; pointer-events: none;"></div>
         
         <div class="card" style="background: rgba(255, 255, 255, 0.7); margin-bottom: 20px; text-align: center; border: 1px dashed #cbd5e1;">
-            <div style="font-size: 11px; color: #ef4444; font-weight: 900; margin-bottom: 3px;">App Version: V1.0.19</div>
+            <div style="font-size: 11px; color: #ef4444; font-weight: 900; margin-bottom: 3px;">App Version: V1.0.20</div>
             <div style="font-size: 12px; color: #1e40af; font-weight: 800; text-transform: uppercase; margin-bottom: 5px;"><i class="fa-solid fa-user-tie"></i> <span id="welcomeTxt">Mr Name: Loading...</span></div>
             <div style="font-size: 11px; font-weight: 700; color: #475569; border-top: 1px solid #cbd5e1; padding-top: 5px;">
                 Developed by:- Er. Anurag Shakya | 9761414105
@@ -1288,14 +1281,14 @@
         
         <div style="width: 100%; height: 20px; clear: both; display: block !important; visibility: hidden; pointer-events: none;"></div>
 
-    <!-- 📱 इमेज के अनुसार केवल 3 बटन्स वाला साफ और सुंदर बॉटम बार -->
+    <!-- 📱 कस्टमाइज्ड 4 बटन्स वाला साफ और सुंदर बॉटम बार -->
     <div class="tab-bar">
         <button class="tab-btn active" id="btn-tab-summary" onclick="switchTab('summary')">
             <i class="fa-solid fa-house"></i>
             <span>होम</span>
         </button>
         <button class="tab-btn" id="btn-tab-list" onclick="switchTab('list')">
-            <i class="fa-solid fa-users"></i>
+            <i class="fa-solid fa-user-clock"></i>
             <span>उपभोक्ता</span>
         </button>
         <button class="tab-btn" id="btn-tab-billdist" onclick="switchTab('billdist')">
@@ -1479,7 +1472,7 @@ var REPORT_COL_MAP = {
     "EXCEPTION TYPE (MAIN METER)": "mainMeterFieldException", "FINAL_MAIN_METER_SITE_REMARK": "mainStatusRemark", "REMARK": "preFetchedRemark",
     "IS MRI AVAILABLE (MAIN METER)": "mriAvailableMain", "IS LOAD SURVAY AVAILBLE (MAIN Mtr)": "surveyAvailableMain",
     "LAST MONTH FINAL PM NO.": "lastPmNo", "LAST MONTH FINAL PM MAKE": "lastPmMake", "EXCEPTION TYPE (POLE METER)": "poleMeterFieldException",
-    "FINAL_POLE_METER_SITE_REMARK": "poleStatusRemark", "IS MRI AVAILABLE (POLE METER)": "mriAvailablePole", "IS LOAD SURVAY AVAILBLE (Pole Mtr)": "surveyAvailablePole",
+    "FINAL_POLE_METER_SITE_REMARK": "poleStatusRemark", "IS MRI AVAILABLE (POLE METER)": "mriAvailablePole", "IS LOAD SURVAY AVAILBLE (Pole Mtr) animate": "surveyAvailablePole",
     "TIME STAMP": "timeStampVal", "ATTEND STATUS": "attendStatus",
     
     "BILLED DATE": "billedDate", "BILL PRINT TAG": "billPrintTag", "IS BILL SEND BY WHATUP": "isWaSent", "BILL_GROUP": "billGroup",
@@ -1487,10 +1480,10 @@ var REPORT_COL_MAP = {
     "BILL DOWNLOAD LINK": "pdfLink", "ERROR (BILL NOT DOWNLOAD)": "errBill", "IS BILL PRINT": "isBillPrint",
     "BILL PRINT DATE": "billPrDate", "DISTRIBUTION STATUS": "distStatus",
     
-    // ⚡ NEW CONFIG KEYS MAPPED
     "formkey": "formkey", "FORMKEY": "formkey", "reportBlankGroup": "reportGroup", "reportGroup": "reportGroup"
 };
-    var REPORT_NAMES = { 'main_mri_pending': '1. Main Meter MRI Pending', 'pole_mri_pending': '2. Pole Meter MRI Pending', 'main_field_exception': '3. Main Meter Field Exception', 'pole_field_exception': '4. Pole Meter Field Exception', 'mri_no_survey_main': '5. MRI But No Load Survay (Main)', 'mri_no_survey_pole': '6. MRI But No Load Survay (Pole)', 'billed_no_bill': '7. Billed But No Bill Available', 'bill_print_pending': '8. Bill Available But Print Pending', 'bill_dist_pending': '9. Bill Available But Distribution Pending', 'rep10': '10. 50 Kw MRI Pending List', 'rep11': '11. 50 Kw VisiT Pending', 'rep12': '12. 50 Kw Main Meter Field Exception', 'rep13': '13. 50 Kw Pole Meter Field Exception', 'all_bills_report': 'All Bills Report', 'all_consumers_list': 'All Consumers Master' };
+// ⚡ दोनों चाबियों (all_consumers_list और Visit_Data_Consumers) को स्वतंत्र रूप से नाम अलॉट किया गया
+var REPORT_NAMES = { 'main_mri_pending': '1. Main Meter MRI Pending', 'pole_mri_pending': '2. Pole Meter MRI Pending', 'main_field_exception': '3. Main Meter Field Exception', 'pole_field_exception': '4. Pole Meter Field Exception', 'mri_no_survey_main': '5. MRI But No Load Survay (Main)', 'mri_no_survey_pole': '6. MRI But No Load Survay (Pole)', 'billed_no_bill': '7. Billed But No Bill Available', 'bill_print_pending': '8. Bill Available But Print Pending', 'bill_dist_pending': '9. Bill Available But Distribution Pending', 'rep10': '11. 50 Kw MRI Pending List', 'rep11': '11. 50 Kw VisiT Pending', 'rep12': '12. 50 Kw Main Meter Field Exception', 'rep13': '13. 50 Kw Pole Meter Field Exception', 'all_bills_report': 'All Bills Report', 'all_consumers_list': 'All Consumers Master', 'Visit_Data_Consumers': 'VisiT_Data Master' };
 
     var IMAGE_VALIDATED_REMARKS = ["Mri Done", "Cmri Done", "China Meter/Sem I-Electronic Meter/Electro Mechnical Meter", "Communication Error", "Ct-Pt Damaged", "Duplicate", "Entry Denied By Consumer", "Meter Defective/ Display Off/ Meter Burnt", "Meter Lead/Sensor Faulty", "Meter Not Accessible", "Meter Ok But Meter Bypass", "No Meter At Site", "No Meter No Cable At Site (Pdc)", "No Supply", "No Use Of Supply At Site (Stw Or Payjal)", "No_Need To_Visit (<10)", "Premises Locked", "Single Phase Meter", "Site Not Found", "Smart/Prepaid Meter", "Street Light OR Payjal (Unmeterd)", "Tdc", "Under Load", "Water/Flood Logging", "Wrong Tarrif (Ptw)"];
     var METER_MAKE_OPTIONS = ["Allied", "Avon", "Bentec", "Capital", "Elymer", "Eppeltone", "Flash", "Genus", "HPL", "LNG", "LNT", "Maxwell", "MTPL", "Other", "Powertech", "Radius", "Saral", "Schneider Electric India Private Limited", "Secure", "Visiontek", "WCM", "Smart"];
@@ -2273,7 +2266,7 @@ window.applyHeaderReaderFilter = function() {
     getAdminDashboardDataAsync(function(res) {
         if (!res || !res.reports) return;
 
-        var allConsumersReport = res.reports.find(r => r.key === 'all_consumers_list');
+        var allConsumersReport = res.reports.find(r => r.key === 'all_consumers_list' || r.key === 'Visit_Data_Consumers');
         var allData = allConsumersReport ? (allConsumersReport.data || []) : [];
         
         var filteredData = allData.filter(function(item) {
@@ -2429,8 +2422,8 @@ window.applyHeaderReaderFilter = function() {
                 var userRole = loggedInReader.toUpperCase();
                 if (config.target === "ADMIN" && userRole !== "ANURAG SHAKYA") return;
                 
-                // मास्टर लिस्ट्स को नीचे रेंडर होने से रोकना
-                if (config.key === 'all_consumers_list' || config.key === 'all_bills_report' || config.key === 'bill_dist_pending') return;
+                // 🛑 सख्त रोक: ऑल कंज्यूमर्स की दोनों चाबियों को रिपोर्ट्स वॉचलिस्ट में आने से ब्लॉक किया
+                if (config.key === 'all_consumers_list' || config.key === 'Visit_Data_Consumers' || config.key === 'all_bills_report' || config.key === 'bill_dist_pending') return;
 
                 var watchlistItems = filteredData.filter(function(item) {
                     if (item.isDone === true || item.isDone === "true") return false;
@@ -2482,14 +2475,23 @@ window.applyHeaderReaderFilter = function() {
             setCountBadgeColor('count-reports', totalReportsPendencyCount); 
         }
         // =========================================================================
+        // 🚀 अल्टीमेट साइडबार फ़िल्टर पैच: 'all_consumers_list' और 'all_bills_report' को यहाँ आने से पूरी तरह ब्लॉक करें
+        // =========================================================================
         
-        menuHtmlBuffer.push('<div class="section-title" style="background:#eff6ff; color:#1e40af; border-left:4px solid #3b82f6; text-align:center;"><i class="fa-solid fa-info-circle"></i> Use Home Dashboard tabs for Reports</div>');
+        // =========================================================================
+        // 🚀 अल्टीमेट साइडबार क्लीनअप पैच: होम में रिपोर्ट्स सब-टैब होने के कारण साइड मेन्यू से रिपोर्ट्स पूरी तरह रिमूव्ड
+        // =========================================================================
+        var cleanMenuHtmlBuffer = ['<div class="section-title" style="background:#eff6ff; color:#1e40af; border-left:4px solid #3b82f6; text-transform:uppercase; text-align:center;"><i class="fa-solid fa-info-circle"></i> ADMIN TOOLS ONLY</div>'];
 
+        // वॉचलिस्ट टेबल रेंडरर
         var tableBodyNode = document.getElementById('dynamicWatchlistTableBody');
         if(tableBodyNode) tableBodyNode.innerHTML = tableHtmlBuffer.join('');
         
+        // मुख्य फिक्स: साइडबार कंटेनर को पूरी तरह फ्रेश और साफ़ बफ़र से ओवरराइड करें
         var menuContainerNode = document.getElementById('dynamicReportsMenuContainer');
-        if(menuContainerNode) menuContainerNode.innerHTML = menuHtmlBuffer.join('');
+        if(menuContainerNode) {
+            menuContainerNode.innerHTML = cleanMenuHtmlBuffer.join('');
+        }
 
         var nodeReports = document.getElementById('count-reports');
         if(nodeReports) { nodeReports.innerText = totalReportsPendencyCount; setCountBadgeColor('count-reports', totalReportsPendencyCount); }
@@ -2523,7 +2525,7 @@ window.applyHeaderReaderFilter = function() {
 
     // 🟢 अल्टीमेट टैब फिक्स: कन्फिग टैब दबाने पर ब्लैंक स्क्रीन की समस्या का 100% परमानेंट इलाज
     function switchTab(tabName) {
-        // मास्टर लिस्ट में सभी 7 टैब्स को शामिल किया गया है
+        // मास्टर लिस्ट में सभी टैब्स और हमारे नए 'visitdata' (डाटा) बटन की आईडी को शामिल किया गया है
         var tabs = ['summary', 'list', 'billdist', 'visitdata', 'reports', 'filter', 'notifyadmin', 'configmaker'];
         
         tabs.forEach(function(t) { 
@@ -2712,15 +2714,22 @@ window.applyHeaderReaderFilter = function() {
     // ⚡ ULTRA-FAST SEARCH ENGINE (INDEXEDDB MEMORY CACHE CONTEXT)
 var appSearchDatabaseCache = null; // बार-बार DB लोड होने से रोकने के लिए ग्लोबल कैशे
 
+// ⚡ सुपर-फास्ट सर्च इंजन पैच (पेस्ट फिक्स और कीबोर्ड री-रेंडरिंग लॉकिंग सिस्टम)
 function universalListSearch(inputId, containerId) {
-    var input = document.getElementById(inputId).value.toUpperCase().trim();
+    var inputNode = document.getElementById(inputId);
+    if (!inputNode) return;
+    
+    // 🎯 फिक्स 1: सर्च टेक्स्ट को साफ करना (Spaces, Tabs, New Lines को हटाकर क्लीन पैकेट बनाना)
+    var input = inputNode.value.replace(/[\r\n\t]/g, ' ').replace(/\s+/g, ' ').toUpperCase().trim();
     var container = document.getElementById(containerId);
     if (!container) return;
 
     var nodes = container.querySelectorAll('.list-item');
+    
+    // शब्दों को अलग-अलग कीवर्ड्स के रूप में तोड़ना
     var searchKeywords = input.split(/\s+/).filter(function(k) { return k !== ""; });
 
-    // अगर सर्च बॉक्स खाली है, तो डिफ़ॉल्ट रूप से सारे पुराने कार्ड्स वापस दिखा दें
+    // अगर सर्च बॉक्स पूरी तरह खाली है, तो पुराने सारे कार्ड्स वापस दिखा दें
     if (searchKeywords.length === 0) {
         nodes.forEach(function(node) { node.style.removeProperty("display"); });
         var qvContent = container.querySelector('.accordion-content');
@@ -2731,7 +2740,7 @@ function universalListSearch(inputId, containerId) {
 
     if (!db) return;
 
-    // Failsafe: अगर कैशे मौजूद है, तो बिना DB कॉल किए तुरंत फ़िल्टर रन करें
+    // 🎯 फिक्स 2: कीबोर्ड के बार-बार रिफ्रेश होने से रोकने के लिए कैशे प्रोटेक्शन इंजन
     if (appSearchDatabaseCache && appSearchDatabaseCache.length > 0) {
         executeFastCacheSearch(searchKeywords, appSearchDatabaseCache, container, containerId);
     } else {
@@ -2746,7 +2755,7 @@ function universalListSearch(inputId, containerId) {
     }
 }
 
-// ⚡ सुपर-फास्ट कैशे सर्च ड्राइवर
+// ⚡ सुपर-फास्ट कैशे सर्च ड्राइवर (100% सिंटैक्स एरर, ब्रैकेट और ऑल कंज्यूमर्स फॉर्म बटन फिक्स)
 function executeFastCacheSearch(searchKeywords, allData, container, containerId) {
     var matchedItemsHtml = [];
     var matchedCount = 0;
@@ -2764,8 +2773,18 @@ function executeFastCacheSearch(searchKeywords, allData, container, containerId)
         var poleMtrNo = (item.lastPmNo || "").toString().toUpperCase();
         var mainRemark = (item.mainStatusRemark || "").toString().toUpperCase();
 
-        // केवल मुख्य सर्चिंग कीवर्ड्स का ही कॉम्पैक्ट पैकेट (स्ट्रिंग कॉन्सिटिनेशन ऑप्टिमाइजेशन)
-        var combinedData = accNo + "|" + name + "|" + addr + "|" + mob + "|" + mainMtrNo + "|" + poleMtrNo + "|" + mainRemark;
+        // 🎯 फिक्स 3: डेटाबेस के डेटा में से भी फालतू स्पेस साफ करना (ताकि पेस्ट किया हुआ बड़ा डेटा तुरंत मैच हो)
+        var cleanField = function(f) { return (f || "").toString().replace(/[\r\n\t]/g, ' ').replace(/\s+/g, ' ').toUpperCase().trim(); };
+        
+        var accNo = cleanField(item.accountNo);
+        var name = cleanField(item.consumerName);
+        var addr = cleanField(item.address);
+        var mob = cleanField(item.masterMobileNumber || item.mobileNo);
+        var mainMtrNo = cleanField(item.lastMmNo);
+        var poleMtrNo = cleanField(item.lastPmNo);
+        var mainRemark = cleanField(item.mainStatusRemark);
+
+        var combinedData = accNo + " " + name + " " + addr + " " + mob + " " + mainMtrNo + " " + poleMtrNo + " " + mainRemark;
 
         var isMatch = true;
         for (var j = 0; j < searchKeywords.length; j++) {
@@ -2796,27 +2815,62 @@ function executeFastCacheSearch(searchKeywords, allData, container, containerId)
                     '</div></div>'
                 );
             } else {
-                var isPoleType = activeReportType.toLowerCase().includes("pole") || activeReportType === 'rep13';
+                var isPoleType = activeReportType ? (activeReportType.toLowerCase().includes("pole") || activeReportType === 'rep13') : false;
                 var mtrNoLabel = isPoleType ? poleMtrNo : mainMtrNo;
                 var divisionDisplay = item.division || item.DIVISION || "";
                 
-                // अगर कोई रिपोर्ट एक्टिव है तो एकॉर्डियन खुलेगा, लेकिन सामान्य उपभोक्ता/विजिट टैब में क्विक व्यू खुलेगा
-                if (activeReportType && activeReportType !== 'all_consumers_list') {
+                // नियम 1: सम्पूर्ण विजिट्स डेटा कंटेनर के लिए हमेशा फुल एकॉर्डियन ऑन रहेगा
+                if (containerId === 'visitDataListContainer') {
                     matchedItemsHtml.push(
-                        '<div class="list-item" style="border-left-color:#334155; flex-direction:column; align-items:stretch;" onclick="toggleReportAccordion(\'' + accNo + '\', \'STANDARD\')">' +
+                        '<div class="list-item" style="border-left-color:#334155; flex-direction:column; align-items:stretch;" onclick="toggleVisitAccordion(\'' + accNo + '\', \'FULL\')">' +
                         '<div style="display:flex; justify-content:space-between; width:100%;">' +
                         '<div style="text-align:left;">' +
                         '<div class="c-name">' + item.consumerName + '</div>' +
                         '<div class="c-acc">A/C: ' + accNo + ' | Mob: ' + mob + '</div>' +
-                        '<div class="c-mtr">' + (isPoleType ? "P-Mtr: " : "M-Mtr: ") + mtrNoLabel + '</div>' +
+                        '<div class="c-addr"><b>पता:</b> ' + addr + '</div>' +
+                        '<div class="c-mtr">M-Mtr: ' + mainMtrNo + ' | P-Mtr: ' + poleMtrNo + '</div>' +
                         '</div>' +
-                        '<div style="color:#64748b;"><i class="fa-solid fa-chevron-down"></i></div>' +
+                        '<div style="color:#64748b; display:flex; align-items:center;"><i class="fa-solid fa-chevron-down"></i></div>' +
                         '</div>' +
-                        '<div id="rep_acc_' + accNo + '" class="accordion-content"></div>' +
+                        '<div id="visit_acc_' + accNo + '" class="accordion-content"></div>' +
+                        '</div>'
+                    );
+                } 
+                // नियम 2: ऑल कंज्यूमर्स मास्टर और सब-रिपोर्ट्स के लिए कस्टमाइज्ड ड्रॉपडाउन डिटेल व्यू और फॉर्म बटन फिक्स
+                // --- [खोजें और केवल इस हिस्से को बदलें] ---
+                else if (activeReportType === 'all_consumers_list' || activeReportType === 'Visit_Data_Consumers') {
+                    var singlePdfBtn = '<div style="display:flex; gap:4px;">' +
+                        '<button onclick="event.stopPropagation(); exportSingleConsumerPDF(event, \'' + accNo + '\', \'' + (activeReportType === 'Visit_Data_Consumers' ? 'FULL' : 'MASTER_COLS') + '\')" class="export-btn mini pdf-bg" style="padding: 5px 8px; font-size: 10px;" title="Download PDF"><i class="fa-solid fa-file-pdf"></i></button>' +
+                        '<button onclick="event.stopPropagation(); exportConsumerReadingFormPDF(\'' + accNo + '\')" class="export-btn mini" style="padding: 5px 8px; font-size: 10px; background:#4f46e5;" title="Download Reading Form"><i class="fa-solid fa-file-invoice"></i> Form</button>' +
+                        '<button onclick="event.stopPropagation(); openContactUpdateModal(\'' + accNo + '\')" class="export-btn mini" style="padding: 5px 8px; font-size: 10px; background:#0ea5e9;" title="Update Contact Info"><i class="fa-solid fa-user-pen"></i> Info</button>' +
+                        '</div>';
+                        
+                    var toggleAction = (activeReportType === 'Visit_Data_Consumers') 
+                        ? 'toggleVisitAccordion(\'' + accNo + '\', \'FULL\')' 
+                        : 'openQuickViewModal(\'' + accNo + '\', \'STANDARD\')';
+
+                    var arrowIconHtml = (activeReportType === 'Visit_Data_Consumers') ? '<i class="fa-solid fa-chevron-down" style="color:#64748b; font-size:12px;"></i>' : '';
+                    var targetAccordionDiv = (activeReportType === 'Visit_Data_Consumers') ? '<div id="visit_acc_' + accNo + '" class="accordion-content"></div>' : '';
+
+                    matchedItemsHtml.push(
+                        '<div class="list-item" style="border-left-color: #334155; display: flex !important; flex-direction: column !important; align-items: stretch !important;" onclick="' + toggleAction + '">' +
+                        '<div style="display: flex; justify-content: space-between; width: 100%; align-items: center;">' +
+                        '<div style="flex: 1; text-align: left;">' +
+                        '<div class="c-name">' + item.consumerName + '</div>' +
+                        '<div class="c-acc">A/C: ' + accNo + ' | Mob: ' + mob + '</div>' +
+                        '<div class="c-addr"><b>पता:</b> ' + addr + '</div>' +
+                        '<div class="c-mtr">M-Mtr: ' + mainMtrNo + ' | P-Mtr: ' + poleMtrNo + '</div>' +
+                        '</div>' +
+                        '<div style="text-align:right; width: 30%; flex-shrink: 0; display:flex; flex-direction:column; align-items:flex-end; justify-content:center; gap: 6px;">' +
+                        '<div style="font-size:10px; font-weight:bold; color:#4338ca; background:#e0e7ff; padding:2px 6px; border-radius:4px;">' + divisionDisplay + '</div>' +
+                        '<div style="display:flex; gap:8px; align-items:center;" onclick="event.stopPropagation();">' + singlePdfBtn + arrowIconHtml + '</div>' +
+                        '</div>' +
+                        '</div>' +
+                        targetAccordionDiv +
                         '</div>'
                     );
                 } else {
-                    // उपभोक्ता टैब के लिए परफेक्ट क्विक व्यू फ़िक्स
+                    // नियम 3: केवल मुख्य 'उपभोक्ता' (होम/लिस्ट) टैब सर्च करने पर ही क्विक व्यू मॉडल (पॉपअप) खुलेगा
                     matchedItemsHtml.push(
                         '<div class="list-item" onclick="openQuickViewModal(\'' + accNo + '\', \'STANDARD\')">' +
                         '<div style="width: 75%; text-align: left;">' +
@@ -3164,9 +3218,11 @@ function renderNewListTab() {
                     var poleMtrDisplay = getRobustKey(item, "LAST MONTH FINAL PM NO.") || item.lastPmNo || "";
                     var divisionDisplay = getRobustKey(item, "DIVISION") || item.division || "";
 
+                    // 🎯 उपभोक्ता टैब फिक्स: पूरे कार्ड पर क्लिक करने से Quick View खुलेगा
+                    // 🎯 Upbhokta Tab: Bahar se Form button hata diya gaya hai, ab sirf Division dikhega
                     htmlBuffer.push(
                         '<div class="list-item" onclick="openQuickViewModal(\'' + item.accountNo + '\', \'STANDARD\')">' +
-                        '<div style="width: 75%; text-align: left;">' +
+                        '<div style="width: 75%; text-align: left; cursor: pointer;">' +
                         '<div class="c-name">' + consumerNameDisplay + '</div>' +
                         '<div class="c-acc">A/C: ' + item.accountNo + ' | Mob: ' + consumerMobile + '</div>' +
                         '<div class="c-addr"><b>पता:</b> ' + consumerAddress + '</div>' +
@@ -3648,132 +3704,141 @@ async function downloadSelectedMergedPDF() {
                        '<button onclick="exportSingleConsumerPDF(event, \'' + accNo + '\', \'' + mode + '\')" class="export-btn mini pdf-bg"><i class="fa-solid fa-file-pdf"></i></button></div>';
         gridHtml += '<div class="detail-view-grid">';
         
-        if(mode === 'FULL') {
-            gridHtml += '<div class="grp-title" style="grid-column: 1 / -1;">All Consumer Details</div>';
-            
-            var ALL_SHEET_COLS = [
-                "CONSUMER REMARK", "SUB REMARK", "BILLING CYCLE", "LOAD TYPE (H-L-T)", "IS MAIN METER VISIT", 
-                "DIVISION", "AREA TYPE", "METER READER NAME", "VISIT BY", "METER_READER_NAME (ISSPL)", 
-                "VISIT LAST MONTH", "ASSINED USER ISSPL", "MR LOGIN (UGO)", "MR MOBILE NO.", "ACCOUNT NO", 
-                "BOOK NUMBER", "CONNECTION NUMBER", "SUB DIVISION CODE", "SUB DIVISION NAME", "AGENCY-STATUS", 
-                "CONSUMER-TYPE", "CONSUMER TYPE", "MASTER-SUBSTATION NAME", "MASTER-FEEDER-NAME", "SUBSTATION-NAME", 
-                "FEEDER-NAME", "ST", "CONSUMER CATOGARY", "ACTVITY", "ACTIVITY IN ISSPL APP", "Activity By MR", 
-                "PROCESS FINAL", "CONSUMER-NAME", "ADDRESS", "Master Mobile Number", "LOAD", "UNIT", "LOAD IN KW", 
-                "LOAD GROUP (5,10,50)", "LOAD_CATOGERY (5,10)", "LOAD_WISE GROUP (5,10,25,50,75,100)", 
-                "LOAD TAG H-LT", "LOAD GROUP", "IS NET METER", "LAST MONTH VS FINAL VISITED METER", 
-                "FINAL VISITED METER NUMBER VS BILLED METER NUMBER", "SITE METER APPSHEET VS FINAL VISITED METER NUMBER", 
-                "FINAL VISITED METER NUMBER VS BILLED METER MAKE", "FINAL MAIN VS FINAL POLE MTR MISMATCH", 
-                "LAST MONTH MAIN VS LAST MONTH POLE MTR MISMATCH", "MAIN METER MF", "BILLED METER NUMBER", 
-                "MASTER METER NUMBER", "MASTER METER MAKE", "FIELD METER NUMBER", "FIELD METER MAKE", "METER_TYPE", 
-                "FINAL VISITED POLE MTR NO.", "LAST MONTH FINAL MM NO.", "LAST MONTH FINAL MM MAKE", 
-                "FINAL VISITED MAIN METER NUMBER", "FINAL VISITED MAIN METER MAKE", "SITE METER NUMBER_APPSHEET", 
-                "SITE METER MAKE_APPSHEET", "INENTIVE VISIT METER NUMBER", "INVENTIVE VISIT METER MAKE", 
-                "REVISIT- MAIN MTR NO.", "REVISIT-MAIN MTR MAKE", "METER_ LOCATION", "ATTEND STATUS", "FINAL VISIT DATE", 
-                "APPSHEET VISIT DATE", "INVENTIVE VISIT DATE", "INVENTIVE REVISIT_DATE", "TIME STAMP_1", 
-                "BILLABLE -NOT-BILLABLE", "EXCEPTION TYPE (MAIN METER)", "LAST_MONTH SITE REMARK", 
-                "FINAL_MAIN_METER_SITE_REMARK", "APPSHEET MAIN METER SITE REMARK", "INVENTIVE MAIN METER SITE REMARK", 
-                "INVENTIVE REVISIT SITE REMARK (MAIN MTR)", "REMARK", "INVENTIVE GENRAL REMARK", "INVENTIVE APP REMARK", 
-                "LAST MONTH MRI (MAIN MTR)", "IS MRI AVAILABLE (MAIN METER)", "FIELD METER MRI AVAILABLE", 
-                "IS VISITED MRI AVAILABLE", "FINAL VISITED MAIN METER MRI AVAILABLE", 
-                "MAIN FIELD METER MRI AVAILABLE BY MTR NO.", "INVENTIVE VISITED MAIN METER MRI AVAILABLE BY MTR NO.", 
-                "APPSHEET VISITED MAIN METER MRI AVAILABLE BY MTR NO.", "LAST MONTH FINAL MM MRI AVAILABLE BY M N.", 
-                "REVISIT METER MRI AVAILABLE BY MTR NO.", "IS METER RTC CORRECT", "RTC DATE", 
-                "IS LOAD SURVAY AVAILBLE (MAIN Mtr)", "MRI DATE", "MRI KWH", "MRI KVAH", "MRI MD KW", "MRI MD KVA", 
-                "MANUAL KWH", "MANUAL KVAH", "MANUAL KW", "MANUAL KVA", "APPSHEET-KWH", "APPSHEET-KVAH", 
-                "APPSHEET-KW", "APPSHEET-KVA", "INVENTIVE KWH", "INVENTIVE KVAH", "INVENTIVE MD KW", "INVENTIVE MD KVA", 
-                "NEW KWH", "NEW KVAH", "MD", "LAST MONTH KWH", "LAST MONTH KVAH", "LAST MONTH CONSUMPTION KWH", 
-                "LAST MONTH CONSUMPTION KVAH", "LAST MONTH MD", "LAST MONTH BILL BASE", 
-                "LAST MONTH VS FINAL VISITED METER POLE", "LAST MONTH VS FINAL VISITED METER POLE MAKE", 
-                "SAI PORTAL VS FINAL VISITED POLE", "LAST MONTH FINAL POLE MTR VS SAI PORTAL MTR NO.", 
-                "LAST MONTH FINAL POLE MTR VS INVENTIVE (FIELD MTR NO.) PORTAL MTR NO.", 
-                "LAST MONTH FINAL POLE MTR VS INVENTIVE (FIELD MTR NO.) PORTAL MTR MAKE.", 
-                "APPSHEET VS FINAL VISITED POLE MTR NO.", "POLE METER MF (INVENTIVE PORTAL)", 
-                "POLE METER MF (SAI PORTAL)", "SAI PORTAL POLE MTR NO.", "FIELD METER NUMBER (POLE)", 
-                "FIELD METER MAKE (POLE)", "POLE METER STATUS", "FINAL VISIT MAIN MTR VS FINAL VISITE POLE MTR", 
-                "FINAL VISIT MAIN MTR", "LAST MONTH FINAL PM NO.", "LAST MONTH FINAL PM MAKE", 
-                "FINAL VISITED POLE METER NO.", "FINAL VISITED POLE METER MAKE", "APPSHEET VISIT POLE METER NUMBER", 
-                "APPSHEET VISIT POLE METER MAKE", "INVENTIVE VISIT POLE METER NUMBER", "INVENTIVE VISIT POLE METER MAKE", 
-                "REVISIT- POLE MTR NO.", "REVISIT-POLE MTR MAKE", "LAST MONTH POLE SITE REMARK", "ATTEND STATUS (POLE)", 
-                "LOAD TAG", "IS POLE METER VISIT", "EXCEPTION TYPE (POLE METER)", "FINAL_POLE_METER_SITE_REMARK", 
-                "APPSHEET POLE METER SITE REMARK", "INVENTIVE POLE METER SITE REMARK", 
-                "INVENTIVE REVISIT SITE REMARK (POLE MTR)", "INVENTIVE POLE METER GENRAL REMARK", 
-                "LAST MONTH MRI (POLE MTR)", "IS MRI AVAILABLE (POLE METER)", "FIELD METER MRI (POLE) AVAILABLE", 
-                "VISITED METER MRI (POLE) AVAILABLE", "FINAL METER MRI (POLE) AVAILABLE BY MTR NO.", 
-                "FIELD METER MRI (POLE) AVAILABLE BY MTR NO.", "INVENTIVE VISITED METER MRI (POLE) AVAILABLE BY MTR NO.", 
-                "APPSHEET METER MRI (POLE) AVAILABLE BY MTR NO.", "LAST MONTHMETER MRI (POLE) AVAILABLE BY MTR NO.", 
-                "REVISIT METER MRI (POLE) AVAILABLE BY MTR NO.", "POLE METER RTC CORRECT", "POLE RTC DATE", 
-                "POLE METER MRI DATE TIME", "IS LOAD SURVAY AVAILBLE (Pole Mtr)", "MAIN METER PHOTO", "POLE METER PHOTO", 
-                "FINAL BILLING STATUS _MANUAL", "BILLING TYPE_MANUAL", "BILL AUTO TAG_MANUAL", "BILLING STATUS", 
-                "BILLED DATE", "BILL_BASE", "BILL_TYPE", "MR_SOURCE_CODE", "DUE DATE", "LAST PAY DATE", "PAYBLE AMOUNT", 
-                "DATA SOURCE NAME", "READING SOURCE TYPE", "PROCESSING DATE", "EXPORT STATUS", "EXPORT FAILURE MESSAGE", 
-                "ACCOUNT ID FOR BILL DISTRIBUTION", "MR NAME FOR BILL DISTRIBUTION", "Folder Creater", "Pdf Name", 
-                "234For Copy Folder", "BILL PRINT TAG", "IS BILL SEND BY WHATUP", "BILL_GROUP", "FOR_BILL DISTRIBUTION", 
-                "IS BILL UPLOAD", "BILL UPLOAD DATE", "BILL DOWNLOAD LINK", "ERROR (BILL NOT DOWNLOAD)", "IS BILL PRINT", 
-                "BILL PRINT DATE", "FINAL BILLING TAG", "DISTRIBUTION STATUS", "BILL DELIVERED DATE", "BILL RECEIVER NAME", 
-                "CONSUMER MOBILE NUMBER", "MOBILE NUMBER NEW", "TIME STAMP2", "M_BILL_DELIVERD_DATE", "M_BILL RECEIVER NAME", 
-                "M_CONSUMER MOBILE NUMBER", "M_BILL RECEIVER IMAGE", "M_REMARK", "SAI-BILL DISTRIBUTION STATUS", 
-                "SAI-BILL DELIVERED DATE", "SAI-BILL RECEIVER NAME", "SAI-CONSUMER MOBILE NUMBER", "New Whatsup No.", 
-                "MAIN METER READING MONTH LAST MONTH", "MAIN MTR KWH CONSUMPTION", "MAIN MTR KVAH CONSUMPTION", 
-                "MAIN MTR MD KW UHI", "MAIN METER MD KVA UHI", "MAIN_MTR_MF", "MAIN METER CONSUMPTION KWH WITH MF", 
-                "MAIN METER CONSUMPTION KVAH WITH MF", "POLE METER READING DATE CURRENT MONTH", 
-                "POLE METER READING MONTH LAST MONTH", "POLE MTR KWH CONSUMPTION", "POLE MTR KVAH CONSUMPTION", 
-                "POLE METER MD KW UHI", "POLE METER MD KVA UHI", "POLE_MTR_MF", "POLE METER CONSUMPTION KWH WITH MF", 
-                "POLE METER CONSUMPTION KVAH WITH MF", "MAIN & POLE METER CONSUMPTION DIFFRENCE KVAH", 
-                "MAIN & POLE METER CONSUMPTION DIFFRENCE KVAH %", "MAIN & POLE METER MD DIFFRENCE KVA WITH MF", 
-                "MAIN & POLE METER MD DIFFRENCE KVA %", "IF PENDING IN ANY LIST"
-            ];
-            
-            // इस लूप से क्रम बिल्कुल नहीं बिगड़ेगा, जो खाली होगा वहां '-' आ जाएगा।
-            ALL_SHEET_COLS.forEach(function(colName) {
-                var val = getRobustKey(record, colName);
-                var displayVal = (val !== undefined && val !== null && val.toString().trim() !== "") ? val : "-";
-                gridHtml += '<div><span class="detail-lbl">' + colName + '</span><span style="font-size:12px; font-weight:700; color:#0f172a;">' + displayVal + '</span></div>'; 
-            });
+        var currentUserLower = (loggedInReader || "").toString().trim().toUpperCase();
 
-        // 🔥 NAYA BLOCK YAHAN SE SHURU HOTA HAI
-        } else if (mode === 'MASTER_COLS') {
-            gridHtml += '<div class="grp-title" style="grid-column: 1 / -1;">Master Consumer Details</div>';
-            
-            var IMAGE_COLS = [
-                "DIVISION", "ACCOUNT NO", "Consumer Type", "Consumer Catogary", "MR NAME", 
-                "Process Final", "CONSUMER-NAME", "ADDRESS", "Master Mobile Number", "LOAD IN KW", 
-                "LAST MONTH FINAL MM NO.", "LAST MONTH FINAL MM MAKE", "FINAL VISIT_DATE", 
-                "EXCEPTION TYPE (MAIN METER)", "FINAL_MAIN_METER_SITE_REMARK", "REMARK", 
-                "IS MRI AVAILABLE (MAIN METER)", "IS LOAD SURVAY AVAILBLE (MAIN Mtr)", 
-                "LAST MONTH FINAL PM NO.", "LAST MONTH FINAL PM MAKE", "EXCEPTION TYPE (POLE METER)", 
-                "FINAL_POLE_METER_SITE_REMARK", "IS MRI AVAILABLE (POLE METER)", "IS LOAD SURVAY AVAILBLE (Pole Mtr)"
-            ];
-            
-            IMAGE_COLS.forEach(function(colName) {
-                var val = (colName === "MR NAME") ? getReaderName(record) : getRobustKey(record, colName);
-                var displayVal = (val !== undefined && val !== null && val.toString().trim() !== "") ? val : "-";
-                gridHtml += '<div><span class="detail-lbl">' + colName + '</span><span style="font-size:12px; font-weight:700; color:#0f172a;">' + displayVal + '</span></div>'; 
-            });
-        // 🔥 NAYA BLOCK YAHAN KHATAM HOTA HAI
+        // 👑 नियम 1: एडमिन (ANURAG SHAKYA / ADMIN) लॉगिन होने पर सभी विस्तृत मोड खुलेंगे
+        if (currentUserLower === "ANURAG SHAKYA" || currentUserLower === "ADMIN") {
+            if (mode === 'FULL') {
+                gridHtml += '<div class="grp-title" style="grid-column: 1 / -1;">All Consumer Details (Complete Row Keys)</div>';
+                
+                var ALL_SHEET_COLS = [
+                    "CONSUMER REMARK", "SUB REMARK", "BILLING CYCLE", "LOAD TYPE (H-L-T)", "IS MAIN METER VISIT", 
+                    "DIVISION", "AREA TYPE", "METER READER NAME", "VISIT BY", "METER_READER_NAME (ISSPL)", 
+                    "VISIT LAST MONTH", "ASSINED USER ISSPL", "MR LOGIN (UGO)", "MR MOBILE NO.", "ACCOUNT NO", 
+                    "BOOK NUMBER", "CONNECTION NUMBER", "SUB DIVISION CODE", "SUB DIVISION NAME", "AGENCY-STATUS", 
+                    "CONSUMER-TYPE", "CONSUMER TYPE", "MASTER-SUBSTATION NAME", "MASTER-FEEDER-NAME", "SUBSTATION-NAME", 
+                    "FEEDER-NAME", "ST", "CONSUMER CATOGARY", "ACTVITY", "ACTIVITY IN ISSPL APP", "Activity By MR", 
+                    "PROCESS FINAL", "CONSUMER-NAME", "ADDRESS", "Master Mobile Number", "LOAD", "UNIT", "LOAD IN KW", 
+                    "LOAD GROUP (5,10,50)", "LOAD_CATOGERY (5,10)", "LOAD_WISE GROUP (5,10,25,50,75,100)", 
+                    "LOAD TAG H-LT", "LOAD GROUP", "IS NET METER", "LAST MONTH VS FINAL VISITED METER", 
+                    "FINAL VISITED METER NUMBER VS BILLED METER NUMBER", "SITE METER APPSHEET VS FINAL VISITED METER NUMBER", 
+                    "FINAL VISITED METER NUMBER VS BILLED METER MAKE", "FINAL MAIN VS FINAL POLE MTR MISMATCH", 
+                    "LAST MONTH MAIN VS LAST MONTH POLE MTR MISMATCH", "MAIN METER MF", "BILLED METER NUMBER", 
+                    "MASTER METER NUMBER", "MASTER METER MAKE", "FIELD METER NUMBER", "FIELD METER MAKE", "METER_TYPE", 
+                    "FINAL VISITED POLE MTR NO.", "LAST MONTH FINAL MM NO.", "LAST MONTH FINAL MM MAKE", 
+                    "FINAL VISITED MAIN METER NUMBER", "FINAL VISITED MAIN METER MAKE", "SITE METER NUMBER_APPSHEET", 
+                    "SITE METER MAKE_APPSHEET", "INENTIVE VISIT METER NUMBER", "INVENTIVE VISIT METER MAKE", 
+                    "REVISIT- MAIN MTR NO.", "REVISIT-MAIN MTR MAKE", "METER_ LOCATION", "ATTEND STATUS", "FINAL VISIT DATE", 
+                    "APPSHEET VISIT DATE", "INVENTIVE VISIT DATE", "INVENTIVE REVISIT_DATE", "TIME STAMP_1", 
+                    "BILLABLE -NOT-BILLABLE", "EXCEPTION TYPE (MAIN METER)", "LAST_MONTH SITE REMARK", 
+                    "FINAL_MAIN_METER_SITE_REMARK", "APPSHEET MAIN METER SITE REMARK", "INVENTIVE MAIN METER SITE REMARK", 
+                    "INVENTIVE REVISIT SITE REMARK (MAIN MTR)", "REMARK", "INVENTIVE GENRAL REMARK", "INVENTIVE APP REMARK", 
+                    "LAST MONTH MRI (MAIN MTR)", "IS MRI AVAILABLE (MAIN METER)", "FIELD METER MRI AVAILABLE", 
+                    "IS VISITED MRI AVAILABLE", "FINAL VISITED MAIN METER MRI AVAILABLE", 
+                    "MAIN FIELD METER MRI AVAILABLE BY MTR NO.", "INVENTIVE VISITED MAIN METER MRI AVAILABLE BY MTR NO.", 
+                    "APPSHEET VISITED MAIN METER MRI AVAILABLE BY MTR NO.", "LAST MONTH FINAL MM MRI AVAILABLE BY M N.", 
+                    "REVISIT METER MRI AVAILABLE BY MTR NO.", "IS METER RTC CORRECT", "RTC DATE", 
+                    "IS LOAD SURVAY AVAILBLE (MAIN Mtr)", "MRI DATE", "MRI KWH", "MRI KVAH", "MRI MD KW", "MRI MD KVA", 
+                    "MANUAL KWH", "MANUAL KVAH", "MANUAL KW", "MANUAL KVA", "APPSHEET-KWH", "APPSHEET-KVAH", 
+                    "APPSHEET-KW", "APPSHEET-KVA", "INVENTIVE KWH", "INVENTIVE KVAH", "INVENTIVE MD KW", "INVENTIVE MD KVA", 
+                    "NEW KWH", "NEW KVAH", "MD", "LAST MONTH KWH", "LAST MONTH KVAH", "LAST MONTH CONSUMPTION KWH", 
+                    "LAST MONTH CONSUMPTION KVAH", "LAST MONTH MD", "LAST MONTH BILL BASE", 
+                    "LAST MONTH VS FINAL VISITED METER POLE", "LAST MONTH VS FINAL VISITED METER POLE MAKE", 
+                    "SAI PORTAL VS FINAL VISITED POLE", "LAST MONTH FINAL POLE MTR VS SAI PORTAL MTR NO.", 
+                    "LAST MONTH FINAL POLE MTR VS INVENTIVE (FIELD MTR NO.) PORTAL MTR NO.", 
+                    "LAST MONTH FINAL POLE MTR VS INVENTIVE (FIELD MTR NO.) PORTAL MTR MAKE.", 
+                    "APPSHEET VS FINAL VISITED POLE MTR NO.", "POLE METER MF (INVENTIVE PORTAL)", 
+                    "POLE METER MF (SAI PORTAL)", "SAI PORTAL POLE MTR NO.", "FIELD METER NUMBER (POLE)", 
+                    "FIELD METER MAKE (POLE)", "POLE METER STATUS", "FINAL VISIT MAIN MTR VS FINAL VISITE POLE MTR", 
+                    "FINAL VISIT MAIN MTR", "LAST MONTH FINAL PM NO.", "LAST MONTH FINAL PM MAKE", 
+                    "FINAL VISITED POLE METER NO.", "FINAL VISITED POLE METER MAKE", "APPSHEET VISIT POLE METER NUMBER", 
+                    "APPSHEET VISIT POLE METER MAKE", "INVENTIVE VISIT POLE METER NUMBER", "INVENTIVE VISIT POLE METER MAKE", 
+                    "REVISIT- POLE MTR NO.", "REVISIT-POLE MTR MAKE", "LAST MONTH POLE SITE REMARK", "ATTEND STATUS (POLE)", 
+                    "LOAD TAG", "IS POLE METER VISIT", "EXCEPTION TYPE (POLE METER)", "FINAL_POLE_METER_SITE_REMARK", 
+                    "APPSHEET POLE METER SITE REMARK", "INVENTIVE POLE METER SITE REMARK", 
+                    "INVENTIVE REVISIT SITE REMARK (POLE MTR)", "INVENTIVE POLE METER GENRAL REMARK", 
+                    "LAST MONTH MRI (POLE MTR)", "IS MRI AVAILABLE (POLE METER)", "FIELD METER MRI (POLE) AVAILABLE", 
+                    "VISITED METER MRI (POLE) AVAILABLE", "FINAL METER MRI (POLE) AVAILABLE BY MTR NO.", 
+                    "FIELD METER MRI (POLE) AVAILABLE BY MTR NO.", "INVENTIVE VISITED METER MRI (POLE) AVAILABLE BY MTR NO.", 
+                    "APPSHEET METER MRI (POLE) AVAILABLE BY MTR NO.", "LAST MONTHMETER MRI (POLE) AVAILABLE BY MTR NO.", 
+                    "REVISIT METER MRI (POLE) AVAILABLE BY MTR NO.", "POLE METER RTC CORRECT", "POLE RTC DATE", 
+                    "POLE METER MRI DATE TIME", "IS LOAD SURVAY AVAILBLE (Pole Mtr)", "MAIN METER PHOTO", "POLE METER PHOTO", 
+                    "FINAL BILLING STATUS _MANUAL", "BILLING TYPE_MANUAL", "BILL AUTO TAG_MANUAL", "BILLING STATUS", 
+                    "BILLED DATE", "BILL_BASE", "BILL_TYPE", "MR_SOURCE_CODE", "DUE DATE", "LAST PAY DATE", "PAYBLE AMOUNT", 
+                    "DATA SOURCE NAME", "READING SOURCE TYPE", "PROCESSING DATE", "EXPORT STATUS", "EXPORT FAILURE MESSAGE", 
+                    "ACCOUNT ID FOR BILL DISTRIBUTION", "MR NAME FOR BILL DISTRIBUTION", "Folder Creater", "Pdf Name", 
+                    "234For Copy Folder", "BILL PRINT TAG", "IS BILL SEND BY WHATUP", "BILL_GROUP", "FOR_BILL DISTRIBUTION", 
+                    "IS BILL UPLOAD", "BILL UPLOAD DATE", "BILL DOWNLOAD LINK", "ERROR (BILL NOT DOWNLOAD)", "IS BILL PRINT", 
+                    "BILL PRINT DATE", "FINAL BILLING TAG", "DISTRIBUTION STATUS", "BILL DELIVERED DATE", "BILL RECEIVER NAME", 
+                    "CONSUMER MOBILE NUMBER", "MOBILE NUMBER NEW", "TIME STAMP2", "M_BILL_DELIVERD_DATE", "M_BILL RECEIVER NAME", 
+                    "M_CONSUMER MOBILE NUMBER", "M_BILL RECEIVER IMAGE", "M_REMARK", "SAI-BILL DISTRIBUTION STATUS", 
+                    "SAI-BILL DELIVERED DATE", "SAI-BILL RECEIVER NAME", "SAI-CONSUMER MOBILE NUMBER", "New Whatsup No.", 
+                    "MAIN METER READING MONTH LAST MONTH", "MAIN MTR KWH CONSUMPTION", "MAIN MTR KVAH CONSUMPTION", 
+                    "MAIN MTR MD KW UHI", "MAIN METER MD KVA UHI", "MAIN_MTR_MF", "MAIN METER CONSUMPTION KWH WITH MF", 
+                    "MAIN METER CONSUMPTION KVAH WITH MF", "POLE METER READING DATE CURRENT MONTH", 
+                    "POLE METER READING MONTH LAST MONTH", "POLE MTR KWH CONSUMPTION", "POLE MTR KVAH CONSUMPTION", 
+                    "POLE METER MD KW UHI", "POLE METER MD KVA UHI", "POLE_MTR_MF", "POLE METER CONSUMPTION KWH WITH MF", 
+                    "POLE METER CONSUMPTION KVAH WITH MF", "MAIN & POLE METER CONSUMPTION DIFFRENCE KVAH", 
+                    "MAIN & POLE METER CONSUMPTION DIFFRENCE KVAH %", "MAIN & POLE METER MD DIFFRENCE KVA WITH MF", 
+                    "MAIN & POLE METER MD DIFFRENCE KVA %", "IF PENDING IN ANY LIST"
+                ];
+                
+                ALL_SHEET_COLS.forEach(function(keyName) {
+                    var val = getRobustKey(record, keyName);
+                    var displayVal = (val !== undefined && val !== null && val.toString().trim() !== "") ? val : "-";
+                    var printableKeyLabel = keyName.replace(/_/g, ' ').toUpperCase();
+                    gridHtml += '<div><span class="detail-lbl">' + printableKeyLabel + '</span><span style="font-size:11.5px; font-weight:700; color:#0f172a;">' + displayVal + '</span></div>';
+                });
+
+            } else {
+                gridHtml += '<div class="grp-title" style="grid-column: 1 / -1;">Admin Complete Overview (All Columns Pack)</div>';
+                var g1 = ["DIVISION", "AREA TYPE", "BOOK NUMBER", "CONNECTION NUMBER", "SUB DIVISION CODE", "SUB DIVISION NAME", "AGENCY-STATUS", "CONSUMER-TYPE", "CONSUMER TYPE", "MASTER-SUBSTATION NAME", "MASTER-FEEDER-NAME", "SUBSTATION-NAME", "FEEDER-NAME", "ST", "CONSUMER CATOGARY", "ACTVITY", "PROCESS FINAL", "ACCOUNT NO", "CONSUMER-NAME", "ADDRESS", "Master Mobile Number", "LOAD IN KW", "LOAD GROUP (5-10-50)", "LOAD_CATOGERY (5,10)"];
+                var g2 = ["LAST MONTH FINAL MM NO.", "LAST MONTH FINAL MM MAKE", "EXCEPTION TYPE (MAIN METER)", "FINAL_MAIN_METER_SITE_REMARK", "IS MRI AVAILABLE (MAIN METER)", "IS LOAD SURVAY AVAILBLE (MAIN Mtr)", "MRI DATE", "MRI KWH", "MRI KVAH", "MRI MD KW", "MRI MD KVA", "MANUAL KWH", "MANUAL KVAH", "MANUAL KW", "MANUAL KVA"];
+                var g3 = ["LAST MONTH FINAL PM NO.", "LAST MONTH FINAL PM MAKE", "EXCEPTION TYPE (POLE METER)", "FINAL_POLE_METER_SITE_REMARK", "IS MRI AVAILABLE (POLE METER)", "IS LOAD SURVAY AVAILBLE (Pole Mtr)", "POLE METER MRI DATE TIME", "POLE METER STATUS", "POLE MTR KWH CONSUMPTION", "POLE MTR KVAH CONSUMPTION"];
+                var g4 = COLUMNS_BILL_ADDITIONS;
+                var g5 = ["MR NAME", "FINAL VISIT_DATE", "REMARK", "TIME STAMP", "ATTEND STATUS"];
+                
+                var drawAdminGroup = function(title, cols) {
+                    gridHtml += '<div class="grp-title" style="grid-column: 1 / -1; background: #e0e7ff; color: #1e3a8a; padding: 4px 8px; border-radius: 4px; font-size: 11px; margin-top: 8px;"><i class="fa-solid fa-layer-group"></i> ' + title + '</div>';
+                    cols.forEach(function(k) { 
+                        var val = (k === "MR NAME") ? getReaderName(record) : getRobustKey(record, k);
+                        var displayVal = (val !== undefined && val !== null && val.toString().trim() !== "") ? val : "-";
+                        gridHtml += '<div><span class="detail-lbl">' + k.toUpperCase() + '</span><span style="font-size:11.5px; font-weight:700; color:#0f172a;">' + displayVal + '</span></div>'; 
+                    });
+                };
+                drawAdminGroup("1. Consumer Profile & Connection Data", g1); 
+                drawAdminGroup("2. Main Meter Details & Readings Log", g2); 
+                drawAdminGroup("3. Pole Meter Details & Pendency Log", g3); 
+                drawAdminGroup("4. Billing & Distribution Tracking", g4); 
+                drawAdminGroup("5. System Logs & Attendance Status", g5);
+            }
 
         } else {
-            var g1 = ["DIVISION", "ACCOUNT NO", "CONSUMER-NAME", "ADDRESS", "Master Mobile Number", "Consumer Type", "Consumer Catogary", "LOAD IN KW", "Process Final"];
-            var g2 = ["LAST MONTH FINAL MM NO.", "LAST MONTH FINAL MM MAKE", "EXCEPTION TYPE (MAIN METER)", "FINAL_MAIN_METER_SITE_REMARK", "IS MRI AVAILABLE (MAIN METER)", "IS LOAD SURVAY AVAILBLE (MAIN Mtr)"];
-            var g3 = ["LAST MONTH FINAL PM NO.", "LAST MONTH FINAL PM MAKE", "EXCEPTION TYPE (POLE METER)", "FINAL_POLE_METER_SITE_REMARK", "IS MRI AVAILABLE (POLE METER)", "IS LOAD SURVAY AVAILBLE (Pole Mtr)"];
-            var g4 = COLUMNS_BILL_ADDITIONS;
-            var g5 = ["MR NAME", "FINAL VISIT_DATE", "REMARK", "TIME STAMP", "ATTEND STATUS"];
+            // 👦 नियम 2: मीटर रीडर (लड़कों) की लॉगिन होने पर (चाहे FULL मोड हो या STANDARD), केवल वही सटीक 17 कॉलम ही दिखाई देंगे! कोई ओवरराइडिंग नहीं होगी!
+            gridHtml += '<div class="grp-title" style="grid-column: 1 / -1;">Consumer Details (Allocated Fields)</div>';
             
-            var drawGroup = function(title, cols) {
-                gridHtml += '<div class="grp-title" style="grid-column: 1 / -1;">' + title + '</div>';
-                cols.forEach(function(k) { 
-                    var val = (k === "MR NAME") ? getReaderName(record) : getRobustKey(record, k);
-                    var displayVal = (val !== undefined && val !== null && val.toString().trim() !== "") ? val : "-";
-                    gridHtml += '<div><span class="detail-lbl">' + k.toUpperCase() + '</span><span style="font-size:12px; font-weight:700; color:#0f172a;">' + displayVal + '</span></div>'; 
-                });
-            };
+            var targetCols = [
+                "DIVISION", "ACCOUNT NO", "CONSUMER-NAME", "ADDRESS", "LOAD IN KW", 
+                "LOAD GROUP (5-10-50)", "FINAL VISIT DATE", "LAST MONTH FINAL MM NO.", 
+                "LAST MONTH FINAL MM MAKE", "EXCEPTION TYPE (MAIN METER)", 
+                "FINAL_MAIN_METER_SITE_REMARK", "REMARK", "FINAL_POLE_METER_SITE_REMARK",
+                "IS MRI AVAILABLE (MAIN METER)", "LAST MONTH FINAL PM NO.", 
+                "LAST MONTH FINAL PM MAKE", "EXCEPTION TYPE (POLE METER)", "IS MRI AVAILABLE (POLE METER)"
+            ];
             
-            drawGroup("1. Consumer Profile", g1); 
-            drawGroup("2. Main Meter Details", g2); 
-            drawGroup("3. Pole Meter Details", g3); 
-            drawGroup("4. Billing & Distribution", g4); 
-            drawGroup("5. Logs & Status", g5);
+            // तय किए गए 17 कॉलम का सटीक रेंडरर लूप
+            targetCols.forEach(function(colName) {
+                if (!colName || colName.trim() === "") return;
+                var val = getRobustKey(record, colName);
+                var displayVal = (val !== undefined && val !== null && val.toString().trim() !== "") ? val : "-";
+                var printableKeyLabel = colName.replace(/_/g, ' ').toUpperCase();
+                
+                gridHtml += '<div><span class="detail-lbl">' + printableKeyLabel + '</span><span style="font-size:12px; font-weight:700; color:#0f172a;">' + displayVal + '</span></div>'; 
+            });
         }
-        gridHtml += '</div>'; targetDiv.innerHTML = gridHtml;
+        
+        gridHtml += '</div>'; 
+        targetDiv.innerHTML = gridHtml;
     };
 }
 
@@ -3785,6 +3850,12 @@ async function downloadSelectedMergedPDF() {
         var finalRow = [];
         
         var mrName = getReaderName(r) || "N/A";
+        var currentUserLower = (loggedInReader || "").toString().trim().toUpperCase();
+
+        // 👦 सुरक्षा कवच: अगर लॉग-इन यूजर एडमिन नहीं है, तो मोड को जबरदस्ती 'MASTER_COLS' (17 लिमिटेड कॉलम्स) पर सेट करें
+        if (currentUserLower !== "ANURAG SHAKYA" && currentUserLower !== "ADMIN") {
+            mode = 'MASTER_COLS';
+        }
 
         var ALL_SHEET_COLS = [
                 "CONSUMER REMARK", "SUB REMARK", "BILLING CYCLE", "LOAD TYPE (H-L-T)", "IS MAIN METER VISIT", 
@@ -3866,13 +3937,12 @@ async function downloadSelectedMergedPDF() {
             });
         } else if (mode === 'MASTER_COLS') {
             reqCols = [
-                "DIVISION", "ACCOUNT NO", "Consumer Type", "Consumer Catogary", "MR NAME", 
-                "Process Final", "CONSUMER-NAME", "ADDRESS", "Master Mobile Number", "LOAD IN KW", 
-                "LAST MONTH FINAL MM NO.", "LAST MONTH FINAL MM MAKE", "FINAL VISIT_DATE", 
-                "EXCEPTION TYPE (MAIN METER)", "FINAL_MAIN_METER_SITE_REMARK", "REMARK", 
-                "IS MRI AVAILABLE (MAIN METER)", "IS LOAD SURVAY AVAILBLE (MAIN Mtr)", 
-                "LAST MONTH FINAL PM NO.", "LAST MONTH FINAL PM MAKE", "EXCEPTION TYPE (POLE METER)", 
-                "FINAL_POLE_METER_SITE_REMARK", "IS MRI AVAILABLE (POLE METER)", "IS LOAD SURVAY AVAILBLE (Pole Mtr)"
+                "DIVISION", "ACCOUNT NO", "CONSUMER-NAME", "ADDRESS", "LOAD IN KW", 
+                "LOAD GROUP (5-10-50)", "FINAL VISIT DATE", "LAST MONTH FINAL MM NO.", 
+                "LAST MONTH FINAL MM MAKE", "EXCEPTION TYPE (MAIN METER)", 
+                "FINAL_MAIN_METER_SITE_REMARK", "REMARK", "FINAL_POLE_METER_SITE_REMARK",
+                "IS MRI AVAILABLE (MAIN METER)", "LAST MONTH FINAL PM NO.", 
+                "LAST MONTH FINAL PM MAKE", "EXCEPTION TYPE (POLE METER)", "IS MRI AVAILABLE (POLE METER)"
             ];
             finalRow = reqCols.map(function(c) { 
                 var val = (c === "MR NAME") ? getReaderName(r) : getRobustKey(r, c); 
@@ -3901,16 +3971,13 @@ async function downloadSelectedMergedPDF() {
         var ws = XLSX.utils.aoa_to_sheet(aoa); 
         XLSX.utils.book_append_sheet(wb, ws, "Detail");
         
-        // --- 🚀 एंड्रॉइड APK डाउनलोड मैनेजर नेटिव ब्रिज लॉजिक ---
         var wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'base64' });
         var filename = "Consumer_" + accNo + "_" + getFormattedDateTimeForFile() + ".xlsx";
 
         if (typeof AndroidBridge !== "undefined" && AndroidBridge.processBase64Download) {
-            // नेटिव जावा इंटरफेस को डायरेक्ट बेस64 स्ट्रिंग पास करें
-            AndroidBridge.processBase64Download(wbout, "excel");
+            AndroidBridge.processBase64Download(wbout, "excel", filename);
             showThinAlert("🎉 Excel डाउनलोड शुरू हो गया है...", true);
         } else {
-            // ब्राउज़र फॉलबैक मोड
             var base64Data = "data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64," + wbout;
             var link = document.createElement('a');
             link.href = base64Data;
@@ -3926,6 +3993,12 @@ async function downloadSelectedMergedPDF() {
         var record = e.target.result; if(!record) return;
         var rows = [];
         var mrName = getReaderName(record) || "N/A";
+        var currentUserLower = (loggedInReader || "").toString().trim().toUpperCase();
+
+        // 👦 सुरक्षा कवच: अगर लॉग-इन यूजर एडमिन नहीं है, तो मोड को जबरदस्ती 'MASTER_COLS' (17 लिमिटेड कॉलम्स) पर सेट करें
+        if (currentUserLower !== "ANURAG SHAKYA" && currentUserLower !== "ADMIN") {
+            mode = 'MASTER_COLS';
+        }
         
         var ALL_SHEET_COLS = [
                 "CONSUMER REMARK", "SUB REMARK", "BILLING CYCLE", "LOAD TYPE (H-L-T)", "IS MAIN METER VISIT", 
@@ -4005,16 +4078,17 @@ async function downloadSelectedMergedPDF() {
                 var displayVal = val !== undefined && val !== null && val.toString().trim() !== "" ? val.toString() : "-";
                 rows.push([colName, displayVal]);
             });
-        } else if (mode === 'MASTER_COLS') {
+        } else if (mode === 'MASTER_COLS' || mode === 'STANDARD') {
             var reqCols = [
-                "DIVISION", "ACCOUNT NO", "Consumer Type", "Consumer Catogary", "MR NAME", 
-                "Process Final", "CONSUMER-NAME", "ADDRESS", "Master Mobile Number", "LOAD IN KW", 
-                "LAST MONTH FINAL MM NO.", "LAST MONTH FINAL MM MAKE", "FINAL VISIT_DATE", 
-                "EXCEPTION TYPE (MAIN METER)", "FINAL_MAIN_METER_SITE_REMARK", "REMARK", 
-                "IS MRI AVAILABLE (MAIN METER)", "IS LOAD SURVAY AVAILBLE (MAIN Mtr)", 
-                "LAST MONTH FINAL PM NO.", "LAST MONTH FINAL PM MAKE", "EXCEPTION TYPE (POLE METER)", 
-                "FINAL_POLE_METER_SITE_REMARK", "IS MRI AVAILABLE (POLE METER)", "IS LOAD SURVAY AVAILBLE (Pole Mtr)"
+                "DIVISION", "ACCOUNT NO", "CONSUMER-NAME", "ADDRESS", "LOAD IN KW", 
+                "LOAD GROUP (5-10-50)", "FINAL VISIT DATE", "LAST MONTH FINAL MM NO.", 
+                "LAST MONTH FINAL MM MAKE", "EXCEPTION TYPE (MAIN METER)", 
+                "FINAL_MAIN_METER_SITE_REMARK", "REMARK", "FINAL_POLE_METER_SITE_REMARK",
+                "IS MRI AVAILABLE (MAIN METER)", "LAST MONTH FINAL PM NO.", 
+                "LAST MONTH FINAL PM MAKE", "EXCEPTION TYPE (POLE METER)", "IS MRI AVAILABLE (POLE METER)"
             ];
+            if(reqCols.indexOf("MR NAME") === -1) reqCols.push("MR NAME");
+
             rows = reqCols.map(function(k) {
                 var val = (k === "MR NAME") ? getReaderName(record) : getRobustKey(record, k);
                 return [k, val !== undefined && val !== null && val.toString().trim() !== "" ? val.toString() : "-"];
@@ -4053,7 +4127,6 @@ async function downloadSelectedMergedPDF() {
             doc.text('Report Prepared By: Billing_App Tool | Anurag Shakya | Mo: 9761414105 - Page ' + i, doc.internal.pageSize.width / 2, doc.internal.pageSize.height - 15, { align: 'center' }); 
         }
         
-        // --- 🚀 एंड्रॉइड APK डाउनलोड मैनेजर ब्रिज बाईपास लॉजिक ---
         var filename = "Consumer_" + accNo + "_" + getFormattedDateTimeForFile() + ".pdf";
         if (navigator.userAgent.match(/Android/i)) {
             var pdfBase64 = doc.output('datauristring');
@@ -4085,17 +4158,18 @@ function openReportRowDirect(reportKey) {
     activeReportType = reportKey;
     if(loggedInReader) { localStorage.setItem("app_current_view_state_" + loggedInReader, "reportDetailContainer"); }
     
-    // सभी टैब को इन-एक्टिव करें और केवल रिपोर्ट्स कंटेनर को चालू करें
-    var tabs = ['summary', 'list', 'billdist', 'visitdata', 'reports', 'filter'];
+    var tabs = ['summary', 'list', 'billdist', 'visitdata', 'reports', 'filter', 'notifyadmin', 'configmaker'];
     tabs.forEach(function(t) { 
         var view = document.getElementById('view-' + t); 
         var btn = document.getElementById('btn-tab-' + t); 
-        if(view) view.style.display = "none"; 
+        if(view) view.style.setProperty("display", "none", "important"); 
         if(btn) btn.classList.remove('active'); 
     });
     
     var activeView = document.getElementById('view-reports'); 
-    var activeBtn = document.getElementById('btn-tab-summary'); // होम बटन को ही एक्टिव रखेंगे
+    // 🎯 अब कोई भी मास्टर रिपोर्ट ओपन होने पर सीधे होम (Summary) बटन ही एक्टिवेट रहेगा
+    var activeBtn = document.getElementById('btn-tab-summary');
+    
     if(activeView) activeView.style.display = "block"; 
     if(activeBtn) activeBtn.classList.add('active');
     
@@ -4111,6 +4185,7 @@ function openReportRowDirect(reportKey) {
     }
 
     function openReportGroupView(reportType) {
+    // ⚡ दोनों चाबियों को स्वतंत्र रूप से उनके सही कॉन्टेक्स्ट में लॉक करना
     activeReportType = reportType; 
     if(loggedInReader) { localStorage.setItem("app_active_report_type_ctx_" + loggedInReader, reportType); }
     
@@ -4124,42 +4199,40 @@ function openReportRowDirect(reportKey) {
     document.getElementById('reportDetailContainer').style.display = "block";
     
     var matchedConfig = globalReportConfigs.find(function(c) { return c.key === reportType; });
+    var isBillingModeTop = reportType.toLowerCase().includes("bill") || reportType.toLowerCase().includes("dist");
     
-    // Case-insensitive strong check for billing and distribution modes
-    var isBillingModeTop = reportType.toLowerCase().includes("bill") || 
-                           reportType.toLowerCase().includes("dist") || 
-                           (matchedConfig && (
-                               matchedConfig.key.toLowerCase().includes("bill") || 
-                               matchedConfig.key.toLowerCase().includes("dist") || 
-                               (matchedConfig.name && matchedConfig.name.toLowerCase().includes("bill")) ||
-                               (matchedConfig.name && matchedConfig.name.toLowerCase().includes("dist")) ||
-                               (matchedConfig.reportGroup && matchedConfig.reportGroup.toLowerCase().includes("bill")) ||
-                               (matchedConfig.reportGroup && matchedConfig.reportGroup.toLowerCase().includes("dist"))
-                           ));
-    
-    document.getElementById('reportBillFilters').style.display = isBillingModeTop ? "flex" : "none";
+    // 🚀 सर्च और फ़िल्टर पट्टी फिक्स: दोनों मुख्य टैब्स में कॉम्पैक्ट बार (सर्च बॉक्स सहित) को ऑन रखना
+    var filterNode = document.getElementById('reportBillFilters');
+    if(filterNode) {
+        if (isBillingModeTop || reportType === 'all_consumers_list' || reportType === 'Visit_Data_Consumers') {
+            filterNode.style.setProperty("display", "flex", "important");
+        } else {
+            filterNode.style.setProperty("display", "none", "important");
+        }
+    }
+
     if(document.getElementById('groupFilterLabel')) {
          document.getElementById('groupFilterLabel').innerText = isBillingModeTop ? "🔍 ग्रुप फ़िल्टर (BILL UPLOAD DATE):" : "🔍 ग्रुप फ़िल्टर (Available Remarks):";
     }
-    document.getElementById('reportMergePdfBtn').style.display = isBillingModeTop ? "inline-flex" : "none";
+    var mergeBtn = document.getElementById('reportMergePdfBtn');
+    if(mergeBtn) mergeBtn.style.display = isBillingModeTop ? "inline-flex" : "none";
     var selectAllChk = document.getElementById('selectAllBillsReport');
     if(selectAllChk) selectAllChk.checked = false;
 
-    // 🚀 मास्टर डेटा रिपोर्ट्स (All Bills या All Consumers) - सुपर स्पीड मोड (getAll Engine)
-    if(reportType === 'all_bills_report' || reportType === 'all_consumers_list') {
+    // 🚀 मास्टर डेटा रिपोर्ट्स (All Bills, All Consumers या Visit_Data_Consumers) का कंबाइंड सुपर स्पीड इंजन
+    if(reportType === 'all_bills_report' || reportType === 'all_consumers_list' || reportType === 'Visit_Data_Consumers') {
         document.getElementById('groupFilterContainer').style.display = "none"; 
         var htmlArr = [];
         
         var tx = db.transaction("consumers", "readonly");
         var store = tx.objectStore("consumers");
-        var getAllReq = store.getAll(); // ⚡ वन-शॉट में पूरा डेटा मेमोरी में लोड
+        var getAllReq = store.getAll(); // वन-शॉट में पूरा डेटा मेमोरी में लोड
 
         getAllReq.onsuccess = function(e) {
             var allConsumers = e.target.result || [];
             var repSelectedLoadCat = document.getElementById('reportLoadCategoryFilter') ? document.getElementById('reportLoadCategoryFilter').value : "ALL";
             var repWaStatus = document.getElementById('reportWaFilter') ? document.getElementById('reportWaFilter').value : "ALL";
 
-            // डेटा को फ़िल्टर करने के लिए फ़ास्ट एरे मैपिंग
             for (var i = 0; i < allConsumers.length; i++) {
                 var item = allConsumers[i];
                 if (!isReaderAllowed(getReaderName(item))) continue;
@@ -4175,135 +4248,172 @@ function openReportRowDirect(reportKey) {
                     var isBillValid = (item.pdfLink && item.pdfLink.trim() !== "") || isBillUploaded(item);
                     if (isBillValid && loadMatch && waMatch) {
                         var pdfBtn = (item.pdfLink) ? '<a href="' + item.pdfLink + '" target="_blank" class="pdf-icon" onclick="event.stopPropagation();"><i class="fa-solid fa-file-pdf"></i></a>' : '';
+                        var waBtn = item.pdfLink ? '<button class="whatsapp-icon" onclick="event.stopPropagation(); triggerWhatsApp(event, \'' + item.accountNo + '\')"><i class="fa-brands fa-whatsapp"></i></button>' : '';
                         var cbHtml = (item.pdfLink) ? '<div style="margin-right:10px; display:flex; align-items:center;"><input type="checkbox" class="bill-select-cb" value="' + item.pdfLink + '" data-acc="' + item.accountNo + '" style="transform:scale(1.2); cursor:pointer;" onclick="event.stopPropagation();"></div>' : '';
-                        
                         var upDate = getRobustKey(item, "BILL UPLOAD DATE") || item.billUpDate || item["BILL UPLOAD DATE"] || "NOT UPLOADED";
                         var uiStatusText = "Upld: " + (upDate !== "NOT UPLOADED" ? upDate : "N/A");
 
-                        htmlArr.push(
-                            '<div class="list-item" style="border-left-color: #f59e0b; flex-direction:column; align-items:stretch;" ' +
-                            'onclick="openQuickViewModal(\'' + item.accountNo + '\', \'BILL_DIST\')">' +
-                            '<div style="display:flex; justify-content:space-between; width:100%; align-items:center;">' +
-                            cbHtml +
-                            '<div style="flex:1; text-align:left;">' +
-                            '<div class="c-name">' + item.consumerName + '</div>' +
-                            '<div class="c-acc">A/C: ' + item.accountNo + '</div>' +
-                            '</div>' +
-                            '<div style="text-align:right; width: 35%; flex-shrink: 0; display:flex; flex-direction:column; align-items:flex-end;">' +
-                            '<div class="c-stat" style="color:#b45309; font-size:11px; font-weight:bold;">' + uiStatusText + '</div>' +
-                            pdfBtn +
-                            '</div>' +
-                            '</div>' +
-                            '<div id="visit_acc_' + item.accountNo + '" class="accordion-content"></div>' +
-                            '</div>'
-                        );
+                        htmlArr.push({
+                            index: 0,
+                            name: (getRobustKey(item, "CONSUMER-NAME") || item.consumerName || "").toString().toUpperCase(),
+                            html: '<div class="list-item" style="border-left-color: #f59e0b; flex-direction:column; align-items:stretch;" onclick="openQuickViewModal(\'' + item.accountNo + '\', \'BILL_DIST\')">' +
+                                  '<div style="display:flex; justify-content:space-between; width:100%; align-items:center;">' +
+                                  cbHtml + '<div style="flex:1; text-align:left;">' +
+                                  '<div class="c-name">' + item.consumerName + '</div>' +
+                                  '<div class="c-acc">A/C: ' + item.accountNo + '</div>' +
+                                  '</div>' +
+                                  '<div style="text-align:right; width: 35%; flex-shrink: 0; display:flex; flex-direction:column; align-items:flex-end;" onclick="event.stopPropagation();">' +
+                                  '<div class="c-stat" style="color:#b45309; font-size:11px; font-weight:bold; margin-bottom:4px;">' + uiStatusText + '</div>' +
+                                  '<div style="display:flex; gap:5px;">' + pdfBtn + waBtn + '</div>' +
+                                  '</div></div></div>'
+                        });
                     }
-                } else if (reportType === 'all_consumers_list') {
-                    // ⚡ FIX: ADMIN VIEW ALIGNED WITH READER (QUICK VIEW MODAL LINKED)
-                    var consumerAddress = item.address || item.ADDRESS || item["ADDRESS"] || "-";
-                    var consumerMobile = item.masterMobileNumber || item["Master Mobile Number"] || item.mobileNo || "-";
+                } else if (reportType === 'all_consumers_list' || reportType === 'Visit_Data_Consumers') {
+                    if (loadMatch && waMatch) {
+                        var consumerAddress = getRobustKey(item, "ADDRESS") || getRobustKey(item, "address") || "-";
+                        var consumerMobile = getRobustKey(item, "Master Mobile Number") || getRobustKey(item, "masterMobileNumber") || "-";
+                        var divisionDisplay = getRobustKey(item, "DIVISION") || getRobustKey(item, "division") || "";
+                        
+                        var mainMtrNo = getRobustKey(item, "LAST MONTH FINAL MM NO.") || item.lastMmNo || "-";
+                        var poleMtrNo = getRobustKey(item, "LAST MONTH FINAL PM NO.") || item.lastPmNo || "-";
 
-                    htmlArr.push(
-                        '<div class="list-item" style="border-left-color: #334155;" onclick="openQuickViewModal(\'' + item.accountNo + '\', \'STANDARD\')">' +
-                        '<div style="width: 100%; text-align: left;">' +
-                        '<div class="c-name">' + item.consumerName + '</div>' +
-                        '<div class="c-acc">A/C: ' + item.accountNo + ' | Mob: ' + consumerMobile + '</div>' +
-                        '<div class="c-addr"><b>पता:</b> ' + consumerAddress + '</div>' +
-                        '<div class="c-mtr">M-Mtr: ' + (item.lastMmNo || "") + ' | P-Mtr: ' + (item.lastPmNo || "") + '</div>' +
-                        '</div></div>'
-                    );
+                        var singlePdfBtn = '<div style="display:flex; gap:4px;">' +
+                            '<button onclick="event.stopPropagation(); exportSingleConsumerPDF(event, \'' + item.accountNo + '\', \'' + (reportType === 'Visit_Data_Consumers' ? 'FULL' : 'MASTER_COLS') + '\')" class="export-btn mini pdf-bg" style="padding: 5px 8px; font-size: 10px;" title="Download PDF"><i class="fa-solid fa-file-pdf"></i></button>' +
+                            '<button onclick="event.stopPropagation(); exportConsumerReadingFormPDF(\'' + item.accountNo + '\')" class="export-btn mini" style="padding: 5px 8px; font-size: 10px; background:#4f46e5;" title="Download Reading Form"><i class="fa-solid fa-file-invoice"></i> Form</button>' +
+                            '<button onclick="event.stopPropagation(); openContactUpdateModal(\'' + item.accountNo + '\')" class="export-btn mini" style="padding: 5px 8px; font-size: 10px; background:#0ea5e9;" title="Update Contact Info"><i class="fa-solid fa-user-pen"></i> Info</button>' +
+                            '</div>';
+                        
+                        var toggleAction = (reportType === 'Visit_Data_Consumers') 
+                            ? 'toggleVisitAccordion(\'' + item.accountNo + '\', \'FULL\')' 
+                            : 'openQuickViewModal(\'' + item.accountNo + '\', \'STANDARD\')';
+                            
+                        var arrowIconHtml = (reportType === 'Visit_Data_Consumers') ? '<i class="fa-solid fa-chevron-down" style="color:#64748b; font-size:12px;"></i>' : '';
+                        var targetAccordionDiv = (reportType === 'Visit_Data_Consumers') ? '<div id="visit_acc_' + item.accountNo + '" class="accordion-content"></div>' : '';
+
+                        // 🚀 सटीक कतार क्रम ड्राइवर: शीट का Row Index निकालना
+                        var rIdx = parseInt(item.rowIndex || getRobustKey(item, "rowIndex") || 0);
+
+                        htmlArr.push({
+                            index: rIdx,
+                            name: (getRobustKey(item, "CONSUMER-NAME") || item.consumerName || "").toString().toUpperCase(),
+                            html: '<div class="list-item" style="border-left-color: #334155; display: flex !important; flex-direction: column !important; align-items: stretch !important;" onclick="' + toggleAction + '">' +
+                                  '<div style="display: flex; justify-content: space-between; width: 100%; align-items: center;">' +
+                                  '<div style="flex: 1; text-align: left;">' +
+                                  '<div class="c-name">' + (getRobustKey(item, "CONSUMER-NAME") || item.consumerName || "-") + '</div>' +
+                                  '<div class="c-acc">A/C: ' + item.accountNo + ' | Mob: ' + consumerMobile + '</div>' +
+                                  '<div class="c-addr"><b>पता:</b> ' + consumerAddress + '</div>' +
+                                  '<div class="c-mtr">M-Mtr: ' + mainMtrNo + ' | P-Mtr: ' + poleMtrNo + '</div>' +
+                                  '</div>' +
+                                  '<div style="text-align:right; width: 30%; flex-shrink: 0; display:flex; flex-direction:column; align-items:flex-end; justify-content:center; gap: 6px;">' +
+                                  '<div style="font-size:10px; font-weight:bold; color:#4338ca; background:#e0e7ff; padding:2px 6px; border-radius:4px;">' + divisionDisplay + '</div>' +
+                                  '<div style="display:flex; gap:8px; align-items:center;" onclick="event.stopPropagation();">' + singlePdfBtn + arrowIconHtml + '</div>' +
+                                  '</div>' +
+                                  '</div>' +
+                                  targetAccordionDiv +
+                                  '</div>'
+                        });
+                    }
                 }
             }
             
-            // लाइव रिस्पांस रेंडर इंजन
+            // 🚀 शार्टिंग कंट्रोल रूम: 
+            // 1. Visit_Data_Consumers हमेशा शीट के ओरिजिनल Row Index के हिसाब से सॉर्ट होगा।
+            // 2. all_consumers_list सामान्य रूप से नाम (A to Z) के हिसाब से सॉर्ट होगा।
+            if (reportType === 'Visit_Data_Consumers') {
+                htmlArr.sort(function(a, b) { return a.index - b.index; });
+            } else if (reportType === 'all_consumers_list') {
+                htmlArr.sort(function(a, b) { return a.name.localeCompare(b.name); });
+            }
+
+            var finalRenderedHtml = htmlArr.map(function(obj) { return obj.html; });
+            
             var resTitle = document.getElementById('reportResultTitle');
-            var rName = (reportType === 'all_bills_report') ? "All Bills Report" : "All Consumers Master";
-            var unitText = (reportType === 'all_bills_report') ? "बिल उपलब्ध" : "उपभोक्ता";
+            var rName = REPORT_NAMES[reportType] || reportType.toUpperCase();
+            if(resTitle) {
+                resTitle.innerHTML = "<div style='color:#1e3a8a; font-size:14px; text-transform:uppercase; border-bottom:1px solid #cbd5e1; padding-bottom:4px; margin-bottom:4px;'><i class='fa-solid fa-file-lines'></i> " + rName + "</div><div style='font-size:11px; color:#ef4444; font-weight:bold;'>कुल परिणाम: " + finalRenderedHtml.length + " उपभोक्ता</div>";
+                resTitle.style.display = "block";
+            }
+            var listCont = document.getElementById('reportListContainer');
+            if(listCont) listCont.innerHTML = finalRenderedHtml.length === 0 ? '<div style="text-align:center; padding:15px; font-weight:bold; color:#ef4444;">कोई डेटा नहीं मिला।</div>' : finalRenderedHtml.join('');
             
-            resTitle.innerHTML = "<div style='color:#1e3a8a; font-size:14px; text-transform:uppercase; border-bottom:1px solid #cbd5e1; padding-bottom:4px; margin-bottom:4px;'><i class='fa-solid fa-file-lines'></i> " + rName + "</div><div style='font-size:11px; color:#ef4444; font-weight:bold;'>कुल परिणाम: " + htmlArr.length + " " + unitText + "</div>";
-            resTitle.style.display = "block";
-            
-            document.getElementById('reportListContainer').innerHTML = htmlArr.length === 0 ? '<div style="text-align:center; padding:15px; font-weight:bold; color:#ef4444;">कोई डेटा नहीं मिला।</div>' : htmlArr.join(''); 
+            // सर्च बार को लाइव रिफ्रेश करना ताकि इनपुट बार तुरंत काम करे
+            if (document.getElementById('reportSearchBar')) {
+                document.getElementById('reportSearchBar').setAttribute('onkeyup', "universalListSearch('reportSearchBar', 'reportListContainer')");
+            }
         };
         return;
     }
 
-    // 🚀 कस्टम/शेड्यूल रिपोर्ट्स (प्राइमरी फ़िल्टर आधारित) के लिए सामान्य ब्लॉक
-            document.getElementById('groupFilterContainer').style.display = "block"; 
-            document.getElementById('reportResultTitle').style.display = "block"; 
-            var savedEntries = new Set(); 
-            
-            var tx = db.transaction(["saved_entries"], "readonly");
-            tx.objectStore("saved_entries").openCursor().onsuccess = function(e) { 
-                var cursor = e.target.result; 
-                if(cursor) { savedEntries.add(cursor.value.accountNo); cursor.continue(); } 
-            };
-            
-            tx.oncomplete = function() {
-                var cTx = db.transaction("consumers", "readonly");
-                currentReportDataList = []; 
-                var uniqueRemarksSet = new Set();
+    // 🚀 अन्य सभी कस्टम/कंडीशनल रिपोर्ट्स (जैसे पेंडेंसी लिस्ट्स) के लिए मूल ब्लॉक
+    document.getElementById('groupFilterContainer').style.display = "block"; 
+    document.getElementById('reportResultTitle').style.display = "block"; 
+    var savedEntries = new Set(); 
+    
+    var tx = db.transaction(["saved_entries"], "readonly");
+    tx.objectStore("saved_entries").openCursor().onsuccess = function(e) { 
+        var cursor = e.target.result; 
+        if(cursor) { savedEntries.add(cursor.value.accountNo); cursor.continue(); } 
+    };
+    
+    tx.oncomplete = function() {
+        var cTx = db.transaction("consumers", "readonly");
+        currentReportDataList = []; 
+        var uniqueRemarksSet = new Set();
+        
+        document.getElementById('groupFilterContainer').style.display = "block";
+
+        cTx.objectStore("consumers").openCursor().onsuccess = function(ev) {
+            var cursor = ev.target.result;
+            if(cursor) {
+                var item = cursor.value || {};
+                var rStat = (item["ATTEND STATUS"] || item.attendStatus || "").toString().toUpperCase().trim();
                 
-                cTx.objectStore("consumers").openCursor().onsuccess = function(ev) {
-                    var cursor = ev.target.result;
-                    if(cursor) {
-                        var item = cursor.value || {};
-                        
-                        var rStat = (item["ATTEND STATUS"] || item.attendStatus || "").toString().toUpperCase().trim();
-                        var dStat = (item["DISTRIBUTION STATUS"] || item.distStatus || "").toString().toUpperCase().trim();
-                        
-                        // 🔥 FIX: यहाँ से Load Filter हटा दिया गया है ताकि ड्रॉपडाउन में सारे रिमार्क आ सकें, उसे नीचे लिस्ट रेंडरिंग में शिफ्ट किया गया है
-                        // 🔥 FIX: अब ATTEND को जबरदस्ती ब्लॉक नहीं करेंगे, सिर्फ Google Sheet की कंडीशन डेटा को फिल्टर करेगी!
-if(isReaderAllowed(getReaderName(item)) && !parseTrue(item.isDone) && !savedEntries.has(item.accountNo)) {
-                            var match = false;
-                            if (matchedConfig) {
-                                match = evaluateCustomCondition(item, matchedConfig.conditionStr);
-                            } else {
-                                // 🚀 Hardcoded Reports Fallback (अगर कस्टम कन्फिग न हो)
-                                if(reportType === 'main_field_exception') match = parseTrue(item.isMainMeterFieldException);
-                                else if(reportType === 'pole_field_exception') match = parseTrue(item.isPoleMeterFieldException);
-                                else if(reportType === 'main_mri_pending') match = parseTrue(item.isMainMeterMriPending);
-                                else if(reportType === 'pole_mri_pending') match = parseTrue(item.isPoleMeterMriPending);
-                                else if(reportType === 'mri_no_survey_main') match = parseTrue(item.isMriButNoLoadSurveyMain);
-                                else if(reportType === 'mri_no_survey_pole') match = parseTrue(item.isMriButNoLoadSurveyPole);
-                                else if(reportType === 'billed_no_bill') match = parseTrue(item.isBilledButNoBillAvailable);
-                                else if(reportType === 'bill_print_pending') match = parseTrue(item.isBillAvailableButPrintPending);
-                                else if(reportType === 'bill_dist_pending') match = parseTrue(item.isBillAvailableButDistributionPending);
-                                else if(reportType === 'rep10') match = parseTrue(item.rep50Mri);
-                                else if(reportType === 'rep11') match = parseTrue(item.rep50VisiT);
-                                else if(reportType === 'rep12') match = parseTrue(item.rep50MainExc);
-                                else if(reportType === 'rep13') match = parseTrue(item.rep50PoleExc);
-                            }
-                            
-                            if(match) {
-                                currentReportDataList.push(item);
-                                var remText = isBillingModeTop ? (getRobustKey(item, "BILL UPLOAD DATE") || item.billUpDate || "") : (isBillingModeTop ? "" : (activeReportType.toLowerCase().includes("pole") || activeReportType === 'rep13' ? (getRobustKey(item, "FINAL_POLE_METER_SITE_REMARK") || item.poleStatusRemark || "") : (getRobustKey(item, "FINAL_MAIN_METER_SITE_REMARK") || item.mainStatusRemark || "")));
-                                if(remText.trim() !== "" && remText.toUpperCase() !== "NOT FOUND") uniqueRemarksSet.add(remText.trim().toUpperCase());
-                            }
-                        }
-                        cursor.continue();
+                if(isReaderAllowed(getReaderName(item)) && !parseTrue(item.isDone) && !savedEntries.has(item.accountNo)) {
+                    var match = false;
+                    if (matchedConfig) {
+                        match = evaluateCustomCondition(item, matchedConfig.conditionStr);
+                    } else {
+                        if(reportType === 'main_field_exception') match = parseTrue(item.isMainMeterFieldException);
+                        else if(reportType === 'pole_field_exception') match = parseTrue(item.isPoleMeterFieldException);
+                        else if(reportType === 'main_mri_pending') match = parseTrue(item.isMainMeterMriPending);
+                        else if(reportType === 'pole_mri_pending') match = parseTrue(item.isPoleMeterMriPending);
+                        else if(reportType === 'mri_no_survey_main') match = parseTrue(item.isMriButNoLoadSurveyMain);
+                        else if(reportType === 'mri_no_survey_pole') match = parseTrue(item.isMriButNoLoadSurveyPole);
+                        else if(reportType === 'billed_no_bill') match = parseTrue(item.isBilledButNoBillAvailable);
+                        else if(reportType === 'bill_print_pending') match = parseTrue(item.isBillAvailableButPrintPending);
+                        else if(reportType === 'bill_dist_pending') match = parseTrue(item.isBillAvailableButDistributionPending);
                     }
-                };
-                
-                cTx.oncomplete = function() {
-                    var dropdown = document.getElementById('reportRemarkFilterGroup'); 
-                    if(dropdown) {
-                        dropdown.innerHTML = '<option value="ALL">-- सभी उपभोक्ता (Show All) --</option>';
-                        uniqueRemarksSet.forEach(function(rem) { dropdown.innerHTML += '<option value="' + rem.toUpperCase() + '">' + rem + '</option>'; }); 
-                        dropdown.value = "ALL";
+                    
+                    if(match) {
+                        currentReportDataList.push(item);
+                        var remText = isBillingModeTop ? (getRobustKey(item, "BILL UPLOAD DATE") || item.billUpDate || "") : (activeReportType.toLowerCase().includes("pole") ? (getRobustKey(item, "FINAL_POLE_METER_SITE_REMARK") || item.poleStatusRemark || "") : (getRobustKey(item, "FINAL_MAIN_METER_SITE_REMARK") || item.mainStatusRemark || ""));
+                        if(remText.trim() !== "" && remText.toUpperCase() !== "NOT FOUND") uniqueRemarksSet.add(remText.trim().toUpperCase());
                     }
-                    loadOfflineReportFiltered("ALL");
-                };
-            };
+                }
+                cursor.continue();
+            }
+        };
+        
+        cTx.oncomplete = function() {
+            var dropdown = document.getElementById('reportRemarkFilterGroup'); 
+            if(dropdown) {
+                dropdown.innerHTML = '<option value="ALL">-- सभी उपभोक्ता (Show All) --</option>';
+                uniqueRemarksSet.forEach(function(rem) { dropdown.innerHTML += '<option value="' + rem.toUpperCase() + '">' + rem + '</option>'; }); 
+                dropdown.value = "ALL";
+            }
+            loadOfflineReportFiltered("ALL");
+        };
+    };
 }
 
     function applyRemarkGroupFilter() { 
-        if (activeReportType === 'all_bills_report' || activeReportType === 'all_consumers_list') {
-            openReportGroupView(activeReportType);
-        } else {
-            loadOfflineReportFiltered(document.getElementById('reportRemarkFilterGroup').value); 
-        }
+    // यहाँ 'Visit_Data_Consumers' की कंडीशन जोड़ दी गई है ताकि फ़िल्टर बदलते ही रिपोर्ट दोबारा लोड हो सके
+    if (activeReportType === 'all_bills_report' || activeReportType === 'all_consumers_list' || activeReportType === 'Visit_Data_Consumers') {
+        openReportGroupView(activeReportType);
+    } else {
+        loadOfflineReportFiltered(document.getElementById('reportRemarkFilterGroup').value); 
     }
+}
 
     function loadOfflineReportFiltered(groupFilterValue) {
         var repCont = document.getElementById('reportListContainer'); 
@@ -4418,8 +4528,14 @@ function universalExportToExcel(tabName) {
     var currentTabKey = activeReportType; // डिफ़ॉल्ट
 
     if(tabName === 'list') {
-        reportNameStr = "Master Consumer List";
         currentTabKey = "all_consumers_list";
+        // फ़िक्स: पेंडिंग या अटेंड फ़िल्टर के आधार पर एक्सेल फ़ाइल का सटीक नाम तय करना
+        var currentFilterStatus = document.getElementById('listStatusFilter') ? document.getElementById('listStatusFilter').value : "PENDING";
+        if (currentFilterStatus === "PENDING") {
+            reportNameStr = "VisiT_Pending Consumers List";
+        } else {
+            reportNameStr = "Attend COnsumers List";
+        }
     }
     if(tabName === 'billdist') {
         reportNameStr = "Bill Distribution Pending";
@@ -4524,7 +4640,15 @@ function universalExportToExcel(tabName) {
     
     var reportNameStr = tabName.toUpperCase();
     if(tabName === 'reports' && activeReportType) reportNameStr = REPORT_NAMES[activeReportType] || activeReportType;
-    if(tabName === 'list') reportNameStr = "Master Consumer List";
+    if(tabName === 'list') {
+        // फ़िक्स: पेंडिंग या अटेंड फ़िल्टर के आधार पर पीडीएफ फ़ाइल और हेडर का सटीक नाम तय करना
+        var currentFilterStatus = document.getElementById('listStatusFilter') ? document.getElementById('listStatusFilter').value : "PENDING";
+        if (currentFilterStatus === "PENDING") {
+            reportNameStr = "VisiT_Pending Consumers List";
+        } else {
+            reportNameStr = "Attend COnsumers List";
+        }
+    }
     if(tabName === 'billdist') reportNameStr = "Bill Distribution Pending";
     if(tabName === 'visitdata') reportNameStr = "All Visits Data";
 
@@ -4686,7 +4810,9 @@ function universalExportToExcel(tabName) {
 
                 for (var k = 0; k < activeConfigs.length; k++) {
                     var config = activeConfigs[k];
-                    var isMasterReport = (config.key === 'all_consumers_list' || config.key === 'all_bills_report');
+                    var cfgKeyClean = (config.key || "").toString().trim();
+                    // 🛑 री-रूटिंग पैच पूरी तरह रिमूव्ड: दोनों चाबियां अब डेटाबेस से अपना-अपना स्वतंत्र डेटा लोड करेंगी
+                    var isMasterReport = (cfgKeyClean === 'all_consumers_list' || cfgKeyClean === 'Visit_Data_Consumers' || cfgKeyClean === 'all_bills_report');
                     var matchedData = [];
 
                     for (var m = 0; m < fullData.length; m++) {
@@ -5678,16 +5804,17 @@ function exportAllMRSummaryPDF() {
         var pNo = document.getElementById('f-poleNo').value.trim().toUpperCase(); 
         var pMake = document.getElementById('f-poleMake').value.trim().toUpperCase();
         
-        var mainPhotoNode = document.getElementById('f-mainPhotoCompressedBase64') || document.querySelector('[id*="mainPhoto"]');
-        var mainPhoto = mainPhotoNode ? mainPhotoNode.value : "";
+        // फिक्स: सीधे छुपे हुए बेस64 इनपुट बॉक्स से वैल्यू उठाएं, न कि फाइल इनपुट की .value से
+        var mainPhoto = document.getElementById('f-mainPhotoCompressedBase64') ? document.getElementById('f-mainPhotoCompressedBase64').value : "";
         
         if(!mainPhoto && mainStatus !== "No Meter At Site") { return customAlert("🚨 कृपया 'Main Meter' की फोटो लें!"); }
         
         var poleStatus = document.getElementById('f-poleStatus').value; 
-        var polePhotoNode = document.getElementById('f-polePhotoCompressedBase64') || document.querySelector('[id*="polePhoto"]');
-        var polePhoto = polePhotoNode ? polePhotoNode.value : "";
+        var polePhoto = document.getElementById('f-polePhotoCompressedBase64') ? document.getElementById('f-polePhotoCompressedBase64').value : "";
         
-        if(poleStatus && poleStatus !== "No Meter At Site" && !polePhoto) { return customAlert("🚨 कृपया 'Pole Meter' की फोटो लें!"); }
+        if(poleStatus && poleStatus !== "No Meter At Site" && poleStatus !== "POLE METER NOT INSTALLED" && !polePhoto) { 
+            return customAlert("🚨 कृपया 'Pole Meter' की फोटो लें!"); 
+        }
         
         entryData.mainMeterStatus = mainStatus; 
         entryData.editablePrefetchedRemark = editableRem; 
@@ -6049,75 +6176,168 @@ function triggerSilentBackgroundSync() {
     if(quickViewCurrentIndex === -1) { quickViewAccList = [accNo]; quickViewCurrentIndex = 0; }
 
     db.transaction("consumers", "readonly").objectStore("consumers").get(accNo).onsuccess = function(e) {
-        var r = e.target.result; 
-        if(!r) return alert("उपभोक्ता का डेटा नहीं मिला!");
+        var record = e.target.result; 
+        if(!record) return alert("उपभोक्ता का डेटा नहीं मिला!");
 
-        var name = r["CONSUMER-NAME"] || r["CONSUMER NAME"] || "-";
-        var address = r["ADDRESS"] || "-";
-        var mobile = r["Master Mobile Number"] || r["MR MOBILE NO."] || "-";
-        var mainMtr = r["LAST MONTH FINAL MM NO."] || r["SITE METER NUMBER_APPSHEET"] || "-";
-        var poleMtr = r["LAST MONTH FINAL PM NO."] || r["APPSHEET VISIT POLE METER NUMBER"] || "-";
-        var remMain = r["FINAL_MAIN_METER_SITE_REMARK"] || "-";
-        var mriMain = r["IS MRI AVAILABLE (MAIN METER)"] || "-";
-        var remPole = r["FINAL_POLE_METER_SITE_REMARK"] || "-";
-        var mriPole = r["IS MRI AVAILABLE (POLE METER)"] || "-";
-        var remarkGen = r["REMARK"] || "-";
+        var name = record["CONSUMER-NAME"] || record["CONSUMER NAME"] || "-";
+        var address = record["ADDRESS"] || "-";
+        var mobile = record["Master Mobile Number"] || record["MR MOBILE NO."] || "-";
+        var mainMtr = record["LAST MONTH FINAL MM NO."] || record["SITE METER NUMBER_APPSHEET"] || "-";
+        var poleMtr = record["LAST MONTH FINAL PM NO."] || record["APPSHEET VISIT POLE METER NUMBER"] || "-";
+        var remMain = record["FINAL_MAIN_METER_SITE_REMARK"] || "-";
+        var remPole = record["FINAL_POLE_METER_SITE_REMARK"] || "-";
+        var remarkGen = record["REMARK"] || "-";
+        
+        var division = record["DIVISION"] || record.division || "-";
+        var subdivision = record["SUB DIVISION NAME"] || record.subdivision || "-";
+        var loadInKw = record["LOAD IN KW"] || record.loadInKw || "-";
+        var mrName = getReaderName(record) || "-";
+        var mrMobile = record["MR MOBILE NO."] || record.mrMobile || "-";
+        var visitDate = record["FINAL VISIT_DATE"] || record.finalVisitDate || "-";
 
-        // ⚡ नया मोबाइल रिस्पॉन्सिव हाई-कंट्रास्ट डार्क ब्लू टेक्स्ट लेआउट स्ट्रिंग
-        // फिक्स: white-space:normal और break-word बड़े एड्रेस को ऑटोमैटिकली रैप कर देंगे, बटन नहीं कटेंगे
-        var html = '<b style="color:#1e3a8a; font-size:12px; font-weight:800;">A/C No:</b><span style="font-weight:900; color:#0f172a; font-size:14px;">' + accNo + '</span>' +
-                   '<b style="color:#1e3a8a; font-size:12px; font-weight:800;">Name:</b><span style="font-weight:900; color:#0f172a; font-size:13px; text-transform:uppercase;">' + name + '</span>' +
-                   '<b style="color:#1e3a8a; font-size:12px; font-weight:800;">Address:</b><span style="font-weight:bold; color:#334155; font-size:12px; line-height:1.4; display:block; white-space:normal; word-wrap:break-word; word-break:break-word;">' + address + '</span>' +
-                   '<b style="color:#1e3a8a; font-size:12px; font-weight:800;">Mobile:</b><span style="font-weight:900; color:#0f172a; font-size:13px;">' + mobile + '</span>' +
-                   '<b style="color:#1e3a8a; font-size:12px; font-weight:800;">M-Mtr:</b><span style="font-weight:900; color:#0f172a; font-size:12px;">' + mainMtr + '</span>' +
-                   '<b style="color:#1e3a8a; font-size:12px; font-weight:800;">P-Mtr:</b><span style="font-weight:900; color:#0f172a; font-size:12px;">' + poleMtr + '</span>' +
-                   '<b style="color:#ef4444; font-size:12px; font-weight:900;">M-Rem:</b><span style="font-weight:bold; color:#b91c1c; font-size:11px;">' + remMain + ' (MRI: ' + mriMain + ')</span>' +
-                   '<b style="color:#ef4444; font-size:12px; font-weight:900;">P-Rem:</b><span style="font-weight:bold; color:#b91c1c; font-size:11px;">' + remPole + ' (MRI: ' + mriPole + ')</span>' +
-                   '<b style="color:#4f46e5; font-size:12px; font-weight:900;">Gen Rem:</b><span style="font-weight:bold; color:#4338ca; font-size:11px;">' + remarkGen + '</span>';
+        // वर्तमान रीडिंग्स डेटा पार्सर
+        var manKwh = record["MANUAL KWH"] || record.kwh || "-";
+        var manKvah = record["MANUAL KVAH"] || record.kvah || "-";
+        var manKw = record["MANUAL KW"] || record.kw || "-";
+        var manKva = record["MANUAL KVA"] || record.kva || "-";
+
+        var mriKwh = record["MRI KWH"] || "-";
+        var mriKvah = record["MRI KVAH"] || "-";
+        var mriKw = record["MRI MD KW"] || "-";
+        var mriKva = record["MRI MD KVA"] || "-";
+
+        var html = "";
+        var currentUserLower = (loggedInReader || "").toString().trim().toUpperCase();
+
+        // 👑 नियम 1: एडमिन (ANURAG SHAKYA / ADMIN) लॉगिन पर पूरा विस्तृत फॉर्म विवरण दिखेगा
+        if (currentUserLower === "ANURAG SHAKYA" || currentUserLower === "ADMIN") {
+            var contentContainerNode = document.getElementById('quickViewContent');
+            if (contentContainerNode) {
+                contentContainerNode.style.setProperty("display", "block", "important");
+            }
+
+            html = '<div style="border: 2px solid #000000; padding: 0; font-family: sans-serif; background: #fff; width: 100%; box-sizing: border-box; font-size: 11px; color: #000;">' +
+                   '<div style="text-align: center; font-weight: bold; font-size: 14px; border-bottom: 2px solid #000; padding: 6px 0; background: #f8fafc;">Consumer Details Form (Admin Complete View)</div>' +
+                   '<div style="display: grid; grid-template-columns: 1fr 1fr; border-bottom: 1px solid #000;">' +
+                   '<div style="padding: 5px; border-right: 1px solid #000; border-bottom: 1px solid #e2e8f0;"><b>Division:</b> ' + division + '</div>' +
+                   '<div style="padding: 5px; border-bottom: 1px solid #e2e8f0;"><b>Subdivision:</b> ' + subdivision + '</div>' +
+                   '</div>' +
+                   '<div style="display: grid; grid-template-columns: 1fr 1fr; border-bottom: 1px solid #000;">' +
+                   '<div style="padding: 5px; border-right: 1px solid #000; border-bottom: 1px solid #e2e8f0;"><b>Account ID:</b> ' + accNo + '</div>' +
+                   '<div style="padding: 5px; border-bottom: 1px solid #e2e8f0;"><b>Consumer Mobile No:</b> ' + mobile + '</div>' +
+                   '</div>' +
+                   '<div style="display: grid; grid-template-columns: 1fr 1fr; border-bottom: 1px solid #000;">' +
+                   '<div style="padding: 5px; border-right: 1px solid #000; border-bottom: 1px solid #e2e8f0;"><b>Consumer Name:</b> ' + name + '</div>' +
+                   '<div style="padding: 5px; border-bottom: 1px solid #e2e8f0;"><b>Load In KW:</b> ' + loadInKw + '</div>' +
+                   '</div>' +
+                   '<div style="display: grid; grid-template-columns: 1fr 1fr; border-bottom: 1px solid #000;">' +
+                   '<div style="padding: 5px; border-right: 1px solid #000; border-bottom: 1px solid #e2e8f0;"><b>Address:</b> ' + address + '</div>' +
+                   '<div style="padding: 5px; border-bottom: 1px solid #e2e8f0;"><b>Remark:</b> ' + remarkGen + '</div>' +
+                   '</div>' +
+                   '<div style="display: grid; grid-template-columns: 1fr 1fr; border-bottom: 1px solid #000;">' +
+                   '<div style="padding: 5px; border-right: 1px solid #000; border-bottom: 1px solid #e2e8f0;"><b>Site Meter Remark (Main Meter):</b> ' + remMain + '</div>' +
+                   '<div style="padding: 5px; border-bottom: 1px solid #e2e8f0;"><b>Site Meter No. (Main Meter):</b> ' + mainMtr + '</div>' +
+                   '</div>' +
+                   '<div style="display: grid; grid-template-columns: 1fr 1fr; border-bottom: 1px solid #000;">' +
+                   '<div style="padding: 5px; border-right: 1px solid #000; border-bottom: 1px solid #e2e8f0;"><b>Site Meter Remark (Pole Meter):</b> ' + remPole + '</div>' +
+                   '<div style="padding: 5px; border-bottom: 1px solid #e2e8f0;"><b>Site Meter No. (Pole Meter):</b> ' + poleMtr + '</div>' +
+                   '</div>' +
+                   '<div style="display: grid; grid-template-columns: 1fr 1fr; border-bottom: 2px solid #000;">' +
+                   '<div style="padding: 5px; border-right: 1px solid #000;"><b>Mr Name:</b> ' + mrName + '</div>' +
+                   '<div style="padding: 5px;"><b>Mr Mobile No.:</b> ' + mrMobile + '</div>' +
+                   '</div>' +
+                   '<div style="text-align: center; font-weight: bold; font-size: 12px; border-bottom: 1px solid #000; padding: 4px 0; background: #f8fafc;">Reading Details</div>' +
+                   '<div style="text-align: center; font-weight: bold; border-bottom: 1px solid #000; padding: 3px 0; background: #fff;">Manual Reading</div>' +
+                   '<table style="width: 100%; border-collapse: collapse; text-align: center; font-size: 11px;">' +
+                   '<tr style="font-weight: bold; background: #fafafa; border-bottom: 1px solid #000;">' +
+                   '<td style="border-right: 1px solid #000; padding: 4px; width: 20%;">Date</td>' +
+                   '<td style="border-right: 1px solid #000; padding: 4px; width: 20%;">KWH</td>' +
+                   '<td style="border-right: 1px solid #000; padding: 4px; width: 20%;">KVAH</td>' +
+                   '<td style="border-right: 1px solid #000; padding: 4px; width: 20%;">MD KW</td>' +
+                   '<td style="padding: 4px; width: 20%;">MD KVA</td>' +
+                   '</tr>' +
+                   '<tr style="border-bottom: 2px solid #000;">' +
+                   '<td style="border-right: 1px solid #000; padding: 5px;">' + visitDate + '</td>' +
+                   '<td style="border-right: 1px solid #000; padding: 5px; font-weight: bold;">' + manKwh + '</td>' +
+                   '<td style="border-right: 1px solid #000; padding: 5px; font-weight: bold;">' + manKvah + '</td>' +
+                   '<td style="border-right: 1px solid #000; padding: 5px;">' + manKw + '</td>' +
+                   '<td style="padding: 5px;">' + manKva + '</td>' +
+                   '</tr>' +
+                   '</table>' +
+                   '<div style="text-align: center; font-weight: bold; border-bottom: 1px solid #000; padding: 3px 0; background: #fff; margin-top: 2px;">MRI Reading</div>' +
+                   '<table style="width: 100%; border-collapse: collapse; text-align: center; font-size: 11px;">' +
+                   '<tr style="font-weight: bold; background: #fafafa; border-bottom: 1px solid #000;">' +
+                   '<td style="border-right: 1px solid #000; padding: 4px; width: 20%;">Date</td>' +
+                   '<td style="border-right: 1px solid #000; padding: 4px; width: 20%;">KWH</td>' +
+                   '<td style="border-right: 1px solid #000; padding: 4px; width: 20%;">KVAH</td>' +
+                   '<td style="border-right: 1px solid #000; padding: 4px; width: 20%;">MD KW</td>' +
+                   '<td style="padding: 4px; width: 20%;">MD KVA</td>' +
+                   '</tr>' +
+                   '<tr>' +
+                   '<td style="border-right: 1px solid #000; padding: 5px;">' + visitDate + '</td>' +
+                   '<td style="border-right: 1px solid #000; padding: 5px; font-weight: bold; color: #4f46e5;">' + mriKwh + '</td>' +
+                   '<td style="border-right: 1px solid #000; padding: 5px; font-weight: bold; color: #4f46e5;">' + mriKvah + '</td>' +
+                   '<td style="border-right: 1px solid #000; padding: 5px;">' + mriKw + '</td>' +
+                   '<td style="padding: 5px;">' + mriKva + '</td>' +
+                   '</tr>' +
+                   '</table>' +
+                   '</div>';
+        } else {
+            // 👦 नियम 2: मीटर रीडर (लड़कों) की लॉगिन होने पर शीट का डेटा चाहे जैसा भी हो, सिर्फ और सिर्फ ये 17 कॉलम ही लॉक होकर दिखेंगे
+            var contentContainerNode = document.getElementById('quickViewContent');
+            if (contentContainerNode) {
+                contentContainerNode.style.setProperty("display", "grid", "important");
+            }
+
+            var targetCols = [
+                "DIVISION", "ACCOUNT NO", "CONSUMER-NAME", "ADDRESS", "LOAD IN KW", 
+                "LOAD GROUP (5-10-50)", "FINAL VISIT DATE", "LAST MONTH FINAL MM NO.", 
+                "LAST MONTH FINAL MM MAKE", "EXCEPTION TYPE (MAIN METER)", 
+                "FINAL_MAIN_METER_SITE_REMARK", "REMARK", "FINAL_POLE_METER_SITE_REMARK",
+                "IS MRI AVAILABLE (MAIN METER)", "LAST MONTH FINAL PM NO.", 
+                "LAST MONTH FINAL PM MAKE", "EXCEPTION TYPE (POLE METER)", "IS MRI AVAILABLE (POLE METER)"
+            ];
+
+            var pdfDownloadBtnHtml = '<div style="grid-column: span 2; display: flex; justify-content: flex-end; margin-bottom: -4px;">' +
+                                     '<button onclick="exportSingleConsumerPDF(event, \'' + accNo + '\', \'MASTER_COLS\')" class="export-btn mini pdf-bg" style="padding: 5px 12px; font-size: 11px; display: inline-flex; align-items: center; gap: 4px; box-shadow: 0 2px 4px rgba(220,38,38,0.25);">' +
+                                     '<i class="fa-solid fa-file-pdf"></i> Download PDF</button>' +
+                                     '</div>';
+
+            html = pdfDownloadBtnHtml;
+
+            // ⚡ सिलेक्टेड कॉलम पैकेट रेंडरर इंजन
+            targetCols.forEach(function(colName) {
+                if (!colName || colName.trim() === "") return;
+                var val = getRobustKey(record, colName);
+                var displayVal = (val !== undefined && val !== null && val.toString().trim() !== "") ? val : "-";
+                var printableKeyLabel = colName.replace(/_/g, ' ').toUpperCase();
+
+                html += '<b style="color:#1e3a8a; font-size:11px; font-weight:800;">' + printableKeyLabel + ':</b>' +
+                        '<span style="font-weight:700; color:#0f172a; font-size:11.5px; white-space:normal; word-break:break-word;">' + displayVal + '</span>';
+            });
+        }
 
         document.getElementById('quickViewContent').innerHTML = html;
-        
-        // 🚀 नया फिक्स: डेटा बॉक्स स्क्रॉल को हमेशा टॉप पर रीसेट करें ताकि पिछला स्क्रॉल रुका न रहे
         document.getElementById('quickViewContent').scrollTop = 0;
         
-        // 🟢 Edit Button का ACTION (अचूक शीट आधारित डायनामिक फॉर्म डिस्ट्रीब्यूटर)
+        // 🟢 [मास्टर फिक्स] क्विक व्यू से हमेशा स्टैंडर्ड रीडिंग फॉर्म (ऑफ़लाइन एंट्री फॉर्म) खोलने का इंजन
         document.getElementById('quickViewEditBtn').onclick = function() {
             document.getElementById('quickViewModal').style.display = 'none';
             
-            var targetMode = mode || 'EDIT'; // बाहर से आ रहा ओरिजिनल मोड बैकअप
+            var targetMode = 'EDIT'; // 🎯 डिफ़ॉल्ट रूप से हमेशा स्टैंडर्ड रीडिंग फॉर्म (गूगल शीट फॉर्म) लॉक
+            var currentUserLower = (loggedInReader || "").toString().trim().toUpperCase();
 
-            if (loggedInReader.toUpperCase() === "ANURAG SHAKYA" && activeReportType) {
-                var currentCfg = globalReportConfigs.find(function(c) { return c.key === activeReportType; });
-                
-                if (currentCfg) {
-                    // ⚡ केस-इन्सेंसिटिव होकर शीट की असली फॉर्म-की निकालना
-                    var formKeyStr = (currentCfg.formkey || currentCfg["formkey"] || currentCfg.FORMKEY || currentCfg["FORMKEY"] || "").toString().trim();
-                    var reportGroupStr = (currentCfg.reportGroup || currentCfg["reportGroup"] || "").toString().toUpperCase().trim();
-
-                    // 1. अगर मास्टर ऑल-बिल्स या वितरण सूची है तो उसे मूल मोड पर रखें
-                    if (activeReportType === 'all_bills_report' || activeReportType === 'bill_dist_pending') {
-                        targetMode = 'BILL_DIST';
-                    } 
-                    // 2. अगर गूगल शीट में साफ़ तौर पर कोई फॉर्म की डिफाइन है तो सर्वोपरि रखें
-                    else if (formKeyStr !== "") {
-                        targetMode = formKeyStr; 
-                    } 
-                    // 3. फॉलबैक सुरक्षा कवच: अगर शीट में फॉर्म की खाली है लेकिन वह मीटर मिसमैच/पेंडेंसी की रिपोर्ट है
-                    else if (reportGroupStr.includes("MISMATCH") || reportGroupStr.includes("PENDENCY") || activeReportType.includes("mri") || activeReportType.includes("exception")) {
-                        targetMode = 'DYNAMIC_REPORT_EDIT';
-                    } else {
-                        targetMode = 'EDIT';
-                    }
-                }
+            // बिल वितरण से संबंधित रिपोर्ट्स का अपवाद (Failsafe Backup)
+            if (activeReportType === 'all_bills_report' || activeReportType === 'bill_dist_pending' || mode === 'BILL_DIST') {
+                targetMode = 'BILL_DIST';
             }
-                             
+            
+            // इमेज वाला डायनामिक फॉर्म (DYNAMIC_REPORT_EDIT) अब पूरी तरह बायपास है
             openForm(accNo, targetMode); 
         };
 
-        // 🟢 Next/Prev बटन इंजन फिक्स: जब यूज़र नेविगेट करेगा, तो मोड डिलीट नहीं होगा
         var modalNode = document.getElementById('quickViewModal');
         modalNode.setAttribute('data-current-mode', mode || '');
-
         modalNode.style.display = 'flex';
     };
 }
@@ -6549,59 +6769,45 @@ document.addEventListener("DOMContentLoaded", function() {
     // 6 सेकंड बाद लूप बंद करें
     setTimeout(function() { clearInterval(supremeBannerKillTimer); }, 6000);
 });// 🟢 फिक्स: टेक्स्ट बॉक्स के डेटा को 100% सटीक और क्रैश-प्रूफ शीट कंडीशन में बदलने वाला एडवांस इंजन
-    window.generateSheetConfigString = function() {
-        var inputNode = document.getElementById('cfgCustomInputTextArea');
-        var outputNode = document.getElementById('cfgGeneratedResultOutput');
-        if (!inputNode || !outputNode) return;
-        
-        var rawInput = inputNode.value.trim();
-        if (rawInput === "") {
-            outputNode.value = "";
-            alert("🚨 कृपया बॉक्स में अपनी कंडीशन्स टाइप करें!");
-            return;
-        }
-        
-        // 🎯 नियमों को प्रोसेस करना (कोमा से अलग करना और हर एक वैल्यू के एक्स्ट्रा स्पेस को मारना)
-        var cleanLines = rawInput.split(',').map(function(line) { 
-            var str = line.trim();
+    // 🟢 फिक्स: टेक्स्ट बॉक्स के डेटा को 100% सटीक और क्रैश-प्रूफ शीट कंडीशन में बदलने वाला एडवांस इंजन (डुपिलकेशन मुक्त)
+window.generateSheetConfigString = function() {
+    var inputNode = document.getElementById('cfgCustomInputTextArea');
+    var outputNode = document.getElementById('cfgGeneratedResultOutput');
+    if (!inputNode || !outputNode) return;
+    
+    var rawInput = inputNode.value.trim();
+    if (rawInput === "") {
+        outputNode.value = "";
+        alert("🚨 कृपया बॉक्स में अपनी कंडीशन्स टाइप करें!");
+        return;
+    }
+    
+    var cleanLines = rawInput.split(',').map(function(line) { 
+        var str = line.trim();
+        if (str.indexOf('=') !== -1) {
+            var operator = str.indexOf('!=') !== -1 ? "!=" : "=";
+            var parts = str.split(operator);
             
-            // अगर नियम में '=' का साइन मौजूद है
-            if (str.indexOf('=') !== -1) {
-                var operator = "=";
-                var parts = str.split('=');
-                
-                // अगर '!=' ऑपरेटर का इस्तेमाल किया गया हो
-                if (str.indexOf('!=') !== -1) {
-                    operator = "!=";
-                    parts = str.split('!=');
+            if (parts.length === 2) {
+                var key = parts[0].trim();
+                var val = parts[1].trim();
+                if (val.indexOf('|') !== -1) {
+                    val = val.split('|').map(function(v) { return v.trim(); }).join('|');
                 }
-                
-                if (parts.length === 2) {
-                    var key = parts[0].trim();
-                    var val = parts[1].trim();
-                    
-                    // 🚀 पाइप (|) वाले मल्टीपल वैल्यूज़ के अंदर के स्पेस को भी साफ़ करना
-                    if (val.indexOf('|') !== -1) {
-                        val = val.split('|').map(function(v) { return v.trim(); }).join('|');
-                    }
-                    
-                    return key + operator + val;
-                }
+                return key + operator + val;
             }
-            return str;
-        }).filter(function(line) { 
-            return line !== ""; 
-        });
-        
-        // बिना किसी स्पेस गड़बड़ी के फाइनल कनवर्टर आउटपुट जनरेट करना
-        var finalCodeString = cleanLines.join(",");
-        outputNode.value = finalCodeString;
-        
-        // यूजर फीडबैक अलर्ट
-        if(typeof showThinAlert === 'function') {
-            showThinAlert("🚀 कोड सफलतापूर्वक जनरेट हो गया है!", true);
         }
-    };
+        return str;
+    }).filter(function(line) { 
+        return line !== ""; 
+    });
+    
+    var finalCodeString = cleanLines.join(",");
+    outputNode.value = finalCodeString;
+    if(typeof showThinAlert === 'function') {
+        showThinAlert("🚀 कोड सफलतापूर्वक जनरेट हो गया है!", true);
+    }
+};
     // 📊 वैश्विक चार्ट इंस्टेंस होल्डर्स (3 स्प्लिट आसान इंजन)
 var chartInstanceMainMeter = null;
 var chartInstancePoleMeter = null;
@@ -6733,12 +6939,18 @@ function renderAnalyticsDashboardEngine() {
             poleLsArr.push(m.dynamicCounts['pole_ls_not_avail'] || 0); 
             poleExcArr.push(m.dynamicCounts['pole_field_exception'] || 0);
             
-            // 3. बिलिंग, डिस्ट्रीब्यूशन और डिलीवर्ड चार्ट डेटा मैपिंग (🎯 FIX)
+            // 3. बिलिंग, डिस्ट्रीब्यूशन और डिलीवर्ड का कंबाइंड डोनट चार्ट (निश्चित एरे फिक्स)
             billArr.push(m.dynamicCounts['bill_upload_status'] || 0); 
             billDistArr.push(m.dynamicCounts['bill_dist_pending'] || 0);
+            
+            // पुश करने से पहले एरे को इनिशियलाइज करना अनिवार्य है
             if (!window.billDeliveredArr) { window.billDeliveredArr = []; }
             window.billDeliveredArr.push(m.dynamicCounts['bill_delivered_status'] || 0);
         });
+        
+        // लूप खत्म होने के बाद चार्ट बनाने से पहले एरे को दोबारा सिंक करें ताकि पुराना कचरा साफ़ रहे
+        if (!window.billDeliveredArr) { window.billDeliveredArr = []; }
+        
         document.getElementById('analyticsMatrixTableBody').innerHTML = matrixHtml;
 
         // 📈 Chart.js इंजन रेंडरिंग (3 आसान और अलग-अलग बार चार्ट्स)
@@ -6961,7 +7173,301 @@ function exportAnalyticsReportPDF() {
         var finalCodeString = cleanLines.join(",");
         outputNode.value = finalCodeString;
     };
+    function exportConsumerReadingFormPDF(accNo) {
+    if (typeof window.jspdf === 'undefined') return alert("🚨 PDF Library (jsPDF) लोड नहीं हो पाई है!");
+    if (!db) return alert("🚨 डेटाबेस रेडी नहीं है!");
 
-    </script>
-</body> <!-- यहाँ से ठीक पहले पेस्ट करें -->
+    showThinAlert("⏳ सुपर-प्रोफेशनल लेआउट में रीडिंग फॉर्म जनरेट हो रहा है...", false);
+
+    db.transaction("consumers", "readonly").objectStore("consumers").get(accNo).onsuccess = function(e) {
+        var record = e.target.result;
+        if (!record) return alert("🚨 उपभोक्ता का डेटा नहीं मिला!");
+
+        var cleanData = function(val) {
+            if (val === undefined || val === null) return "-";
+            var s = val.toString().trim();
+            if (s === "" || s.toUpperCase() === "N/A" || s.toUpperCase() === "UNDEFINED" || s.toUpperCase() === "NOT FOUND") return "-";
+            return s;
+        };
+
+        // डेटा मैपिंग
+        var division = cleanData(getRobustKey(record, "DIVISION"));
+        var subdivision = cleanData(getRobustKey(record, "SUB DIVISION NAME"));
+        var name = cleanData(getRobustKey(record, "CONSUMER-NAME") || record.consumerName);
+        var mobile = cleanData(getRobustKey(record, "Master Mobile Number") || record.mobileNo);
+        var address = cleanData(getRobustKey(record, "ADDRESS"));
+        var loadInKw = cleanData(getRobustKey(record, "LOAD IN KW"));
+        
+        var remMain = cleanData(getRobustKey(record, "FINAL_MAIN_METER_SITE_REMARK"));
+        var mainMtrNo = cleanData(getRobustKey(record, "LAST MONTH FINAL MM NO."));
+        var remPole = cleanData(getRobustKey(record, "FINAL_POLE_METER_SITE_REMARK"));
+        var poleMtrNo = cleanData(getRobustKey(record, "LAST MONTH FINAL PM NO."));
+        
+        var mfMain = cleanData(getRobustKey(record, "MAIN METER MF") || getRobustKey(record, "MAIN_METER_MF"));
+        var mfPole = cleanData(getRobustKey(record, "POLE METER MF (SAI PORTAL)") || getRobustKey(record, "POLE METER MF (INVENTIVE PORTAL)") || getRobustKey(record, "POLE_MTR_MF"));
+        
+        var mrName = cleanData(getReaderName(record));
+        var mrMobile = cleanData(record["MR MOBILE NO."] || record.mrMobile);
+        var visitDate = cleanData(getRobustKey(record, "FINAL VISIT_DATE"));
+
+        var manKwh = cleanData(getRobustKey(record, "MANUAL KWH"));
+        var manKvah = cleanData(getRobustKey(record, "MANUAL KVAH"));
+        var manKw = cleanData(getRobustKey(record, "MANUAL KW"));
+        var manKva = cleanData(getRobustKey(record, "MANUAL KVA"));
+
+        var mriMainDate = "-", mriMainKwh = "-", mriMainKvah = "-", mriMainKw = "-", mriMainKva = "-";
+        var mriPoleDate = "-", mriPoleKwh = "-", mriPoleKvah = "-", mriPoleKw = "-", mriPoleKva = "-";
+
+        if (mainMtrNo !== "-" && record.xmlMainData) {
+            var xm = record.xmlMainData;
+            mriMainDate = cleanData(xm["Visit Date"] || xm["Visit_Date"] || visitDate);
+            mriMainKwh  = cleanData(xm["KWH"]);
+            mriMainKvah = cleanData(xm["KVAH"]);
+            mriMainKw   = cleanData(xm["MD KW"] || xm["MDKW"]);
+            mriMainKva  = cleanData(xm["MD KVA"] || xm["MDKVA"]);
+        }
+
+        if (poleMtrNo !== "-" && record.xmlPoleData) {
+            var xp = record.xmlPoleData;
+            mriPoleDate = cleanData(xp["Visit Date"] || xp["Visit_Date"] || visitDate);
+            mriPoleKwh  = cleanData(xp["KWH"]);
+            mriPoleKvah = cleanData(xp["KVAH"]);
+            mriPoleKw   = cleanData(xp["MD KW"] || xp["MDKW"]);
+            mriPoleKva  = cleanData(xp["MD KVA"] || xp["MDKVA"]);
+        }
+
+        var doc = new window.jspdf.jsPDF('p', 'pt', 'a4');
+        var pageWidth = doc.internal.pageSize.width;
+
+        // 🎨 मुख्य फॉर्म हेडर टाइटल
+        doc.setFontSize(18); doc.setTextColor(15, 23, 42); doc.setFont("Helvetica", "bold");
+        doc.text("Consumer Details Form", pageWidth / 2, 40, { align: 'center' });
+
+        // 📊 बिल्कुल फिक्स 6-कॉलम सिमेट्रिकल प्रोफाइल ग्रिड (कुल चौड़ाई = 535pt, रिमार्क हाइलाइट फीचर के साथ)
+        var profileBody = [
+            ["Division:", division, "Subdivision:", subdivision, "Generated:", getPrintableDateTime()],
+            ["Account ID:", accNo, "Consumer Name:", name, "Consumer Mob:", mobile],
+            ["Address:", address, "Load In KW:", loadInKw, "Remark:", cleanData(getRobustKey(record, "REMARK"))],
+            ["Remark (Main):", remMain, "Meter No. (Main):", mainMtrNo, "MF (Main Meter):", mfMain],
+            ["Remark (Pole):", remPole, "Meter No. (Pole):", poleMtrNo, "MF (Pole Meter):", mfPole],
+            ["Meter Reader:", mrName, "MR Mobile No:", mrMobile, "Visit Date:", visitDate]
+        ];
+
+        doc.autoTable({
+            body: profileBody,
+            startY: 55,
+            theme: 'grid',
+            styles: { fontSize: 8.5, cellPadding: 4, textColor: [30, 41, 59], overflow: 'linebreak', valign: 'middle' },
+            columnStyles: {
+                0: { fontStyle: 'bold', fillColor: [241, 245, 249], cellWidth: 80 },  // Label 1
+                1: { cellWidth: 105 },                                                 // Value 1
+                2: { fontStyle: 'bold', fillColor: [241, 245, 249], cellWidth: 85 },  // Label 2
+                3: { cellWidth: 105 },                                                 // Value 2
+                4: { fontStyle: 'bold', fillColor: [241, 245, 249], cellWidth: 85 },  // Label 3
+                5: { cellWidth: 75 }                                                   // Value 3
+            },
+            margin: { left: 30, right: 30 },
+            didParseCell: function(data) {
+                // लंबे एड्रेस और रिमार्क वाले सेल को स्पैन करके पूरे ग्रिड को एक समान लाइन में लाना
+                if (data.row.index === 2) {
+                    if (data.column.index === 1) data.cell.colSpan = 1;
+                }
+                
+                // 🎯 [रिमार्क हाइलाइट इंजन फिक्स]
+                // रो इंडेक्स 3 (Main Remark) और रो इंडेक्स 4 (Pole Remark) का कॉलम 1 (Value) चेक करें
+                if ((data.row.index === 3 || data.row.index === 4) && data.column.index === 1) {
+                    var remarkValue = data.cell.raw ? data.cell.raw.toString().trim() : "";
+                    
+                    if (remarkValue !== "" && remarkValue !== "-") {
+                        data.cell.styles.fillColor = [254, 243, 199]; // हल्का एम्बर/ऑरेंज बैकग्राउंड
+                        data.cell.styles.textColor = [180, 83, 9];    // गहरा एम्बर टेक्स्ट कलर
+                        data.cell.styles.fontStyle = 'bold';           // टेक्स्ट बोल्ड करें
+                    }
+                }
+            }
+        });
+
+        var currentY = doc.lastAutoTable.finalY + 15;
+
+        // ⚡ सेक्शन 1: MAIN METER DETAILS
+        doc.setFontSize(10.5); doc.setTextColor(30, 58, 138); doc.setFont("Helvetica", "bold");
+        doc.setFillColor(239, 246, 255);
+        doc.rect(30, currentY, pageWidth - 60, 18, 'F');
+        doc.text("Main Meter Reading Details (Meter Number: " + mainMtrNo + ")", 38, currentY + 13);
+        
+        currentY += 22;
+
+        doc.autoTable({
+            head: [[{ content: 'Manual Reading', colSpan: 5, styles: { halign: 'left', fillColor: [51, 65, 85] } }], ["Date", "KWH", "KVAH", "MD KW", "MD KVA"]],
+            body: [[visitDate, manKwh, manKvah, manKw, manKva]],
+            startY: currentY,
+            theme: 'grid',
+            styles: { fontSize: 8.5, halign: 'center', cellPadding: 4.5, textColor: [0, 0, 0] },
+            headStyles: { fillColor: [15, 23, 42], textColor: [255, 255, 255] },
+            margin: { left: 30, right: 30 }
+        });
+
+        currentY = doc.lastAutoTable.finalY + 8;
+
+        doc.autoTable({
+            head: [[{ content: 'MRI Reading', colSpan: 5, styles: { halign: 'left', fillColor: [29, 78, 216] } }], ["Date", "KWH", "KVAH", "MD KW", "MD KVA"]],
+            body: [[mriMainDate, mriMainKwh, mriMainKvah, mriMainKw, mriMainKva]],
+            startY: currentY,
+            theme: 'grid',
+            styles: { fontSize: 8.5, halign: 'center', cellPadding: 4.5, textColor: [0, 0, 0] },
+            headStyles: { fillColor: [15, 23, 42], textColor: [255, 255, 255] },
+            margin: { left: 30, right: 30 }
+        });
+
+        currentY = doc.lastAutoTable.finalY + 15;
+
+        // ⚡ सेक्शन 2: POLE METER DETAILS
+        doc.setFontSize(10.5); doc.setTextColor(30, 58, 138); doc.setFont("Helvetica", "bold");
+        doc.setFillColor(239, 246, 255);
+        doc.rect(30, currentY, pageWidth - 60, 18, 'F');
+        doc.text("Pole Meter Reading Details (Meter Number: " + poleMtrNo + ")", 38, currentY + 13);
+        
+        currentY += 22;
+
+        doc.autoTable({
+            head: [[{ content: 'Manual Reading', colSpan: 5, styles: { halign: 'left', fillColor: [51, 65, 85] } }], ["Date", "KWH", "KVAH", "MD KW", "MD KVA"]],
+            body: [["-", "-", "-", "-", "-"]],
+            startY: currentY,
+            theme: 'grid',
+            styles: { fontSize: 8.5, halign: 'center', cellPadding: 4.5, textColor: [0, 0, 0] },
+            headStyles: { fillColor: [15, 23, 42], textColor: [255, 255, 255] },
+            margin: { left: 30, right: 30 }
+        });
+
+        currentY = doc.lastAutoTable.finalY + 8;
+
+        doc.autoTable({
+            head: [[{ content: 'MRI Reading', colSpan: 5, styles: { halign: 'left', fillColor: [29, 78, 216] } }], ["Date", "KWH", "KVAH", "MD KW", "MD KVA"]],
+            body: [[mriPoleDate, mriPoleKwh, mriPoleKvah, mriPoleKw, mriPoleKva]],
+            startY: currentY,
+            theme: 'grid',
+            styles: { fontSize: 8.5, halign: 'center', cellPadding: 4.5, textColor: [0, 0, 0] },
+            headStyles: { fillColor: [15, 23, 42], textColor: [255, 255, 255] },
+            margin: { left: 30, right: 30 }
+        });
+
+        // 👑 कॉरपोरेट ब्रांडिंग फुटर पट्टी
+        doc.setFontSize(8); doc.setTextColor(148, 163, 184); doc.setFont("Helvetica", "normal");
+        doc.text('Generated via DvVNL Reading Tool | Sai Computers Ltd Mainpuri | Technical Support: 9761414105', pageWidth / 2, doc.internal.pageSize.height - 20, { align: 'center' }); 
+
+        var filename = "Reading_Deatils_" + accNo + "_" + getFormattedDateTimeForFile() + ".pdf";
+        if (typeof AndroidBridge !== "undefined" && AndroidBridge.processBase64Download) {
+            var rawBase64 = doc.output('arraybuffer');
+            var uint8 = new Uint8Array(rawBase64); var binary = '';
+            for (var j = 0; j < uint8.byteLength; j++) { binary += String.fromCharCode(uint8[j]); }
+            AndroidBridge.processBase64Download(btoa(binary), "pdf", filename);
+            showThinAlert("🎉 शानदार लेआउट के साथ पीडीएफ डाउनलोड सफल!", true);
+        } else {
+            doc.save(filename);
+            showThinAlert("🎉 फॉर्म डाउनलोड सफल!", true);
+        }
+    };
+}
+
+// 📱 पॉपअप बॉक्स खोलने और डेटाबेस से पुराना कांटेक्ट डेटा भरकर लाने का इंजन
+function openContactUpdateModal(accNo) {
+    if (!db) return alert("डेटाबेस तैयार नहीं है!");
+    
+    db.transaction("consumers", "readonly").objectStore("consumers").get(accNo).onsuccess = function(e) {
+        var record = e.target.result;
+        if (!record) return alert("उपभोक्ता का डेटा नहीं मिला!");
+        
+        document.getElementById('cu-accountNo').innerText = accNo;
+        document.getElementById('cu-consumerName').innerText = record.consumerName || "-";
+        document.getElementById('cu-rowIndex').value = record.rowIndex || "";
+        
+        // तुम्हारी शीट के 'New Whatsup No.' और 'NEW EMAIL ID' कॉलम से पुराना डेटा फेच करना
+        document.getElementById('cu-newWhatsapp').value = getRobustKey(record, "New Whatsup No.") || getRobustKey(record, "NEW WHATSUP NO.") || "";
+        document.getElementById('cu-newEmail').value = getRobustKey(record, "NEW EMAIL ID") || "";
+        
+        document.getElementById('contactUpdateModal').style.display = 'flex';
+    };
+}
+
+// डेटा को वैलिडेशन के साथ ऐप्स स्क्रिप्ट बैकएंड पर भेजने का इंजन
+function submitContactUpdateData() {
+    var accNo = document.getElementById('cu-accountNo').innerText;
+    var rIndex = document.getElementById('cu-rowIndex').value;
+    var whatsappVal = document.getElementById('cu-newWhatsapp').value.trim();
+    var emailVal = document.getElementById('cu-newEmail').value.trim().toLowerCase();
+    
+    if (whatsappVal !== "" && (whatsappVal.length !== 10 || isNaN(whatsappVal))) {
+        return alert("🚨 कृपया सही 10 अंकों का व्हाट्सएप नंबर दर्ज करें!");
+    }
+    
+    if (emailVal !== "" && (emailVal.indexOf('@') === -1 || emailVal.indexOf('.') === -1)) {
+        return alert("🚨 कृपया सही फॉर्मेट में ईमेल आईडी दर्ज करें!");
+    }
+    
+    document.getElementById('cu-saveBtn').disabled = true;
+    document.getElementById('cu-saveBtn').innerText = "⏳ सर्वर पर अपडेट हो रहा है...";
+    
+    google.script.run
+    .withSuccessHandler(function(res) {
+        document.getElementById('cu-saveBtn').disabled = false;
+        document.getElementById('cu-saveBtn').innerText = "💾 अपडेट सुरक्षित करें";
+        
+        if (res && res.success) {
+            // मोबाइल के लोकल IndexedDB स्टोर में भी डेटा तुरंत सिंक करें ताकि पुराना रिकॉर्ड ओवरराइड हो जाये
+            var tx = db.transaction("consumers", "readwrite");
+            tx.objectStore("consumers").get(accNo).onsuccess = function(ev) {
+                var item = ev.target.result;
+                if(item) {
+                    item["New Whatsup No."] = whatsappVal;
+                    item["NEW WHATSUP NO."] = whatsappVal;
+                    item["NEW EMAIL ID"] = emailVal;
+                    ev.target.source.put(item);
+                }
+            };
+            tx.oncomplete = function() {
+                document.getElementById('contactUpdateModal').style.display = 'none';
+                showThinAlert("✅ उपभोक्ता का संपर्क विवरण केवल संबंधित कॉलम्स में अपडेट हो गया है!", true);
+                if (typeof refreshActiveDataViews === 'function') refreshActiveDataViews();
+            };
+        } else {
+            alert("🚨 सर्वर एरर: अपडेट सुरक्षित नहीं हो सका।");
+        }
+    })
+    .withFailureHandler(function(err) {
+        document.getElementById('cu-saveBtn').disabled = false;
+        document.getElementById('cu-saveBtn').innerText = "💾 अपडेट सुरक्षित करें";
+        alert("🚨 नेटवर्क एरर: " + err.toString());
+    })
+    .updateConsumerContactFieldsOnly(rIndex, whatsappVal, emailVal);
+}
+</script>
+
+<div id="contactUpdateModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15, 23, 42, 0.75); z-index:999999; align-items:center; justify-content:center; backdrop-filter:blur(4px); padding: 15px; box-sizing: border-box;">
+    <div style="background:#ffffff; width:100%; max-width:380px; border-radius:12px; padding:20px; box-shadow:0 20px 40px rgba(0,0,0,0.3); position:relative; box-sizing: border-box;">
+        <button onclick="document.getElementById('contactUpdateModal').style.display='none'" style="position:absolute; top:12px; right:12px; background:#ef4444; border:none; color:white; border-radius:50%; width:24px; height:24px; font-size:12px; cursor:pointer; display:flex; align-items:center; justify-content:center;"><i class="fa-solid fa-xmark"></i></button>
+        
+        <h3 style="margin:0 0 15px 0; color:#0ea5e9; font-size:15px; font-weight:900; text-align:center; border-bottom:2px solid #f1f5f9; padding-bottom:8px; text-transform:uppercase;"><i class="fa-solid fa-user-gear"></i> Update Contact Info</h3>
+        
+        <div style="background:#f8fafc; padding:10px; border-radius:6px; margin-bottom:12px; font-size:11px; font-weight:700; color:#334155;">
+            <div>उपभोक्ता: <span id="cu-consumerName" style="color:#0f172a;">-</span></div>
+            <div style="margin-top:4px;">खाता संख्या: <span id="cu-accountNo" style="color:#0ea5e9;">-</span></div>
+        </div>
+        
+        <input type="hidden" id="cu-rowIndex">
+        
+        <div class="input-group" style="margin-bottom:10px;">
+            <label style="font-size:11.5px; font-weight:bold; color:#334155;">New WhatsApp Mobile Number</label>
+            <input type="text" id="cu-newWhatsapp" placeholder="10 अंकों का नंबर दर्ज करें" inputmode="numeric" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '');" style="font-weight:700; border-color:#cbd5e1;">
+        </div>
+        
+        <div class="input-group" style="margin-bottom:15px;">
+            <label style="font-size:11.5px; font-weight:bold; color:#334155;">New Email ID</label>
+            <input type="email" id="cu-newEmail" placeholder="example@gmail.com दर्ज करें" style="font-weight:700; border-color:#cbd5e1; text-transform: lowercase;">
+        </div>
+        
+        <button id="cu-saveBtn" class="btn" style="background:#0ea5e9 !important; box-shadow:0 3px 6px rgba(14,165,233,0.3); margin-bottom:0;" onclick="submitContactUpdateData()">💾 अपडेट सुरक्षित करें</button>
+    </div>
+</div>
+
+</body>
 </html>
