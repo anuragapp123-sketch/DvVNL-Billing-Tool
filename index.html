@@ -54,6 +54,14 @@
               if (loader) loader.style.display = 'none';
               console.error("API Bridge Fetch Error on " + propKey + ":", err);
               
+              // 🚀 शीट में एरर भेजने का ऑटोमैटिक इंजन (Proxy Call Execution Failures)
+              if (typeof loggedInReader !== 'undefined' && loggedInReader && navigator.onLine) {
+                try {
+                  google.script.run.withSuccessHandler(function(){}).withFailureHandler(function(){})
+                    .logAppErrorToSheet(loggedInReader.toUpperCase(), err.toString(), "Server Call Fail: " + propKey);
+                } catch(e){}
+              }
+              
               // स्क्रीन पर साफ़ एरर दिखाने का बॉक्स
               var errBox = document.getElementById('apkErrorLogger');
               if(errBox) {
@@ -412,12 +420,14 @@
         pointer-events: none !important;
     }
 
-    /* 🟢 फ़ॉन्ट स्टैकिंग फिक्स */
+    /* 🟢 ENTERPRISE LABELS COMPACT FONT STACKING ENGINE */
     * { 
         box-sizing: border-box; 
         margin: 0; 
         padding: 0; 
-        font-family: 'Noto Sans Devanagari', 'Roboto', sans-serif; 
+        font-family: 'Roboto', 'Segoe UI', -apple-system, BlinkMacSystemFont, Arial, 'Noto Sans Devanagari', sans-serif;
+        font-stretch: condensed;
+        letter-spacing: -0.1px;
         -webkit-tap-highlight-color: transparent;
     }
     
@@ -445,16 +455,16 @@
     body { padding: calc(5px + env(safe-area-inset-top)) 8px calc(65px + env(safe-area-inset-bottom)) 8px; box-sizing: border-box; }
     .container { max-width: 450px; margin: 0 auto; min-height: 100svh; padding-bottom: 75px !important; box-sizing: border-box; }
     
-    /* 💎 COMPACT CARD DESIGN */
+    /* 💎 COMPACT CARD DESIGN (Enterprise Smooth Makeover) */
     .card { 
         background: var(--theme-card-bg); 
-        backdrop-filter: blur(8px); 
-        border-radius: 10px; 
-        padding: 10px;      
-        box-shadow: 0 4px 6px -1px rgba(15,23,42,0.1); 
-        margin-bottom: 8px; 
-        border: 1px solid var(--theme-table-border); 
-        transition: background 0.3s ease, border 0.3s ease;
+        backdrop-filter: blur(12px); 
+        border-radius: 14px; 
+        padding: 12px;      
+        box-shadow: 0 4px 20px -2px rgba(15,23,42,0.04), 0 2px 6px -1px rgba(15,23,42,0.02); 
+        margin-bottom: 10px; 
+        border: 1px solid rgba(226, 232, 240, 0.8); 
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     h2 { font-size: 16px; color: var(--theme-heading); margin-bottom: 2px; font-weight: 900; text-align: center; text-transform: uppercase; }
@@ -475,27 +485,31 @@
     }
     .input-group { margin-bottom: 10px; }
     label { display: block; font-size: 12px; font-weight: 600; color: var(--theme-text); margin-bottom: 4px; }
-    input, select, textarea { width: 100%; padding: 10px; border: 1px solid var(--theme-table-border); border-radius: 6px; font-size: 14px; color: #0f172a; outline: none; background-color: #f8fafc; transition: all 0.2s; }
-    input:focus, select:focus, textarea:focus { border-color: var(--theme-border); background-color: #ffffff; box-shadow: 0 0 0 3px rgba(37,99,235,0.15); }
+    /* ⚙️ MODERN ENTERPRISE INPUT FIELDS */
+    input, select, textarea { width: 100%; padding: 11px 14px; border: 1px solid #e2e8f0; border-radius: 10px; font-size: 13px; font-weight: 700; color: #0f172a; outline: none; background-color: #f8fafc; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+    input:focus, select:focus, textarea:focus { border-color: #3b82f6; background-color: #ffffff; box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.12); }
     
+    /* 🚀 SOLID FLAT ENTERPRISE BUTTONS */
     .btn { 
         width: 100%; 
-        background: var(--theme-primary) !important; 
+        background: linear-gradient(90deg, var(--theme-primary), var(--theme-primary-dark, #1d4ed8)) !important; 
         color: white; 
         border: none; 
-        padding: 12px; 
-        border-radius: 6px; 
-        font-size: 14px; 
-        font-weight: 700; 
+        padding: 12px 16px; 
+        border-radius: 10px; 
+        font-size: 13px; 
+        font-weight: 900; 
         cursor: pointer; 
         display: block; 
         text-align: center; 
-        margin-bottom: 5px; 
+        margin-bottom: 6px; 
         text-decoration: none; 
-        transition: background 0.2s ease, transform 0.2s; 
-        box-shadow: 0 2px 4px rgba(30,64,175,0.25); 
+        transition: all 0.2s ease; 
+        box-shadow: 0 4px 12px rgba(30,64,175,0.15); 
         letter-spacing: 0.5px; 
+        text-transform: uppercase;
     }
+    .btn:active { transform: scale(0.98); box-shadow: 0 2px 4px rgba(30,64,175,0.1); }
     .btn:active { background: var(--theme-primary-dark) !important; transform: translateY(1px); }
     .btn-back { background: #64748b; box-shadow: 0 2px 4px rgba(100,116,139,0.2); margin-top: 5px; }
     .btn-sync { background: #059669; font-weight: bold; box-shadow: 0 2px 4px rgba(5,150,105,0.2); }
@@ -710,43 +724,64 @@
         top: 0 !important; 
         left: 0 !important; 
         bottom: 0 !important; 
-        width: 240px !important; 
+        width: 250px !important; 
         height: 100vh !important; 
         flex-direction: column !important; 
         justify-content: flex-start !important; 
-        padding-top: 40px !important; 
-        background: var(--theme-primary, #0f172a) !important; 
-        box-shadow: 4px 0 20px rgba(0,0,0,0.15) !important; 
+        padding: 30px 12px !important; 
+        background: linear-gradient(180deg, var(--theme-primary, #1e40af), var(--theme-primary-dark, #1d4ed8)) !important; 
+        box-shadow: 4px 0 25px rgba(15, 23, 42, 0.15) !important; 
         position: fixed !important; 
         border-radius: 0 !important; 
         display: flex !important; 
-        border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
+        border-right: 1px solid rgba(255, 255, 255, 0.08) !important;
         border-top: none !important;
+        box-sizing: border-box !important;
     }
+    /* 🦾 ULTRA-PREMIUM SIDEBAR TAB BUTTONS */
     body.desktop-force .tab-btn { 
-        padding: 18px 25px !important; 
+        padding: 12px 18px !important; 
         text-align: left !important; 
-        border-top: none !important; 
-        border-left: 4px solid transparent !important; 
+        border: none !important;
+        border-radius: 10px !important; 
         width: 100% !important; 
         display: flex !important; 
         flex-direction: row !important; 
         justify-content: flex-start !important; 
         align-items: center !important; 
-        gap: 15px !important; 
+        gap: 14px !important; 
         flex: none !important; 
+        background: transparent !important;
+        margin-bottom: 6px !important;
+        color: rgba(255, 255, 255, 0.75) !important;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        box-sizing: border-box !important;
     }
-    body.desktop-force .tab-btn i { font-size: 18px !important; margin-right: 5px; }
-    body.desktop-force .tab-btn span { font-size: 14px !important; }
+    body.desktop-force .tab-btn i { font-size: 15px !important; margin-right: 0px !important; color: rgba(255, 255, 255, 0.7) !important; transition: all 0.2s; }
+    body.desktop-force .tab-btn span { font-size: 12.5px !important; font-weight: 700 !important; color: rgba(255, 255, 255, 0.85) !important; letter-spacing: 0.3px; }
     
-    /* 🎯 डेस्कटॉप एक्टिव टैब को बेहद खूबसूरत और प्रीमियम लुक देने का फिक्स */
-    body.desktop-force .tab-btn.active {
-        background: rgba(255, 255, 255, 0.15) !important;
+    /* माउस ले जाने पर हल्का ग्लास इफेक्ट */
+    body.desktop-force .tab-btn:hover {
+        background: rgba(255, 255, 255, 0.08) !important;
         color: #ffffff !important;
-        border-left: 4px solid #facc15 !important;
-        border-top: none !important;
     }
-    body.desktop-force .tab-btn.active i { transform: scale(1.15) !important; }
+    
+    /* 🎯 डेस्कटॉप एक्टिव टैब को सुपर-लक्ज़री कर्व्ड कैप्सूल लुक देने का फिक्स */
+    body.desktop-force .tab-btn.active {
+        background: rgba(255, 255, 255, 0.18) !important;
+        color: #ffffff !important;
+        border-left: none !important;
+        box-shadow: inset 0 1px 1px rgba(255,255,255,0.2), 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+    }
+    body.desktop-force .tab-btn.active i { 
+        transform: scale(1.1) !important; 
+        color: #facc15 !important; /* एक्टिव होने पर आइकॉन चमकीला पीला होगा */
+        text-shadow: 0 0 10px rgba(250, 204, 21, 0.5) !important;
+    }
+    body.desktop-force .tab-btn.active span { 
+        color: #ffffff !important; 
+        font-weight: 900 !important; 
+    }
     body.desktop-force .tab-btn[style*="none"] { display: none !important; }
     body.desktop-force .app-top-header, body.desktop-force .tab-content, body.desktop-force #syncBox { margin-left: 0 !important; width: 100% !important; max-width: 100% !important; }
     
@@ -853,17 +888,27 @@
         }
     </style>
 
+    <!-- 🌌 प्रिमियम नियॉन ऑरा स्प्लैश स्क्रीन (iOS Minimalistic Makeover) -->
     <div id="appSplashScreen" class="animated-splash" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white;">
-        <!-- ⚡ स्टाइलिश ग्लोइंग आइकॉन -->
-        <i class="fa-solid fa-bolt glowing-bolt"></i>
-        <h2 style="color: white; font-weight: 900; letter-spacing: 1.5px; text-shadow: 0 4px 10px rgba(0,0,0,0.3); font-size: 24px;">DvVNL Reading Tool</h2>
-        <!-- 🟢 आपका नया हिंदी संदेश बिल्कुल सही फ़ॉन्ट वेट के साथ -->
-        <p style="color: #93c5fd; font-size: 14px; font-weight: 700; margin-top: 10px; letter-spacing: 0.5px; text-shadow: 0 2px 5px rgba(0,0,0,0.2); margin-bottom: 25px;">एप्लिकेशन खुल रहा है कृपया थोड़ा इंतजार करें...</p>
         
-        <!-- 📱 डेवलपर क्रेडिट्स विथ मोबाइल आइकॉन ड्राइवर -->
-        <div style="position: absolute; bottom: 30px; text-align: center; color: rgba(255,255,255,0.85); font-size: 12px; font-weight: 700; letter-spacing: 0.5px;">
-            <div>Developed by :- Er. Anurag Shakya</div>
-            <div style="margin-top: 5px; color: #facc15; font-size: 13px;"><i class="fa-solid fa-phone"></i> 9761414105</div>
+        <!-- ⚡ घूमने वाली नियॉन ऑरा के अंदर चमकती हुई बिजली -->
+        <div class="neon-glow-aura-container">
+            <i class="fa-solid fa-bolt glowing-bolt-new"></i>
+        </div>
+        
+        <!-- मुख्य टेक्स्ट और विवरण लेबल -->
+        <h2 style="color: #ffffff; font-weight: 900; letter-spacing: 1px; font-size: 21px; margin-bottom: 4px; text-transform: none;">DvVNL Reading Tool</h2>
+        <div style="font-size: 10.5px; color: #64748b; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px;">Sai Computer Ltd Mainpuri</div>
+        
+        <p style="color: #94a3b8; font-size: 12px; font-weight: 700; letter-spacing: 0.2px;">एप्लिकेशन खुल रहा है, कृपया प्रतीक्षा करें</p>
+        
+        <!-- स्लीक आधुनिक लोड प्रोग्रेस बार -->
+        <div class="splash-progress-stream-bar"></div>
+        
+        <!-- 📱 प्रिमियम फुटर डेवलपर क्रेडिट्स -->
+        <div style="position: absolute; bottom: 35px; text-align: center; color: #475569; font-size: 11px; font-weight: 800; letter-spacing: 0.3px; line-height: 1.4;">
+            <div style="color: #94a3b8; font-size: 11.5px; font-weight: 900;">Developed by: Er. Anurag Shakya</div>
+            <div style="color: #3b82f6; margin-top: 2px; font-size: 11px;"><i class="fa-solid fa-phone-volume" style="font-size: 10px;"></i> +91 9761414105</div>
         </div>
     </div>
 
@@ -882,7 +927,7 @@
         <div id="apkErrorLogger" style="display:none; margin-top:10px; padding:10px; background:#fef2f2; border:1px solid #fca5a5; border-radius:6px; color:#b91c1c; font-size:11px; font-weight:bold; text-align:left; word-break:break-all; white-space:pre-wrap;"></div>
         <div class="app-footer-branding" style="position: relative;">
             Developed by:- Anurag Shakya | 9761414105
-            <span style="display:block; margin-top:4px; font-size:10px; color:#ef4444; font-weight:900;">App Version: V1.0.20</span>
+            <span style="display:block; margin-top:4px; font-size:10px; color:#ef4444; font-weight:900;">App Version: V1.0.21</span>
         </div>
     </div>
     
@@ -917,12 +962,15 @@
             </div>
         </div>
 
-        <div id="syncBox" class="card" style="display:none; background: #fffbeb; border: 1px dashed #d97706; padding: 10px; text-align: center;">
-            <p style="color: #b45309; font-weight: 500; margin-bottom: 8px; font-size: 13px;">⚠️ <span id="syncCountTxt">0</span> एंट्रीज मोबाइल में ऑफलाइन सुरक्षित हैं!</p>
-            <button class="btn btn-sync" onclick="syncOfflineDataToServer()">🔗 इंटरनेट चालू करके यहाँ सिंक करें</button>
+        <div id="syncBox" class="card" style="display:none; background: linear-gradient(135deg, #fffbeb, #fef3c7); border: 1px solid #f59e0b; border-radius: 12px; padding: 12px; text-align: center; box-shadow: 0 10px 15px -3px rgba(217, 119, 6, 0.2); margin-bottom: 12px; animation: pulse 2s infinite;">
+            <p style="color: #78350f; font-weight: 800; margin-bottom: 10px; font-size: 12px; letter-spacing: 0.3px;">
+                <i class="fa-solid fa-triangle-exclamation fa-beat" style="color: #d97706; margin-right: 4px;"></i> 
+                <span id="syncCountTxt" style="font-size: 14px; font-weight: 900; background: #d97706; color: white; padding: 1px 6px; border-radius: 4px; margin: 0 2px;">0</span> एंट्रीज मोबाइल में ऑफलाइन सुरक्षित हैं!
+            </p>
+            <button class="btn btn-sync" onclick="syncOfflineDataToServer()" style="background: linear-gradient(90deg, #d97706, #b45309) !important; font-weight: 900; font-size: 12px; padding: 10px; border-radius: 8px; box-shadow: 0 4px 6px rgba(217,119,6,0.25); letter-spacing: 0.5px; text-transform: uppercase;">🔗 क्लाउड सर्वर पर सिंक करें</button>
         </div>
         
-        <div class="loader" id="globalLoader">Master Data Downloding In Processing Please wait...</div>
+        <div class="loader" id="globalLoader">Master Data Downloading In Processing Please wait...</div>
 
         <!-- 🟢 एडमिन फ़िल्टर और लाइव नोटिफिकेशन का अलग-अलग पैनल फिक्स -->
         <!-- 📢 टैब 1: केवल लाइव नोटिफिकेशन सेंडर पैनल (नया टैब) -->
@@ -1013,50 +1061,73 @@
 
         <div id="view-summary" class="tab-content" style="display: block;">
             
-            <div class="flex-row-btns" style="align-items: center; gap: 6px;">
-                <button onclick="refreshDataFromServer(true)" class="btn" style="background: #334155; flex: 1;"><i class="fa-solid fa-cloud-arrow-down mr-1"></i> Master Data Download</button>
-                <button onclick="exportSummaryDashboardToPDF()" class="btn pdf-bg" style="width:auto; padding: 12px 15px;" title="Download Current Summary PDF"><i class="fa-solid fa-file-pdf"></i></button>
-                <button id="btnAllMrPdfSummary" onclick="exportAllMRSummaryPDF()" class="btn" style="width:auto; padding: 12px 15px; background: #047857; display: none;" title="Download All Meter Reader Wise Summary PDF"><i class="fa-solid fa-users-gear"></i></button>
+            <!-- ⚡ प्रीमियम रिस्पॉन्सिव एक्शन बटन्स बार -->
+            <div class="flex-row-btns" style="align-items: center; gap: 8px; margin-bottom: 12px;">
+                <button onclick="refreshDataFromServer(true)" class="btn" style="background: linear-gradient(90deg, #334155, #475569) !important; flex: 1; padding: 11px; font-size: 12px; font-weight: 800; border-radius: 8px; box-shadow: 0 4px 6px rgba(51,65,85,0.2); letter-spacing: 0.3px;">
+                    <i class="fa-solid fa-cloud-arrow-down" style="margin-right: 4px;"></i> Master Data Download
+                </button>
+                <button onclick="exportSummaryDashboardToPDF()" class="btn pdf-bg" style="width:40px; height:38px; padding: 0; display: inline-flex; align-items: center; justify-content: center; border-radius: 8px; box-shadow: 0 4px 6px rgba(220,38,38,0.2);" title="Download Current Summary PDF">
+                    <i class="fa-solid fa-file-pdf" style="font-size: 14px;"></i>
+                </button>
+                <button id="btnAllMrPdfSummary" onclick="exportAllMRSummaryPDF()" class="btn" style="width:40px; height:38px; padding: 0; background: linear-gradient(135deg, #059669, #047857) !important; display: none; align-items: center; justify-content: center; border-radius: 8px; box-shadow: 0 4px 6px rgba(4,120,87,0.2);" title="Download All Meter Reader Wise Summary PDF">
+                    <i class="fa-solid fa-users-gear" style="font-size: 14px;"></i>
+                </button>
             </div>
 
-            <!-- 🟢 LAST UPDATED LABEL: अब यह हमेशा सबसे टॉप पर दिखाई देगा -->
-            <div id="lastUpdatedLabel" style="text-align:center; font-size:11px; font-weight:800; margin-bottom:10px; color:#1e40af; background:#eff6ff; padding:6px; border-radius:8px; border:1px solid #bfdbfe; letter-spacing: 0.5px; text-transform: uppercase;">Last Updated:- Not Downloaded Yet</div>
+            <!-- 🟢 प्रिमियम हाई-कंट्रास्ट लास्ट अपडेटेड बैज -->
+            <div id="lastUpdatedLabel" style="text-align: center; font-size: 11px; font-weight: 900; margin-bottom: 14px; color: #ffffff; background: linear-gradient(90deg, #1e293b, #0f172a); padding: 8px 16px; border-radius: 30px; border: 1px solid #334155; letter-spacing: 0.5px; text-transform: uppercase; display: inline-flex; align-items: center; justify-content: center; gap: 6px; width: 100%; box-sizing: border-box; box-shadow: 0 4px 10px rgba(15,23,42,0.15);">
+                <i class="fa-solid fa-clock-rotate-left fa-spin" style="color: #facc15; font-size: 12px;"></i> LAST UPDATED:- <span id="lastUpdatedTimeSpan" style="color: #facc15; margin-left: 2px;">NOT DOWNLOADED YET</span>
+            </div>
 
-            <div style="display: flex; background: #e2e8f0; padding: 5px; border-radius: 8px; margin-bottom: 12px; gap: 6px; flex-wrap: nowrap; overflow-x: auto; align-items: center; -webkit-overflow-scrolling: touch; scrollbar-width: none;">
+            <!-- 🎨 100% प्रिमियम मोबाइल ऐप ड्रॉअर आइकॉन ग्रिड (Workspace Navigation) -->
+            <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; background: #ffffff; padding: 10px 6px; border-radius: 14px; margin-bottom: 14px; border: 1px solid #e2e8f0; box-shadow: 0 4px 10px rgba(0,0,0,0.02); width: 100%; box-sizing: border-box; clear: both;">
                 <style>
-                    /* स्क्रॉलबार डिज़ाइन को अदृश्य और साफ रखने के लिए */
-                    div::-webkit-scrollbar { display: none !important; }
-                    .sub-tab-shared-style {
-                        padding: 8px 12px !important;
-                        border: none !important;
-                        border-radius: 6px !important;
-                        font-weight: 900 !important;
-                        font-size: 11px !important;
-                        cursor: pointer !important;
-                        transition: all 0.2s ease-in-out !important;
-                        white-space: nowrap !important;
-                        display: inline-flex !important;
-                        align-items: center !important;
-                        justify-content: center !important;
-                        gap: 5px !important;
-                        height: 32px !important;
-                        line-height: 1 !important;
+                    .app-drawer-icon-btn {
+                        display: flex; flex-direction: column; align-items: center; justify-content: center;
+                        background: transparent; border: none; cursor: pointer; padding: 6px 2px;
+                        border-radius: 10px; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); min-height: 60px;
                     }
+                    .app-drawer-icon-circle {
+                        width: 34px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center;
+                        margin-bottom: 5px; background: #f1f5f9; transition: all 0.2s; border: 1px solid transparent;
+                    }
+                    .app-drawer-icon-btn span {
+                        font-size: 9.5px; font-weight: 800; color: #475569; text-transform: uppercase; 
+                        letter-spacing: 0.1px; text-align: center; line-height: 1.1; white-space: normal;
+                    }
+                    /* एक्टिव स्टेट स्टाइल */
+                    .app-drawer-icon-btn.active-pill span { color: #1e40af !important; font-weight: 900; }
+                    .app-drawer-icon-btn.active-pill .app-drawer-icon-circle { background: #eff6ff !important; border-color: #bfdbfe !important; transform: scale(1.05); box-shadow: 0 4px 8px rgba(30,64,175,0.08); }
                 </style>
-                <button id="sub-tab-cards-btn" class="sub-tab-shared-style" onclick="switchSubSummary('cards')" style="background: #1e40af; color: white;">
-                    <i class="fa-solid fa-chart-simple"></i> डैशबोर्ड
+
+                <!-- बटन 1: डैशबोर्ड -->
+                <button id="sub-tab-cards-btn" class="app-drawer-icon-btn active-pill" onclick="switchSubSummary('cards')">
+                    <div class="app-drawer-icon-circle"><i class="fa-solid fa-chart-simple" style="color: #1e40af; font-size: 13px;"></i></div>
+                    <span>डैशबोर्ड</span>
                 </button>
-                <button id="sub-tab-analytics-btn" class="sub-tab-shared-style" onclick="switchSubSummary('analytics')" style="background: transparent; color: #475569;">
-                    <i class="fa-solid fa-chart-pie"></i> Analytics
+
+                <!-- बटन 2: Analytics -->
+                <button id="sub-tab-analytics-btn" class="app-drawer-icon-btn" onclick="switchSubSummary('analytics')">
+                    <div class="app-drawer-icon-circle"><i class="fa-solid fa-chart-pie" style="color: #9333ea; font-size: 13px;"></i></div>
+                    <span>Analytics</span>
                 </button>
-                <button id="sub-tab-table-btn" class="sub-tab-shared-style" onclick="switchSubSummary('table')" style="background: transparent; color: #475569;">
-                    <i class="fa-solid fa-list-check"></i> Reports
+
+                <!-- बटन 3: Reports -->
+                <button id="sub-tab-table-btn" class="app-drawer-icon-btn" onclick="switchSubSummary('table')">
+                    <div class="app-drawer-icon-circle"><i class="fa-solid fa-list-check" style="color: #0d9488; font-size: 13px;"></i></div>
+                    <span>Reports</span>
                 </button>
-                <button id="sub-tab-bills-btn" class="sub-tab-shared-style" onclick="openReportRowDirect('all_bills_report')" style="background: transparent; color: #475569;">
-                    <i class="fa-solid fa-file-invoice-dollar"></i> All Bills
+
+                <!-- बटन 4: All Bills -->
+                <button id="sub-tab-bills-btn" class="app-drawer-icon-btn" onclick="openReportRowDirect('all_bills_report')">
+                    <div class="app-drawer-icon-circle"><i class="fa-solid fa-file-invoice-dollar" style="color: #ea580c; font-size: 13px;"></i></div>
+                    <span>All Bills</span>
                 </button>
-                <button id="sub-tab-consumers-btn" class="sub-tab-shared-style" onclick="openReportRowDirect('Visit_Data_Consumers')" style="background: transparent; color: #475569;">
-                    <i class="fa-solid fa-users"></i> All Consumers
+
+                <!-- बटन 5: All Consumers -->
+                <button id="sub-tab-consumers-btn" class="app-drawer-icon-btn" onclick="openReportRowDirect('Visit_Data_Consumers')">
+                    <div class="app-drawer-icon-circle"><i class="fa-solid fa-users" style="color: #4f46e5; font-size: 13px;"></i></div>
+                    <span>Consumers</span>
                 </button>
             </div>
             
@@ -1066,21 +1137,44 @@
 
             <!-- 📊 नया सब-टैब 1.5: एनालिटिक्स विज़ुअल चार्ट्स एवं पेंडेंसी मैट्रिक्स ब्लॉक -->
             <div id="sub-view-analytics" style="display: none;">
-                <div class="flex-row-btns" style="margin-bottom: 8px;">
+                <div class="flex-row-btns" style="margin-bottom: 12px;">
                     <button onclick="exportAnalyticsReportPDF()" class="btn pdf-bg" style="font-size:12px; padding:10px;"><i class="fa-solid fa-file-pdf"></i> Download Analytics Report (PDF)</button>
                 </div>
-                <!-- 🎯 FIX: display: flex करके तीनों चार्ट्स को मोबाइल और डेस्कटॉप पर एक ही लाइन में लाने का परमानेंट यूआई ब्लॉक -->
-<div class="card" id="analyticsLiveChartEngine" style="background:#fff; padding:12px; margin-bottom:10px; display: flex; flex-direction: row; justify-content: space-between; gap: 12px; height: auto; width: 100%; box-sizing: border-box; overflow-x: auto;">
-                    <!-- 🎯 FIX: flex-basis: 33% से तीनों डोनट बॉक्स को गणितीय रूप से एक सीध में बराबर चौड़ाई देना -->
-    <div style="background:#f8fafc; padding:8px; border:1px solid #e2e8f0; border-radius:8px; height:280px; flex: 1; flex-basis: 33%; min-width: 0; box-sizing: border-box;">
-        <canvas id="chartMainMeterAnalytics"></canvas>
-    </div>
-    <div style="background:#f8fafc; padding:8px; border:1px solid #e2e8f0; border-radius:8px; height:280px; flex: 1; flex-basis: 33%; min-width: 0; box-sizing: border-box;">
-        <canvas id="chartPoleMeterAnalytics"></canvas>
-    </div>
-    <div style="background:#f8fafc; padding:8px; border:1px solid #e2e8f0; border-radius:8px; height:280px; flex: 1; flex-basis: 33%; min-width: 0; box-sizing: border-box;">
-        <canvas id="chartBillDistAnalytics"></canvas>
-    </div>
+                
+                <!-- 🎯 स्टाइलिंग: मोबाइल पर १ कॉलम और डेस्कटॉप पर ३ कॉलम ऑटोमैटिक ग्रिड लेआउट -->
+                <style>
+                    .perfect-chart-grid {
+                        display: grid;
+                        grid-template-columns: 1fr;
+                        gap: 12px;
+                        margin-bottom: 14px;
+                    }
+                    @media (min-width: 769px) {
+                        .perfect-chart-grid {
+                            grid-template-columns: repeat(3, 1fr);
+                        }
+                    }
+                    .chart-container-box {
+                        background: #ffffff;
+                        padding: 14px;
+                        border: 1px solid #e2e8f0;
+                        border-radius: 12px;
+                        height: 290px;
+                        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);
+                        box-sizing: border-box;
+                    }
+                </style>
+
+                <div class="perfect-chart-grid" id="analyticsLiveChartEngine">
+                    <div class="chart-container-box">
+                        <canvas id="chartMainMeterAnalytics"></canvas>
+                    </div>
+                    <div class="chart-container-box">
+                        <canvas id="chartPoleMeterAnalytics"></canvas>
+                    </div>
+                    <div class="chart-container-box">
+                        <canvas id="chartBillDistAnalytics"></canvas>
+                    </div>
                 </div>
                 <div class="card" style="padding:10px; overflow-x:auto;">
                     <h4 style="font-size:12px; color:var(--theme-primary); margin-bottom:6px; text-transform:uppercase;"><i class="fa-solid fa-table-list"></i> Reader Wise Pendency Matrix</h4>
@@ -1138,8 +1232,10 @@
                 <select id="listDivisionFilter" style="width: 25%;" onchange="renderNewListTab()"><option value="ALL">All Div</option></select>
                 <select id="listStatusFilter" style="width: 25%; font-weight:bold; color:#4f46e5;" onchange="renderNewListTab()"><option value="PENDING">PENDING</option><option value="ATTEND">ATTEND</option></select>
                 <div style="position: relative; width: 50%; display: flex; align-items: center;">
-                    <input type="text" id="listSearchBar" style="width: 100%; padding-right: 30px;" placeholder="🔍 Search..." onkeyup="universalListSearch('listSearchBar', 'listDataContainer')">
-                    <i class="fa-solid fa-microphone" onclick="startVoiceSearch('listSearchBar', 'listDataContainer')" style="position: absolute; right: 12px; color: #1e40af; cursor: pointer; font-size: 15px; padding: 5px; z-index: 10;"></i>
+                    <input type="text" id="listSearchBar" style="width: 100%; padding-right: 45px;" placeholder="🔍 Search..." onkeyup="universalListSearch('listSearchBar', 'listDataContainer')">
+                    <!-- Quick Clear Button -->
+                    <span onclick="document.getElementById('listSearchBar').value=''; universalListSearch('listSearchBar', 'listDataContainer');" style="position: absolute; right: 28px; color: #94a3b8; cursor: pointer; font-size: 14px; font-weight: bold; user-select: none; padding: 4px; z-index: 11;" title="Clear Search">✕</span>
+                    <i class="fa-solid fa-microphone" onclick="startVoiceSearch('listSearchBar', 'listDataContainer')" style="position: absolute; right: 8px; color: #1e40af; cursor: pointer; font-size: 14px; padding: 4px; z-index: 10;"></i>
                 </div>
             </div>
             <div id="listDataContainer"></div>
@@ -1170,9 +1266,9 @@
             <option value="YES">WA: YES</option>
             <option value="NO">WA: NO</option>
         </select>
-        <div style="background: white; border: 1px solid #cbd5e1; border-radius: 6px; padding: 0 4px; display: flex; align-items: center; justify-content: center; gap: 2px; height: 32px; flex: 1; min-width: 0; white-space: nowrap;">
-            <input type="checkbox" id="selectAllBillsDist" onchange="toggleAllBillsDist(this)" style="width: 13px; height: 14px; cursor: pointer; margin: 0; flex-shrink: 0;">
-            <label for="selectAllBillsDist" style="margin: 0; font-weight: bold; color: #0f172a; cursor: pointer; font-size: 10px; text-overflow: ellipsis; overflow: hidden;">All</label>
+        <div id="reportSelectAllWrapperDistTab" style="background: white; border: 1px solid #cbd5e1; border-radius: 6px; padding: 0 4px; display: flex; align-items: center; justify-content: center; gap: 2px; height: 32px; flex: 1; min-width: 0; white-space: nowrap;">
+            <input type="checkbox" id="selectAllBillsReport" onchange="toggleAllBillsDist(this, event)" style="width: 13px; height: 14px; cursor: pointer; margin: 0; flex-shrink: 0;">
+            <label for="selectAllBillsReport" style="margin: 0; font-weight: bold; color: #0f172a; cursor: pointer; font-size: 10px; text-overflow: ellipsis; overflow: hidden; user-select: none;">All</label>
         </div>
     </div>
     <h3 style="font-size: 13px; margin: 5px 0 8px 2px; color: #b45309; font-weight: bold; display: flex; align-items: center; gap: 6px;">📦 बिल वितरण सूची: <span id="count-billdist" class="badge-count zero">0</span></h3>
@@ -1225,7 +1321,7 @@
             
             <div style="text-align: center; margin-top: 25px; padding-top: 15px; border-top: 1px dashed #cbd5e1; color: #64748b;">
                 <div style="font-size: 12px; font-weight: bold;">Developed by: Anurag Shakya</div>
-                <div style="font-size: 11px; color: #ef4444; font-weight: 900; margin-top: 4px;">App Version: V1.0.20</div>
+                <div style="font-size: 11px; color: #ef4444; font-weight: 900; margin-top: 4px;">App Version: V1.0.21</div>
             </div>
         </div>
 
@@ -1237,7 +1333,7 @@
                     <button onclick="universalExportToExcel('reports')" class="export-btn excel-bg"><i class="fa-solid fa-file-excel"></i></button>
                     <button onclick="generateUniversalPDF('reports')" class="export-btn pdf-bg"><i class="fa-solid fa-file-pdf"></i></button>
                 </div>
-                <!-- 🚀 अल्टीमेट कॉम्पैक्ट रो: रिपोर्ट्स व्यू के अंदर भी सर्च बार और फिल्टर्स अब एक सिंगल लाइन बार में सिंक हैं -->
+                <!-- 🚀 अल्टीमेट कॉम्पैक्ट रो: मास्टर रिपोर्ट में WA और ALL की जगह Main & Pole Site Remark फ़िल्टर्स सिंक -->
                 <div id="reportBillFilters" style="display: none; flex-direction: row; align-items: center; justify-content: space-between; gap: 4px; margin-bottom: 8px; width: 100%; box-sizing: border-box;">
                     <div style="position: relative; flex: 2; min-width: 0; display: flex; align-items: center; height: 32px;">
                         <input type="text" id="reportSearchBar" style="width: 100%; padding: 6px 28px 6px 8px; font-size: 12px; height: 32px; border: 1px solid #cbd5e1; border-radius: 6px; background: #ffffff;" placeholder="🔍 खोजें..." onkeyup="universalListSearch('reportSearchBar', 'reportListContainer')">
@@ -1248,14 +1344,20 @@
                         <option value="5">5 KW</option>
                         <option value="10">10 KW</option>
                     </select>
-                    <select id="reportWaFilter" style="flex: 1; font-weight: bold; color: #059669; padding: 0 2px; font-size: 11px; border: 1px solid #cbd5e1; border-radius: 6px; height: 32px; background: #fff;" onchange="applyRemarkGroupFilter()">
+                    <select id="reportWaFilter" style="display: none; flex: 1.2; font-weight: bold; color: #059669; padding: 0 2px; font-size: 11px; border: 1px solid #cbd5e1; border-radius: 6px; height: 32px; background: #fff;" onchange="applyRemarkGroupFilter()">
                         <option value="ALL">WA: All</option>
                         <option value="YES">WA: YES</option>
                         <option value="NO">WA: NO</option>
                     </select>
-                    <div style="background: white; border: 1px solid #cbd5e1; border-radius: 6px; padding: 0 4px; display: flex; align-items: center; justify-content: center; gap: 2px; height: 32px; flex: 1; min-width: 0; white-space: nowrap;">
-                        <input type="checkbox" id="selectAllBillsReport" onchange="toggleAllBillsDist(this)" style="width: 13px; height: 14px; cursor: pointer; margin: 0; flex-shrink: 0;">
-                        <label for="selectAllBillsReport" style="margin: 0; font-weight: bold; color: #0f172a; cursor: pointer; font-size: 10px; text-overflow: ellipsis; overflow: hidden;">All</label>
+                    <select id="reportMainRemarkFilter" style="flex: 1.2; font-weight: bold; color: #7c3aed; padding: 0 2px; font-size: 11px; border: 1px solid #cbd5e1; border-radius: 6px; height: 32px; background: #fff;" onchange="applyRemarkGroupFilter()">
+                        <option value="ALL">Main Rem: All</option>
+                    </select>
+                    <select id="reportPoleRemarkFilter" style="flex: 1.2; font-weight: bold; color: #0f766e; padding: 0 2px; font-size: 11px; border: 1px solid #cbd5e1; border-radius: 6px; height: 32px; background: #fff;" onchange="applyRemarkGroupFilter()">
+                        <option value="ALL">Pole Rem: All</option>
+                    </select>
+                    <div id="reportSelectAllWrapper" style="background: white; border: 1px solid #cbd5e1; border-radius: 6px; padding: 0 4px; display: none; align-items: center; justify-content: center; gap: 2px; height: 32px; flex: 1; min-width: 0; white-space: nowrap;">
+                        <input type="checkbox" id="selectAllBillsReportTab" onchange="toggleAllBillsReportTab(this)" style="width: 13px; height: 14px; cursor: pointer; margin: 0; flex-shrink: 0;">
+                        <label for="selectAllBillsReportTab" style="margin: 0; font-weight: bold; color: #0f172a; cursor: pointer; font-size: 10px; user-select: none;">All</label>
                     </div>
                 </div>
 
@@ -1272,7 +1374,7 @@
         <div style="width: 100%; height: 40px; clear: both; display: block !important; visibility: hidden; pointer-events: none;"></div>
         
         <div class="card" style="background: rgba(255, 255, 255, 0.7); margin-bottom: 20px; text-align: center; border: 1px dashed #cbd5e1;">
-            <div style="font-size: 11px; color: #ef4444; font-weight: 900; margin-bottom: 3px;">App Version: V1.0.20</div>
+            <div style="font-size: 11px; color: #ef4444; font-weight: 900; margin-bottom: 3px;">App Version: V1.0.21</div>
             <div style="font-size: 12px; color: #1e40af; font-weight: 800; text-transform: uppercase; margin-bottom: 5px;"><i class="fa-solid fa-user-tie"></i> <span id="welcomeTxt">Mr Name: Loading...</span></div>
             <div style="font-size: 11px; font-weight: 700; color: #475569; border-top: 1px solid #cbd5e1; padding-top: 5px;">
                 Developed by:- Er. Anurag Shakya | 9761414105
@@ -1458,6 +1560,9 @@ var db = null; var loggedInReader = ""; var activeReportType = "";
 var currentReportDataList = []; var viewHistoryStack = []; var adminSelectedReaders = [];
 var globalReportConfigs = []; // शीट कॉन्फ़िगरेशन को स्टोर करने के लिए
 
+// ⚡ सुपर-फास्ट रिपोर्ट्स इंजन के लिए ग्लोबल मेमोरी कैशे
+var globalReportsDatabaseCache = null;
+
 // 🔥 CRITICAL FIX: 'isDownloadingMasterData' को यहाँ ग्लोबली डिफाइन किया गया है ताकि ReferenceError न आए
 var isDownloadingMasterData = false; 
 
@@ -1602,6 +1707,30 @@ var REPORT_NAMES = { 'main_mri_pending': '1. Main Meter MRI Pending', 'pole_mri_
             alert("🚨 ऐप दूसरे टैब में खुला है! कृपया ब्राउज़र के बाकी सभी टैब बंद करें और फिर रिफ्रेश करें।");
         };
     }
+    // ⬇️ यहाँ पर इस कोड को पेस्ट कर दें ⬇️
+    // 🚀 अल्टीमेट ग्लोबल एरर ट्रैकर: ऐप में कोई भी अनपेक्षित जावास्क्रिप्ट एरर आने पर सीधे Google Sheet में लॉग करेगा
+    window.addEventListener('error', function(event) {
+        console.error("Global JS Crash Caught: ", event.error);
+        
+        if (typeof loggedInReader !== 'undefined' && loggedInReader && navigator.onLine) {
+            var errorMsg = event.error ? event.error.toString() : event.message;
+            var sourceFile = event.filename ? " (File: " + event.filename.substring(event.filename.lastIndexOf('/') + 1) + " Line: " + event.lineno + ")" : "";
+            
+            var currentActiveAction = "App Navigation/Process";
+            try {
+                var activeTabNode = document.querySelector('.tab-bar .tab-btn.active span');
+                if(activeTabNode) currentActiveAction = "Working on Tab: " + activeTabNode.innerText;
+                if(document.getElementById('formView') && document.getElementById('formView').style.display === 'block') {
+                    currentActiveAction = "Filling Entry Form for A/C: " + (document.getElementById('f-acc') ? document.getElementById('f-acc').innerText : "Unknown");
+                }
+            } catch(e){}
+
+            try {
+                google.script.run.withSuccessHandler(function(){}).withFailureHandler(function(){})
+                    .logAppErrorToSheet(loggedInReader.toUpperCase(), errorMsg + sourceFile, currentActiveAction);
+            } catch(e){}
+        }
+    }, true);
 
     window.onload = function() {
         setupSafetyPopBackState(); populateDropdownStaticElements();
@@ -1662,7 +1791,10 @@ var REPORT_NAMES = { 'main_mri_pending': '1. Main Meter MRI Pending', 'pole_mri_
         if(activeSession) {
             loggedInReader = toTitleProperCase(activeSession);
             var lastUpdate = localStorage.getItem("data_last_updated_" + loggedInReader);
-            if(lastUpdate) { document.getElementById("lastUpdatedLabel").innerText = "Last Updated:- " + lastUpdate; }
+            if(lastUpdate) { 
+                var tsSpan = document.getElementById("lastUpdatedTimeSpan");
+                if(tsSpan) { tsSpan.innerText = lastUpdate; } else { document.getElementById("lastUpdatedLabel").innerText = "LAST UPDATED:- " + lastUpdate; }
+            }
             
             // 🚀 FIX: ऐप स्टार्ट होते ही Configs लोड कर लें, ताकि कोई भी रिपोर्ट ब्लैंक न हो
             try {
@@ -1698,17 +1830,18 @@ var REPORT_NAMES = { 'main_mri_pending': '1. Main Meter MRI Pending', 'pole_mri_
             
             var isDesktop = window.innerWidth > 768 || document.body.classList.contains('desktop-force');
             if(!lastUpdate) { 
-                triggerSilentBackgroundDataDownload(function(){ document.getElementById('appSplashScreen').style.display = "none"; }); 
+                // पुराने सीधे कॉल की जगह नया वर्कफ़्लो
+                executeSafeSyncAndDownloadWorkflow(function(){ document.getElementById('appSplashScreen').style.display = "none"; });  
             } else { 
                 document.getElementById('appSplashScreen').style.display = "none";
                 if (isDesktop) {
                     var lastSyncMs = localStorage.getItem("last_sync_time_ms_" + loggedInReader);
                     var timeDiff = lastSyncMs ? (new Date().getTime() - parseInt(lastSyncMs)) : Infinity;
                     if(timeDiff > (15 * 60 * 1000)) { 
-                        triggerSilentBackgroundDataDownload();
+                        executeSafeSyncAndDownloadWorkflow();
                     }
                 } else {
-                    triggerSilentBackgroundDataDownload();
+                    executeSafeSyncAndDownloadWorkflow();
                 }
             }
         } else {
@@ -1800,32 +1933,48 @@ function saveLiveNotificationToServer(targetReader, messageText, lockSeconds) {
 
     function populateDivisionFilter(consumersList) {
     var divSet = new Set();
-    
-    consumersList.forEach(function(item) { 
-        // 🚀 नया फिक्स: हम हर संभव की-नेम (Key name) को चेक करेंगे
-        // यह DIVISION, Division या division तीनों को पकड़ लेगा
-        var div = (item.division || item.DIVISION || item["DIVISION"] || "").toString().trim().toUpperCase(); 
-        
-        if(div && div !== "undefined" && div !== "") {
-            divSet.add(div); 
-        }
-    });
-
     var select = document.getElementById('listDivisionFilter'); 
+    if (!select) return;
+    
     var currentSelection = select.value;
-    
-    // ड्रॉपडाउन को रीसेट करें
+
+    // इंजन 1: यदि लिस्ट पास की गई है, तो सीधे एरे से पार्स करें
+    if (Array.isArray(consumersList) && consumersList.length > 0) {
+        consumersList.forEach(function(item) { 
+            var div = (item.division || item.DIVISION || item["DIVISION"] || "").toString().trim().toUpperCase(); 
+            if(div && div !== "undefined" && div !== "") { divSet.add(div); }
+        });
+        renderDivisionDropdownHTML(divSet, select, currentSelection);
+    } 
+    // इंजन 2: (Failsafe) यदि लिस्ट खाली है, तो तुरंत ऑफलाइन IndexedDB से सारा डेटा फेच करें
+    else if (db) {
+        try {
+            var tx = db.transaction("consumers", "readonly");
+            var store = tx.objectStore("consumers");
+            var req = store.getAll();
+            req.onsuccess = function(e) {
+                var localData = e.target.result || [];
+                localData.forEach(function(item) {
+                    var div = (item.division || item.DIVISION || item["DIVISION"] || "").toString().trim().toUpperCase(); 
+                    if(div && div !== "undefined" && div !== "") { divSet.add(div); }
+                });
+                renderDivisionDropdownHTML(divSet, select, currentSelection);
+            };
+        } catch(err) { console.error("DB Division Filter Err: ", err); }
+    }
+}
+
+// ड्रॉपडाउन रेंडर करने का हेल्पर इंजन
+function renderDivisionDropdownHTML(divSet, select, currentSelection) {
     select.innerHTML = '<option value="ALL">All Div</option>';
-    
-    // अब सेट को सॉर्ट करके ड्रॉपडाउन में डालें
     var sortedDivs = Array.from(divSet).sort();
     sortedDivs.forEach(function(div) { 
         select.innerHTML += '<option value="' + div + '">' + div + '</option>'; 
     });
-
-    // अगर पहले से कोई सिलेक्शन था, तो उसे बनाए रखें
     if (divSet.has(currentSelection)) { 
         select.value = currentSelection; 
+    } else {
+        select.value = "ALL";
     }
 }
 
@@ -1842,6 +1991,57 @@ function saveLiveNotificationToServer(targetReader, messageText, lockSeconds) {
             }
         }
     }
+    // 🚀 सुरक्षित वर्कफ़्लो इंजन: पहले ऑफलाइन डेटा सिंक होगा, फिर नया मास्टर डेटा डाउनलोड होगा
+function executeSafeSyncAndDownloadWorkflow(onComplete) {
+    if (!db) {
+        if (onComplete) onComplete();
+        return;
+    }
+    
+    try {
+        var tx = db.transaction("saved_entries", "readonly");
+        var store = tx.objectStore("saved_entries");
+        var req = store.getAll();
+        
+        req.onsuccess = function() {
+            var offlineData = req.result || [];
+            
+            // यदि मोबाइल में ऑफलाइन डेटा मौजूद है और इंटरनेट चालू है
+            if (offlineData.length > 0 && navigator.onLine) {
+                showThinAlert("🔄 स्टार्टअप: पहले ऑफलाइन डेटा सिंक हो रहा है...", false);
+                
+                google.script.run
+                .withSuccessHandler(function(res) {
+                    if (res && res.success) {
+                        var delTx = db.transaction("saved_entries", "readwrite");
+                        delTx.objectStore("saved_entries").clear();
+                        
+                        delTx.oncomplete = function() {
+                            showThinAlert("✅ ऑफलाइन डेटा सिंक सफल! नया मास्टर डेटा डाउनलोड हो रहा है...", false);
+                            // सिंक पूरा होने के ठीक बाद मास्टर डेटा डाउनलोड ट्रिगर करें
+                            triggerSilentBackgroundDataDownload(onComplete, false);
+                        };
+                    } else {
+                        // यदि सिंक किसी वजह से फेल हो, तो भी सुरक्षा के लिए डेटा डाउनलोड चलाएं (डेटा डिलीट नहीं होगा)
+                        triggerSilentBackgroundDataDownload(onComplete, false);
+                    }
+                })
+                .withFailureHandler(function() {
+                    triggerSilentBackgroundDataDownload(onComplete, false);
+                })
+                .uploadOfflineBulkEntries(offlineData);
+            } else {
+                // यदि कोई ऑफलाइन डेटा नहीं है, तो सीधे मास्टर डेटा डाउनलोड करें
+                triggerSilentBackgroundDataDownload(onComplete, false);
+            }
+        };
+        req.onerror = function() {
+            triggerSilentBackgroundDataDownload(onComplete, false);
+        };
+    } catch (e) {
+        triggerSilentBackgroundDataDownload(onComplete, false);
+    }
+}
 
     function triggerSilentBackgroundDataDownload(onComplete, isManualClick) {
     if(!loggedInReader) { if(onComplete) onComplete(); return; }
@@ -1868,7 +2068,7 @@ function saveLiveNotificationToServer(targetReader, messageText, lockSeconds) {
                 var store = tx.objectStore("consumers"); 
                 store.clear();
 bulkData.consumers.forEach(function(item) { store.put(item); });
-appSearchDatabaseCache = null; 
+appSearchDatabaseCache = null; // सही वेरिएबल नाम का उपयोग करके कैशे साफ़ किया गया 
 
 tx.oncomplete = function() {
     if(bulkData && bulkData.reportConfigs) {
@@ -1890,11 +2090,21 @@ tx.oncomplete = function() {
                     var currentDateTimeStr = new Date().toLocaleString('en-IN');
                     localStorage.setItem("data_last_updated_" + loggedInReader, currentDateTimeStr);
                     localStorage.setItem("last_sync_time_ms_" + loggedInReader, new Date().getTime()); 
-                    var tsLabelNode = document.getElementById("lastUpdatedLabel"); 
-                    if(tsLabelNode) tsLabelNode.innerText = "Last Updated:- " + currentDateTimeStr;
+                    var tsSpan = document.getElementById("lastUpdatedTimeSpan");
+                    if(tsSpan) { 
+                        tsSpan.innerText = currentDateTimeStr; 
+                    } else {
+                        var tsLabelNode = document.getElementById("lastUpdatedLabel"); 
+                        if(tsLabelNode) tsLabelNode.innerText = "LAST UPDATED:- " + currentDateTimeStr;
+                    }
                     
                     buildAdminMultiSelectCheckbox(bulkData.consumers); 
                     populateDivisionFilter(bulkData.consumers);
+                    
+                    // 🎯 फ़िक्स: डेटा डाउनलोड पूरा होते ही लिस्ट रेंडर करने से पहले दोबारा ड्रॉपडाउन सिंक करें
+                    if(typeof renderNewListTab === 'function') {
+                        setTimeout(function() { populateDivisionFilter(bulkData.consumers); }, 50);
+                    }
 
                     // 🟢 नया: डेटा डाउनलोड होते ही एडमिन द्वारा भेजा गया लाइव मैसेज स्क्रीन पर लॉक करना
                     if (bulkData && bulkData.activeNotification) {
@@ -2251,23 +2461,26 @@ window.applyHeaderReaderFilter = function() {
         return;
     }
 
-    // फिक्स: समरी डैशबोर्ड के लिए भी पहली प्राथमिकता 10 को दी गई है
+    // समरी डैशबोर्ड के लिए फ़िल्टर वैल्यू निकालें
     var selectedLoadCat = document.getElementById('billLoadCategoryFilter') ? document.getElementById('billLoadCategoryFilter').value : "10";
     
     try {
-    var cachedConfigs = localStorage.getItem("app_report_configs_cache");
-    if(cachedConfigs) {
-        var tempCfg = JSON.parse(cachedConfigs);
-        if (typeof tempCfg === "string") tempCfg = JSON.parse(tempCfg);
-        globalReportConfigs = Array.isArray(tempCfg) ? tempCfg : [];
-    }
-} catch(e){}
+        var cachedConfigs = localStorage.getItem("app_report_configs_cache");
+        if(cachedConfigs) {
+            var tempCfg = JSON.parse(cachedConfigs);
+            if (typeof tempCfg === "string") tempCfg = JSON.parse(tempCfg);
+            globalReportConfigs = Array.isArray(tempCfg) ? tempCfg : [];
+        }
+    } catch(e){}
 
     getAdminDashboardDataAsync(function(res) {
         if (!res || !res.reports) return;
 
         var allConsumersReport = res.reports.find(r => r.key === 'all_consumers_list' || r.key === 'Visit_Data_Consumers');
         var allData = allConsumersReport ? (allConsumersReport.data || []) : [];
+        
+        // ⚡ भविष्य के क्विक-लोड के लिए डेटा को ग्लोबल मेमोरी कैशे में सुरक्षित करें
+        globalReportsDatabaseCache = allData;
         
         var filteredData = allData.filter(function(item) {
             var itemLoadCat = (item["LOAD_CATOGERY (5,10)"] || "").toString();
@@ -2285,28 +2498,27 @@ window.applyHeaderReaderFilter = function() {
             if(isVisitDateMatch(item.finalVisitDate, 1)) yest++;
         });
 
-        // 🔵 100% डायनामिक बायफर्केशन (Bifurcation) लेआउट इंजन (🎯 FIX)
-        var colorPalette = ["#7c3aed", "#ec4899", "#f59e0b", "#06b6d4", "#14b8a6", "#ef4444", "#3b82f6", "#10b981"];
+        // =========================================================================
+        // 💎 ULTRA-PREMIUM MODERN DASHBOARD CARDS & HEADER LAYOUT ENGINE
+        // =========================================================================
+        var colorPalette = ["#6366f1", "#ec4899", "#f59e0b", "#06b6d4", "#14b8a6", "#ef4444", "#3b82f6", "#10b981"];
         var colorIdx = 0;
         
-        // अलग-अलग सेक्शन्स के लिए बफ़र्स
         var generalGroupHtml = [];
         var mainMeterGroupHtml = [];
         var poleMeterGroupHtml = [];
         var billDistGroupHtml = [];
-        var menuHtmlBuffer = []; // ✅ FIXED: menuHtmlBuffer को यहाँ डिफाइन कर दिया गया है ताकि एरर न आए
 
-        // 1. General Stats (सामान्य क्रेडेंशियल्स)
-        generalGroupHtml.push('<div class="stat-card" style="background: #eff6ff; border-left: 5px solid #1d4ed8;"><div class="stat-val" style="color: #1e40af;">' + total + '</div><div class="stat-lbl" style="color: #1e40af;">Total Allotted</div></div>');
-        generalGroupHtml.push('<div class="stat-card" style="background: #f0fdf4; border-left: 5px solid #16a34a;"><div class="stat-val" style="color: #15803d;">' + done + '</div><div class="stat-lbl" style="color: #15803d;">Visit Done</div></div>');
-        var pendingVisits = total - done;
-        generalGroupHtml.push('<div class="stat-card" style="background: #fff1f2; border-left: 5px solid #e11d48;"><div class="stat-val" style="color: #9f1239;">' + pendingVisits + '</div><div class="stat-lbl" style="color: #9f1239;">Visit Pending</div></div>');
-        generalGroupHtml.push('<div class="stat-card" style="background: #faf5ff; border-left: 5px solid #7c3aed;"><div class="stat-val" style="color: #6b21a8;">' + today + '</div><div class="stat-lbl" style="color: #6b21a8;">Today Visit</div></div>');
+        // 🌟 1. जनरल स्टैटिस्टिक्स कार्ड्स (Glassmorphism + Smooth Shadow Effect)
+        generalGroupHtml.push('<div class="stat-card" style="background: linear-gradient(135deg, #eff6ff, #dbeafe); border-radius: 12px; padding: 12px 4px; text-align: center; box-shadow: 0 4px 15px rgba(30,64,175,0.1); border: 1px solid #e2e8f0; border-top: 4px solid #1e40af; display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 78px; box-sizing: border-box;"><div class="stat-val" style="color: #1e40af; font-size: 22px; font-weight: 900; line-height: 1;">' + total + '</div><div class="stat-lbl" style="color: #1e3a8a; font-size: 10px; font-weight: 800; margin-top: 4px; letter-spacing: 0.2px; line-height: 1.2; white-space: normal !important; text-overflow: clip !important; overflow: visible !important; display: block !important; max-height: none !important;"><i class="fa-solid fa-users" style="margin-right: 4px;"></i> Total Allotted</div></div>');
+        generalGroupHtml.push('<div class="stat-card" style="background: linear-gradient(135deg, #f0fdf4, #dcfce7); border-radius: 12px; padding: 12px 4px; text-align: center; box-shadow: 0 4px 15px rgba(22,163,74,0.1); border: 1px solid #e2e8f0; border-top: 4px solid #16a34a; display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 78px; box-sizing: border-box;"><div class="stat-val" style="color: #15803d; font-size: 22px; font-weight: 900; line-height: 1;">' + done + '</div><div class="stat-lbl" style="color: #166534; font-size: 10px; font-weight: 800; margin-top: 4px; letter-spacing: 0.2px; line-height: 1.2; white-space: normal !important; text-overflow: clip !important; overflow: visible !important; display: block !important; max-height: none !important;"><i class="fa-solid fa-circle-check" style="margin-right: 4px;"></i> Visit Done</div></div>');
         
-        // ऑफ़लाइन सेव्ड को भी जनरल स्टेट्स में रख रहे हैं
-        generalGroupHtml.push('<div class="stat-card" onclick="syncOfflineDataToServer()" style="background: #f0fdf4; border-left: 5px solid #059669;"><div class="stat-val" style="color: #047857;"><span id="st-local-saved">0</span></div><div class="stat-lbl" style="color: #047857;">Offline Saved</div></div>');
+        var pendingVisits = total - done;
+        generalGroupHtml.push('<div class="stat-card" style="background: linear-gradient(135deg, #fff1f2, #ffe4e6); border-radius: 12px; padding: 12px 4px; text-align: center; box-shadow: 0 4px 15px rgba(225,29,72,0.1); border: 1px solid #e2e8f0; border-top: 4px solid #e11d48; display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 78px; box-sizing: border-box;"><div class="stat-val" style="color: #9f1239; font-size: 22px; font-weight: 900; line-height: 1;">' + pendingVisits + '</div><div class="stat-lbl" style="color: #9f1239; font-size: 10px; font-weight: 800; margin-top: 4px; letter-spacing: 0.2px; line-height: 1.2; white-space: normal !important; text-overflow: clip !important; overflow: visible !important; display: block !important; max-height: none !important;"><i class="fa-solid fa-clock" style="margin-right: 4px;"></i> Visit Pending</div></div>');
+        generalGroupHtml.push('<div class="stat-card" style="background: linear-gradient(135deg, #faf5ff, #f3e8ff); border-radius: 12px; padding: 12px 4px; text-align: center; box-shadow: 0 4px 15px rgba(124,58,237,0.1); border: 1px solid #e2e8f0; border-top: 4px solid #7c3aed; display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 78px; box-sizing: border-box;"><div class="stat-val" style="color: #6b21a8; font-size: 22px; font-weight: 900; line-height: 1;">' + today + '</div><div class="stat-lbl" style="color: #581c87; font-size: 10px; font-weight: 800; margin-top: 4px; letter-spacing: 0.2px; line-height: 1.2; white-space: normal !important; text-overflow: clip !important; overflow: visible !important; display: block !important; max-height: none !important;"><i class="fa-solid fa-calendar-day" style="margin-right: 4px;"></i> Today Visit</div></div>');
+        generalGroupHtml.push('<div class="stat-card" onclick="syncOfflineDataToServer()" style="background: linear-gradient(135deg, #f0fdfa, #ccfbf1); border-radius: 12px; padding: 12px 4px; text-align: center; box-shadow: 0 4px 15px rgba(13,148,136,0.1); border: 1px solid #e2e8f0; border-top: 4px solid #0d9488; cursor: pointer; display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 78px; box-sizing: border-box;"><div class="stat-val" style="color: #0f766e; font-size: 22px; font-weight: 900; line-height: 1;"><span id="st-local-saved">0</span></div><div class="stat-lbl" style="color: #115e59; font-size: 10px; font-weight: 800; margin-top: 4px; letter-spacing: 0.2px; line-height: 1.2; white-space: normal !important; text-overflow: clip !important; overflow: visible !important; display: block !important; max-height: none !important;"><i class="fa-solid fa-cloud-arrow-up" style="margin-right: 4px;"></i> Offline Saved</div></div>');
 
-        // 2. डायनामिक शीट कॉन्फ़िगरेशन से कार्ड्स को फ़िल्टर करके उनके सही सेक्शन्स में डालना
+        // 🔗 2. डायनामिक शीट कॉन्फ़िगरेशन से प्रीमियम कार्ड्स जनरेशन Engine
         if (Array.isArray(globalReportConfigs)) {
             globalReportConfigs.forEach(function(config) {
                 var userRole = loggedInReader.toUpperCase();
@@ -2321,10 +2533,9 @@ window.applyHeaderReaderFilter = function() {
                     var currentCardColor = colorPalette[colorIdx % colorPalette.length];
                     colorIdx++;
                     
-                    var cardString = '<div class="stat-card" style="background: ' + currentCardColor + '0d; border-left: 5px solid ' + currentCardColor + ';" onclick="openReportRowDirect(\'' + config.key + '\')"><div class="stat-val" style="color: ' + currentCardColor + ';">' + matchedItems.length + '</div><div class="stat-lbl" style="color: ' + currentCardColor + '; font-weight: 900;">' + config.name + '</div></div>';
+                    var cardString = '<div class="stat-card" style="background: #ffffff; border-radius: 12px; padding: 12px 8px; text-align: center; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05); border: 1px solid #e2e8f0; border-top: 4px solid ' + currentCardColor + '; cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 78px; box-sizing: border-box;" onclick="openReportRowDirect(\'' + config.key + '\')"><div class="stat-val" style="color: ' + currentCardColor + '; font-size: 22px; font-weight: 900; line-height: 1;">' + matchedItems.length + '</div><div class="stat-lbl" style="color: #334155; font-size: 10px; font-weight: 800; margin-top: 4px; letter-spacing: 0.2px; line-height: 1.2; white-space: normal !important; text-overflow: clip !important; overflow: visible !important; display: block !important; max-height: none !important; -webkit-line-clamp: unset !important;">' + config.name + '</div></div>';
                     
                     var configKeyClean = config.key.toLowerCase();
-                    // नाम या की-आईडी के आधार पर सही सेक्शन्स में विभाजन
                     if (configKeyClean.includes("main") || configKeyClean.includes("mm")) {
                         mainMeterGroupHtml.push(cardString);
                     } else if (configKeyClean.includes("pole") || configKeyClean.includes("pm")) {
@@ -2332,97 +2543,58 @@ window.applyHeaderReaderFilter = function() {
                     } else if (configKeyClean.includes("bill") || configKeyClean.includes("dist")) {
                         billDistGroupHtml.push(cardString);
                     } else {
-                        mainMeterGroupHtml.push(cardString); // फॉलबैक
+                        mainMeterGroupHtml.push(cardString);
                     }
                 }
             });
         }
 
-        // बिल डिस्ट्रीब्यूशन पेंडेंसी को बिल वाले सेक्शन में पुश करना
-        billDistGroupHtml.push('<div class="stat-card" style="background: #fffbeb; border-left: 5px solid #d97706;" onclick="switchTab(\'billdist\')"><div class="stat-val" style="color: #b45309;">' + billP + '</div><div class="stat-lbl" style="color: #b45309;">Bill Dist Pending</div></div>');
+        // बिल डिस्ट्रीब्यूशन पेंडेंसी कार्ड (Premium Amber Visual)
+        billDistGroupHtml.push('<div class="stat-card" style="background: linear-gradient(135deg, #fffbeb, #fef3c7); border-radius: 12px; padding: 12px 8px; text-align: center; box-shadow: 0 4px 15px rgba(217,119,6,0.1); border: 1px solid #e2e8f0; border-top: 4px solid #d97706; cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 78px; box-sizing: border-box;" onclick="switchTab(\'billdist\')"><div class="stat-val" style="color: #b45309; font-size: 22px; font-weight: 900; line-height: 1;">' + billP + '</div><div class="stat-lbl" style="color: #78350f; font-size: 10px; font-weight: 800; margin-top: 4px; letter-spacing: 0.2px; line-height: 1.2; white-space: normal !important; text-overflow: clip !important; overflow: visible !important; display: block !important; max-height: none !important;"><i class="fa-solid fa-file-invoice-dollar" style="margin-right: 4px;"></i> Bill Dist Pending</div></div>');
 
-        // 🛠️ डार्क थीम हेडर और डेस्कटॉप रिस्पॉन्सिव ग्रुपिंग इंजन (🎯 FIX)
+        // 🛠️ रिस्पॉन्सिव ग्रुपिंग सेक्शन रैपर
         var finalDashboardHtml = [];
-        
-        // एक कॉमन फंक्शन जो हेडिंग पट्टी को डार्क प्रीमियम लुक देगा और उसके नीचे के कार्ड्स को एक अलग ग्रिड में पैक करेगा
-        var wrapGroupSection = function(titleText, cardsContent, iconClass, baseColor) {
+        var wrapGroupSection = function(titleText, cardsContent, iconClass, gradientColors) {
             if (!cardsContent || cardsContent.length === 0) return "";
             
-            // डार्क हाई-कंट्रास्ट पट्टी डिज़ाइन
-            var headerHtml = '<div class="section-title" style="width: 100% !important; margin: 15px 0 10px 0 !important; background: ' + baseColor + ' !important; color: #ffffff !important; font-weight: 900 !important; font-size: 13px !important; border-left: 6px solid rgba(0,0,0,0.4) !important; padding: 10px 14px !important; border-radius: 6px !important; box-shadow: 0 4px 6px rgba(0,0,0,0.15) !important; display: block !important; clear: both !important;">' +
-                             '<i class="' + iconClass + '" style="margin-right: 8px;"></i> ' + titleText + '</div>';
+            var headerHtml = '<div style="width: 100%; margin: 20px 0 10px 0; display: flex; align-items: center; gap: 10px; padding: 0 4px; clear: both;">' +
+                               '<div style="width: 4px; height: 16px; background: ' + gradientColors + '; border-radius: 4px;"></div>' +
+                               '<span style="font-size: 12px; font-weight: 900; color: #0f172a; letter-spacing: 0.7px; text-transform: uppercase; display: inline-flex; align-items: center; gap: 6px;">' +
+                                 '<i class="' + iconClass + '" style="color: #475569; font-size: 13px;"></i> ' + titleText + 
+                               '</span>' +
+                               '<div style="flex: 1; height: 1px; background: #e2e8f0;"></div>' +
+                             '</div>';
             
-            // कंप्यूटर व्यू के लिए सब-ग्रिड ताकि कार्ड्स अपनी-अपनी कतार में पूरी चौड़ाई लें
-            var subGridHtml = '<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 8px; width: 100%; box-sizing: border-box; clear: both;">' + cardsContent.join('') + '</div>';
+            var subGridHtml = '<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; width: 100%; box-sizing: border-box; clear: both; padding: 2px 4px;">' + cardsContent.join('') + '</div>';
             
             return headerHtml + subGridHtml;
         };
 
-        // 1. रो 1: General Group (डार्क स्लेट थीम)
-        finalDashboardHtml.push(wrapGroupSection("GENERAL VISIT STATISTICS", generalGroupHtml, "fa-solid fa-chart-simple", "#1e293b"));
-        
-        // 2. रो 2: Main Meter Group (डार्क रॉयल ब्लू थीम)
-        finalDashboardHtml.push(wrapGroupSection("MAIN METER STATUS", mainMeterGroupHtml, "fa-solid fa-bolt", "#1e40af"));
-        
-        // 3. रो 3: Pole Meter Group (डार्क टील/ग्रीन थीम)
-        finalDashboardHtml.push(wrapGroupSection("POLE METER STATUS", poleMeterGroupHtml, "fa-solid fa-box-tissue", "#0f766e"));
-        
-        // 4. रो 4: Bill Distribution Group (डार्क बर्न ऑरेंज थीम)
-        finalDashboardHtml.push(wrapGroupSection("BILLING & DISTRIBUTION STATUS", billDistGroupHtml, "fa-solid fa-file-invoice-dollar", "#c2410c"));
+        // ग्रिड्स को उनके विशिष्ट ग्रुप्स में पैक करना
+        finalDashboardHtml.push(wrapGroupSection("General Visit Statistics", generalGroupHtml, "fa-solid fa-chart-pie", "#6366f1"));
+        finalDashboardHtml.push(wrapGroupSection("Main Meter Status", mainMeterGroupHtml, "fa-solid fa-bolt", "#1e40af"));
+        finalDashboardHtml.push(wrapGroupSection("Pole Meter Status", poleMeterGroupHtml, "fa-solid fa-box", "#0f766e"));
+        finalDashboardHtml.push(wrapGroupSection("Billing & Distribution", billDistGroupHtml, "fa-solid fa-file-invoice-dollar", "#ea580c"));
 
-        // पैरेंट नोड को ग्रिड से हटाकर ब्लॉक लेआउट देना ताकि कंप्यूटर व्यू का बिखराव रुक जाए
+        // मुख्य डोम नोड में इंजेक्ट करना (पुराना सारा डेटा ओवरराइट हो जाएगा)
         var statsGridNode = document.getElementById('summaryGridToPrint');
         if (statsGridNode) {
             statsGridNode.style.setProperty("display", "block", "important");
             statsGridNode.innerHTML = finalDashboardHtml.join('');
         }
 
-        // 🟢 ऑफलाइन सेव काउंटर और सिंक बॉक्स को लाइव अपडेट करने वाला नया फंक्शन
-        function checkSyncStatus() {
-            if (!db) return;
-            try {
-                var tx = db.transaction("saved_entries", "readonly");
-                var store = tx.objectStore("saved_entries");
-                var countReq = store.count();
-                
-                countReq.onsuccess = function() {
-                    var count = countReq.result;
-                    var syncBox = document.getElementById("syncBox");
-                    var syncCountTxt = document.getElementById("syncCountTxt");
-                    var localSavedNode = document.getElementById("st-local-saved");
-                    
-                    // ऑफलाइन सेव वाले कार्ड का नंबर बदलें
-                    if (localSavedNode) localSavedNode.innerText = count;
-                    
-                    // अगर पेंडिंग डेटा है तो सिंक बार दिखाएं, वरना छुपाएं
-                    if (count > 0) {
-                        if (syncBox) syncBox.style.setProperty("display", "block", "important");
-                        if (syncCountTxt) syncCountTxt.innerText = count;
-                    } else {
-                        if (syncBox) syncBox.style.setProperty("display", "none", "important");
-                    }
-                };
-            } catch (e) {
-                console.error("Sync status check error:", e);
-            }
-        }
-
-        // इस फ़ंक्शन को तुरंत रन करें ताकि लोड होते ही काउंटर अपडेट हो जाए
-        checkSyncStatus();
-
-        // =========================================================================
-        // 🎯 FIX: WATCHLIST TABLE ENGINE (क्रैश-प्रूफ लाइव वॉचलिस्ट)
-        // =========================================================================
-        var tableHtmlBuffer = [];
+        // ऑफलाइन सिंक स्टेटस चेक करें
+        if (typeof checkSyncStatus === 'function') checkSyncStatus();
+        
+        // पेंडेंसी वॉचलिस्ट अपडेट करने के लिए री-रेंडर
         var totalReportsPendencyCount = 0;
+        var tableHtmlBuffer = [];
         var currentSummaryGroup = "";
 
         if (Array.isArray(globalReportConfigs)) {
             globalReportConfigs.forEach(function(config) {
                 var userRole = loggedInReader.toUpperCase();
                 if (config.target === "ADMIN" && userRole !== "ANURAG SHAKYA") return;
-                
-                // 🛑 सख्त रोक: ऑल कंज्यूमर्स की दोनों चाबियों को रिपोर्ट्स वॉचलिस्ट में आने से ब्लॉक किया
                 if (config.key === 'all_consumers_list' || config.key === 'Visit_Data_Consumers' || config.key === 'all_bills_report' || config.key === 'bill_dist_pending') return;
 
                 var watchlistItems = filteredData.filter(function(item) {
@@ -2431,74 +2603,66 @@ window.applyHeaderReaderFilter = function() {
                 });
 
                 var groupNameStr = (config.reportGroup || "").toUpperCase().trim();
-                var isTopCard = groupNameStr === "TOP_CARD";
-                var isAnalyticsMatrix = groupNameStr === "ANALYTICS_MATRIX";
-
-                // केवल PENDENCY ग्रुप्स को ही नीचे दिखाना
-                if (!isTopCard && !isAnalyticsMatrix) {
+                if (groupNameStr !== "TOP_CARD" && groupNameStr !== "ANALYTICS_MATRIX") {
                     var groupName = config.reportGroup || "OTHER REPORTS";
-                    
-                    // ग्रुप हेडिंग पट्टी (Section Title)
+                    // 🎯 नया सुधरा हुआ ग्रुप हेडिंग पट्टी (Premium Compartment Bar)
                     if (groupName.toUpperCase().trim() !== currentSummaryGroup) {
+                        var cleanGroupName = groupName.toUpperCase().replace(/_/g, ' ').trim();
+                        
+                        // आइकॉन सेलेक्टर इंजन (नाम के हिसाब से आइकॉन अपने आप बदल जाएगा)
+                        var groupIcon = "fa-solid fa-folder-open";
+                        if(cleanGroupName.includes("MAIN METER")) groupIcon = "fa-solid fa-bolt";
+                        if(cleanGroupName.includes("POLE METER")) groupIcon = "fa-solid fa-box";
+                        if(cleanGroupName.includes("50 KW")) groupIcon = "fa-solid fa-industry";
+                        if(cleanGroupName.includes("NEW CONSUMER")) groupIcon = "fa-solid fa-user-plus";
+
                         tableHtmlBuffer.push(
-                            '<tr style="background-color: #f1f5f9; border-top: 2px solid #cbd5e1; border-bottom: 1px solid #cbd5e1;">' +
-                            '<td colspan="2" style="font-weight: 900; color: #1e40af; font-size: 11px; text-transform: uppercase; padding: 6px 8px; letter-spacing: 0.5px;"><i class="fa-solid fa-layer-group"></i> ' + groupName + '</td>' +
-                            '</tr>'
+                            '<div style="width: 100%; margin: 18px 0 8px 0; background: #0f172a; color: #ffffff; font-weight: 800; font-size: 11px; border-left: 5px solid #3b82f6; padding: 8px 12px; border-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.08); display: flex; align-items: center; gap: 8px; letter-spacing: 0.5px; clear: both; box-sizing: border-box; text-transform: uppercase;">' +
+                                '<i class="' + groupIcon + '" style="color: #3b82f6; font-size: 12px;"></i> ' + cleanGroupName +
+                            '</div>'
                         );
                         currentSummaryGroup = groupName.toUpperCase().trim();
                     }
 
-                    // इंडिविजुअल रिपोर्ट और उसका पेंडेंसी काउंट
-                    var badgeClass = (watchlistItems.length === 0) ? "badge-count zero" : "badge-count alert";
-                    var displayName = config.name || config.reportNames || config.key;
+                    // 🎯 प्रीमियम कॉम्पैक्ट कार्ड डिज़ाइन (टेबल रो की जगह आधुनिक कार्ड्स)
+                    var hasPendency = watchlistItems.length > 0;
+                    var cardBg = hasPendency ? "background: #ffffff;" : "background: #f8fafc; opacity: 0.85;";
+                    var indicatorColor = hasPendency ? "#ef4444" : "#cbd5e1";
+                    var badgeStyle = hasPendency 
+                        ? "background: #fef2f2; color: #b91c1c; border: 1px solid #fca5a5; font-size: 11px; font-weight: 900; padding: 3px 10px; border-radius: 20px;" 
+                        : "background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; font-size: 11px; font-weight: 900; padding: 3px 10px; border-radius: 20px;";
+
                     tableHtmlBuffer.push(
-                        '<tr onclick="openReportRowDirect(\'' + config.key + '\')">' +
-                        '<td style="padding-left: 12px; border-left: 4px solid ' + (watchlistItems.length > 0 ? '#1e40af' : 'transparent') + '; font-weight:700; color:#0f172a; font-size: 12px;">' + displayName + '</td>' +
-                        '<td style="text-align: center; vertical-align: middle;"><span class="' + badgeClass + '" style="font-size:11px; padding:3px 8px; font-weight:bold;">' + watchlistItems.length + '</span></td>' +
-                        '</tr>'
+                        '<div onclick="openReportRowDirect(\'' + config.key + '\')" style="' + cardBg + ' border: 1px solid #e2e8f0; border-left: 4px solid ' + indicatorColor + '; border-radius: 10px; padding: 12px 14px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.02);" onmouseover="this.style.boxShadow=\'0 4px 12px rgba(0,0,0,0.05)\'; this.style.transform=\'translateY(-1px)\'" onmouseout="this.style.boxShadow=\'0 2px 4px rgba(0,0,0,0.02)\'; this.style.transform=\'none\'">' +
+                          '<div style="font-weight: 700; color: #1e293b; font-size: 11.5px; padding-right: 15px; line-height: 1.4; text-align: left;">' + config.name + '</div>' +
+                          '<div style="flex-shrink: 0; display: flex; align-items: center;"><span style="' + badgeStyle + '">' + watchlistItems.length + '</span></div>' +
+                        '</div>'
                     );
                     totalReportsPendencyCount += watchlistItems.length;
                 }
             }); 
         }
 
-        // HTML में डेटा रेंडर करना
-        var tableBodyNode = document.getElementById('dynamicWatchlistTableBody');
-        if(tableBodyNode) {
-            tableBodyNode.innerHTML = tableHtmlBuffer.length === 0 ? '<tr><td colspan="2" style="text-align:center; padding:15px; color:#64748b; font-weight:bold;">कोई पेंडेंसी रिपोर्ट नहीं मिली।</td></tr>' : tableHtmlBuffer.join('');
+        // 🎯 पैरेंट टेबल कंटेनर को हटाकर सीधे सुंदर ग्रिड डिव ब्लॉक में बदलना
+        var watchlistContainerBox = document.getElementById('summaryPendencyTableBox');
+        if (watchlistContainerBox) {
+            // पुराने टेबल स्ट्रक्चर को मॉडर्न क्लीन डिव लेआउट से ओवरराइड करें
+            watchlistContainerBox.innerHTML = '<div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px; padding: 0 2px;">' +
+                                                '<div style="width: 4px; height: 16px; background: #3b82f6; border-radius: 4px;"></div>' +
+                                                '<span style="font-size: 12px; font-weight: 900; color: #0f172a; letter-spacing: 0.5px; text-transform: uppercase;"><i class="fa-solid fa-layer-group" style="color: #475569; margin-right: 4px;"></i> Reports Watchlist</span>' +
+                                                '<div style="flex: 1; height: 1px; background: #e2e8f0;"></div>' +
+                                              '</div>' + 
+                                              '<div style="display: flex; flex-direction: column; width: 100%; box-sizing: border-box;">' + tableHtmlBuffer.join('') + '</div>';
         }
-        
-        // टोटल काउंट बैज अपडेट करना
-        var nodeReports = document.getElementById('count-reports');
-        if(nodeReports) { 
-            nodeReports.innerText = totalReportsPendencyCount; 
-            setCountBadgeColor('count-reports', totalReportsPendencyCount); 
-        }
-        // =========================================================================
-        // 🚀 अल्टीमेट साइडबार फ़िल्टर पैच: 'all_consumers_list' और 'all_bills_report' को यहाँ आने से पूरी तरह ब्लॉक करें
-        // =========================================================================
-        
-        // =========================================================================
-        // 🚀 अल्टीमेट साइडबार क्लीनअप पैच: होम में रिपोर्ट्स सब-टैब होने के कारण साइड मेन्यू से रिपोर्ट्स पूरी तरह रिमूव्ड
-        // =========================================================================
-        var cleanMenuHtmlBuffer = ['<div class="section-title" style="background:#eff6ff; color:#1e40af; border-left:4px solid #3b82f6; text-transform:uppercase; text-align:center;"><i class="fa-solid fa-info-circle"></i> ADMIN TOOLS ONLY</div>'];
 
-        // वॉचलिस्ट टेबल रेंडरर
         var tableBodyNode = document.getElementById('dynamicWatchlistTableBody');
         if(tableBodyNode) tableBodyNode.innerHTML = tableHtmlBuffer.join('');
-        
-        // मुख्य फिक्स: साइडबार कंटेनर को पूरी तरह फ्रेश और साफ़ बफ़र से ओवरराइड करें
-        var menuContainerNode = document.getElementById('dynamicReportsMenuContainer');
-        if(menuContainerNode) {
-            menuContainerNode.innerHTML = cleanMenuHtmlBuffer.join('');
-        }
 
         var nodeReports = document.getElementById('count-reports');
         if(nodeReports) { nodeReports.innerText = totalReportsPendencyCount; setCountBadgeColor('count-reports', totalReportsPendencyCount); }
 
         var nodeList = document.getElementById('count-list');
         if(nodeList) { 
-            // 🎯 फिक्स: अगर उपभोक्ता टैब खुला है, तो यह फंक्शन काउंट को जबरदस्ती चेंज नहीं करेगा
             var listViewActive = document.getElementById('view-list') && document.getElementById('view-list').style.display === 'block';
             if (!listViewActive && nodeList.getAttribute('data-search-locked') !== "true") {
                 nodeList.innerText = total; 
@@ -2508,7 +2672,6 @@ window.applyHeaderReaderFilter = function() {
 
         var nodeBillDist = document.getElementById('count-billdist');
         if(nodeBillDist) { 
-            // 🎯 फिक्स: अगर बिल वितरण टैब खुला है, तो यह फंक्शन काउंट को ओवरराइड नहीं करेगा
             var billdistViewActive = document.getElementById('view-billdist') && document.getElementById('view-billdist').style.display === 'block';
             if (!billdistViewActive && nodeBillDist.getAttribute('data-search-locked') !== "true") {
                 nodeBillDist.innerText = billP; 
@@ -2552,7 +2715,7 @@ window.applyHeaderReaderFilter = function() {
         
         if(tabName === 'billdist') renderBillDistributionList(); 
         if(tabName === 'summary') updateSummaryStatsRaw(); 
-        if(tabName === 'list') renderNewListTab(); 
+        if(tabName === 'list') { populateDivisionFilter(); renderNewListTab(); } 
         if(tabName === 'visitdata') renderVisitDataList(); 
         if(tabName === 'reports') closeReportView();
     }
@@ -2561,39 +2724,43 @@ window.applyHeaderReaderFilter = function() {
     function switchSubSummary(subTabName) {
         var cardsView = document.getElementById('sub-view-cards');
         var tableView = document.getElementById('sub-view-table');
+        var analyticsView = document.getElementById('sub-view-analytics');
         
+        // सभी 5 आइकॉन आईडी को ऑब्जेक्ट मैप में बाइंड करना
         var btns = {
             'cards': document.getElementById('sub-tab-cards-btn'),
+            'analytics': document.getElementById('sub-tab-analytics-btn'),
             'table': document.getElementById('sub-tab-table-btn'),
             'all_bills': document.getElementById('sub-tab-bills-btn'),
             'all_consumers': document.getElementById('sub-tab-consumers-btn')
         };
 
-        // सभी बटन्स को पहले डिफ़ॉल्ट (In-Active) स्टाइल दें
+        // 🎯 सभी आइकॉन बटन्स से एक्टिव क्लास हटाकर डिफ़ॉल्ट रूप में लाना
         for(var k in btns) {
-            if(btns[k]) { btns[k].style.background = 'transparent'; btns[k].style.color = '#475569'; }
+            if(btns[k]) { btns[k].classList.remove('active-pill'); }
         }
 
-        var analyticsView = document.getElementById('sub-view-analytics');
+        // व्यू मैनेजमेंट और सिलेक्टेड आइकॉन पर 'active-pill' सेट करना
         if(subTabName === 'cards') {
-            if(cardsView) cardsView.style.display = 'block';
-            if(tableView) tableView.style.display = 'none';
-            if(analyticsView) analyticsView.style.display = 'none';
-            if(btns['cards']) { btns['cards'].style.background = 'linear-gradient(90deg, #1e40af, #6b21a8)'; btns['cards'].style.color = 'white'; }
+            if(cardsView) cardsView.style.setProperty("display", "block", "important");
+            if(tableView) tableView.style.setProperty("display", "none", "important");
+            if(analyticsView) analyticsView.style.setProperty("display", "none", "important");
+            if(btns['cards']) btns['cards'].classList.add('active-pill');
         } else if(subTabName === 'analytics') {
-            if(cardsView) cardsView.style.display = 'none';
-            if(tableView) tableView.style.display = 'none';
-            if(analyticsView) analyticsView.style.display = 'block';
-            if(btns['analytics']) { btns['analytics'].style.background = 'linear-gradient(90deg, #1e40af, #6b21a8)'; btns['analytics'].style.color = 'white'; }
+            if(cardsView) cardsView.style.setProperty("display", "none", "important");
+            if(tableView) tableView.style.setProperty("display", "none", "important");
+            if(analyticsView) analyticsView.style.setProperty("display", "block", "important");
+            if(btns['analytics']) btns['analytics'].classList.add('active-pill');
             setTimeout(renderAnalyticsDashboardEngine, 50); // चार्ट री-ड्रॉ ड्राइवर
         } else if(subTabName === 'table') {
-            if(cardsView) cardsView.style.display = 'none';
-            if(tableView) tableView.style.display = 'block';
-            if(analyticsView) analyticsView.style.display = 'none';
-            if(btns['table']) { btns['table'].style.background = 'linear-gradient(90deg, #1e40af, #6b21a8)'; btns['table'].style.color = 'white'; }
-        } else {
-            // यदि All Bills या All Consumers डायरेक्ट खुला हो
-            if(btns[subTabName]) { btns[subTabName].style.background = 'linear-gradient(90deg, #1e40af, #6b21a8)'; btns[subTabName].style.color = 'white'; }
+            if(cardsView) cardsView.style.setProperty("display", "none", "important");
+            if(tableView) tableView.style.setProperty("display", "block", "important");
+            if(analyticsView) analyticsView.style.setProperty("display", "none", "important");
+            if(btns['table']) btns['table'].classList.add('active-pill');
+        } else if(subTabName === 'all_bills') {
+            if(btns['all_bills']) btns['all_bills'].classList.add('active-pill');
+        } else if(subTabName === 'all_consumers') {
+            if(btns['all_consumers']) btns['all_consumers'].classList.add('active-pill');
         }
     }
 
@@ -2654,6 +2821,8 @@ window.applyHeaderReaderFilter = function() {
             if (typeof switchSubSummary === 'function') { 
                 switchSubSummary('table'); // 🚀 अब यह सीधा रिपोर्ट्स वॉचलिस्ट दिखाएगा
             }
+            // 🎯 सुरक्षा कवच: मास्टर लिस्ट बंद होते ही पिछले डायनामिक फ़िल्टर ऑप्शंस को मेमोरी से डिलीट करना
+            document.querySelectorAll('.dynamic-opt').forEach(el => el.remove());
             return;
         }
 
@@ -2676,6 +2845,8 @@ window.applyHeaderReaderFilter = function() {
             }
             launchDashboard(); 
         }
+        // 🎯 सेफ़्टी चेक: यहाँ भी डायनामिक ऑप्शंस को पूरी तरह साफ़ किया गया
+        document.querySelectorAll('.dynamic-opt').forEach(el => el.remove());
     }
 
     function launchDashboard() {
@@ -2714,81 +2885,92 @@ window.applyHeaderReaderFilter = function() {
     // ⚡ ULTRA-FAST SEARCH ENGINE (INDEXEDDB MEMORY CACHE CONTEXT)
 var appSearchDatabaseCache = null; // बार-बार DB लोड होने से रोकने के लिए ग्लोबल कैशे
 
-// ⚡ सुपर-फास्ट सर्च इंजन पैच (पेस्ट फिक्स और कीबोर्ड री-रेंडरिंग लॉकिंग सिस्टम)
+// ⚡ इंटेलिजेंट रैम-डीप सर्च इंजन (पेस्ट फिक्स, कीबोर्ड लैग सुरक्षा और डीप डेटा स्कैन इंजन)
+var globalSearchLockTimer = null;
+
 function universalListSearch(inputId, containerId) {
     var inputNode = document.getElementById(inputId);
     if (!inputNode) return;
     
-    // 🎯 फिक्स 1: सर्च टेक्स्ट को साफ करना (Spaces, Tabs, New Lines को हटाकर क्लीन पैकेट बनाना)
-    var input = inputNode.value.replace(/[\r\n\t]/g, ' ').replace(/\s+/g, ' ').toUpperCase().trim();
+    // 🎯 फिक्स 1: पेस्ट किए गए डेटा में से न्यू-लाइन, टैब और फालतू स्पेस को साफ करके शुद्ध कीवर्ड्स बनाना
+    var rawInput = inputNode.value || "";
+    var cleanInput = rawInput.replace(/[\r\n\t]/g, ' ').replace(/\s+/g, ' ').toUpperCase().trim();
     var container = document.getElementById(containerId);
     if (!container) return;
 
-    var nodes = container.querySelectorAll('.list-item');
-    
-    // शब्दों को अलग-अलग कीवर्ड्स के रूप में तोड़ना
-    var searchKeywords = input.split(/\s+/).filter(function(k) { return k !== ""; });
+    var searchKeywords = cleanInput.split(/\s+/).filter(function(k) { return k !== ""; });
 
-    // अगर सर्च बॉक्स पूरी तरह खाली है, तो पुराने सारे कार्ड्स वापस दिखा दें
+    // यदि सर्च बॉक्स पूरा खाली हो जाए, तो मूल स्थिति वापस रेंडर करें
     if (searchKeywords.length === 0) {
-        nodes.forEach(function(node) { node.style.removeProperty("display"); });
-        var qvContent = container.querySelector('.accordion-content');
-        if(qvContent) qvContent.style.display = "none";
-        updateSearchBadgeCount(containerId, nodes.length, false);
+        appSearchDatabaseCache = null; // कैशे रीसेट
+        var currentTabNode = document.querySelector('.tab-btn.active');
+        if (currentTabNode) {
+            var activeTabName = currentTabNode.id.replace('btn-tab-', '');
+            if (activeTabName === 'list' && typeof renderNewListTab === 'function') renderNewListTab();
+            else if (activeTabName === 'billdist' && typeof renderBillDistributionList === 'function') renderBillDistributionList();
+            else if (activeReportType && typeof applyRemarkGroupFilter === 'function') applyRemarkGroupFilter();
+        }
         return;
     }
 
     if (!db) return;
 
-    // 🎯 फिक्स 2: कीबोर्ड के बार-बार रिफ्रेश होने से रोकने के लिए कैशे प्रोटेक्शन इंजन
-    if (appSearchDatabaseCache && appSearchDatabaseCache.length > 0) {
-        executeFastCacheSearch(searchKeywords, appSearchDatabaseCache, container, containerId);
-    } else {
-        var tx = db.transaction("consumers", "readonly");
-        var store = tx.objectStore("consumers");
-        var req = store.getAll();
-
-        req.onsuccess = function(e) {
-            appSearchDatabaseCache = e.target.result || [];
+    // 🎯 फिक्स 2: कीबोर्ड लैग रोकने के लिए थ्रॉटलिंग (३०ms डिले) ताकि हर टाइप पर यूआई न लटके
+    if (globalSearchLockTimer) clearTimeout(globalSearchLockTimer);
+    globalSearchLockTimer = setTimeout(function() {
+        if (appSearchDatabaseCache && appSearchDatabaseCache.length > 0) {
             executeFastCacheSearch(searchKeywords, appSearchDatabaseCache, container, containerId);
-        };
-    }
+        } else {
+            var tx = db.transaction("consumers", "readonly");
+            var store = tx.objectStore("consumers");
+            var req = store.getAll();
+            req.onsuccess = function(e) {
+                appSearchDatabaseCache = e.target.result || [];
+                executeFastCacheSearch(searchKeywords, appSearchDatabaseCache, container, containerId);
+            };
+        }
+    }, 30);
 }
 
-// ⚡ सुपर-फास्ट कैशे सर्च ड्राइवर (100% सिंटैक्स एरर, ब्रैकेट और ऑल कंज्यूमर्स फॉर्म बटन फिक्स)
+// ⚡ सुपर-फास्ट कैशे डीप सर्च ड्राइवर (उपभोक्ता के सम्पूर्ण अंदरूनी डेटाबेस से मिलान)
 function executeFastCacheSearch(searchKeywords, allData, container, containerId) {
     var matchedItemsHtml = [];
     var matchedCount = 0;
+    
     var isBillingMode = containerId.toLowerCase().includes("bill") || activeReportType.toLowerCase().includes("bill") || activeReportType.toLowerCase().includes("dist");
+    var currentFilterDiv = document.getElementById('listDivisionFilter') ? document.getElementById('listDivisionFilter').value : "ALL";
+    var currentFilterStatus = document.getElementById('listStatusFilter') ? document.getElementById('listStatusFilter').value : "PENDING";
 
     for (var i = 0; i < allData.length; i++) {
-        var item = allData[i];
+        var item = allData[i] || {};
         if (!isReaderAllowed(getReaderName(item))) continue;
 
-        var accNo = (item.accountNo || "").toString().toUpperCase();
-        var name = (item.consumerName || "").toString().toUpperCase();
-        var addr = (item.address || "").toString().toUpperCase();
-        var mob = (item.masterMobileNumber || item.mobileNo || "").toString().toUpperCase();
-        var mainMtrNo = (item.lastMmNo || "").toString().toUpperCase();
-        var poleMtrNo = (item.lastPmNo || "").toString().toUpperCase();
-        var mainRemark = (item.mainStatusRemark || "").toString().toUpperCase();
+        // 🎯 फिक्स 3: उपभोक्ता टैब के वर्तमान पेंडिंग/अटेंड फ़िल्टर का सम्मान करना ताकि सर्च में भी वही स्टेट्स आएं
+        if (containerId === 'listDataContainer') {
+            var itemDiv = (getRobustKey(item, "DIVISION") || item.division || "").toString().toUpperCase().trim();
+            if (currentFilterDiv !== "ALL" && currentFilterDiv !== itemDiv) continue;
+            
+            var rawStatus = (getRobustKey(item, "ATTEND STATUS") || item.attendStatus || "").toString().toUpperCase().trim();
+            var rawDistStatus = (getRobustKey(item, "DISTRIBUTION STATUS") || item.distStatus || "").toString().toUpperCase().trim();
+            var isStrictlyDone = (item.isDone === true || item.isDone === "true" || rawStatus === "ATTEND" || rawStatus === "DONE" || rawDistStatus === "DISTRIBUTED");
+            
+            if (currentFilterStatus === "PENDING" && isStrictlyDone) continue;
+            if (currentFilterStatus === "ATTEND" && !isStrictlyDone) continue;
+        }
 
-        // 🎯 फिक्स 3: डेटाबेस के डेटा में से भी फालतू स्पेस साफ करना (ताकि पेस्ट किया हुआ बड़ा डेटा तुरंत मैच हो)
-        var cleanField = function(f) { return (f || "").toString().replace(/[\r\n\t]/g, ' ').replace(/\s+/g, ' ').toUpperCase().trim(); };
-        
-        var accNo = cleanField(item.accountNo);
-        var name = cleanField(item.consumerName);
-        var addr = cleanField(item.address);
-        var mob = cleanField(item.masterMobileNumber || item.mobileNo);
-        var mainMtrNo = cleanField(item.lastMmNo);
-        var poleMtrNo = cleanField(item.lastPmNo);
-        var mainRemark = cleanField(item.mainStatusRemark);
+        // 🎯 फिक्स 4: आवश्यक इंडेक्स कॉलम्स पर केंद्रित करके प्रोसेसर लैग को दूर किया गया
+        var consumerCompleteRowString = [
+            (item.accountNo || ""),
+            (item.consumerName || ""),
+            (getRobustKey(item, "ADDRESS") || ""),
+            (getRobustKey(item, "LAST MONTH FINAL MM NO.") || ""),
+            (getRobustKey(item, "LAST MONTH FINAL PM NO.") || "")
+        ].join(" ").replace(/[\r\n\t]/g, ' ').replace(/\s+/g, ' ').toUpperCase();
 
-        var combinedData = accNo + " " + name + " " + addr + " " + mob + " " + mainMtrNo + " " + poleMtrNo + " " + mainRemark;
-
+        // कीवर्ड्स मिलान चेकर
         var isMatch = true;
         for (var j = 0; j < searchKeywords.length; j++) {
-            if (combinedData.indexOf(searchKeywords[j]) === -1) {
+            if (consumerCompleteRowString.indexOf(searchKeywords[j]) === -1) {
                 isMatch = false;
                 break;
             }
@@ -2796,9 +2978,16 @@ function executeFastCacheSearch(searchKeywords, allData, container, containerId)
 
         if (isMatch) {
             matchedCount++;
+            var accNo = (item.accountNo || "").toString().toUpperCase();
+            var addr = getRobustKey(item, "ADDRESS") || "-";
+            var mob = getRobustKey(item, "Master Mobile Number") || "-";
+            var mainMtrNo = getRobustKey(item, "LAST MONTH FINAL MM NO.") || item.lastMmNo || "";
+            var poleMtrNo = getRobustKey(item, "LAST MONTH FINAL PM NO.") || item.lastPmNo || "";
+            var divisionDisplay = item.division || item.DIVISION || "";
+
             if (isBillingMode) {
                 var pdfBtn = item.pdfLink ? '<a href="' + item.pdfLink + '" target="_blank" class="pdf-icon" onclick="event.stopPropagation();"><i class="fa-solid fa-file-pdf"></i></a>' : '';
-                var waBtn = '<button class="whatsapp-icon" onclick="event.stopPropagation(); triggerWhatsApp(event, \'' + accNo + '\')"><i class="fa-brands fa-whatsapp"></i></button>';
+                var waBtn = item.pdfLink ? '<button class="whatsapp-icon" onclick="event.stopPropagation(); triggerWhatsApp(event, \'' + accNo + '\')"><i class="fa-brands fa-whatsapp"></i></button>' : '';
                 var upDate = item.billUpDate || "N/A";
                 
                 matchedItemsHtml.push(
@@ -2806,39 +2995,17 @@ function executeFastCacheSearch(searchKeywords, allData, container, containerId)
                     '<div style="width:30px; display:flex; align-items:center;"><input type="checkbox" class="bill-select-cb" value="' + item.pdfLink + '" data-acc="' + accNo + '" onclick="event.stopPropagation();"></div>' +
                     '<div style="flex:1; text-align:left; padding:0 5px;">' +
                     '<div class="c-name">' + item.consumerName + '</div>' +
-                    '<div class="c-acc">A/C: ' + accNo + '</div>' +
+                    '<div class="c-acc">A/C: ' + accNo + ' | Mob: ' + mob + '</div>' +
                     '<div class="c-addr"><b>पता:</b> ' + addr + '</div>' +
+                    '<div class="c-mtr">M-Mtr: ' + mainMtrNo + ' | P-Mtr: ' + poleMtrNo + '</div>' +
                     '</div>' +
-                    '<div style="text-align:right; width:35%; display:flex; flex-direction:column; align-items:flex-end;">' +
-                    '<div style="color:#b45309; font-size:11px; font-weight:bold;">Upld: ' + upDate + '</div>' +
-                    '<div style="display:flex; gap:5px; margin-top:4px;">' + pdfBtn + waBtn + '</div>' +
+                    '<div style="text-align:right; width:35%; display:flex; flex-direction:column; align-items:flex-end;" onclick="event.stopPropagation();">' +
+                    '<div style="color:#b45309; font-size:11px; font-weight:bold; margin-bottom:4px;">Upld: ' + upDate + '</div>' +
+                    '<div style="display:flex; gap:5px;">' + pdfBtn + waBtn + '</div>' +
                     '</div></div>'
                 );
             } else {
-                var isPoleType = activeReportType ? (activeReportType.toLowerCase().includes("pole") || activeReportType === 'rep13') : false;
-                var mtrNoLabel = isPoleType ? poleMtrNo : mainMtrNo;
-                var divisionDisplay = item.division || item.DIVISION || "";
-                
-                // नियम 1: सम्पूर्ण विजिट्स डेटा कंटेनर के लिए हमेशा फुल एकॉर्डियन ऑन रहेगा
-                if (containerId === 'visitDataListContainer') {
-                    matchedItemsHtml.push(
-                        '<div class="list-item" style="border-left-color:#334155; flex-direction:column; align-items:stretch;" onclick="toggleVisitAccordion(\'' + accNo + '\', \'FULL\')">' +
-                        '<div style="display:flex; justify-content:space-between; width:100%;">' +
-                        '<div style="text-align:left;">' +
-                        '<div class="c-name">' + item.consumerName + '</div>' +
-                        '<div class="c-acc">A/C: ' + accNo + ' | Mob: ' + mob + '</div>' +
-                        '<div class="c-addr"><b>पता:</b> ' + addr + '</div>' +
-                        '<div class="c-mtr">M-Mtr: ' + mainMtrNo + ' | P-Mtr: ' + poleMtrNo + '</div>' +
-                        '</div>' +
-                        '<div style="color:#64748b; display:flex; align-items:center;"><i class="fa-solid fa-chevron-down"></i></div>' +
-                        '</div>' +
-                        '<div id="visit_acc_' + accNo + '" class="accordion-content"></div>' +
-                        '</div>'
-                    );
-                } 
-                // नियम 2: ऑल कंज्यूमर्स मास्टर और सब-रिपोर्ट्स के लिए कस्टमाइज्ड ड्रॉपडाउन डिटेल व्यू और फॉर्म बटन फिक्स
-                // --- [खोजें और केवल इस हिस्से को बदलें] ---
-                else if (activeReportType === 'all_consumers_list' || activeReportType === 'Visit_Data_Consumers') {
+                if (activeReportType === 'all_consumers_list' || activeReportType === 'Visit_Data_Consumers') {
                     var singlePdfBtn = '<div style="display:flex; gap:4px;">' +
                         '<button onclick="event.stopPropagation(); exportSingleConsumerPDF(event, \'' + accNo + '\', \'' + (activeReportType === 'Visit_Data_Consumers' ? 'FULL' : 'MASTER_COLS') + '\')" class="export-btn mini pdf-bg" style="padding: 5px 8px; font-size: 10px;" title="Download PDF"><i class="fa-solid fa-file-pdf"></i></button>' +
                         '<button onclick="event.stopPropagation(); exportConsumerReadingFormPDF(\'' + accNo + '\')" class="export-btn mini" style="padding: 5px 8px; font-size: 10px; background:#4f46e5;" title="Download Reading Form"><i class="fa-solid fa-file-invoice"></i> Form</button>' +
@@ -2870,7 +3037,6 @@ function executeFastCacheSearch(searchKeywords, allData, container, containerId)
                         '</div>'
                     );
                 } else {
-                    // नियम 3: केवल मुख्य 'उपभोक्ता' (होम/लिस्ट) टैब सर्च करने पर ही क्विक व्यू मॉडल (पॉपअप) खुलेगा
                     matchedItemsHtml.push(
                         '<div class="list-item" onclick="openQuickViewModal(\'' + accNo + '\', \'STANDARD\')">' +
                         '<div style="width: 75%; text-align: left;">' +
@@ -2888,6 +3054,7 @@ function executeFastCacheSearch(searchKeywords, allData, container, containerId)
         }
     }
 
+    // 🎯 फिक्स 5: डोम को एक शॉट में ओवरराइड करना, फालतू कार्ड्स स्क्रीन से बिल्कुल साफ़ हो जाएंगे
     container.innerHTML = matchedItemsHtml.length === 0 ? 
         '<div style="text-align:center; padding:25px; color:#ef4444; font-weight:bold;">🚨 कोई परिणाम नहीं मिला!</div>' : 
         matchedItemsHtml.join('');
@@ -2953,12 +3120,12 @@ function updateSearchBadgeCount(containerId, visibleCount, isLocked) {
             '</div>';
         
         // फीडबैक लेबल्स और छिपे हुए बेस64 इनपुट्स साफ़ करना
-        document.getElementById('feedback-main').innerText = ""; 
-        document.getElementById('feedback-pole').innerText = ""; 
-        document.getElementById('feedback-receiver').innerText = "";
-        document.getElementById('f-mainPhotoCompressedBase64').value = ""; 
-        document.getElementById('f-polePhotoCompressedBase64').value = ""; 
-        document.getElementById('f-receiverPhotoCompressedBase64').value = "";
+        if(document.getElementById('feedback-main')) document.getElementById('feedback-main').innerText = ""; 
+        if(document.getElementById('feedback-pole')) document.getElementById('feedback-pole').innerText = ""; 
+        if(document.getElementById('feedback-receiver')) document.getElementById('feedback-receiver').innerText = "";
+        if(document.getElementById('f-mainPhotoCompressedBase64')) document.getElementById('f-mainPhotoCompressedBase64').value = ""; 
+        if(document.getElementById('f-polePhotoCompressedBase64')) document.getElementById('f-polePhotoCompressedBase64').value = ""; 
+        if(document.getElementById('f-receiverPhotoCompressedBase64')) document.getElementById('f-receiverPhotoCompressedBase64').value = "";
         
         document.getElementById('f-editablePrefetchedRemark').value = record.preFetchedRemark || "";
         document.getElementById('f-formType').value = mode;
@@ -3218,19 +3385,51 @@ function renderNewListTab() {
                     var poleMtrDisplay = getRobustKey(item, "LAST MONTH FINAL PM NO.") || item.lastPmNo || "";
                     var divisionDisplay = getRobustKey(item, "DIVISION") || item.division || "";
 
-                    // 🎯 उपभोक्ता टैब फिक्स: पूरे कार्ड पर क्लिक करने से Quick View खुलेगा
-                    // 🎯 Upbhokta Tab: Bahar se Form button hata diya gaya hai, ab sirf Division dikhega
+                    // 🎯 प्रिमियम अल्ट्रा-कॉम्पैक्ट उपभोक्ता सूची लेआउट (Error Fixed Engine)
+                    var currentConsumerName = getRobustKey(item, "CONSUMER-NAME") || item.consumerName || "-";
+                    var currentConsumerMobile = getRobustKey(item, "Master Mobile Number") || item.masterMobileNumber || "-";
+                    var currentDivisionDisplay = getRobustKey(item, "DIVISION") || item.division || "";
+
+                    // 🎯 प्रिमियम अल्ट्रा-कॉम्पैक्ट उपभोक्ता सूची लेआउट (सिंटैक्स और डुप्लीकेशन फिक्स)
+                    var currentConsumerName = getRobustKey(item, "CONSUMER-NAME") || item.consumerName || "-";
+                    var currentConsumerMobile = getRobustKey(item, "Master Mobile Number") || item.masterMobileNumber || "-";
+                    var currentDivisionDisplay = getRobustKey(item, "DIVISION") || item.division || "";
+
+                    // 🚀 मुख्य मीटर और पोल मीटर नंबर को डीप-मैपिंग से फ़ेच करना
+                    var listMainMtrNo = getRobustKey(item, "LAST MONTH FINAL MM NO.") || item.lastMmNo || "-";
+                    var listPoleMtrNo = getRobustKey(item, "LAST MONTH FINAL PM NO.") || item.lastPmNo || "-";
+
+                    // 🚀 मुख्य मीटर और पोल मीटर नंबर की मैपिंग
+                    var listMainMtrNo = getRobustKey(item, "LAST MONTH FINAL MM NO.") || item.lastMmNo || "-";
+                    var listPoleMtrNo = getRobustKey(item, "LAST MONTH FINAL PM NO.") || item.lastPmNo || "-";
+
+                    // 🎯 नया सुधार: उपभोक्ता लिस्ट में भी राइट साइड में मोबाइल+ईमेल अपडेट करने का डायरेक्ट बटन जोड़ा गया
+                    var listInfoBtn = '<button onclick="event.stopPropagation(); openContactUpdateModal(\'' + item.accountNo + '\')" class="export-btn mini" style="padding: 5px 8px; font-size: 10px; background:#0ea5e9; display:inline-flex; align-items:center; justify-content:center; gap:3px; margin-top:4px;" title="Update Contact Info"><i class="fa-solid fa-mobile-screen-button" style="font-size:9px;"></i><i class="fa-solid fa-envelope" style="font-size:9px;"></i></button>';
+
+                    // 🚀 मुख्य मीटर और पोल मीटर नंबर की मैपिंग
+                    var listMainMtrNo = getRobustKey(item, "LAST MONTH FINAL MM NO.") || item.lastMmNo || "-";
+                    var listPoleMtrNo = getRobustKey(item, "LAST MONTH FINAL PM NO.") || item.lastPmNo || "-";
+                    // 🎯 पता (Address) फ़ेच करने का इंजन
+                    var listAddressDisplay = getRobustKey(item, "ADDRESS") || "-";
+
+                    // 🎯 नया सुधार: उपभोक्ता लिस्ट में भी राइट साइड में मोबाइल+ईमेल अपडेट करने का डायरेक्ट बटन जोड़ा गया
+                    var listInfoBtn = '<button onclick="event.stopPropagation(); openContactUpdateModal(\'' + item.accountNo + '\')" class="export-btn mini" style="padding: 5px 8px; font-size: 10px; background:#0ea5e9; display:inline-flex; align-items:center; justify-content:center; gap:3px; margin-top:4px;" title="Update Contact Info"><i class="fa-solid fa-mobile-screen-button" style="font-size:9px;"></i><i class="fa-solid fa-envelope" style="font-size:9px;"></i></button>';
+
                     htmlBuffer.push(
-                        '<div class="list-item" onclick="openQuickViewModal(\'' + item.accountNo + '\', \'STANDARD\')">' +
-                        '<div style="width: 75%; text-align: left; cursor: pointer;">' +
-                        '<div class="c-name">' + consumerNameDisplay + '</div>' +
-                        '<div class="c-acc">A/C: ' + item.accountNo + ' | Mob: ' + consumerMobile + '</div>' +
-                        '<div class="c-addr"><b>पता:</b> ' + consumerAddress + '</div>' +
-                        '<div class="c-mtr">M-Mtr: ' + mainMtrDisplay + ' | P-Mtr: ' + poleMtrDisplay + '</div>' +
+                        '<div class="list-item" style="padding: 6px 10px !important; margin-bottom: 4px !important; border-radius: 8px !important; box-shadow: 0 1px 3px rgba(0,0,0,0.04) !important;" onclick="openQuickViewModal(\'' + item.accountNo + '\', \'STANDARD\')">' +
+                        '<div style="display:flex; width:100%; align-items:center; justify-content:space-between; cursor: pointer;">' +
+                        '<div style="flex: 1; text-align: left; min-width: 0; padding-right: 5px;">' +
+                        '<div class="c-name" style="font-size:12.5px !important; font-weight:900 !important; line-height:1.2 !important; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + currentConsumerName + '</div>' +
+                        '<div class="c-acc" style="font-size:11px !important; margin-top:1px !important; color:#475569;">A/C: ' + item.accountNo + ' | Mob: ' + currentConsumerMobile + '</div>' +
+                        // 🎯 पता (Address) रो जोड़ी गई
+                        '<div class="c-addr" style="font-size:11px !important; margin-top:2px !important; color:#64748b; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"><b>पता:</b> ' + listAddressDisplay + '</div>' +
+                        '<div class="c-mtr" style="font-size:11px !important; margin-top:2px !important; color:#4f46e5; font-weight:700;">M-Mtr: ' + listMainMtrNo + ' | P-Mtr: ' + listPoleMtrNo + '</div>' +
                         '</div>' +
-                        '<div style="text-align:right; width: 25%; flex-shrink: 0; display:flex; flex-direction:column; align-items:flex-end; justify-content:center;">' +
-                        '<div style="font-size:10px; font-weight:bold; color:#4338ca; background:#e0e7ff; padding:2px 6px; border-radius:4px;">' + divisionDisplay + '</div>' +
-                        '</div></div>'
+                        // राइट side का लेआउट
+                        '<div style="text-align:right; flex-shrink: 0; display:flex; flex-direction:column; align-items:flex-end; gap:2px;">' +
+                        '<div style="font-size:10px; font-weight:bold; color:#4338ca; background:#e0e7ff; padding:2px 6px; border-radius:4px; white-space:nowrap;">' + currentDivisionDisplay + '</div>' +
+                        '<div onclick="event.stopPropagation();">' + listInfoBtn + '</div>' +
+                        '</div></div></div>'
                     );
                 }
             } // loop end
@@ -3330,11 +3529,50 @@ function renderNewListTab() {
         }
     };
 }
-    function toggleAllBillsDist(source) {
-        var checkboxes = document.querySelectorAll('.bill-select-cb');
+    // 🔗 १. मुख्य बिल वितरण टैब के लिए इवेंट-फ्रीज सिलेक्ट इंजन
+    function toggleAllBillsDist(source, event) {
+        if (event) {
+            event.stopPropagation();
+            event.stopImmediatePropagation(); // इवेंट को ऊपर जाने से पूरी तरह रोका
+        }
+        if (!source) return;
+        var container = document.getElementById('billDistributionContainer');
+        if (!container) return;
+        var checkboxes = container.querySelectorAll('.bill-select-cb');
+        
         checkboxes.forEach(function(cb) {
-            if(cb.closest('.list-item').style.display !== 'none') {
+            var parentRow = cb.closest('.list-item');
+            if (parentRow && parentRow.style.display !== 'none') {
                 cb.checked = source.checked;
+                if (source.checked) {
+                    cb.setAttribute('checked', 'true');
+                } else {
+                    cb.removeAttribute('checked');
+                }
+            }
+        });
+    }
+
+    // 🔗 २. ALL BILLS REPORT टैब के लिए इवेंट-फ्रीज सिलेक्ट इंजन
+    function toggleAllBillsReportTab(source, event) {
+        if (event) {
+            event.stopPropagation();
+            event.stopImmediatePropagation(); // सर्च लूप को ट्रिगर होने से रोका
+        }
+        if (!source) return;
+        var container = document.getElementById('reportListContainer');
+        if (!container) return;
+        var checkboxes = container.querySelectorAll('.bill-select-cb');
+        
+        checkboxes.forEach(function(cb) {
+            var parentRow = cb.closest('.list-item');
+            if (parentRow && parentRow.style.display !== 'none') {
+                cb.checked = source.checked;
+                if (source.checked) {
+                    cb.setAttribute('checked', 'true');
+                } else {
+                    cb.removeAttribute('checked');
+                }
             }
         });
     }
@@ -3435,8 +3673,12 @@ function renderNewListTab() {
                 }
             };
             cTx.oncomplete = function() { 
-                document.getElementById('billDistributionContainer').innerHTML = htmlBuffer.length === 0 ? '<div style="text-align:center; padding:25px; color:#475569;">कोई उपभोक्ता शेष नहीं है।</div>' : htmlBuffer.join(''); 
-                universalListSearch('billSearchBar', 'billDistributionContainer'); 
+                // 🎯 फ़िक्स: डेटा को सीधे इनपुट किया गया बिना किसी री-सर्च क्लैश के
+                var distContainerNode = document.getElementById('billDistributionContainer');
+                if (distContainerNode) {
+                    distContainerNode.innerHTML = htmlBuffer.length === 0 ? '<div style="text-align:center; padding:25px; color:#475569;">कोई उपभोक्ता शेष नहीं है।</div>' : htmlBuffer.join('');
+                }
+                
                 var countNode = document.getElementById('count-billdist');
                 if(countNode) {
                     countNode.innerText = htmlBuffer.length;
@@ -4214,8 +4456,18 @@ function openReportRowDirect(reportKey) {
     if(document.getElementById('groupFilterLabel')) {
          document.getElementById('groupFilterLabel').innerText = isBillingModeTop ? "🔍 ग्रुप फ़िल्टर (BILL UPLOAD DATE):" : "🔍 ग्रुप फ़िल्टर (Available Remarks):";
     }
+
+    // 🎯 सख्त नियम: 'Bill Merge' और 'All' चेकबॉक्स केवल 'all_bills_report' या 'bill_dist_pending' में ही दिखेंगे, बाकी सब में छुपे रहेंगे
+    var isStrictBillingTab = (reportType === 'all_bills_report' || reportType === 'bill_dist_pending');
+    
     var mergeBtn = document.getElementById('reportMergePdfBtn');
-    if(mergeBtn) mergeBtn.style.display = isBillingModeTop ? "inline-flex" : "none";
+    if(mergeBtn) mergeBtn.style.setProperty("display", isStrictBillingTab ? "inline-flex" : "none", "important");
+    
+    var selectAllWrapper = document.getElementById('reportSelectAllWrapper');
+    if (selectAllWrapper) {
+        selectAllWrapper.style.setProperty("display", isStrictBillingTab ? "flex" : "none", "important");
+    }
+    
     var selectAllChk = document.getElementById('selectAllBillsReport');
     if(selectAllChk) selectAllChk.checked = false;
 
@@ -4226,99 +4478,161 @@ function openReportRowDirect(reportKey) {
         
         var tx = db.transaction("consumers", "readonly");
         var store = tx.objectStore("consumers");
-        var getAllReq = store.getAll(); // वन-शॉट में पूरा डेटा मेमोरी में लोड
+        var getAllReq = store.getAll(); 
 
         getAllReq.onsuccess = function(e) {
             var allConsumers = e.target.result || [];
             var repSelectedLoadCat = document.getElementById('reportLoadCategoryFilter') ? document.getElementById('reportLoadCategoryFilter').value : "ALL";
+            
+            // 🎯 नए Main, Pole और पुराने WA फ़िल्टर की वैल्यूज़ को रीड करना
+            var filterMainRem = document.getElementById('reportMainRemarkFilter') ? document.getElementById('reportMainRemarkFilter').value : "ALL";
+            var filterPoleRem = document.getElementById('reportPoleRemarkFilter') ? document.getElementById('reportPoleRemarkFilter').value : "ALL";
             var repWaStatus = document.getElementById('reportWaFilter') ? document.getElementById('reportWaFilter').value : "ALL";
+
+            // 🎯 यूआई विज़िबिलिटी पैच: ऐप्स एनवायरनमेंट में फ़िल्टर्स की फोर्स-डिस्प्ले लॉकिंग
+            var isMasterListCtx = (reportType === 'all_consumers_list' || reportType === 'Visit_Data_Consumers');
+            var isAllBillsCtx = (reportType === 'all_bills_report');
+
+            if(document.getElementById('reportMainRemarkFilter')) {
+                document.getElementById('reportMainRemarkFilter').style.setProperty("display", isMasterListCtx ? "inline-block" : "none", "important");
+            }
+            if(document.getElementById('reportPoleRemarkFilter')) {
+                document.getElementById('reportPoleRemarkFilter').style.setProperty("display", isMasterListCtx ? "inline-block" : "none", "important");
+            }
+            if(document.getElementById('reportWaFilter')) {
+                document.getElementById('reportWaFilter').style.setProperty("display", isAllBillsCtx ? "inline-block" : "none", "important");
+            }
+            if(document.getElementById('reportSelectAllWrapper')) {
+                // 🎯 फिक्स: ऑल बिल्स रिपोर्ट खुलने पर चेकबॉक्स रैपर को फ़ोर्स ऑन (flex) किया जाएगा
+                document.getElementById('reportSelectAllWrapper').style.setProperty("display", isAllBillsCtx ? "flex" : "none", "important");
+            }
+            // टैब बदलते ही ऊपर का मास्टर 'All' चेकबॉक्स हमेशा फ्रेश (Unchecked) रहेगा
+            var masterReportAllChk = document.getElementById('selectAllBillsReportTab');
+            if (masterReportAllChk) {
+                masterReportAllChk.checked = false;
+                masterReportAllChk.removeAttribute('checked');
+            }
+
+            var uniqueMainRemarks = new Set();
+            var uniquePoleRemarks = new Set();
+
+            allConsumers.forEach(function(cItem) {
+                if (!isReaderAllowed(getReaderName(cItem))) return;
+                var rm = (getRobustKey(cItem, "FINAL_MAIN_METER_SITE_REMARK") || cItem.mainStatusRemark || "").toString().trim().toUpperCase();
+                var rp = (getRobustKey(cItem, "FINAL_POLE_METER_SITE_REMARK") || cItem.poleStatusRemark || "").toString().trim().toUpperCase();
+                if(rm && rm !== "-" && rm !== "NOT FOUND") uniqueMainRemarks.add(rm);
+                if(rp && rp !== "-" && rp !== "NOT FOUND") uniquePoleRemarks.add(rp);
+            });
+
+            var selectMainNode = document.getElementById('reportMainRemarkFilter');
+            if(selectMainNode && selectMainNode.options.length <= 1) {
+                Array.from(uniqueMainRemarks).sort().forEach(function(rem) {
+                    var opt = document.createElement('option'); opt.value = rem; opt.className = "dynamic-opt"; opt.innerText = rem;
+                    selectMainNode.appendChild(opt);
+                });
+                if(filterMainRem !== "ALL") selectMainNode.value = filterMainRem;
+            }
+
+            var selectPoleNode = document.getElementById('reportPoleRemarkFilter');
+            if(selectPoleNode && selectPoleNode.options.length <= 1) {
+                Array.from(uniquePoleRemarks).sort().forEach(function(rem) {
+                    var opt = document.createElement('option'); opt.value = rem; opt.className = "dynamic-opt"; opt.innerText = rem;
+                    selectPoleNode.appendChild(opt);
+                });
+                if(filterPoleRem !== "ALL") selectPoleNode.value = filterPoleRem;
+            }
 
             for (var i = 0; i < allConsumers.length; i++) {
                 var item = allConsumers[i];
                 if (!isReaderAllowed(getReaderName(item))) continue;
 
+                // 🎯 क्रिटिकल फिक्स: टैब के अनुसार डेटा का कड़ा पृथक्करण (Data Separation Engine)
+                if (reportType === 'all_bills_report') {
+                    // ऑल बिल रिपोर्ट में केवल वही दिखेंगे जिनका बिल लिंक या पीडीएफ उपलब्ध हो
+                    var hasValidBillFile = (item.pdfLink && item.pdfLink.trim() !== "") || isBillUploaded(item);
+                    if (!hasValidBillFile) continue; // बिना बिल वाले उपभोक्ता इस टैब से तुरंत बाहर (Skip)
+                }
+
                 var itemLoadCat = (item["LOAD_CATOGERY (5,10)"] || "").toString().trim();
                 var loadMatch = (repSelectedLoadCat === "ALL" || (repSelectedLoadCat === "5" && itemLoadCat.includes(">=5KW")) || (repSelectedLoadCat === "10" && itemLoadCat.includes(">=10KW")));
 
-                var isWaSent = getRobustKey(item, "IS BILL SEND BY WHATUP") || item.isWaSent || item["IS BILL SEND BY WHATUP"] || "";
+                var itemMainRem = (getRobustKey(item, "FINAL_MAIN_METER_SITE_REMARK") || item.mainStatusRemark || "").toString().trim().toUpperCase();
+                var itemPoleRem = (getRobustKey(item, "FINAL_POLE_METER_SITE_REMARK") || item.poleStatusRemark || "").toString().trim().toUpperCase();
+
+                // 🎯 ऑल बिल्स के लिए रिमार्क फ़िल्टर्स को बाईपास करना और WA फ़िल्टर को एक्टिव करना
+                var mainRemarkMatch = (reportType === 'all_bills_report' || filterMainRem === "ALL" || itemMainRem === filterMainRem);
+                var poleRemarkMatch = (reportType === 'all_bills_report' || filterPoleRem === "ALL" || itemPoleRem === filterPoleRem);
+
+                var isWaSent = getRobustKey(item, "IS BILL SEND BY WHATUP") || item.isWaSent || "";
                 isWaSent = isWaSent.toString().toUpperCase().trim();
-                var waMatch = (repWaStatus === "ALL" || isWaSent === repWaStatus);
+                var waMatch = (reportType !== 'all_bills_report' || repWaStatus === "ALL" || isWaSent === repWaStatus);
 
-                if (reportType === 'all_bills_report') {
-                    var isBillValid = (item.pdfLink && item.pdfLink.trim() !== "") || isBillUploaded(item);
-                    if (isBillValid && loadMatch && waMatch) {
-                        var pdfBtn = (item.pdfLink) ? '<a href="' + item.pdfLink + '" target="_blank" class="pdf-icon" onclick="event.stopPropagation();"><i class="fa-solid fa-file-pdf"></i></a>' : '';
-                        var waBtn = item.pdfLink ? '<button class="whatsapp-icon" onclick="event.stopPropagation(); triggerWhatsApp(event, \'' + item.accountNo + '\')"><i class="fa-brands fa-whatsapp"></i></button>' : '';
-                        var cbHtml = (item.pdfLink) ? '<div style="margin-right:10px; display:flex; align-items:center;"><input type="checkbox" class="bill-select-cb" value="' + item.pdfLink + '" data-acc="' + item.accountNo + '" style="transform:scale(1.2); cursor:pointer;" onclick="event.stopPropagation();"></div>' : '';
-                        var upDate = getRobustKey(item, "BILL UPLOAD DATE") || item.billUpDate || item["BILL UPLOAD DATE"] || "NOT UPLOADED";
-                        var uiStatusText = "Upld: " + (upDate !== "NOT UPLOADED" ? upDate : "N/A");
+                if (loadMatch && mainRemarkMatch && poleRemarkMatch && waMatch) {
+                    var consumerAddress = getRobustKey(item, "ADDRESS") || "-";
+                    var consumerMobile = getRobustKey(item, "Master Mobile Number") || "-";
+                    var mainMtrNo = getRobustKey(item, "LAST MONTH FINAL MM NO.") || item.lastMmNo || "-";
+                    var poleMtrNo = getRobustKey(item, "LAST MONTH FINAL PM NO.") || item.lastPmNo || "-";
+                    var divisionDisplay = getRobustKey(item, "DIVISION") || item.division || "";
 
-                        htmlArr.push({
-                            index: 0,
-                            name: (getRobustKey(item, "CONSUMER-NAME") || item.consumerName || "").toString().toUpperCase(),
-                            html: '<div class="list-item" style="border-left-color: #f59e0b; flex-direction:column; align-items:stretch;" onclick="openQuickViewModal(\'' + item.accountNo + '\', \'BILL_DIST\')">' +
-                                  '<div style="display:flex; justify-content:space-between; width:100%; align-items:center;">' +
-                                  cbHtml + '<div style="flex:1; text-align:left;">' +
-                                  '<div class="c-name">' + item.consumerName + '</div>' +
-                                  '<div class="c-acc">A/C: ' + item.accountNo + '</div>' +
-                                  '</div>' +
-                                  '<div style="text-align:right; width: 35%; flex-shrink: 0; display:flex; flex-direction:column; align-items:flex-end;" onclick="event.stopPropagation();">' +
-                                  '<div class="c-stat" style="color:#b45309; font-size:11px; font-weight:bold; margin-bottom:4px;">' + uiStatusText + '</div>' +
-                                  '<div style="display:flex; gap:5px;">' + pdfBtn + waBtn + '</div>' +
-                                  '</div></div></div>'
-                        });
-                    }
-                } else if (reportType === 'all_consumers_list' || reportType === 'Visit_Data_Consumers') {
-                    if (loadMatch && waMatch) {
-                        var consumerAddress = getRobustKey(item, "ADDRESS") || getRobustKey(item, "address") || "-";
-                        var consumerMobile = getRobustKey(item, "Master Mobile Number") || getRobustKey(item, "masterMobileNumber") || "-";
-                        var divisionDisplay = getRobustKey(item, "DIVISION") || getRobustKey(item, "division") || "";
+                    var singlePdfBtn = '';
+                    var cbHtml = '';
+                    var uiStatusText = '';
+
+                    if (reportType === 'all_bills_report') {
+                        // 🎯 ऑल बिल्स रिपोर्ट के लिए विशिष्ट आइकन्स, व्हाट्सएप और बिल मर्ज चेकबॉक्स रीस्टोर
+                        var billPdfUrl = item.pdfLink || "#";
+                        var pdfDownloadIcon = '<a href="' + billPdfUrl + '" target="_blank" class="export-btn mini pdf-bg" style="padding: 5px 8px; font-size: 10px; display:inline-flex; align-items:center; justify-content:center;" title="View Bill PDF"><i class="fa-solid fa-file-pdf"></i></a>';
+                        var whatsappShareIcon = '<button class="export-btn mini" style="padding: 5px 8px; font-size: 10px; background:#25D366; display:inline-flex; align-items:center; justify-content:center;" onclick="event.stopPropagation(); triggerWhatsApp(event, \'' + item.accountNo + '\')"><i class="fa-brands fa-whatsapp"></i></button>';
                         
-                        var mainMtrNo = getRobustKey(item, "LAST MONTH FINAL MM NO.") || item.lastMmNo || "-";
-                        var poleMtrNo = getRobustKey(item, "LAST MONTH FINAL PM NO.") || item.lastPmNo || "-";
-
-                        var singlePdfBtn = '<div style="display:flex; gap:4px;">' +
+                        singlePdfBtn = '<div style="display:flex; gap:4px; align-items:center;">' + pdfDownloadIcon + whatsappShareIcon + '</div>';
+                        // 🎯 सुधार: इंडिविजुअल चेकबॉक्स पर क्लिक करने पर भी स्टेट को एट्रिब्यूट में लॉक किया जाएगा
+                        // 🎯 पूर्णतः सुरक्षित इंडिविजुअल नोड
+                        cbHtml = '<div style="margin-right:8px; display:flex; align-items:center;">' +
+                                 '<input type="checkbox" class="bill-select-cb" value="' + billPdfUrl + '" data-acc="' + item.accountNo + '" ' +
+                                 'onclick="event.stopPropagation(); event.stopImmediatePropagation(); this.checked ? this.setAttribute(\'checked\',\'true\') : this.removeAttribute(\'checked\');" style="transform: scale(1.1);">' +
+                                 '</div>';
+                        
+                        var upDate = getRobustKey(item, "BILL UPLOAD DATE") || item.billUpDate || "N/A";
+                        uiStatusText = "Upld: " + upDate;
+                    } else {
+                        // मास्टर लिस्ट (All Consumers / Visit Data) के लिए पुराने बटन्स यथावत रहेंगे
+                        singlePdfBtn = '<div style="display:flex; gap:4px; align-items:center;">' +
                             '<button onclick="event.stopPropagation(); exportSingleConsumerPDF(event, \'' + item.accountNo + '\', \'' + (reportType === 'Visit_Data_Consumers' ? 'FULL' : 'MASTER_COLS') + '\')" class="export-btn mini pdf-bg" style="padding: 5px 8px; font-size: 10px;" title="Download PDF"><i class="fa-solid fa-file-pdf"></i></button>' +
-                            '<button onclick="event.stopPropagation(); exportConsumerReadingFormPDF(\'' + item.accountNo + '\')" class="export-btn mini" style="padding: 5px 8px; font-size: 10px; background:#4f46e5;" title="Download Reading Form"><i class="fa-solid fa-file-invoice"></i> Form</button>' +
-                            '<button onclick="event.stopPropagation(); openContactUpdateModal(\'' + item.accountNo + '\')" class="export-btn mini" style="padding: 5px 8px; font-size: 10px; background:#0ea5e9;" title="Update Contact Info"><i class="fa-solid fa-user-pen"></i> Info</button>' +
+                            '<button onclick="event.stopPropagation(); exportConsumerReadingFormPDF(\'' + item.accountNo + '\')" class="export-btn mini" style="padding: 5px 8px; font-size: 10px; background:#4f46e5; display:inline-flex; align-items:center; justify-content:center;" title="Download Reading Form"><i class="fa-solid fa-file-invoice"></i></button>' +
+                            '<button onclick="event.stopPropagation(); openContactUpdateModal(\'' + item.accountNo + '\')" class="export-btn mini" style="padding: 5px 8px; font-size: 10px; background:#0ea5e9; display:inline-flex; align-items:center; justify-content:center; gap:3px;" title="Update Contact Info"><i class="fa-solid fa-mobile-screen-button" style="font-size:9px;"></i><i class="fa-solid fa-envelope" style="font-size:9px;"></i></button>' +
                             '</div>';
-                        
-                        var toggleAction = (reportType === 'Visit_Data_Consumers') 
-                            ? 'toggleVisitAccordion(\'' + item.accountNo + '\', \'FULL\')' 
-                            : 'openQuickViewModal(\'' + item.accountNo + '\', \'STANDARD\')';
-                            
-                        var arrowIconHtml = (reportType === 'Visit_Data_Consumers') ? '<i class="fa-solid fa-chevron-down" style="color:#64748b; font-size:12px;"></i>' : '';
-                        var targetAccordionDiv = (reportType === 'Visit_Data_Consumers') ? '<div id="visit_acc_' + item.accountNo + '" class="accordion-content"></div>' : '';
-
-                        // 🚀 सटीक कतार क्रम ड्राइवर: शीट का Row Index निकालना
-                        var rIdx = parseInt(item.rowIndex || getRobustKey(item, "rowIndex") || 0);
-
-                        htmlArr.push({
-                            index: rIdx,
-                            name: (getRobustKey(item, "CONSUMER-NAME") || item.consumerName || "").toString().toUpperCase(),
-                            html: '<div class="list-item" style="border-left-color: #334155; display: flex !important; flex-direction: column !important; align-items: stretch !important;" onclick="' + toggleAction + '">' +
-                                  '<div style="display: flex; justify-content: space-between; width: 100%; align-items: center;">' +
-                                  '<div style="flex: 1; text-align: left;">' +
-                                  '<div class="c-name">' + (getRobustKey(item, "CONSUMER-NAME") || item.consumerName || "-") + '</div>' +
-                                  '<div class="c-acc">A/C: ' + item.accountNo + ' | Mob: ' + consumerMobile + '</div>' +
-                                  '<div class="c-addr"><b>पता:</b> ' + consumerAddress + '</div>' +
-                                  '<div class="c-mtr">M-Mtr: ' + mainMtrNo + ' | P-Mtr: ' + poleMtrNo + '</div>' +
-                                  '</div>' +
-                                  '<div style="text-align:right; width: 30%; flex-shrink: 0; display:flex; flex-direction:column; align-items:flex-end; justify-content:center; gap: 6px;">' +
-                                  '<div style="font-size:10px; font-weight:bold; color:#4338ca; background:#e0e7ff; padding:2px 6px; border-radius:4px;">' + divisionDisplay + '</div>' +
-                                  '<div style="display:flex; gap:8px; align-items:center;" onclick="event.stopPropagation();">' + singlePdfBtn + arrowIconHtml + '</div>' +
-                                  '</div>' +
-                                  '</div>' +
-                                  targetAccordionDiv +
-                                  '</div>'
-                        });
+                        cbHtml = '';
+                        uiStatusText = "M-Mtr: " + mainMtrNo;
                     }
+                        
+                    var toggleAction = (reportType === 'Visit_Data_Consumers') ? 'toggleVisitAccordion(\'' + item.accountNo + '\', \'FULL\')' : 'openQuickViewModal(\'' + item.accountNo + '\', \'STANDARD\')';
+                    var arrowIconHtml = (reportType === 'Visit_Data_Consumers') ? '<i class="fa-solid fa-chevron-down" style="color:#64748b; font-size:12px; margin-left:4px;"></i>' : '';
+                    var targetAccordionDiv = (reportType === 'Visit_Data_Consumers') ? '<div id="visit_acc_' + item.accountNo + '" class="accordion-content"></div>' : '';
+                    var rIdx = parseInt(item.rowIndex || getRobustKey(item, "rowIndex") || 0);
+
+                    htmlArr.push({
+                        index: rIdx,
+                        name: (getRobustKey(item, "CONSUMER-NAME") || item.consumerName || "").toString().toUpperCase(),
+                        html: '<div class="list-item" style="border-left-color: ' + (reportType === 'all_bills_report' ? '#f59e0b' : '#334155') + '; padding: 6px 10px !important; margin-bottom: 4px !important; border-radius: 8px !important;" onclick="' + toggleAction + '">' +
+                              '<div style="display: flex; justify-content: space-between; width: 100%; align-items: center;">' +
+                              cbHtml + 
+                              '<div style="flex: 1; text-align: left; min-width: 0; padding-right: 5px;">' +
+                              '<div class="c-name" style="font-size:12.5px !important; font-weight:900 !important; line-height:1.2 !important; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + (getRobustKey(item, "CONSUMER-NAME") || item.consumerName || "-") + '</div>' +
+                              '<div class="c-acc" style="font-size:11px !important; margin-top:1px !important; color:#475569;">A/C: ' + item.accountNo + ' | Mob: ' + consumerMobile + '</div>' +
+                              '<div class="c-addr" style="font-size:11px !important; margin-top:2px !important; color:#64748b; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"><b>पता:</b> ' + consumerAddress + '</div>' +
+                              '<div class="c-mtr" style="font-size:11px !important; margin-top:2px !important; color:#4f46e5; font-weight:700;">M-Mtr: ' + mainMtrNo + ' | P-Mtr: ' + poleMtrNo + '</div>' +
+                              '</div>' +
+                              '<div style="text-align:right; flex-shrink: 0; display:flex; flex-direction:row; align-items:center; gap:8px;">' +
+                              '<div class="c-stat" style="color:#b45309; font-size:10.5px; font-weight:800; white-space:nowrap;">' + uiStatusText + '</div>' +
+                              '<div style="display:flex; gap:4px; align-items:center;" onclick="event.stopPropagation();">' + singlePdfBtn + arrowIconHtml + '</div>' +
+                              '</div>' +
+                              '</div>' +
+                              targetAccordionDiv +
+                              '</div>'
+                    });
                 }
             }
-            
-            // 🚀 शार्टिंग कंट्रोल रूम: 
-            // 1. Visit_Data_Consumers हमेशा शीट के ओरिजिनल Row Index के हिसाब से सॉर्ट होगा।
-            // 2. all_consumers_list सामान्य रूप से नाम (A to Z) के हिसाब से सॉर्ट होगा।
+
             if (reportType === 'Visit_Data_Consumers') {
                 htmlArr.sort(function(a, b) { return a.index - b.index; });
             } else if (reportType === 'all_consumers_list') {
@@ -4326,26 +4640,27 @@ function openReportRowDirect(reportKey) {
             }
 
             var finalRenderedHtml = htmlArr.map(function(obj) { return obj.html; });
-            
             var resTitle = document.getElementById('reportResultTitle');
             var rName = REPORT_NAMES[reportType] || reportType.toUpperCase();
+            
             if(resTitle) {
-                resTitle.innerHTML = "<div style='color:#1e3a8a; font-size:14px; text-transform:uppercase; border-bottom:1px solid #cbd5e1; padding-bottom:4px; margin-bottom:4px;'><i class='fa-solid fa-file-lines'></i> " + rName + "</div><div style='font-size:11px; color:#ef4444; font-weight:bold;'>कुल परिणाम: " + finalRenderedHtml.length + " उपभोक्ता</div>";
+                resTitle.innerHTML = "<div style='color:#1e3a8a; font-size:13px; font-weight:900; text-transform:uppercase; border-bottom:1px solid #cbd5e1; padding-bottom:3px; margin-bottom:3px;'><i class='fa-solid fa-file-lines'></i> " + rName + "</div><div style='font-size:11px; color:#ef4444; font-weight:bold;'>कुल परिणाम: " + finalRenderedHtml.length + " उपभोक्ता</div>";
                 resTitle.style.display = "block";
             }
             var listCont = document.getElementById('reportListContainer');
-            if(listCont) listCont.innerHTML = finalRenderedHtml.length === 0 ? '<div style="text-align:center; padding:15px; font-weight:bold; color:#ef4444;">कोई डेटा नहीं मिला।</div>' : finalRenderedHtml.join('');
-            
-            // सर्च बार को लाइव रिफ्रेश करना ताकि इनपुट बार तुरंत काम करे
-            if (document.getElementById('reportSearchBar')) {
-                document.getElementById('reportSearchBar').setAttribute('onkeyup', "universalListSearch('reportSearchBar', 'reportListContainer')");
+            if(listCont) {
+                listCont.innerHTML = finalRenderedHtml.length === 0 ? '<div style="text-align:center; padding:15px; font-weight:bold; color:#ef4444;">कोई डेटा नहीं मिला।</div>' : finalRenderedHtml.join('');
+                listCont.scrollTop = 0;
             }
+            window.scrollTo(0, 0);
         };
         return;
     }
 
-    // 🚀 अन्य सभी कस्टम/कंडीशनल रिपोर्ट्स (जैसे पेंडेंसी लिस्ट्स) के लिए मूल ब्लॉक
-    document.getElementById('groupFilterContainer').style.display = "block"; 
+    // 🚀 अन्य सभी कंडीशनल रिपोर्ट्स (जैसे पेंडेंसी लिस्ट्स) के लिए बैकअप ब्लॉक
+    var groupFilterBarBox = document.getElementById('groupFilterContainer');
+    if(groupFilterBarBox) groupFilterBarBox.style.setProperty("margin-bottom", "8px", "important");
+
     document.getElementById('reportResultTitle').style.display = "block"; 
     var savedEntries = new Set(); 
     
@@ -4359,8 +4674,6 @@ function openReportRowDirect(reportKey) {
         var cTx = db.transaction("consumers", "readonly");
         currentReportDataList = []; 
         var uniqueRemarksSet = new Set();
-        
-        document.getElementById('groupFilterContainer').style.display = "block";
 
         cTx.objectStore("consumers").openCursor().onsuccess = function(ev) {
             var cursor = ev.target.result;
@@ -4401,6 +4714,11 @@ function openReportRowDirect(reportKey) {
                 uniqueRemarksSet.forEach(function(rem) { dropdown.innerHTML += '<option value="' + rem.toUpperCase() + '">' + rem + '</option>'; }); 
                 dropdown.value = "ALL";
             }
+            
+            if(groupFilterBarBox) {
+                groupFilterBarBox.style.setProperty("display", uniqueRemarksSet.size > 0 ? "block" : "none", "important");
+            }
+            
             loadOfflineReportFiltered("ALL");
         };
     };
@@ -4416,88 +4734,77 @@ function openReportRowDirect(reportKey) {
 }
 
     function loadOfflineReportFiltered(groupFilterValue) {
-        var repCont = document.getElementById('reportListContainer'); 
-        var resTitle = document.getElementById('reportResultTitle');
-        var filteredCount = 0; 
-        var htmlArr = [];
-        var repSelectedLoadCat = document.getElementById('reportLoadCategoryFilter') ? document.getElementById('reportLoadCategoryFilter').value : "ALL";
-        var repWaStatus = document.getElementById('reportWaFilter') ? document.getElementById('reportWaFilter').value : "ALL";
+    var repCont = document.getElementById('reportListContainer'); 
+    var resTitle = document.getElementById('reportResultTitle');
+    var filteredCount = 0; 
+    var htmlArr = [];
+    var repSelectedLoadCat = document.getElementById('reportLoadCategoryFilter') ? document.getElementById('reportLoadCategoryFilter').value : "ALL";
+    var repWaStatus = document.getElementById('reportWaFilter') ? document.getElementById('reportWaFilter').value : "ALL";
 
-        currentReportDataList.forEach(function(item) {
-            var match = true; 
-            var matchedConfig = globalReportConfigs.find(function(c) { return c.key === activeReportType; });
-            var isBillingMode = (activeReportType === 'all_bills_report' || activeReportType === 'bill_dist_pending' || activeReportType === 'bill_print_pending' || activeReportType === 'billed_no_bill' || (matchedConfig && (matchedConfig.key.toLowerCase().includes("bill") || matchedConfig.key.toLowerCase().includes("dist"))));
-            
-            // 🛑 [सुरक्षा कवच] - UI में केवल उसे छिपाएं जो अभी-अभी ऑफलाइन सेव (Done) हुआ है।
-            if (item.isDone === true || item.isDone === "true") {
-                match = false;
-            }
-            
-            // 🔥 FIX: Load Category Check
-            var itemLoadCat = (item["LOAD_CATOGERY (5,10)"] || "").toString().trim();
-            if (repSelectedLoadCat === "5" && !itemLoadCat.includes(">=5KW")) match = false;
-            if (repSelectedLoadCat === "10" && !itemLoadCat.includes(">=10KW")) match = false;
-            
-            var itemRem = "";
-            var isPoleType = (matchedConfig && matchedConfig.reportGroup && matchedConfig.reportGroup.toUpperCase().indexOf("POLE") !== -1) || activeReportType.toLowerCase().indexOf("pole") !== -1 || activeReportType.toLowerCase() === 'rep13';
-            
-            if (isBillingMode) {
-                itemRem = getRobustKey(item, "BILL UPLOAD DATE") || item.billUpDate || item["BILL UPLOAD DATE"] || "NOT UPLOADED";
-            } else {
-                itemRem = isPoleType ? (getRobustKey(item, "FINAL_POLE_METER_SITE_REMARK") || item.poleStatusRemark || "") : (getRobustKey(item, "FINAL_MAIN_METER_SITE_REMARK") || item.mainStatusRemark || "");
-            }
-            
-            if(groupFilterValue !== "ALL" && itemRem.toString().toUpperCase() !== groupFilterValue) { match = false; }
-            
-            if (isBillingMode && match) {
-                var isWaSent = getRobustKey(item, "IS BILL SEND BY WHATUP") || item.isWaSent || item["IS BILL SEND BY WHATUP"] || "";
-                isWaSent = isWaSent.toString().toUpperCase().trim();
-                if (repWaStatus !== "ALL" && isWaSent !== repWaStatus) match = false;
-            }
-
-            if(match) {
-                filteredCount++; 
-                var cbHtml = (isBillingMode && item.pdfLink) ? '<div style="margin-right:10px;"><input type="checkbox" class="bill-select-cb" value="' + item.pdfLink + '" data-acc="' + item.accountNo + '" style="transform:scale(1.2); cursor:pointer;" onclick="event.stopPropagation();"></div>' : '';
-                var isPrinted = (getRobustKey(item, "IS BILL PRINT") || item.isBillPrint || "").toString().toUpperCase() === "YES";
-                var printBadge = (isBillingMode && isPrinted) ? '<span style="background:#10b981; color:white; font-size:9px; padding:2px 4px; border-radius:4px; margin-left:6px; vertical-align:middle; box-shadow:0 1px 2px rgba(0,0,0,0.1);"><i class="fa-solid fa-print"></i> Printed</span>' : '';
-                var pdfBtn = (isBillingMode && item.pdfLink) ? '<a href="' + item.pdfLink + '" target="_blank" class="pdf-icon" style="margin-top:5px; align-self:flex-end;" onclick="event.stopPropagation();"><i class="fa-solid fa-file-pdf"></i></a>' : '';
-
-                var uiStatusText = "";
-                var waBtn = ""; // वॉट्सएप बटन होल्डर
-                
-                if (isBillingMode) {
-                    uiStatusText = "Upld: " + (itemRem !== "NOT UPLOADED" ? itemRem : "N/A");
-                    // 🎯 फिक्स: सभी सब-रिपोर्ट्स की लिस्ट में बिल वितरण जैसा लाइव वॉट्सएप शेयरिंग बटन जोड़ा गया
-                    waBtn = item.pdfLink ? '<button class="whatsapp-icon" onclick="event.stopPropagation(); triggerWhatsApp(event, \'' + item.accountNo + '\')" style="display: inline-flex; align-items: center; justify-content: center; color: #25D366; font-size: 20px; border: none; background: none; cursor: pointer; padding: 3px;"><i class="fa-brands fa-whatsapp"></i></button>' : '';
-                } else {
-                    uiStatusText = "Rem: " + itemRem;
-                }
-
-                htmlArr.push(
-                    '<div class="list-item" style="border-left-color: #4f46e5; align-items:center;" ' +
-                    'onclick="openQuickViewModal(\'' + item.accountNo + '\', \'' + (isBillingMode ? "BILL_DIST" : "STANDARD") + '\')">' +
-                    cbHtml +
-                    '<div style="flex: 1; text-align: left; padding: 0 4px;">' +
-                    '<div class="c-name">' + item.consumerName + printBadge + '</div>' +
-                    '<div class="c-acc">A/C: ' + item.accountNo + '</div>' +
-                    '<div class="c-mtr">' + (isPoleType ? "P-Mtr: " : "M-Mtr: ") + (isPoleType ? item.lastPmNo : item.lastMmNo||"") + '</div>' +
-                    '</div>' +
-                    '<div style="text-align:right; width: 35%; flex-shrink: 0; display:flex; flex-direction:column; align-items:flex-end; justify-content:center;">' +
-                    '<div class="c-stat" style="color:#b45309; font-size:11px; font-weight:bold; margin-bottom:4px;">' + uiStatusText + '</div>' +
-                    '<div style="display:flex; gap:6px; align-items:center;" onclick="event.stopPropagation();">' + pdfBtn + waBtn + '</div>' +
-                    '</div></div>'
-                );
-            }
-        });
-
-        var matchedConfigTitle = globalReportConfigs.find(function(c) { return c.key === activeReportType; });
-        var rName = matchedConfigTitle ? matchedConfigTitle.name : (REPORT_NAMES[activeReportType] || activeReportType.toUpperCase());
+    currentReportDataList.forEach(function(item) {
+        var match = true; 
+        var matchedConfig = globalReportConfigs.find(function(c) { return c.key === activeReportType; });
+        var isBillingMode = (activeReportType === 'all_bills_report' || activeReportType === 'bill_dist_pending' || activeReportType === 'bill_print_pending' || activeReportType === 'billed_no_bill' || (matchedConfig && (matchedConfig.key.toLowerCase().includes("bill") || matchedConfig.key.toLowerCase().includes("dist"))));
         
-        resTitle.innerHTML = "<div style='color:#1e3a8a; font-size:14px; text-transform:uppercase; border-bottom:1px solid #cbd5e1; padding-bottom:4px; margin-bottom:4px;'><i class='fa-solid fa-file-lines'></i> " + rName + "</div><div style='font-size:11px; color:#ef4444; font-weight:bold;'>कुल परिणाम: " + filteredCount + " उपभोक्ता</div>"; 
-        resTitle.style.display = "block";
+        if (item.isDone === true || item.isDone === "true") match = false;
         
-        repCont.innerHTML = filteredCount === 0 ? '<div style="text-align:center; padding:15px; font-weight:bold; color:#ef4444;">कोई डेटा नहीं मिला।</div>' : htmlArr.join('');
-    }
+        var itemLoadCat = (item["LOAD_CATOGERY (5,10)"] || "").toString().trim();
+        if (repSelectedLoadCat === "5" && !itemLoadCat.includes(">=5KW")) match = false;
+        if (repSelectedLoadCat === "10" && !itemLoadCat.includes(">=10KW")) match = false;
+        
+        var itemRem = "";
+        var isPoleType = (matchedConfig && matchedConfig.reportGroup && matchedConfig.reportGroup.toUpperCase().indexOf("POLE") !== -1) || activeReportType.toLowerCase().indexOf("pole") !== -1 || activeReportType.toLowerCase() === 'rep13';
+        
+        if (isBillingMode) {
+            itemRem = getRobustKey(item, "BILL UPLOAD DATE") || item.billUpDate || "NOT UPLOADED";
+        } else {
+            itemRem = isPoleType ? (getRobustKey(item, "FINAL_POLE_METER_SITE_REMARK") || item.poleStatusRemark || "") : (getRobustKey(item, "FINAL_MAIN_METER_SITE_REMARK") || item.mainStatusRemark || "");
+        }
+        
+        if(groupFilterValue !== "ALL" && itemRem.toString().toUpperCase() !== groupFilterValue) { match = false; }
+        
+        if (isBillingMode && match) {
+            var isWaSent = getRobustKey(item, "IS BILL SEND BY WHATUP") || item.isWaSent || "";
+            isWaSent = isWaSent.toString().toUpperCase().trim();
+            if (repWaStatus !== "ALL" && isWaSent !== repWaStatus) match = false;
+        }
+
+        if(match) {
+            filteredCount++; 
+            var cbHtml = (isBillingMode && item.pdfLink) ? '<div style="margin-right:8px; display:flex; align-items:center;"><input type="checkbox" class="bill-select-cb" value="' + item.pdfLink + '" data-acc="' + item.accountNo + '" onclick="event.stopPropagation();"></div>' : '';
+            var isPrinted = (getRobustKey(item, "IS BILL PRINT") || item.isBillPrint || "").toString().toUpperCase() === "YES";
+            var printBadge = (isBillingMode && isPrinted) ? '<span style="background:#10b981; color:white; font-size:9px; padding:1px 3px; border-radius:4px; margin-left:4px;"><i class="fa-solid fa-print"></i> Printed</span>' : '';
+            var pdfBtn = (isBillingMode && item.pdfLink) ? '<a href="' + item.pdfLink + '" target="_blank" class="pdf-icon" onclick="event.stopPropagation();"><i class="fa-solid fa-file-pdf"></i></a>' : '';
+            var waBtn = (isBillingMode && item.pdfLink) ? '<button class="whatsapp-icon" onclick="event.stopPropagation(); triggerWhatsApp(event, \'' + item.accountNo + '\')"><i class="fa-brands fa-whatsapp"></i></button>' : '';
+
+            var uiStatusText = isBillingMode ? "Upld: " + (itemRem !== "NOT UPLOADED" ? itemRem : "N/A") : "Rem: " + itemRem;
+
+            // 🎯 अल्ट्रा-कॉम्पैक्ट मोबाइल लिस्टिंग यूआई लेआउट (No wasted screen space)
+            htmlArr.push(
+                '<div class="list-item" style="border-left-color: #4f46e5; padding: 6px 10px !important; margin-bottom: 4px !important; border-radius: 8px !important; box-shadow: 0 1px 3px rgba(0,0,0,0.04) !important;" onclick="openQuickViewModal(\'' + item.accountNo + '\', \'' + (isBillingMode ? "BILL_DIST" : "STANDARD") + '\')">' +
+                '<div style="display:flex; width:100%; align-items:center; justify-content:space-between;">' +
+                cbHtml +
+                '<div style="flex: 1; text-align: left; min-width: 0; padding-right: 5px;">' +
+                '<div class="c-name" style="font-size:12.5px !important; font-weight:900 !important; line-height:1.2 !important; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + item.consumerName + printBadge + '</div>' +
+                '<div class="c-acc" style="font-size:11px !important; margin-top:1px !important;">A/C: ' + item.accountNo + ' | <span style="color:#475569;">' + (isPoleType ? "P-Mtr: " : "M-Mtr: ") + (isPoleType ? item.lastPmNo : item.lastMmNo||"") + '</span></div>' +
+                '</div>' +
+                '<div style="text-align:right; flex-shrink: 0; display:flex; flex-direction:row; align-items:center; gap:8px;" onclick="event.stopPropagation();">' +
+                '<div class="c-stat" style="color:#b45309; font-size:10.5px; font-weight:800; white-space:nowrap;">' + uiStatusText + '</div>' +
+                '<div style="display:flex; gap:4px; align-items:center;">' + pdfBtn + waBtn + '</div>' +
+                '</div></div></div>'
+            );
+        }
+    });
+
+    var matchedConfigTitle = globalReportConfigs.find(function(c) { return c.key === activeReportType; });
+    var rName = matchedConfigTitle ? matchedConfigTitle.name : (REPORT_NAMES[activeReportType] || activeReportType.toUpperCase());
+    
+    resTitle.innerHTML = "<div style='color:#1e3a8a; font-size:13px; font-weight:900; text-transform:uppercase; border-bottom:1px solid #cbd5e1; padding-bottom:3px; margin-bottom:3px;'><i class='fa-solid fa-file-lines'></i> " + rName + "</div><div style='font-size:11px; color:#ef4444; font-weight:bold;'>कुल परिणाम: " + filteredCount + " उपभोक्ता</div>"; 
+    resTitle.style.display = "block";
+    
+    repCont.innerHTML = filteredCount === 0 ? '<div style="text-align:center; padding:15px; font-weight:bold; color:#ef4444;">कोई डेटा नहीं मिला।</div>' : htmlArr.join('');
+    if(repCont) repCont.scrollTop = 0;
+}
 
     function getVisibleDataFromContainer(containerId) {
         var accNos = []; 
@@ -5840,7 +6147,18 @@ function exportAllMRSummaryPDF() {
         entryData.mainPhotoData = mainPhoto; 
         entryData.polePhotoData = polePhoto; 
         
-        saveToIndexedDB(entryData);
+        // 🚀 ट्रांजैक्शन और सेविंग के दौरान आने वाले एरर को कैच करने के लिए सुरक्षित क्लोजर
+        try {
+            saveToIndexedDB(entryData);
+        } catch(innerDBError) {
+            console.error("IndexedDB Save Error: ", innerDBError);
+            if (typeof loggedInReader !== 'undefined' && loggedInReader && navigator.onLine) {
+                try {
+                    google.script.run.withSuccessHandler(function(){}).withFailureHandler(function(){})
+                        .logAppErrorToSheet(loggedInReader.toUpperCase(), innerDBError.toString(), "DB Save Fail for A/C: " + accNo);
+                } catch(e){}
+            }
+        }
     }
 }
 
@@ -5911,22 +6229,43 @@ function exportAllMRSummaryPDF() {
                 if (activeReportType && typeof applyRemarkGroupFilter === 'function') applyRemarkGroupFilter();
             }, 100);
             
-            // 🎯 ULTIMATE BLANK SCREEN FIX: एंट्री सेव होने के बाद सही पैरेंट व्यू और एक्टिव टैब को लाइव रीस्टोर करना
-            document.getElementById('formView').style.setProperty("display", "none", "important");
+            // 🎯 ULTIMATE BLANK SCREEN FIX: एंट्री सेव होने के बाद 100% सुरक्षित पैरेंट व्यू रीस्टोरेशन
+            
+            // 1. सबसे पहले मुख्य डैशबोर्ड और रिपोर्ट लेआउट के डिस्प्ले को फ़ोर्स ऑन करें
+            var dashView = document.getElementById('appDashboardView');
+            if (dashView) { dashView.style.setProperty("display", "block", "important"); }
             
             if (activeReportType && activeReportType !== "") {
-                // नियम 1: अगर किसी रिपोर्ट के अंदर से एंट्री की थी, तो वापस उसी रिपोर्ट व्यू को रिफ्रेश करें
-                document.getElementById('appDashboardView').style.setProperty("display", "block", "important");
-                document.getElementById('reportDetailContainer').style.setProperty("display", "block", "important");
-                if (typeof applyRemarkGroupFilter === 'function') { applyRemarkGroupFilter(); }
+                // नियम 1: अगर किसी सब-रिपोर्ट के अंदर से फॉर्म खुला था, तो उस रिपोर्ट के कंटेनर को ऑन रखें
+                var repDetailCont = document.getElementById('reportDetailContainer');
+                if (repDetailCont) { repDetailCont.style.setProperty("display", "block", "important"); }
+                
+                // फॉर्म को बंद करें
+                document.getElementById('formView').style.setProperty("display", "none", "important");
+                
+                // लिस्ट को डेटाबेस सिंक के बाद रेंडर होने के लिए 50ms का सेफ़्टी डिले दें
+                setTimeout(function() {
+                    if (typeof applyRemarkGroupFilter === 'function') { applyRemarkGroupFilter(); }
+                }, 50);
             } else {
-                // नियम 2: अगर उपभोक्ता या बिल वितरण टैब से एंट्री की थी, तो सेव्ड स्टेट रिकवर करके उसी टैब पर भेजें
+                // नियम 2: अगर उपभोक्ता (List) या बिल वितरण (Billdist) टैब से एंट्री की थी
                 var lastActiveTab = localStorage.getItem("app_current_tab_state_" + loggedInReader) || "summary";
+                
+                // फॉर्म को बंद करें
+                document.getElementById('formView').style.setProperty("display", "none", "important");
+                
                 if (typeof switchTab === 'function') {
                     switchTab(lastActiveTab); 
                 } else {
                     navigateToViewRaw('appDashboardView');
                 }
+            }
+            
+            // 2. पैरेंट कंटेनर का पैडिंग लेआउट वापस सामान्य (Original) करें
+            var mainContainerNode = document.getElementById('mainAppContainer');
+            if (mainContainerNode) {
+                mainContainerNode.style.removeProperty("min-height");
+                mainContainerNode.style.setProperty("padding-bottom", "140px", "important");
             }
             
             showThinAlert("✅ एंट्री सुरक्षित! शीट में डेटा भेजा जा रहा है...", true);
@@ -6347,16 +6686,36 @@ function quickViewNavigate(direction) {
     if (!quickViewAccList || quickViewAccList.length === 0) return;
     
     var newIndex = quickViewCurrentIndex + direction;
+    var box = document.getElementById('qvSwipeBox');
+    
     if (newIndex >= 0 && newIndex < quickViewAccList.length) {
         quickViewCurrentIndex = newIndex;
         var nextAcc = quickViewAccList[quickViewCurrentIndex];
         var activeMode = document.getElementById('quickViewModal').getAttribute('data-current-mode') || '';
-        openQuickViewModal(nextAcc, activeMode);
-    } else {
-        var box = document.getElementById('qvSwipeBox');
+        
+        // पेज फ्लिप विज़ुअल एनीमेशन
         if (box) {
+            box.style.transition = "transform 0.1s ease, opacity 0.1s ease";
+            box.style.opacity = "0.4";
+            box.style.transform = direction > 0 ? "translateX(-20px)" : "translateX(20px)";
+        }
+        
+        setTimeout(function() {
+            openQuickViewModal(nextAcc, activeMode);
+            if (box) {
+                box.style.transform = direction > 0 ? "translateX(20px)" : "translateX(-20px)";
+                setTimeout(function() {
+                    box.style.transition = "transform 0.15s ease-out, opacity 0.15s ease-out";
+                    box.style.opacity = "1";
+                    box.style.transform = "translateX(0)";
+                }, 30);
+            }
+        }, 100);
+    } else {
+        if (box) {
+            box.style.transition = "transform 0.1s ease";
             box.style.transform = direction > 0 ? "translateX(15px)" : "translateX(-15px)";
-            setTimeout(function() { box.style.transform = "translateX(0)"; }, 150);
+            setTimeout(function() { box.style.transform = "translateX(0)"; }, 120);
         }
     }
 }
@@ -6507,7 +6866,74 @@ function quickViewNavigate(direction) {
     // ब्राउज़र के पुराने alert को override कर रहे हैं
     window.alert = function(msg) { customAlert(msg); };
 
-    // फिक्स: setFieldsRequired और setReadingRequired इंजन डिक्लेरेशन ताकि एडिट करने पर फॉर्म क्रैश न हो
+    // ⚡ [सुपर-फास्ट रैम इंजन]: बिना डेटाबेस को छुए मिलीसेकंड में कैटेगरी रेंडर करने का कोर ड्राइवर
+    window.toggleReportCategorySection = function(categoryKey) {
+        var container = document.getElementById('expandedReportCategoryContainer');
+        if (!container || !window.globalWatchlistHtmlBuffer) return;
+
+        // सभी आइकॉन कार्ड्स की बॉर्डर और बैकग्राउंड को वापस डिफ़ॉल्ट (Normal) करें
+        var allIcons = ['NEW_CONSUMER', '50_KW', 'MAIN_METER', 'POLE_METER'];
+        allIcons.forEach(function(cat) {
+            var node = document.getElementById('icon-cat-' + cat);
+            if (node) {
+                node.style.background = "#ffffff";
+                node.style.border = "1px solid #e2e8f0";
+                node.style.boxShadow = "0 4px 6px -1px rgba(0,0,0,0.03)";
+            }
+        });
+
+        // यदि वही कैटेगरी दोबारा क्लिक हुई है जो पहले से खुली है, तो उसे बंद (Collapse) कर दें
+        if (container.style.display === "block" && container.getAttribute('data-active-cat') === categoryKey) {
+            container.style.display = "none";
+            container.setAttribute('data-active-cat', '');
+            return;
+        }
+
+        // सिलेक्टेड आइकॉन कार्ड को 'Active Accent Border' लुक दें
+        var activeNode = document.getElementById('icon-cat-' + categoryKey);
+        if (activeNode) {
+            activeNode.style.background = "#f8fafc";
+            activeNode.style.border = "1px solid #3b82f6";
+            activeNode.style.boxShadow = "0 10px 15px -3px rgba(59,130,246,0.1)";
+        }
+
+        // ⚡ रैम कैशे पार्सर तकनीक (0.001 सेकंड प्रोसेसिंग टाइम)
+        var filteredHtml = [];
+        var parserDiv = document.createElement('div');
+        parserDiv.innerHTML = window.globalWatchlistHtmlBuffer;
+        
+        var allElements = parserDiv.children;
+        var captureMode = false;
+
+        for (var i = 0; i < allElements.length; i++) {
+            var el = allElements[i];
+            var htmlStr = el.innerHTML || "";
+            var bgStyle = el.style.background || "";
+            
+            // सख्त हेडर डिटेक्शन मैचिंग
+            if (bgStyle.includes("rgb(15, 23, 42)") || htmlStr.includes("fa-folder-open") || htmlStr.includes("fa-bolt") || htmlStr.includes("fa-box") || htmlStr.includes("fa-industry") || htmlStr.includes("fa-user-plus")) {
+                if (categoryKey === "NEW_CONSUMER" && htmlStr.includes("fa-user-plus")) captureMode = true;
+                else if (categoryKey === "50_KW" && htmlStr.includes("fa-industry")) captureMode = true;
+                else if (categoryKey === "MAIN_METER" && htmlStr.includes("fa-bolt")) captureMode = true;
+                else if (categoryKey === "POLE_METER" && htmlStr.includes("fa-box") && !htmlStr.includes("fa-bolt")) captureMode = true;
+                else captureMode = false;
+            }
+            
+            if (captureMode) {
+                filteredHtml.push(el.outerHTML);
+            }
+        }
+
+        // डेटा को स्क्रीन पर तत्काल इंजेक्ट करें
+        container.innerHTML = filteredHtml.join('');
+        container.style.display = "block";
+        container.setAttribute('data-active-cat', categoryKey);
+        
+        // स्क्रीन को हल्का सा स्क्रॉल करके नीचे वाले बॉक्स पर फोकस करना
+        setTimeout(function() {
+            container.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 30);
+    };
     function setFieldsRequired(type, isRequired) {
         var noInput = document.getElementById('f-' + type + 'No');
         var makeInput = document.getElementById('f-' + type + 'Make');
@@ -6900,7 +7326,8 @@ function renderAnalyticsDashboardEngine() {
             headerHtml += "<th style='padding:6px 4px; text-align:center;'> " + finalDisplayName + "</th>"; 
         });
         
-        headerHtml += "<th style='padding:6px 4px; text-align:center;'>Done %</th></tr>";
+        // 🎯 कॉलम का नाम बदलकर VisiT Done % किया गया
+        headerHtml += "<th style='padding:6px 4px; text-align:center;'>VisiT Done %</th></tr>";
         tableNode.querySelector('thead').innerHTML = headerHtml;
 
         var matrixHtml = "";
@@ -6923,6 +7350,7 @@ function renderAnalyticsDashboardEngine() {
                 matrixHtml += "<td style='text-align:center; " + cellStyle + "'>" + cellVal + "</td>";
             });
 
+            // 🎯 टेबल रो में प्रोग्रेस डेटा को नया नाम सिंक किया गया
             matrixHtml += "<td style='text-align:center; background:#dcfce7;'><span style='color:#15803d; font-weight:900;'> " + donePct + "%</span></td>";
             matrixHtml += "</tr>";
 
@@ -6953,26 +7381,40 @@ function renderAnalyticsDashboardEngine() {
         
         document.getElementById('analyticsMatrixTableBody').innerHTML = matrixHtml;
 
-        // 📈 Chart.js इंजन रेंडरिंग (3 आसान और अलग-अलग बार चार्ट्स)
+        // 📈 Chart.js इंजन रेंडरिंग (3 परफेक्टली डिजाइन्ड डोनट चार्ट्स)
         if(chartInstanceMainMeter) chartInstanceMainMeter.destroy();
         if(chartInstancePoleMeter) chartInstancePoleMeter.destroy();
         if(chartInstanceBillDist) chartInstanceBillDist.destroy();
 
-        var chartOptions = { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { boxWidth: 10, font: { size: 9, weight: 'bold' } } } }, scales: { x: { stacked: true, ticks: { font: { size: 8, weight: 'bold' } } }, y: { stacked: true, ticks: { font: { size: 8 } } } } };
+        var sumArray = function(arr) { return arr.reduce(function(a, b) { return a + b; }, 0); };
 
-        // 📊 पाई चार्ट के अंदर लाइव काउंट (Number) ड्रा करने वाला एडवांस्ड इन-बिल्ट इंजन
-        var pieChartOptions = { 
+        // 📊 पाई/डोनट चार्ट्स के लिए सुपर-क्लियर विज़ुअल ऑप्शंस
+        var perfectChartOptions = { 
             responsive: true, 
-            maintainAspectRatio: false, 
+            maintainAspectRatio: false,
+            cutout: '65%', // डोनट का बीच का हिस्सा थोड़ा बड़ा किया ताकि लुक क्लीन आए
             plugins: { 
-                legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10, weight: 'bold' } } } 
+                legend: { 
+                    position: 'bottom', 
+                    labels: { 
+                        boxWidth: 10, 
+                        padding: 10,
+                        font: { size: 10, weight: '600' } 
+                    } 
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return " " + context.label + ": " + context.raw + " उपभोक्ता";
+                        }
+                    }
+                }
             },
-            // 🎯 कमाल की ट्रिक: चार्ट बनने के बाद उसके स्लाइस के अंदर नंबर लिखने का लॉजिक
             animation: {
                 onComplete: function() {
                     var chartInstance = this;
                     var ctx = chartInstance.ctx;
-                    ctx.font = Chart.helpers.fontString(12, 'bold', 'Helvetica');
+                    ctx.font = "bold 11px sans-serif";
                     ctx.textAlign = 'center';
                     ctx.textBaseline = 'middle';
 
@@ -6980,11 +7422,10 @@ function renderAnalyticsDashboardEngine() {
                         var meta = chartInstance.getDatasetMeta(i);
                         meta.data.forEach(function(element, index) {
                             var dataString = dataset.data[index].toString();
-                            // यदि काउंट 0 है, तो चार्ट को साफ़ रखने के लिए उसे नहीं दिखाएंगे
                             if (dataString !== "0") {
-                                ctx.fillStyle = '#FFFFFF'; // नंबर का रंग सफ़ेद (High Contrast)
+                                ctx.fillStyle = '#475569'; // डार्क ग्रे कलर नंबर्स के लिए
                                 var position = element.tooltipPosition();
-                                // चार्ट के स्लाइस के केंद्र (Center) में नंबर प्रिंट करना
+                                // चार्ट स्लाइस के ऊपर लाइव काउंट ड्रा करना
                                 ctx.fillText(dataString, position.x, position.y);
                             }
                         });
@@ -6993,46 +7434,43 @@ function renderAnalyticsDashboardEngine() {
             }
         };
 
-        // 🎯 कुल एरे वैल्यूज का सम (Total) निकालने का क्विक मैकेनिज्म
-        var sumArray = function(arr) { return arr.reduce(function(a, b) { return a + b; }, 0); };
-
-        // चार्ट 1: मेन मीटर पेंडेंसी (Pie / Doughnut Mode)
+        // १. मेन मीटर चार्ट
         chartInstanceMainMeter = new Chart(document.getElementById('chartMainMeterAnalytics'), {
-            type: 'doughnut', // 'pie' भी लिख सकते हैं, लेकिन 'doughnut' मोबाइल पर ज्यादा प्रोफेशनल दिखता है
+            type: 'doughnut', 
             data: { 
-                labels: ['MRI Pending', 'Load Survey Pending', 'Exceptions / Defective'], 
+                labels: ['MRI Pending', 'LS Pending', 'Field Exception'], 
                 datasets: [{ 
                     data: [sumArray(mainMriArr), sumArray(mainLsArr), sumArray(mainExcArr)], 
-                    backgroundColor: ['#7c3aed', '#ec4899', '#f59e0b'] 
+                    backgroundColor: ['#6366f1', '#ec4899', '#f59e0b'] 
                 }] 
             },
-            options: { ...pieChartOptions, plugins: { ...pieChartOptions.plugins, title: { display: true, text: '⚡ MAIN METER TOTAL PENDENCY BREAKUP', font: { size: 12, weight: 'bold' }, color: '#1e3a8a' } } }
+            options: { ...perfectChartOptions, plugins: { ...perfectChartOptions.plugins, title: { display: true, text: '⚡ MAIN METER PENDENCY BREAKUP', font: { size: 11, weight: '800' }, color: '#0f172a', padding: { bottom: 10 } } } }
         });
 
-        // चार्ट 2: पोल मीटर पेंडेंसी (Pie / Doughnut Mode)
+        // २. पोल मीटर चार्ट
         chartInstancePoleMeter = new Chart(document.getElementById('chartPoleMeterAnalytics'), {
             type: 'doughnut', 
             data: { 
-                labels: ['MRI Pending', 'Load Survey Pending', 'Exceptions / Defective'], 
+                labels: ['MRI Pending', 'LS Pending', 'Field Exception'], 
                 datasets: [{ 
                     data: [sumArray(poleMriArr), sumArray(poleLsArr), sumArray(poleExcArr)], 
                     backgroundColor: ['#06b6d4', '#14b8a6', '#ef4444'] 
                 }] 
             },
-            options: { ...pieChartOptions, plugins: { ...pieChartOptions.plugins, title: { display: true, text: '🪡 POLE METER TOTAL PENDENCY BREAKUP', font: { size: 12, weight: 'bold' }, color: '#1e3a8a' } } }
+            options: { ...perfectChartOptions, plugins: { ...perfectChartOptions.plugins, title: { display: true, text: '🪡 POLE METER PENDENCY BREAKUP', font: { size: 11, weight: '800' }, color: '#0f172a', padding: { bottom: 10 } } } }
         });
 
-        // चार्ट 3: बिलिंग, डिस्ट्रीब्यूशन और डिलीवर्ड का कंबाइंड डोनट चार्ट (🎯 FIX)
+        // ३. बिलिंग एवं वितरण चार्ट
         chartInstanceBillDist = new Chart(document.getElementById('chartBillDistAnalytics'), {
             type: 'doughnut', 
             data: { 
-                labels: ['Bill Upload Status', 'Distribution Pending', 'Bill Delivered Status'], 
+                labels: ['Bill Upload Pnd', 'Bill Dist Pnd', 'Bill Delivered'], 
                 datasets: [{ 
                     data: [sumArray(billArr), sumArray(billDistArr), sumArray(window.billDeliveredArr || [])], 
-                    backgroundColor: ['#3b82f6', '#10b981', '#1e3a8a'] 
+                    backgroundColor: ['#3b82f6', '#f59e0b', '#10b981'] 
                 }] 
             },
-            options: { ...pieChartOptions, plugins: { ...pieChartOptions.plugins, title: { display: true, text: '📦 BILLING, DIST & DELIVERY TOTAL BREAKUP', font: { size: 12, weight: 'bold' }, color: '#1e3a8a' } } }
+            options: { ...perfectChartOptions, plugins: { ...perfectChartOptions.plugins, title: { display: true, text: '📦 BILLING & DISTRIBUTION STATUS', font: { size: 11, weight: '800' }, color: '#0f172a', padding: { bottom: 10 } } } }
         });
     };
 }
@@ -7118,10 +7556,10 @@ function exportAnalyticsReportPDF() {
         });
     }
     
-    // परफेक्ट इंग्लिश हेडर अलाइनमेंट (Reader Name फिक्स)
+    // परत इंग्लिश हेडर अलाइनमेंट (Reader Name फिक्स) - PDF एक्सपोर्ट नाम अपडेट
     var customPdfHeaders = ["Reader Name"];
     dynamicMatrixCols.forEach(function(c) { customPdfHeaders.push(c.name || c.key); });
-    customPdfHeaders.push("Done %");
+    customPdfHeaders.push("VisiT Done %"); // 🎯 PDF हेडर में नाम बदला गया
 
     // डेटा ग्रिड टेबल जेनरेटर
     doc.autoTable({
