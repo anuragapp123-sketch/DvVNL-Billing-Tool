@@ -927,7 +927,7 @@
         <div id="apkErrorLogger" style="display:none; margin-top:10px; padding:10px; background:#fef2f2; border:1px solid #fca5a5; border-radius:6px; color:#b91c1c; font-size:11px; font-weight:bold; text-align:left; word-break:break-all; white-space:pre-wrap;"></div>
         <div class="app-footer-branding" style="position: relative;">
             Developed by:- Anurag Shakya | 9761414105
-            <span style="display:block; margin-top:4px; font-size:10px; color:#ef4444; font-weight:900;">App Version: V1.0.21</span>
+            <span style="display:block; margin-top:4px; font-size:10px; color:#ef4444; font-weight:900;">App Version: V1.0.22</span>
         </div>
     </div>
     
@@ -1321,7 +1321,7 @@
             
             <div style="text-align: center; margin-top: 25px; padding-top: 15px; border-top: 1px dashed #cbd5e1; color: #64748b;">
                 <div style="font-size: 12px; font-weight: bold;">Developed by: Anurag Shakya</div>
-                <div style="font-size: 11px; color: #ef4444; font-weight: 900; margin-top: 4px;">App Version: V1.0.21</div>
+                <div style="font-size: 11px; color: #ef4444; font-weight: 900; margin-top: 4px;">App Version: V1.0.22</div>
             </div>
         </div>
 
@@ -1374,7 +1374,7 @@
         <div style="width: 100%; height: 40px; clear: both; display: block !important; visibility: hidden; pointer-events: none;"></div>
         
         <div class="card" style="background: rgba(255, 255, 255, 0.7); margin-bottom: 20px; text-align: center; border: 1px dashed #cbd5e1;">
-            <div style="font-size: 11px; color: #ef4444; font-weight: 900; margin-bottom: 3px;">App Version: V1.0.21</div>
+            <div style="font-size: 11px; color: #ef4444; font-weight: 900; margin-bottom: 3px;">App Version: V1.0.22</div>
             <div style="font-size: 12px; color: #1e40af; font-weight: 800; text-transform: uppercase; margin-bottom: 5px;"><i class="fa-solid fa-user-tie"></i> <span id="welcomeTxt">Mr Name: Loading...</span></div>
             <div style="font-size: 11px; font-weight: 700; color: #475569; border-top: 1px solid #cbd5e1; padding-top: 5px;">
                 Developed by:- Er. Anurag Shakya | 9761414105
@@ -1565,6 +1565,7 @@ var globalReportsDatabaseCache = null;
 
 // 🔥 CRITICAL FIX: 'isDownloadingMasterData' को यहाँ ग्लोबली डिफाइन किया गया है ताकि ReferenceError न आए
 var isDownloadingMasterData = false; 
+var appSearchDatabaseCache = null; // Voice और Key Search के लिए कैशे वेरिएबल
 
 // Columns Configs
 var COLUMNS_MASTER_STD = ["DIVISION", "ACCOUNT NO", "Consumer Type", "Consumer Catogary", "Process Final", "CONSUMER-NAME", "ADDRESS", "Master Mobile Number", "LOAD IN KW", "LAST MONTH FINAL MM NO.", "LAST MONTH FINAL MM MAKE", "FINAL VISIT_DATE", "EXCEPTION TYPE (MAIN METER)", "FINAL_MAIN_METER_SITE_REMARK", "REMARK", "IS MRI AVAILABLE (MAIN METER)", "IS LOAD SURVAY AVAILBLE (MAIN Mtr)", "LAST MONTH FINAL PM NO.", "LAST MONTH FINAL PM MAKE", "EXCEPTION TYPE (POLE METER)", "FINAL_POLE_METER_SITE_REMARK", "IS MRI AVAILABLE (POLE METER)", "IS LOAD SURVAY AVAILBLE (Pole Mtr)", "TIME STAMP", "ATTEND STATUS"];
@@ -1603,13 +1604,17 @@ var REPORT_NAMES = { 'main_mri_pending': '1. Main Meter MRI Pending', 'pole_mri_
         return pad(d.getDate()) + "/" + pad(d.getMonth()+1) + "/" + d.getFullYear() + " " + pad(d.getHours()) + ":" + pad(d.getMinutes());
     }
 
-    // 15 Min Auto-Download Logic (Mobile & Desktop both)
+    // ⏳ डिवाइस के हिसाब से डायनामिक टाइमिंग चेक (कंप्यूटर: 15 मिनट, मोबाइल: 7 मिनट)
     document.addEventListener("visibilitychange", function() {
         if (document.visibilityState === 'visible' && navigator.onLine && loggedInReader) {
             var lastSyncMs = localStorage.getItem("last_sync_time_ms_" + loggedInReader);
             var timeDiff = lastSyncMs ? (new Date().getTime() - parseInt(lastSyncMs)) : Infinity;
-            if (timeDiff > (15 * 60 * 1000)) {
-                // फिक्स: यहाँ दूसरा पैरामीटर (isManualClick) पास नहीं किया, इसलिए यह 'Auto' दिखाएगा
+            
+            // चेक करें कि यूजर डेस्कटॉप मोड पर है या नहीं
+            var isDesktopMode = window.innerWidth > 768 || document.body.classList.contains('desktop-force');
+            var allowedTimeGap = isDesktopMode ? (15 * 60 * 1000) : (7 * 60 * 1000); // कंप्यूटर: 15 min, मोबाइल: 7 min
+            
+            if (timeDiff > allowedTimeGap) {
                 triggerSilentBackgroundDataDownload(null, false); 
             }
         }
@@ -1830,17 +1835,18 @@ var REPORT_NAMES = { 'main_mri_pending': '1. Main Meter MRI Pending', 'pole_mri_
             
             var isDesktop = window.innerWidth > 768 || document.body.classList.contains('desktop-force');
             if(!lastUpdate) { 
-                // पुराने सीधे कॉल की जगह नया वर्कफ़्लो
                 executeSafeSyncAndDownloadWorkflow(function(){ document.getElementById('appSplashScreen').style.display = "none"; });  
             } else { 
                 document.getElementById('appSplashScreen').style.display = "none";
-                if (isDesktop) {
-                    var lastSyncMs = localStorage.getItem("last_sync_time_ms_" + loggedInReader);
-                    var timeDiff = lastSyncMs ? (new Date().getTime() - parseInt(lastSyncMs)) : Infinity;
-                    if(timeDiff > (15 * 60 * 1000)) { 
-                        executeSafeSyncAndDownloadWorkflow();
-                    }
-                } else {
+                
+                // ⏳ ऐप रीस्टोर होने पर डायनामिक डिफरेंस चेक (कंप्यूटर: 15 मिनट, मोबाइल: 7 मिनट)
+                var lastSyncMs = localStorage.getItem("last_sync_time_ms_" + loggedInReader);
+                var timeDiff = lastSyncMs ? (new Date().getTime() - parseInt(lastSyncMs)) : Infinity;
+                
+                var isDesktopMode = window.innerWidth > 768 || document.body.classList.contains('desktop-force');
+                var allowedTimeGap = isDesktopMode ? (15 * 60 * 1000) : (7 * 60 * 1000);
+                
+                if(timeDiff > allowedTimeGap) { 
                     executeSafeSyncAndDownloadWorkflow();
                 }
             }
@@ -2067,10 +2073,10 @@ function executeSafeSyncAndDownloadWorkflow(onComplete) {
                 var tx = db.transaction("consumers", "readwrite"); 
                 var store = tx.objectStore("consumers"); 
                 store.clear();
-bulkData.consumers.forEach(function(item) { store.put(item); });
-appSearchDatabaseCache = null; // सही वेरिएबल नाम का उपयोग करके कैशे साफ़ किया गया 
+                bulkData.consumers.forEach(function(item) { store.put(item); });
+                appSearchDatabaseCache = null; 
 
-tx.oncomplete = function() {
+                tx.oncomplete = function() {
     if(bulkData && bulkData.reportConfigs) {
         // 🚀 गिटहब/APK प्रॉक्सी बाईपास: अगर डेटा स्ट्रिंग के रूप में लिपटा है तो उसे फ़ोर्स पार्स करें
         var parsedConfigs = bulkData.reportConfigs;
@@ -3006,8 +3012,10 @@ function executeFastCacheSearch(searchKeywords, allData, container, containerId)
                 );
             } else {
                 if (activeReportType === 'all_consumers_list' || activeReportType === 'Visit_Data_Consumers') {
+                    // 🚀 सिंटैक्स एरर फिक्स: कोटेशन मार्क को पूरी तरह क्लोज और सुरक्षित किया गया
+                    var pdfModeParam = (activeReportType === 'Visit_Data_Consumers') ? 'FULL' : 'MASTER_COLS';
                     var singlePdfBtn = '<div style="display:flex; gap:4px;">' +
-                        '<button onclick="event.stopPropagation(); exportSingleConsumerPDF(event, \'' + accNo + '\', \'' + (activeReportType === 'Visit_Data_Consumers' ? 'FULL' : 'MASTER_COLS') + '\')" class="export-btn mini pdf-bg" style="padding: 5px 8px; font-size: 10px;" title="Download PDF"><i class="fa-solid fa-file-pdf"></i></button>' +
+                        '<button onclick="event.stopPropagation(); exportSingleConsumerPDF(event, \'' + accNo + '\', \'' + pdfModeParam + '\')" class="export-btn mini pdf-bg" style="padding: 5px 8px; font-size: 10px;" title="Download PDF"><i class="fa-solid fa-file-pdf"></i></button>' +
                         '<button onclick="event.stopPropagation(); exportConsumerReadingFormPDF(\'' + accNo + '\')" class="export-btn mini" style="padding: 5px 8px; font-size: 10px; background:#4f46e5;" title="Download Reading Form"><i class="fa-solid fa-file-invoice"></i> Form</button>' +
                         '<button onclick="event.stopPropagation(); openContactUpdateModal(\'' + accNo + '\')" class="export-btn mini" style="padding: 5px 8px; font-size: 10px; background:#0ea5e9;" title="Update Contact Info"><i class="fa-solid fa-user-pen"></i> Info</button>' +
                         '</div>';
@@ -3385,38 +3393,20 @@ function renderNewListTab() {
                     var poleMtrDisplay = getRobustKey(item, "LAST MONTH FINAL PM NO.") || item.lastPmNo || "";
                     var divisionDisplay = getRobustKey(item, "DIVISION") || item.division || "";
 
-                    // 🎯 प्रिमियम अल्ट्रा-कॉम्पैक्ट उपभोक्ता सूची लेआउट (Error Fixed Engine)
+                    // 🎯 प्रिमियम अल्ट्रा-कॉम्पैक्ट उपभोक्ता सूची लेआउट
                     var currentConsumerName = getRobustKey(item, "CONSUMER-NAME") || item.consumerName || "-";
                     var currentConsumerMobile = getRobustKey(item, "Master Mobile Number") || item.masterMobileNumber || "-";
                     var currentDivisionDisplay = getRobustKey(item, "DIVISION") || item.division || "";
 
-                    // 🎯 प्रिमियम अल्ट्रा-कॉम्पैक्ट उपभोक्ता सूची लेआउट (सिंटैक्स और डुप्लीकेशन फिक्स)
-                    var currentConsumerName = getRobustKey(item, "CONSUMER-NAME") || item.consumerName || "-";
-                    var currentConsumerMobile = getRobustKey(item, "Master Mobile Number") || item.masterMobileNumber || "-";
-                    var currentDivisionDisplay = getRobustKey(item, "DIVISION") || item.division || "";
-
-                    // 🚀 मुख्य मीटर और पोल मीटर नंबर को डीप-मैपिंग से फ़ेच करना
                     var listMainMtrNo = getRobustKey(item, "LAST MONTH FINAL MM NO.") || item.lastMmNo || "-";
                     var listPoleMtrNo = getRobustKey(item, "LAST MONTH FINAL PM NO.") || item.lastPmNo || "-";
-
-                    // 🚀 मुख्य मीटर और पोल मीटर नंबर की मैपिंग
-                    var listMainMtrNo = getRobustKey(item, "LAST MONTH FINAL MM NO.") || item.lastMmNo || "-";
-                    var listPoleMtrNo = getRobustKey(item, "LAST MONTH FINAL PM NO.") || item.lastPmNo || "-";
-
-                    // 🎯 नया सुधार: उपभोक्ता लिस्ट में भी राइट साइड में मोबाइल+ईमेल अपडेट करने का डायरेक्ट बटन जोड़ा गया
-                    var listInfoBtn = '<button onclick="event.stopPropagation(); openContactUpdateModal(\'' + item.accountNo + '\')" class="export-btn mini" style="padding: 5px 8px; font-size: 10px; background:#0ea5e9; display:inline-flex; align-items:center; justify-content:center; gap:3px; margin-top:4px;" title="Update Contact Info"><i class="fa-solid fa-mobile-screen-button" style="font-size:9px;"></i><i class="fa-solid fa-envelope" style="font-size:9px;"></i></button>';
-
-                    // 🚀 मुख्य मीटर और पोल मीटर नंबर की मैपिंग
-                    var listMainMtrNo = getRobustKey(item, "LAST MONTH FINAL MM NO.") || item.lastMmNo || "-";
-                    var listPoleMtrNo = getRobustKey(item, "LAST MONTH FINAL PM NO.") || item.lastPmNo || "-";
-                    // 🎯 पता (Address) फ़ेच करने का इंजन
                     var listAddressDisplay = getRobustKey(item, "ADDRESS") || "-";
 
-                    // 🎯 नया सुधार: उपभोक्ता लिस्ट में भी राइट साइड में मोबाइल+ईमेल अपडेट करने का डायरेक्ट बटन जोड़ा गया
                     var listInfoBtn = '<button onclick="event.stopPropagation(); openContactUpdateModal(\'' + item.accountNo + '\')" class="export-btn mini" style="padding: 5px 8px; font-size: 10px; background:#0ea5e9; display:inline-flex; align-items:center; justify-content:center; gap:3px; margin-top:4px;" title="Update Contact Info"><i class="fa-solid fa-mobile-screen-button" style="font-size:9px;"></i><i class="fa-solid fa-envelope" style="font-size:9px;"></i></button>';
-
+                    // 🚀 सिंटैक्स फिक्स: ऑनक्लिक इवेंट के कोट्स को वेरिएबल्स के जरिए सुरक्षित किया गया
+                    var qvAcc = item.accountNo;
                     htmlBuffer.push(
-                        '<div class="list-item" style="padding: 6px 10px !important; margin-bottom: 4px !important; border-radius: 8px !important; box-shadow: 0 1px 3px rgba(0,0,0,0.04) !important;" onclick="openQuickViewModal(\'' + item.accountNo + '\', \'STANDARD\')">' +
+                        '<div class="list-item" style="padding: 6px 10px !important; margin-bottom: 4px !important; border-radius: 8px !important; box-shadow: 0 1px 3px rgba(0,0,0,0.04) !important;" onclick="openQuickViewModal(\'' + qvAcc + '\', \'STANDARD\')">' +
                         '<div style="display:flex; width:100%; align-items:center; justify-content:space-between; cursor: pointer;">' +
                         '<div style="flex: 1; text-align: left; min-width: 0; padding-right: 5px;">' +
                         '<div class="c-name" style="font-size:12.5px !important; font-weight:900 !important; line-height:1.2 !important; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + currentConsumerName + '</div>' +
@@ -3476,12 +3466,13 @@ function renderNewListTab() {
             var base64Data = item.mainPhotoCompressedBase64 || ""; 
             
             if (base64Data === "" && pdfLink) {
-                // अगर लोकल में बेस64 नहीं है, तो ऐप्स स्क्रिप्ट से लाकर सीधे जावा इंजन को पास करेंगे
+                // 🚀 व्हाट्सएप क्लिक: ऐप्स स्क्रिप्ट से पूरा ओरिजिनल पीडीएफ (बिना पेज हटाए) लाकर व्हाट्सएप पर भेजें
                 google.script.run
                     .withSuccessHandler(function(serverBase64) {
                         if(serverBase64) {
-                            AndroidBridge.shareBillToWhatsApp(cleanPhone, serverBase64, fileName);
-                            showThinAlert("📸 बिल फाइल अटैच हो गई!", true);
+                            var cleanServerBase64 = serverBase64.replace(/\s/g, '');
+                            AndroidBridge.shareBillToWhatsApp(cleanPhone, cleanServerBase64, fileName);
+                            showThinAlert("📸 पूरे दोनों पेज व्हाट्सएप पर अटैच हो गए!", true);
                         } else {
                             alert("🚨 सर्वर से बिल फाइल का डेटा नहीं मिल सका।");
                         }
@@ -3491,10 +3482,10 @@ function renderNewListTab() {
                     })
                     .getPdfDataAsBase64(pdfLink.split('id=')[1]);
             } else if (base64Data !== "") {
-                // अगर बेस64 लोकल में पहले से सेव है
+                // अगर बेस64 लोकल में है (पूरा 2 पेज)
                 var cleanBase64 = base64Data.split(',')[1] || base64Data;
                 AndroidBridge.shareBillToWhatsApp(cleanPhone, cleanBase64, fileName);
-                showThinAlert("📸 बिल फाइल अटैच हो गई!", true);
+                showThinAlert("📸 पूरे दोनों पेज व्हाट्सएप पर अटैच हो गए!", true);
             } else {
                 alert("🚨 इस उपभोक्ता का बिल या पीडीएफ फाइल उपलब्ध नहीं है!");
             }
@@ -3594,10 +3585,12 @@ function renderNewListTab() {
         
         tx.oncomplete = function() {
             var cTx = db.transaction("consumers", "readonly");
-            cTx.objectStore("consumers").openCursor().onsuccess = function(ev) {
-                var cursor = ev.target.result;
-                if(cursor) {
-                    var item = cursor.value;
+            var req = cTx.objectStore("consumers").getAll(); // ⚡ सुपर फास्ट एरे पैकेट लोडर्स
+
+            req.onsuccess = function(ev) {
+                var allConsumers = ev.target.result || [];
+                for (var i = 0; i < allConsumers.length; i++) {
+                    var item = allConsumers[i] || {};
                     var itemLoadCat = (item["LOAD_CATOGERY (5,10)"] || "").toString().trim();
                     
                     var loadMatch = false;
@@ -3637,39 +3630,36 @@ function renderNewListTab() {
                         
                         var waBtn = '<button class="whatsapp-icon" onclick="event.stopPropagation(); triggerWhatsApp(event, \'' + item.accountNo + '\')"><i class="fa-brands fa-whatsapp"></i></button>';
                         
-                        // 🚀 डेटा-ऐट्रिब्यूट (data-acc) जोड़ा गया ताकि मर्ज करते समय Account No मिल सके
-                    var cb = '<div style="width: 30px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;">' +
-                             '<input type="checkbox" class="bill-select-cb" value="' + item.pdfLink + '" data-acc="' + item.accountNo + '" style="transform:scale(1.2); cursor:pointer;" onclick="event.stopPropagation();">' +
-                             '</div>';
+                        var cb = '<div style="width: 30px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;">' +
+                                 '<input type="checkbox" class="bill-select-cb" value="' + item.pdfLink + '" data-acc="' + item.accountNo + '" style="transform:scale(1.2); cursor:pointer;" onclick="event.stopPropagation();">' +
+                                 '</div>';
 
-                    var upDate = getRobustKey(item, "BILL UPLOAD DATE") || item.billUpDate || item["BILL UPLOAD DATE"] || "NOT UPLOADED";
-                    var isPrinted = (getRobustKey(item, "IS BILL PRINT") || item.isBillPrint || "").toString().toUpperCase() === "YES";
-                    var printBadge = isPrinted ? '<span style="background:#10b981; color:white; font-size:9px; padding:2px 4px; border-radius:4px; margin-left:6px; vertical-align:middle; box-shadow:0 1px 2px rgba(0,0,0,0.1);"><i class="fa-solid fa-print"></i> Printed</span>' : '';
-                    var uiStatusText = "Upld: " + (upDate !== "NOT UPLOADED" ? upDate : "N/A");
+                        var upDate = getRobustKey(item, "BILL UPLOAD DATE") || item.billUpDate || item["BILL UPLOAD DATE"] || "NOT UPLOADED";
+                        var isPrinted = (getRobustKey(item, "IS BILL PRINT") || item.isBillPrint || "").toString().toUpperCase() === "YES";
+                        var printBadge = isPrinted ? '<span style="background:#10b981; color:white; font-size:9px; padding:2px 4px; border-radius:4px; margin-left:6px; vertical-align:middle; box-shadow:0 1px 2px rgba(0,0,0,0.1);"><i class="fa-solid fa-print"></i> Printed</span>' : '';
+                        var uiStatusText = "Upld: " + (upDate !== "NOT UPLOADED" ? upDate : "N/A");
 
-                    // ⚡ FIX: BILL DIST TAB DEEP MAPPING ENGINE
-                    var billDistAddress = getRobustKey(item, "ADDRESS") || "-";
-                    var billDistMobile = getRobustKey(item, "Master Mobile Number") || "-";
-                    var billDistName = getRobustKey(item, "CONSUMER-NAME") || item.consumerName || "-";
-                    var billDistMm = getRobustKey(item, "LAST MONTH FINAL MM NO.") || item.lastMmNo || "";
-                    var billDistPm = getRobustKey(item, "LAST MONTH FINAL PM NO.") || item.lastPmNo || "N/A";
+                        var billDistAddress = getRobustKey(item, "ADDRESS") || "-";
+                        var billDistMobile = getRobustKey(item, "Master Mobile Number") || "-";
+                        var billDistName = getRobustKey(item, "CONSUMER-NAME") || item.consumerName || "-";
+                        var billDistMm = getRobustKey(item, "LAST MONTH FINAL MM NO.") || item.lastMmNo || "";
+                        var billDistPm = getRobustKey(item, "LAST MONTH FINAL PM NO.") || item.lastPmNo || "N/A";
 
-                    htmlBuffer.push(
-                        '<div class="list-item" style="border-left-color: #f59e0b; position: relative;" onclick="openQuickViewModal(\'' + item.accountNo + '\', \'BILL_DIST\')">' +
-                        cb +
-                        '<div style="flex:1; text-align: left; padding: 0 5px;">' +
-                        '<div class="c-name">' + billDistName + printBadge + '</div>' +
-                        '<div class="c-acc">A/C: ' + item.accountNo + ' | Mob: ' + billDistMobile + '</div>' +
-                        '<div class="c-addr"><b>पता:</b> ' + billDistAddress + '</div>' +
-                        '<div class="c-mtr">M-Mtr: ' + billDistMm + ' | P-Mtr: ' + billDistPm + '</div>' +
-                        '</div>' +
-                        '<div style="text-align:right; width: 35%; flex-shrink: 0; display:flex; flex-direction:column; align-items:flex-end; justify-content:center; position: relative; z-index: 10;" onclick="event.stopPropagation();">' +
-                        '<div class="c-stat" style="color:#b45309; font-size:11px; font-weight:bold; margin-bottom:4px;">' + uiStatusText + '</div>' +
-                        '<div style="display:flex; gap:5px;">' + pdfBtn + waBtn + '</div>' +
-                        '</div></div>'
-                    );
+                        htmlBuffer.push(
+                            '<div class="list-item" style="border-left-color: #f59e0b; position: relative;" onclick="openQuickViewModal(\'' + item.accountNo + '\', \'BILL_DIST\')">' +
+                            cb +
+                            '<div style="flex:1; text-align: left; padding: 0 5px;">' +
+                            '<div class="c-name">' + billDistName + printBadge + '</div>' +
+                            '<div class="c-acc">A/C: ' + item.accountNo + ' | Mob: ' + billDistMobile + '</div>' +
+                            '<div class="c-addr"><b>पता:</b> ' + billDistAddress + '</div>' +
+                            '<div class="c-mtr">M-Mtr: ' + billDistMm + ' | P-Mtr: ' + billDistPm + '</div>' +
+                            '</div>' +
+                            '<div style="text-align:right; width: 35%; flex-shrink: 0; display:flex; flex-direction:column; align-items:flex-end; justify-content:center; position: relative; z-index: 10;" onclick="event.stopPropagation();">' +
+                            '<div class="c-stat" style="color:#b45309; font-size:11px; font-weight:bold; margin-bottom:4px;">' + uiStatusText + '</div>' +
+                            '<div style="display:flex; gap:5px;">' + pdfBtn + waBtn + '</div>' +
+                            '</div></div>'
+                        );
                     } 
-                    cursor.continue();
                 }
             };
             cTx.oncomplete = function() { 
@@ -3770,10 +3760,12 @@ async function downloadSelectedMergedPDF() {
                     }
                     
                     const pdf = await PDFDocument.load(bytes);
-                    const copiedPages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
-                    copiedPages.forEach(page => mergedPdf.addPage(page));
-                    
-                    successfulCount++;
+                    // 🚀 डाउनलोड / मर्ज फिक्स: हर बिल पीडीएफ में से सिर्फ पहला पेज (इंडेक्स 0) ही कॉपी करें
+                    if (pdf.getPageCount() > 0) {
+                        const copiedPages = await mergedPdf.copyPages(pdf, [0]); 
+                        copiedPages.forEach(page => mergedPdf.addPage(page));
+                        successfulCount++;
+                    }
                 } catch (innerErr) {
                     console.error("Single PDF Error:", innerErr);
                 }
@@ -3868,11 +3860,14 @@ async function downloadSelectedMergedPDF() {
 
     function renderVisitDataList() {
         if(loggedInReader.toUpperCase() !== "ANURAG SHAKYA") return;
-        var htmlBuffer = []; var tx = db.transaction("consumers", "readonly");
-        tx.objectStore("consumers").openCursor().onsuccess = function(ev) {
-            var cursor = ev.target.result;
-            if(cursor) {
-                var item = cursor.value;
+        var htmlBuffer = []; 
+        var tx = db.transaction("consumers", "readonly");
+        var req = tx.objectStore("consumers").getAll();
+        
+        req.onsuccess = function(ev) {
+            var allConsumers = ev.target.result || [];
+            for (var i = 0; i < allConsumers.length; i++) {
+                var item = allConsumers[i] || {};
                 if(isReaderAllowed(getReaderName(item))) {
                     // 🔥 Yahan onclick mein se openQuickViewModal hata diya hai
                     // ⚡ FIX: VISIT TAB DEEP MAPPING ENGINE WITH ADDRESS & MOBILE
@@ -4610,10 +4605,14 @@ function openReportRowDirect(reportKey) {
                     var targetAccordionDiv = (reportType === 'Visit_Data_Consumers') ? '<div id="visit_acc_' + item.accountNo + '" class="accordion-content"></div>' : '';
                     var rIdx = parseInt(item.rowIndex || getRobustKey(item, "rowIndex") || 0);
 
+                    // 🚀 सिंटैक्स फिक्स: ऑल बिल्स रिपोर्ट के ऑनक्लिक टॉगल एक्शन को सुरक्षित किया गया
+                    var qvAcc = item.accountNo;
+                    var finalToggleAction = (reportType === 'Visit_Data_Consumers') ? 'toggleVisitAccordion(\'' + qvAcc + '\', \'FULL\')' : 'openQuickViewModal(\'' + qvAcc + '\', \'STANDARD\')';
+                    
                     htmlArr.push({
                         index: rIdx,
                         name: (getRobustKey(item, "CONSUMER-NAME") || item.consumerName || "").toString().toUpperCase(),
-                        html: '<div class="list-item" style="border-left-color: ' + (reportType === 'all_bills_report' ? '#f59e0b' : '#334155') + '; padding: 6px 10px !important; margin-bottom: 4px !important; border-radius: 8px !important;" onclick="' + toggleAction + '">' +
+                        html: '<div class="list-item" style="border-left-color: ' + (reportType === 'all_bills_report' ? '#f59e0b' : '#334155') + '; padding: 6px 10px !important; margin-bottom: 4px !important; border-radius: 8px !important;" onclick="' + finalToggleAction + '">' +
                               '<div style="display: flex; justify-content: space-between; width: 100%; align-items: center;">' +
                               cbHtml + 
                               '<div style="flex: 1; text-align: left; min-width: 0; padding-right: 5px;">' +
@@ -4672,13 +4671,14 @@ function openReportRowDirect(reportKey) {
     
     tx.oncomplete = function() {
         var cTx = db.transaction("consumers", "readonly");
+        var req = cTx.objectStore("consumers").getAll();
         currentReportDataList = []; 
         var uniqueRemarksSet = new Set();
 
-        cTx.objectStore("consumers").openCursor().onsuccess = function(ev) {
-            var cursor = ev.target.result;
-            if(cursor) {
-                var item = cursor.value || {};
+        req.onsuccess = function(ev) {
+            var allConsumers = ev.target.result || [];
+            for (var i = 0; i < allConsumers.length; i++) {
+                var item = allConsumers[i] || {};
                 var rStat = (item["ATTEND STATUS"] || item.attendStatus || "").toString().toUpperCase().trim();
                 
                 if(isReaderAllowed(getReaderName(item)) && !parseTrue(item.isDone) && !savedEntries.has(item.accountNo)) {
@@ -4780,8 +4780,11 @@ function openReportRowDirect(reportKey) {
             var uiStatusText = isBillingMode ? "Upld: " + (itemRem !== "NOT UPLOADED" ? itemRem : "N/A") : "Rem: " + itemRem;
 
             // 🎯 अल्ट्रा-कॉम्पैक्ट मोबाइल लिस्टिंग यूआई लेआउट (No wasted screen space)
+            // 🚀 सिंटैक्स फिक्स: डायनामिक मोड स्ट्रिंग को पहले ही बाहर निकालकर सुरक्षित किया गया
+            var qvAcc = item.accountNo;
+            var qvMode = isBillingMode ? "BILL_DIST" : "STANDARD";
             htmlArr.push(
-                '<div class="list-item" style="border-left-color: #4f46e5; padding: 6px 10px !important; margin-bottom: 4px !important; border-radius: 8px !important; box-shadow: 0 1px 3px rgba(0,0,0,0.04) !important;" onclick="openQuickViewModal(\'' + item.accountNo + '\', \'' + (isBillingMode ? "BILL_DIST" : "STANDARD") + '\')">' +
+                '<div class="list-item" style="border-left-color: #4f46e5; padding: 6px 10px !important; margin-bottom: 4px !important; border-radius: 8px !important; box-shadow: 0 1px 3px rgba(0,0,0,0.04) !important;" onclick="openQuickViewModal(\'' + qvAcc + '\', \'' + qvMode + '\')">' +
                 '<div style="display:flex; width:100%; align-items:center; justify-content:space-between;">' +
                 cbHtml +
                 '<div style="flex: 1; text-align: left; min-width: 0; padding-right: 5px;">' +
@@ -6440,10 +6443,12 @@ function triggerSilentBackgroundSync() {
         // 2. पेंडिंग डेटा निकालें
         var readerData = [];
         var tx = db.transaction("consumers", "readonly");
-        tx.objectStore("consumers").openCursor().onsuccess = function(e) {
-            var cursor = e.target.result;
-            if(cursor) {
-                var item = cursor.value;
+        var req = tx.objectStore("consumers").getAll();
+        
+        // 🚀 सिंटैक्स एरर फिक्स: एरे लूप का क्लोजिंग ब्रैकेट (}); सही ढंग से बंद किया गया
+        req.onsuccess = function(e) {
+            var allConsumers = e.target.result || [];
+            allConsumers.forEach(function(item) {
                 var rn = getReaderName(item);
                 if(rn && rn.toUpperCase() === readerName.toUpperCase()) {
                     var rStatus = item["ATTEND STATUS"] ? item["ATTEND STATUS"].toString().toUpperCase() : "";
@@ -6452,8 +6457,7 @@ function triggerSilentBackgroundSync() {
                         readerData.push(item);
                     }
                 }
-                cursor.continue();
-            }
+            });
         };
         
         tx.oncomplete = function() {
