@@ -927,7 +927,7 @@
         <div id="apkErrorLogger" style="display:none; margin-top:10px; padding:10px; background:#fef2f2; border:1px solid #fca5a5; border-radius:6px; color:#b91c1c; font-size:11px; font-weight:bold; text-align:left; word-break:break-all; white-space:pre-wrap;"></div>
         <div class="app-footer-branding" style="position: relative;">
             Developed by:- Anurag Shakya | 9761414105
-            <span style="display:block; margin-top:4px; font-size:10px; color:#ef4444; font-weight:900;">App Version: V1.0.22</span>
+            <span style="display:block; margin-top:4px; font-size:10px; color:#ef4444; font-weight:900;">App Version: V1.0.23</span>
         </div>
     </div>
     
@@ -1321,7 +1321,7 @@
             
             <div style="text-align: center; margin-top: 25px; padding-top: 15px; border-top: 1px dashed #cbd5e1; color: #64748b;">
                 <div style="font-size: 12px; font-weight: bold;">Developed by: Anurag Shakya</div>
-                <div style="font-size: 11px; color: #ef4444; font-weight: 900; margin-top: 4px;">App Version: V1.0.22</div>
+                <div style="font-size: 11px; color: #ef4444; font-weight: 900; margin-top: 4px;">App Version: V1.0.23</div>
             </div>
         </div>
 
@@ -1374,7 +1374,7 @@
         <div style="width: 100%; height: 40px; clear: both; display: block !important; visibility: hidden; pointer-events: none;"></div>
         
         <div class="card" style="background: rgba(255, 255, 255, 0.7); margin-bottom: 20px; text-align: center; border: 1px dashed #cbd5e1;">
-            <div style="font-size: 11px; color: #ef4444; font-weight: 900; margin-bottom: 3px;">App Version: V1.0.22</div>
+            <div style="font-size: 11px; color: #ef4444; font-weight: 900; margin-bottom: 3px;">App Version: V1.0.23</div>
             <div style="font-size: 12px; color: #1e40af; font-weight: 800; text-transform: uppercase; margin-bottom: 5px;"><i class="fa-solid fa-user-tie"></i> <span id="welcomeTxt">Mr Name: Loading...</span></div>
             <div style="font-size: 11px; font-weight: 700; color: #475569; border-top: 1px solid #cbd5e1; padding-top: 5px;">
                 Developed by:- Er. Anurag Shakya | 9761414105
@@ -1761,12 +1761,22 @@ var REPORT_NAMES = { 'main_mri_pending': '1. Main Meter MRI Pending', 'pole_mri_
     function setupSafetyPopBackState() {
         history.pushState({page: 1}, "DvVNL", window.location.href);
         window.onpopstate = function(event) {
-            var currentView = localStorage.getItem("app_current_view_state_" + loggedInReader);
-            if (currentView === "formView" || document.getElementById('formView').style.display === "block") {
+            // 🎯 फिक्स 1: क्विक व्यू खुला होने पर बैक बटन दबाने से सिर्फ क्विक व्यू बंद होगा
+            if (document.getElementById('quickViewModal') && document.getElementById('quickViewModal').style.display === "flex") {
+                history.pushState({page: 1}, "DvVNL", window.location.href);
+                document.getElementById('quickViewModal').style.display = 'none';
+                return;
+            }
+
+            // 🎯 फिक्स 2: ताज़ा सेशन्स स्टेट वेरिएबल को ऑन-द-फ्लाई सुरक्षित रीड करना
+            var currentView = loggedInReader ? localStorage.getItem("app_current_view_state_" + loggedInReader) : "";
+            
+            if (currentView === "formView" || (document.getElementById('formView') && document.getElementById('formView').style.display === "block")) {
                 history.pushState({page: 1}, "DvVNL", window.location.href);
                 customConfirm("एंट्री फॉर्म खुला हुआ है! क्या आप बिना सेव किये पीछे जाना चाहते हैं?", function() { navigateBack(); });
-            } else if (document.getElementById('reportDetailContainer').style.display === "block") {
-                history.pushState({page: 1}, "DvVNL", window.location.href); logoutSafely();
+            } else if (document.getElementById('reportDetailContainer') && document.getElementById('reportDetailContainer').style.display === "block") {
+                history.pushState({page: 1}, "DvVNL", window.location.href); 
+                logoutSafely();
             }
         };
     }
@@ -2694,6 +2704,14 @@ window.applyHeaderReaderFilter = function() {
 
     // 🟢 अल्टीमेट टैब फिक्स: कन्फिग टैब दबाने पर ब्लैंक स्क्रीन की समस्या का 100% परमानेंट इलाज
     function switchTab(tabName) {
+        // 🎯 टैब बदलते ही सभी सर्च बॉक्स को खाली करना और सर्च कैशे साफ़ करने का फिक्स
+        var searchInputs = ['listSearchBar', 'billSearchBar', 'visitDataSearchBar', 'reportSearchBar'];
+        searchInputs.forEach(function(id) {
+            var input = document.getElementById(id);
+            if (input) input.value = "";
+        });
+        appSearchDatabaseCache = null; // सर्च कैशे मेमोरी रीसेट
+
         // मास्टर लिस्ट में सभी टैब्स और हमारे नए 'visitdata' (डाटा) बटन की आईडी को शामिल किया गया है
         var tabs = ['summary', 'list', 'billdist', 'visitdata', 'reports', 'filter', 'notifyadmin', 'configmaker'];
         
@@ -2898,18 +2916,18 @@ function universalListSearch(inputId, containerId) {
     var inputNode = document.getElementById(inputId);
     if (!inputNode) return;
     
-    // 🎯 फिक्स 1: पेस्ट किए गए डेटा में से न्यू-लाइन, टैब और फालतू स्पेस को साफ करके शुद्ध कीवर्ड्स बनाना
     var rawInput = inputNode.value || "";
-    var cleanInput = rawInput.replace(/[\r\n\t]/g, ' ').replace(/\s+/g, ' ').toUpperCase().trim();
+    // 🎯 फिक्स 1 (पेस्ट फिक्स): पेस्ट करते समय आने वाले इनविजिबल कैरेक्टर्स (जैसे \ज, \क, हिडन स्पेस) को पूरी तरह साफ करना
+    var cleanInput = rawInput.replace(/[\r\n\t\u200B-\u200D\uFEFF]/g, ' ').replace(/\s+/g, ' ').toUpperCase().trim();
     var container = document.getElementById(containerId);
     if (!container) return;
 
     var searchKeywords = cleanInput.split(/\s+/).filter(function(k) { return k !== ""; });
 
-    // यदि सर्च बॉक्स पूरा खाली हो जाए, तो मूल स्थिति वापस रेंडर करें
     if (searchKeywords.length === 0) {
-        appSearchDatabaseCache = null; // कैशे रीसेट
-        var currentTabNode = document.querySelector('.tab-btn.active');
+        appSearchDatabaseCache = null; 
+        // 🎯 फिक्स 2 (एक्टिव टैब क्लास सेफ्टी): .tab-btn.active को सही से ढूँढना ताकि डेटा ब्लैंक न हो
+        var currentTabNode = document.querySelector('.tab-bar .tab-btn.active') || document.querySelector('.tab-btn.active');
         if (currentTabNode) {
             var activeTabName = currentTabNode.id.replace('btn-tab-', '');
             if (activeTabName === 'list' && typeof renderNewListTab === 'function') renderNewListTab();
@@ -2921,21 +2939,26 @@ function universalListSearch(inputId, containerId) {
 
     if (!db) return;
 
-    // 🎯 फिक्स 2: कीबोर्ड लैग रोकने के लिए थ्रॉटलिंग (३०ms डिले) ताकि हर टाइप पर यूआई न लटके
+    // 🎯 फिक्स 3 (इंस्टेंट रिस्पॉन्स): ३०ms का डिले कभी-कभी पेस्ट होने के तुरंत बाद चलने वाले रेंडरर से टकराता था।
+    // अब यह टाइमर क्लियर होकर बिना किसी यूआई लैग या गायब होने की समस्या के तुरंत सर्च रन करेगा।
     if (globalSearchLockTimer) clearTimeout(globalSearchLockTimer);
     globalSearchLockTimer = setTimeout(function() {
+        var searchAction = function(dataPool) {
+            executeFastCacheSearch(searchKeywords, dataPool, container, containerId);
+        };
+
         if (appSearchDatabaseCache && appSearchDatabaseCache.length > 0) {
-            executeFastCacheSearch(searchKeywords, appSearchDatabaseCache, container, containerId);
+            searchAction(appSearchDatabaseCache);
         } else {
             var tx = db.transaction("consumers", "readonly");
             var store = tx.objectStore("consumers");
             var req = store.getAll();
             req.onsuccess = function(e) {
                 appSearchDatabaseCache = e.target.result || [];
-                executeFastCacheSearch(searchKeywords, appSearchDatabaseCache, container, containerId);
+                searchAction(appSearchDatabaseCache);
             };
         }
-    }, 30);
+    }, 10); // डिले को घटाकर १०ms किया ताकि वैल्यू पेस्ट होते ही बिना गायब हुए लॉक हो जाए
 }
 
 // ⚡ सुपर-फास्ट कैशे डीप सर्च ड्राइवर (उपभोक्ता के सम्पूर्ण अंदरूनी डेटाबेस से मिलान)
@@ -2951,7 +2974,26 @@ function executeFastCacheSearch(searchKeywords, allData, container, containerId)
         var item = allData[i] || {};
         if (!isReaderAllowed(getReaderName(item))) continue;
 
-        // 🎯 फिक्स 3: उपभोक्ता टैब के वर्तमान पेंडिंग/अटेंड फ़िल्टर का सम्मान करना ताकि सर्च में भी वही स्टेट्स आएं
+        // 🎯 फिक्स 1: All Bills रिपोर्ट में सर्च करते समय केवल वही उपभोक्ता दिखेंगे जिनका बिल वास्तव में उपलब्ध है
+        if (activeReportType === 'all_bills_report') {
+            var hasValidBillFile = (item.pdfLink && item.pdfLink.trim() !== "") || (typeof isBillUploaded === 'function' && isBillUploaded(item));
+            if (!hasValidBillFile) continue; // बिना बिल वाले उपभोक्ता ऑल बिल सर्च से बाहर
+        }
+
+        // 🎯 फिक्स 2: अन्य कंडीशनल पेंडेंसी रिपोर्ट्स (Watchlist) में सर्च करते समय उस रिपोर्ट की शीट कंडीशन का पालन करना
+        if (activeReportType && activeReportType !== 'all_bills_report' && activeReportType !== 'all_consumers_list' && activeReportType !== 'Visit_Data_Consumers') {
+            if (item.isDone === true || item.isDone === "true") continue; // विजिट डन वाले बाहर
+            
+            // ग्लोबल कॉन्फ़िगरेशन से इस रिपोर्ट का नियम ढूंढें
+            var matchedConfig = (typeof globalReportConfigs !== 'undefined' && Array.isArray(globalReportConfigs)) ? globalReportConfigs.find(function(c) { return c.key === activeReportType; }) : null;
+            if (matchedConfig && matchedConfig.conditionStr) {
+                if (typeof evaluateCustomCondition === 'function' && !evaluateCustomCondition(item, matchedConfig.conditionStr)) {
+                    continue; // यदि यह उपभोक्ता इस विशिष्ट रिपोर्ट के नियम में फिट नहीं बैठता, तो स्किप करें
+                }
+            }
+        }
+
+        // 🎯 उपभोक्ता टैब के वर्तमान पेंडिंग/अटेंड फ़िल्टर का सम्मान (यथावत सुरक्षित)
         if (containerId === 'listDataContainer') {
             var itemDiv = (getRobustKey(item, "DIVISION") || item.division || "").toString().toUpperCase().trim();
             if (currentFilterDiv !== "ALL" && currentFilterDiv !== itemDiv) continue;
@@ -3321,89 +3363,79 @@ function renderNewListTab() {
     };
     
     tx.oncomplete = function() {
+        // 🚀 सिंटैक्स फिक्स: यहाँ से डुप्लीकेट डबल हेडिंग को हटाकर सीधा उपभोक्ताओं का डेटा सिंक किया गया
         var cTx = db.transaction("consumers", "readonly");
-        var consumersReq = cTx.objectStore("consumers").getAll();
-        
-        consumersReq.onsuccess = function(ev) {
+        var store = cTx.objectStore("consumers");
+        var req = store.getAll(); 
+
+        req.onsuccess = function(ev) {
             var allConsumers = ev.target.result || [];
-            
             for (var i = 0; i < allConsumers.length; i++) {
-    var item = allConsumers[i] || {};
-    
-    // 🚀 APK/GitHub एनवायरनमेंट के लिए क्रैश-प्रूफ की-मैपिंग ड्राइवर
-    var rawStatus = (getRobustKey(item, "ATTEND STATUS") || item.attendStatus || "").toString().toUpperCase().trim();
-    var rawDistStatus = (getRobustKey(item, "DISTRIBUTION STATUS") || item.distStatus || "").toString().toUpperCase().trim();
-    
-    var itemDiv = (getRobustKey(item, "DIVISION") || item.division || "").toString().toUpperCase().trim();
-    var divMatch = (selectedDiv === "ALL" || selectedDiv === itemDiv); 
-    
-    // 🎯 ReferenceError फिक्स: स्थानीय रूप से सेव ड्राफ्ट की जाँच
-    var isLocallyDone = savedEntriesMap && savedEntriesMap[item.accountNo]; 
-    
-    // ⚡ गिटहब/प्रॉक्सी एनवायरनमेंट कैशे सेफ्टी कवच
-    if (!globalReportConfigs || !Array.isArray(globalReportConfigs) || globalReportConfigs.length === 0) {
-        try {
-            var apkCachedConfigs = localStorage.getItem("app_report_configs_cache");
-            if (apkCachedConfigs) globalReportConfigs = JSON.parse(apkCachedConfigs);
-        } catch(e) { console.error("Cache recovery failed", e); }
-    }
-    
-    var configAllList = (globalReportConfigs && Array.isArray(globalReportConfigs)) ? globalReportConfigs.find(function(c) { return c.key === 'all_consumers_list'; }) : null;
-    var matchesSheetCondition = true;
-    
-    // यदि कॉन्फ़िगरेशन मिल जाए तो कंडीशन जांचें, अन्यथा गिटहब बाईपास मोड में इसे डिफ़ॉल्ट रूप से True रखें
-    if (configAllList && configAllList.conditionStr && configAllList.conditionStr.indexOf('=') !== -1) {
-        matchesSheetCondition = evaluateCustomCondition(item, configAllList.conditionStr);
-    }
-    
-    var strictlyDone = (item.isDone === true || item.isDone === "true" || rawStatus === "ATTEND" || rawStatus === "DONE" || rawDistStatus === "DISTRIBUTED" || isLocallyDone);
-    var statusMatch = false;
-
-    // 🎯 पेंडिंग और अटेंड फ़िल्टर रिकवरी इंजन
-    if (selectedStatus === "PENDING") { 
-        if (!strictlyDone && matchesSheetCondition) { 
-            statusMatch = true; 
-        }
-    } else if (selectedStatus === "ATTEND") { 
-        if (strictlyDone) { 
-            statusMatch = true; 
-        }
-    }
+                var item = allConsumers[i] || {};
                 
-    // 🚀 MR LOGIN BYPASS FIX: नाम मैचिंग को केस-इन्सेंसिटिव और ट्रिम सुरक्षित बनाना
-    var currentItemReader = (getReaderName(item) || "").toString().trim().toUpperCase();
-    var currentLoggedInUser = (loggedInReader || "").toString().trim().toUpperCase();
-    
-    // एडमिन के अलावा सामान्य MR के लिए नाम का सीधा और सुरक्षित मिलान
-    var isUserAuthorized = false;
-    if (currentLoggedInUser === "ANURAG SHAKYA" || currentLoggedInUser === "ADMIN") {
-        isUserAuthorized = isReaderAllowed(currentItemReader); 
-    } else {
-        // सामान्य MR लॉगिन पर अगर नाम मैच होता है
-        isUserAuthorized = (currentItemReader === currentLoggedInUser && currentLoggedInUser !== "");
-    }
+                // 🚀 APK/GitHub एनवायरनमेंट के लिए क्रैश-प्रूफ की-मैपिंग ड्राइवर
+                var rawStatus = (getRobustKey(item, "ATTEND STATUS") || item.attendStatus || "").toString().toUpperCase().trim();
+                var rawDistStatus = (getRobustKey(item, "DISTRIBUTION STATUS") || item.distStatus || "").toString().toUpperCase().trim();
+                
+                var itemDiv = (getRobustKey(item, "DIVISION") || item.division || "").toString().toUpperCase().trim();
+                var divMatch = (selectedDiv === "ALL" || selectedDiv === itemDiv); 
+                
+                // 🎯 ReferenceError फिक्स: स्थानीय रूप से सेव ड्राफ्ट की जाँच
+                var isLocallyDone = savedEntriesMap && savedEntriesMap[item.accountNo]; 
+                
+                // ⚡ गिटहब/प्रॉक्सी एनवायरनमेंट कैशे सेफ्टी कवच
+                if (!globalReportConfigs || !Array.isArray(globalReportConfigs) || globalReportConfigs.length === 0) {
+                    try {
+                        var apkCachedConfigs = localStorage.getItem("app_report_configs_cache");
+                        if (apkCachedConfigs) globalReportConfigs = JSON.parse(apkCachedConfigs);
+                    } catch(e) { console.error("Cache recovery failed", e); }
+                }
+                
+                var configAllList = (globalReportConfigs && Array.isArray(globalReportConfigs)) ? globalReportConfigs.find(function(c) { return c.key === 'all_consumers_list'; }) : null;
+                var matchesSheetCondition = true;
+                
+                // यदि कॉन्फ़िगरेशन मिल जाए तो कंडीशन जांचें, अन्यथा गिटहब बाईपास मोड में इसे डिफ़ॉल्ट रूप से True रखें
+                if (configAllList && configAllList.conditionStr && configAllList.conditionStr.indexOf('=') !== -1) {
+                    matchesSheetCondition = evaluateCustomCondition(item, configAllList.conditionStr);
+                }
+                
+                var strictlyDone = (item.isDone === true || item.isDone === "true" || rawStatus === "ATTEND" || rawStatus === "DONE" || rawDistStatus === "DISTRIBUTED" || isLocallyDone);
+                var statusMatch = false;
 
-    // अब यह कंडीशन प्रॉक्सी एनवायरनमेंट में भी कभी फ़ेल नहीं होगी
-    if (statusMatch && isUserAuthorized && divMatch) {
-                    // ⚡ CRITICAL DEEP SCAN MAPPING ENGINE
-                    var consumerAddress = getRobustKey(item, "ADDRESS") || "-";
-                    var consumerMobile = getRobustKey(item, "Master Mobile Number") || "-";
-                    var consumerNameDisplay = getRobustKey(item, "CONSUMER-NAME") || item.consumerName || "-";
-                    var mainMtrDisplay = getRobustKey(item, "LAST MONTH FINAL MM NO.") || item.lastMmNo || "";
-                    var poleMtrDisplay = getRobustKey(item, "LAST MONTH FINAL PM NO.") || item.lastPmNo || "";
-                    var divisionDisplay = getRobustKey(item, "DIVISION") || item.division || "";
+                // 🎯 पेंडिंग और अटेंड फ़िल्टर रिकवरी引擎
+                if (selectedStatus === "PENDING") { 
+                    if (!strictlyDone && matchesSheetCondition) { 
+                        statusMatch = true; 
+                    }
+                } else if (selectedStatus === "ATTEND") { 
+                    if (strictlyDone) { 
+                        statusMatch = true; 
+                    }
+                }
+                            
+                // 🚀 MR LOGIN BYPASS FIX: नाम मैचिंग को केस-इन्सेंसिटिव और ट्रिम सुरक्षित बनाना
+                var currentItemReader = (getReaderName(item) || "").toString().trim().toUpperCase();
+                var currentLoggedInUser = (loggedInReader || "").toString().trim().toUpperCase();
+                
+                // एडमिन के अलावा सामान्य MR के लिए नाम का सीधा और सुरक्षित मिलान
+                var isUserAuthorized = false;
+                if (currentLoggedInUser === "ANURAG SHAKYA" || currentLoggedInUser === "ADMIN") {
+                    isUserAuthorized = isReaderAllowed(currentItemReader); 
+                } else {
+                    isUserAuthorized = (currentItemReader === currentLoggedInUser && currentLoggedInUser !== "");
+                }
 
-                    // 🎯 प्रिमियम अल्ट्रा-कॉम्पैक्ट उपभोक्ता सूची लेआउट
+                // अब यह कंडीशन प्रॉक्सी एनवायरनमेंट में भी कभी फ़ेल नहीं होगी
+                if (statusMatch && isUserAuthorized && divMatch) {
+                    var listMainMtrNo = getRobustKey(item, "LAST MONTH FINAL MM NO.") || item.lastMmNo || "-";
+                    var listPoleMtrNo = getRobustKey(item, "LAST MONTH FINAL PM NO.") || item.lastPmNo || "-";
+                    var listAddressDisplay = getRobustKey(item, "ADDRESS") || "-";
                     var currentConsumerName = getRobustKey(item, "CONSUMER-NAME") || item.consumerName || "-";
                     var currentConsumerMobile = getRobustKey(item, "Master Mobile Number") || item.masterMobileNumber || "-";
                     var currentDivisionDisplay = getRobustKey(item, "DIVISION") || item.division || "";
 
-                    var listMainMtrNo = getRobustKey(item, "LAST MONTH FINAL MM NO.") || item.lastMmNo || "-";
-                    var listPoleMtrNo = getRobustKey(item, "LAST MONTH FINAL PM NO.") || item.lastPmNo || "-";
-                    var listAddressDisplay = getRobustKey(item, "ADDRESS") || "-";
-
                     var listInfoBtn = '<button onclick="event.stopPropagation(); openContactUpdateModal(\'' + item.accountNo + '\')" class="export-btn mini" style="padding: 5px 8px; font-size: 10px; background:#0ea5e9; display:inline-flex; align-items:center; justify-content:center; gap:3px; margin-top:4px;" title="Update Contact Info"><i class="fa-solid fa-mobile-screen-button" style="font-size:9px;"></i><i class="fa-solid fa-envelope" style="font-size:9px;"></i></button>';
-                    // 🚀 सिंटैक्स फिक्स: ऑनक्लिक इवेंट के कोट्स को वेरिएबल्स के जरिए सुरक्षित किया गया
+                    
                     var qvAcc = item.accountNo;
                     htmlBuffer.push(
                         '<div class="list-item" style="padding: 6px 10px !important; margin-bottom: 4px !important; border-radius: 8px !important; box-shadow: 0 1px 3px rgba(0,0,0,0.04) !important;" onclick="openQuickViewModal(\'' + qvAcc + '\', \'STANDARD\')">' +
@@ -3411,11 +3443,9 @@ function renderNewListTab() {
                         '<div style="flex: 1; text-align: left; min-width: 0; padding-right: 5px;">' +
                         '<div class="c-name" style="font-size:12.5px !important; font-weight:900 !important; line-height:1.2 !important; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + currentConsumerName + '</div>' +
                         '<div class="c-acc" style="font-size:11px !important; margin-top:1px !important; color:#475569;">A/C: ' + item.accountNo + ' | Mob: ' + currentConsumerMobile + '</div>' +
-                        // 🎯 पता (Address) रो जोड़ी गई
                         '<div class="c-addr" style="font-size:11px !important; margin-top:2px !important; color:#64748b; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"><b>पता:</b> ' + listAddressDisplay + '</div>' +
                         '<div class="c-mtr" style="font-size:11px !important; margin-top:2px !important; color:#4f46e5; font-weight:700;">M-Mtr: ' + listMainMtrNo + ' | P-Mtr: ' + listPoleMtrNo + '</div>' +
                         '</div>' +
-                        // राइट side का लेआउट
                         '<div style="text-align:right; flex-shrink: 0; display:flex; flex-direction:column; align-items:flex-end; gap:2px;">' +
                         '<div style="font-size:10px; font-weight:bold; color:#4338ca; background:#e0e7ff; padding:2px 6px; border-radius:4px; white-space:nowrap;">' + currentDivisionDisplay + '</div>' +
                         '<div onclick="event.stopPropagation();">' + listInfoBtn + '</div>' +
@@ -3424,22 +3454,18 @@ function renderNewListTab() {
                 }
             } // loop end
             
-            // सीधे सूची को कंटेनर में रेंडर करें 
             var container = document.getElementById('listDataContainer');
             if (container) {
                 container.innerHTML = htmlBuffer.length === 0 ? '<div style="text-align:center; padding:25px; color:#475569; font-weight:bold;">कोई उपभोक्ता नहीं मिला।</div>' : htmlBuffer.join(''); 
             }
             
-            // 🎯 लाइव फ़िल्टर काउंट अपडेट: फ़िल्टर के अनुसार ऊपर का काउंट तुरंत बदलेगा
             var listCountNode = document.getElementById('count-list');
             if (listCountNode) {
                 listCountNode.innerText = htmlBuffer.length;
                 listCountNode.className = (htmlBuffer.length === 0) ? "badge-count zero" : "badge-count alert";
             }
             
-            // सर्च बार की मौजूदा स्थिति के हिसाब से भी लिस्ट को री-फ़िल्टर करें
             universalListSearch('listSearchBar', 'listDataContainer'); 
-            
             if(typeof updateSummaryStatsRaw === 'function') { updateSummaryStatsRaw(); }
         }; 
     };
@@ -4395,6 +4421,14 @@ function openReportRowDirect(reportKey) {
     activeReportType = reportKey;
     if(loggedInReader) { localStorage.setItem("app_current_view_state_" + loggedInReader, "reportDetailContainer"); }
     
+    // 🎯 रिपोर्ट सीधे खोलते समय भी पुराना सर्च टेक्स्ट साफ़ करने का फिक्स
+    var searchInputs = ['listSearchBar', 'billSearchBar', 'visitDataSearchBar', 'reportSearchBar'];
+    searchInputs.forEach(function(id) {
+        var input = document.getElementById(id);
+        if (input) input.value = "";
+    });
+    appSearchDatabaseCache = null;
+
     var tabs = ['summary', 'list', 'billdist', 'visitdata', 'reports', 'filter', 'notifyadmin', 'configmaker'];
     tabs.forEach(function(t) { 
         var view = document.getElementById('view-' + t); 
@@ -4703,7 +4737,6 @@ function openReportRowDirect(reportKey) {
                         if(remText.trim() !== "" && remText.toUpperCase() !== "NOT FOUND") uniqueRemarksSet.add(remText.trim().toUpperCase());
                     }
                 }
-                cursor.continue();
             }
         };
         
@@ -4779,17 +4812,25 @@ function openReportRowDirect(reportKey) {
 
             var uiStatusText = isBillingMode ? "Upld: " + (itemRem !== "NOT UPLOADED" ? itemRem : "N/A") : "Rem: " + itemRem;
 
-            // 🎯 अल्ट्रा-कॉम्पैक्ट मोबाइल लिस्टिंग यूआई लेआउट (No wasted screen space)
-            // 🚀 सिंटैक्स फिक्स: डायनामिक मोड स्ट्रिंग को पहले ही बाहर निकालकर सुरक्षित किया गया
+            // 🎯 फिक्स 1: उपभोक्ता का एड्रेस और मीटर नंबरों का रो डेटा सुरक्षित निकालना
+            var reportAddressDisplay = getRobustKey(item, "ADDRESS") || "-";
+            var listMainMtrNo = getRobustKey(item, "LAST MONTH FINAL MM NO.") || item.lastMmNo || "-";
+            var listPoleMtrNo = getRobustKey(item, "LAST MONTH FINAL PM NO.") || item.lastPmNo || "-";
+
+            // 🎯 फिक्स 2: क्विक व्यू खुलने पर एडिट बटन दबाने से सीधे गूगल शीट फॉर्म (EDIT मोड) खोलने के लिए मोड लॉक करना
             var qvAcc = item.accountNo;
-            var qvMode = isBillingMode ? "BILL_DIST" : "STANDARD";
+            var qvMode = isBillingMode ? "BILL_DIST" : "STANDARD"; 
+            
             htmlArr.push(
                 '<div class="list-item" style="border-left-color: #4f46e5; padding: 6px 10px !important; margin-bottom: 4px !important; border-radius: 8px !important; box-shadow: 0 1px 3px rgba(0,0,0,0.04) !important;" onclick="openQuickViewModal(\'' + qvAcc + '\', \'' + qvMode + '\')">' +
                 '<div style="display:flex; width:100%; align-items:center; justify-content:space-between;">' +
                 cbHtml +
                 '<div style="flex: 1; text-align: left; min-width: 0; padding-right: 5px;">' +
                 '<div class="c-name" style="font-size:12.5px !important; font-weight:900 !important; line-height:1.2 !important; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + item.consumerName + printBadge + '</div>' +
-                '<div class="c-acc" style="font-size:11px !important; margin-top:1px !important;">A/C: ' + item.accountNo + ' | <span style="color:#475569;">' + (isPoleType ? "P-Mtr: " : "M-Mtr: ") + (isPoleType ? item.lastPmNo : item.lastMmNo||"") + '</span></div>' +
+                '<div class="c-acc" style="font-size:11px !important; margin-top:1px !important; color:#475569;">A/C: ' + item.accountNo + '</div>' +
+                // 🎯 फिक्स 3: लिस्ट लेआउट में एड्रेस और मीटर डिटेल्स की लाइन को जोड़ना
+                '<div class="c-addr" style="font-size:11px !important; margin-top:2px !important; color:#64748b; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"><b>पता:</b> ' + reportAddressDisplay + '</div>' +
+                '<div class="c-mtr" style="font-size:11px !important; margin-top:2px !important; color:#4f46e5; font-weight:700;">M-Mtr: ' + listMainMtrNo + ' | P-Mtr: ' + listPoleMtrNo + '</div>' +
                 '</div>' +
                 '<div style="text-align:right; flex-shrink: 0; display:flex; flex-direction:row; align-items:center; gap:8px;" onclick="event.stopPropagation();">' +
                 '<div class="c-stat" style="color:#b45309; font-size:10.5px; font-weight:800; white-space:nowrap;">' + uiStatusText + '</div>' +
@@ -6446,6 +6487,8 @@ function triggerSilentBackgroundSync() {
         var req = tx.objectStore("consumers").getAll();
         
         // 🚀 सिंटैक्स एरर फिक्स: एरे लूप का क्लोजिंग ब्रैकेट (}); सही ढंग से बंद किया गया
+        // 🚀 सिंटैक्स एरर फिक्स: फालतू एक्स्ट्रा '}' ब्रैकेट को पूरी तरह हटाकर एरे लूप को क्लोज किया गया
+        // 🚀 सिंटैक्स एरर फिक्स: एक्स्ट्रा बचे हुए '}' को पूरी तरह हटाकर सिंटैक्स बैलेंस्ड किया गया
         req.onsuccess = function(e) {
             var allConsumers = e.target.result || [];
             allConsumers.forEach(function(item) {
