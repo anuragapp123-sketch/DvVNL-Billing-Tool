@@ -5,7 +5,7 @@
 <script>
   (function() {
     // ⚠️ अपना नया Deployment URL यहाँ पेस्ट करें
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwle6h3QKYUTBYRT-g2_5IRd3hF2irakwaR_hoi4rEtyMbzbkqsyY4ixL4AL5vUzEOfeA/exec";
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyEu-l6DZVBKc5PfsZSuQKzxmCJ6x8E0zU6bO7mFKQHxAGh7VybQX0XsLQriH9ooOpGAA/exec";
 
     function createHandler(successCallback, failureCallback) {
       return new Proxy({}, {
@@ -1056,7 +1056,7 @@
         <div id="apkErrorLogger" style="display:none; margin-top:10px; padding:10px; background:#fef2f2; border:1px solid #fca5a5; border-radius:6px; color:#b91c1c; font-size:11px; font-weight:bold; text-align:left; word-break:break-all; white-space:pre-wrap;"></div>
         <div class="app-footer-branding" style="position: relative;">
             Developed by:- Anurag Shakya | 9761414105
-            <span style="display:block; margin-top:4px; font-size:10px; color:#ef4444; font-weight:900;">App Version: V1.0.24</span>
+            <span style="display:block; margin-top:4px; font-size:10px; color:#ef4444; font-weight:900;">App Version: V1.0.25</span>
         </div>
     </div>
     
@@ -1497,7 +1497,7 @@
             
             <div style="text-align: center; margin-top: 25px; padding-top: 15px; border-top: 1px dashed #cbd5e1; color: #64748b;">
                 <div style="font-size: 12px; font-weight: bold;">Developed by: Anurag Shakya</div>
-                <div style="font-size: 11px; color: #ef4444; font-weight: 900; margin-top: 4px;">App Version: V1.0.24</div>
+                <div style="font-size: 11px; color: #ef4444; font-weight: 900; margin-top: 4px;">App Version: V1.0.25</div>
             </div>
         </div>
 
@@ -1550,7 +1550,7 @@
         <div style="width: 100%; height: 40px; clear: both; display: block !important; visibility: hidden; pointer-events: none;"></div>
         
         <div class="card" style="background: rgba(255, 255, 255, 0.7); margin-bottom: 20px; text-align: center; border: 1px dashed #cbd5e1;">
-            <div style="font-size: 11px; color: #ef4444; font-weight: 900; margin-bottom: 3px;">App Version: V1.0.24</div>
+            <div style="font-size: 11px; color: #ef4444; font-weight: 900; margin-bottom: 3px;">App Version: V1.0.25</div>
             <div style="font-size: 12px; color: #1e40af; font-weight: 800; text-transform: uppercase; margin-bottom: 5px;"><i class="fa-solid fa-user-tie"></i> <span id="welcomeTxt">Mr Name: Loading...</span></div>
             <div style="font-size: 11px; font-weight: 700; color: #475569; border-top: 1px solid #cbd5e1; padding-top: 5px;">
                 Developed by:- Er. Anurag Shakya | 9761414105
@@ -3233,13 +3233,14 @@ function executeFastCacheSearch(searchKeywords, allData, container, containerId)
                     '</div></div>'
                 );
             } else {
+                var listInfoBtn = '<button onclick="event.stopPropagation(); openContactUpdateModal(\'' + accNo + '\')" class="export-btn mini" style="padding: 5px 8px; font-size: 10px; background:#0ea5e9; display:inline-flex; align-items:center; justify-content:center; gap:3px; margin-top:4px;" title="Update Contact Info"><i class="fa-solid fa-mobile-screen-button" style="font-size:9px;"></i><i class="fa-solid fa-envelope" style="font-size:9px;"></i></button>';
+
                 if (activeReportType === 'all_consumers_list' || activeReportType === 'Visit_Data_Consumers') {
-                    // 🚀 सिंटैक्स एरर फिक्स: कोटेशन मार्क को पूरी तरह क्लोज और सुरक्षित किया गया
                     var pdfModeParam = (activeReportType === 'Visit_Data_Consumers') ? 'FULL' : 'MASTER_COLS';
                     var singlePdfBtn = '<div style="display:flex; gap:4px;">' +
                         '<button onclick="event.stopPropagation(); exportSingleConsumerPDF(event, \'' + accNo + '\', \'' + pdfModeParam + '\')" class="export-btn mini pdf-bg" style="padding: 5px 8px; font-size: 10px;" title="Download PDF"><i class="fa-solid fa-file-pdf"></i></button>' +
                         '<button onclick="event.stopPropagation(); exportConsumerReadingFormPDF(\'' + accNo + '\')" class="export-btn mini" style="padding: 5px 8px; font-size: 10px; background:#4f46e5;" title="Download Reading Form"><i class="fa-solid fa-file-invoice"></i> Form</button>' +
-                        '<button onclick="event.stopPropagation(); openContactUpdateModal(\'' + accNo + '\')" class="export-btn mini" style="padding: 5px 8px; font-size: 10px; background:#0ea5e9;" title="Update Contact Info"><i class="fa-solid fa-user-pen"></i> Info</button>' +
+                        listInfoBtn +
                         '</div>';
                         
                     var toggleAction = (activeReportType === 'Visit_Data_Consumers') 
@@ -3268,16 +3269,18 @@ function executeFastCacheSearch(searchKeywords, allData, container, containerId)
                     );
                 } else {
                     matchedItemsHtml.push(
-                        '<div class="list-item" onclick="openQuickViewModal(\'' + accNo + '\', \'STANDARD\')">' +
-                        '<div style="width: 75%; text-align: left;">' +
-                        '<div class="c-name">' + item.consumerName + '</div>' +
-                        '<div class="c-acc">A/C: ' + accNo + ' | Mob: ' + mob + '</div>' +
-                        '<div class="c-addr"><b>पता:</b> ' + addr + '</div>' +
-                        '<div class="c-mtr">M-Mtr: ' + mainMtrNo + ' | P-Mtr: ' + poleMtrNo + '</div>' +
+                        '<div class="list-item" style="padding: 6px 10px !important; margin-bottom: 4px !important; border-radius: 8px !important;" onclick="openQuickViewModal(\'' + accNo + '\', \'STANDARD\')">' +
+                        '<div style="display:flex; width:100%; align-items:center; justify-content:space-between; cursor: pointer;">' +
+                        '<div style="flex: 1; text-align: left; min-width: 0; padding-right: 5px;">' +
+                        '<div class="c-name" style="font-size:12.5px !important; font-weight:900 !important; line-height:1.2 !important;">' + item.consumerName + '</div>' +
+                        '<div class="c-acc" style="font-size:11px !important; margin-top:1px !important; color:#475569;">A/C: ' + accNo + ' | Mob: ' + mob + '</div>' +
+                        '<div class="c-addr" style="font-size:11px !important; margin-top:2px !important; color:#64748b;"><b>पता:</b> ' + addr + '</div>' +
+                        '<div class="c-mtr" style="font-size:11px !important; margin-top:2px !important; color:#4f46e5; font-weight:700;">M-Mtr: ' + mainMtrNo + ' | P-Mtr: ' + poleMtrNo + '</div>' +
                         '</div>' +
-                        '<div style="text-align:right; width: 25%; flex-shrink: 0; display:flex; flex-direction:column; align-items:flex-end; justify-content:center;">' +
+                        '<div style="text-align:right; flex-shrink: 0; display:flex; flex-direction:column; align-items:flex-end; gap:2px;">' +
                         '<div style="font-size:10px; font-weight:bold; color:#4338ca; background:#e0e7ff; padding:2px 6px; border-radius:4px;">' + divisionDisplay + '</div>' +
-                        '</div></div>'
+                        '<div onclick="event.stopPropagation();">' + listInfoBtn + '</div>' +
+                        '</div></div></div>'
                     );
                 }
             }
@@ -8112,7 +8115,7 @@ function openContactUpdateModal(accNo) {
     };
 }
 
-// डेटा को वैलिडेशन के साथ ऐप्स स्क्रिप्ट बैकएंड पर भेजने का इंजन
+// डेटा को तुरंत पॉप-अप बंद करके बैकग्राउंड में भेजने का फ़ास्ट इंजन
 function submitContactUpdateData() {
     var accNo = document.getElementById('cu-accountNo').innerText;
     var rIndex = document.getElementById('cu-rowIndex').value;
@@ -8127,40 +8130,39 @@ function submitContactUpdateData() {
         return alert("🚨 कृपया सही फॉर्मेट में ईमेल आईडी दर्ज करें!");
     }
     
-    document.getElementById('cu-saveBtn').disabled = true;
-    document.getElementById('cu-saveBtn').innerText = "⏳ सर्वर पर अपडेट हो रहा है...";
+    // ⚡ 1. तुरंत पॉप-अप विंडो बंद करें
+    document.getElementById('contactUpdateModal').style.display = 'none';
+    showThinAlert("⏳ बैकग्राउंड में डेटा सुरक्षित किया जा रहा है...", true);
     
+    // ⚡ 2. मोबाइल के लोकल IndexedDB में तुरंत सेव करें ताकि यूज़र को देरी न लगे
+    if (db) {
+        var tx = db.transaction("consumers", "readwrite");
+        tx.objectStore("consumers").get(accNo).onsuccess = function(ev) {
+            var item = ev.target.result;
+            if (item) {
+                item["New Site Mobile No."] = whatsappVal;
+                item["NEW SITE MOBILE NO."] = whatsappVal;
+                item["New Site Email ID"] = emailVal;
+                item["NEW SITE EMAIL ID"] = emailVal;
+                ev.target.source.put(item);
+            }
+        };
+        tx.oncomplete = function() {
+            if (typeof refreshActiveDataViews === 'function') refreshActiveDataViews();
+        };
+    }
+    
+    // ⚡ 3. बैकग्राउंड में गूगल शीट (सर्वर) को डेटा भेजते रहें
     google.script.run
     .withSuccessHandler(function(res) {
-        document.getElementById('cu-saveBtn').disabled = false;
-        document.getElementById('cu-saveBtn').innerText = "💾 अपडेट सुरक्षित करें";
-        
         if (res && res.success) {
-            // मोबाइल के लोकल IndexedDB स्टोर में नए कॉलम्स के साथ डेटा अपडेट
-            var tx = db.transaction("consumers", "readwrite");
-            tx.objectStore("consumers").get(accNo).onsuccess = function(ev) {
-                var item = ev.target.result;
-                if(item) {
-                    item["New Site Mobile No."] = whatsappVal;
-                    item["NEW SITE MOBILE NO."] = whatsappVal;
-                    item["New Site Email ID"] = emailVal;
-                    item["NEW SITE EMAIL ID"] = emailVal;
-                    ev.target.source.put(item);
-                }
-            };
-            tx.oncomplete = function() {
-                document.getElementById('contactUpdateModal').style.display = 'none';
-                showThinAlert("✅ उपभोक्ता का संपर्क विवरण केवल संबंधित कॉलम्स में अपडेट हो गया है!", true);
-                if (typeof refreshActiveDataViews === 'function') refreshActiveDataViews();
-            };
+            showThinAlert("✅ सर्वर पर संपर्क विवरण सुरक्षित हो गया!", true);
         } else {
-            alert("🚨 सर्वर एरर: अपडेट सुरक्षित नहीं हो सका।");
+            showThinAlert("⚠️ सर्वर सिंक में समस्या आई, डेटा लोकल में सुरक्षित है।", true);
         }
     })
     .withFailureHandler(function(err) {
-        document.getElementById('cu-saveBtn').disabled = false;
-        document.getElementById('cu-saveBtn').innerText = "💾 अपडेट सुरक्षित करें";
-        alert("🚨 नेटवर्क एरर: " + err.toString());
+        console.error("Async contact update error:", err);
     })
     .updateConsumerContactFieldsOnly(rIndex, whatsappVal, emailVal);
 }
