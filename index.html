@@ -8136,14 +8136,15 @@ function submitContactUpdateData() {
         document.getElementById('cu-saveBtn').innerText = "💾 अपडेट सुरक्षित करें";
         
         if (res && res.success) {
-            // मोबाइल के लोकल IndexedDB स्टोर में भी डेटा तुरंत सिंक करें ताकि पुराना रिकॉर्ड ओवरराइड हो जाये
+            // मोबाइल के लोकल IndexedDB स्टोर में नए कॉलम्स के साथ डेटा अपडेट
             var tx = db.transaction("consumers", "readwrite");
             tx.objectStore("consumers").get(accNo).onsuccess = function(ev) {
                 var item = ev.target.result;
                 if(item) {
-                    item["New Whatsup No."] = whatsappVal;
-                    item["NEW WHATSUP NO."] = whatsappVal;
-                    item["NEW EMAIL ID"] = emailVal;
+                    item["New Site Mobile No."] = whatsappVal;
+                    item["NEW SITE MOBILE NO."] = whatsappVal;
+                    item["New Site Email ID"] = emailVal;
+                    item["NEW SITE EMAIL ID"] = emailVal;
                     ev.target.source.put(item);
                 }
             };
