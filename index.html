@@ -5,7 +5,7 @@
 <script>
   (function() {
     // ⚠️ अपना नया Deployment URL यहाँ पेस्ट करें
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyETumN1YYrhKa07w2tqkBfvljFNJILR7hifl5iwU2cfYeMNh_1e5rDwTDtIeGjeCcr-Q/exec";
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwle6h3QKYUTBYRT-g2_5IRd3hF2irakwaR_hoi4rEtyMbzbkqsyY4ixL4AL5vUzEOfeA/exec";
 
     function createHandler(successCallback, failureCallback) {
       return new Proxy({}, {
@@ -816,6 +816,50 @@
     .report-sidebar { position: fixed; top: 0; left: -320px; width: 280px; max-width: 85vw; height: 100%; background: #f8fafc; z-index: 10001; box-shadow: 4px 0 25px rgba(0,0,0,0.3); transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1); overflow-y: auto; padding: 15px; padding-bottom: 90px; }
     .report-sidebar.open { left: 0; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    /* 📊 POINT 2: CIRCULAR PROGRESS RING & SPARKLINE CSS */
+    .progress-ring-card {
+        background: var(--theme-card-bg);
+        border: 1px solid rgba(226, 232, 240, 0.8);
+        border-radius: 14px;
+        padding: 12px;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        box-shadow: 0 4px 15px rgba(15,23,42,0.04);
+    }
+    .progress-ring-circle {
+        transform: rotate(-90deg);
+        transform-origin: 50% 50%;
+        transition: stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* 🔍 POINT 3: SKELETON SHIMMER LOADER CSS */
+    .skeleton-loader-container { display: none; flex-direction: column; gap: 8px; margin-bottom: 12px; }
+    .skeleton-card {
+        background: #ffffff;
+        border-radius: 10px;
+        padding: 12px;
+        border: 1px solid #e2e8f0;
+        position: relative;
+        overflow: hidden;
+    }
+    .skeleton-line {
+        height: 12px;
+        background: #e2e8f0;
+        border-radius: 6px;
+        margin-bottom: 8px;
+    }
+    .skeleton-line.short { width: 40%; }
+    .skeleton-line.medium { width: 70%; }
+    .skeleton-shimmer {
+        position: absolute;
+        top: 0; left: -100%; width: 100%; height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.7), transparent);
+        animation: shimmer 1.5s infinite;
+    }
+    @keyframes shimmer { 100% { left: 100%; } }
 </style>
     
     <script>
@@ -920,14 +964,99 @@
         <div class="sub-heading">Sai Computer Ltd Mainpuri</div>
         <div class="input-group"><label>अपना नाम चुनें</label><select id="readerDropdown"><option value="">लोड हो रहा है...</option></select></div>
         <div class="input-group"><label>लॉगिन पिन दर्ज करें</label><input type="password" id="loginPin" placeholder="6 अंकों का पिन दर्ज करें" inputmode="numeric" maxlength="6"></div>
-        <button class="btn" onclick="processLogin()">लॉगिन करें</button>
+        
+        <div style="display: flex; gap: 8px;">
+            <button class="btn" style="flex: 2;" onclick="processLogin()">लॉगिन करें</button>
+            <button class="btn" style="flex: 1; background: #4f46e5 !important;" onclick="loginWithBiometrics()" title="Biometric Login"><i class="fa-solid fa-fingerprint" style="font-size: 16px;"></i></button>
+        </div>
+        
         <div class="loader" id="loginLoader">सर्वर से जुड़ रहे हैं...</div>
+
+    <script>
+    // 🔐 बायोमेट्रिक / फिंगरप्रिंट लॉगिन इंजन
+    async function loginWithBiometrics() {
+        var name = document.getElementById('readerDropdown').value;
+        if (!name) return alert("कृपया पहले अपना नाम चुनें!");
+
+        if (!window.PublicKeyCredential) {
+            return alert("🚨 आपके डिवाइस/ब्राउज़र में बायोमेट्रिक सपोर्ट उपलब्ध नहीं है!");
+        }
+
+        try {
+            var savedBioUser = localStorage.getItem("bio_registered_user");
+            if (savedBioUser && savedBioUser === name) {
+                // पहले से रजिस्टर्ड फिंगरप्रिंट से सत्यापन
+                showThinAlert("👆 फिंगरप्रिंट या फेस लॉक स्कैन करें...", false);
+                
+                var challenge = new Uint8Array(32);
+                window.crypto.getRandomValues(challenge);
+
+                await navigator.credentials.get({
+                    publicKey: {
+                        challenge: challenge,
+                        timeout: 60000,
+                        userVerification: "required"
+                    }
+                });
+
+                loggedInReader = toTitleProperCase(name);
+                localStorage.setItem("mtr_reader_session_lock", loggedInReader);
+                showThinAlert("✅ बायोमेट्रिक सत्यापन सफल!", true);
+                launchDashboard();
+                triggerSilentBackgroundDataDownload();
+            } else {
+                // पहली बार फिंगरप्रिंट लिंक करना (पिन सत्यापन के बाद)
+                var pin = document.getElementById('loginPin').value;
+                if (!pin) return alert("पहली बार फिंगरप्रिंट रजिस्टर करने के लिए लॉगिन पिन दर्ज करना अनिवार्य है!");
+
+                document.getElementById('loginLoader').style.display = "block";
+                google.script.run.withSuccessHandler(async function(res) {
+                    document.getElementById('loginLoader').style.display = "none";
+                    if(res && (res.success === true || res === true || res.readerName)) {
+                        
+                        var challenge = new Uint8Array(32);
+                        window.crypto.getRandomValues(challenge);
+                        var userId = new Uint8Array(16);
+                        window.crypto.getRandomValues(userId);
+
+                        await navigator.credentials.create({
+                            publicKey: {
+                                challenge: challenge,
+                                rp: { name: "DvVNL Billing Tool" },
+                                user: {
+                                    id: userId,
+                                    name: name,
+                                    displayName: name
+                                },
+                                pubKeyCredParams: [{ alg: -7, type: "public-key" }],
+                                authenticatorSelection: { userVerification: "required" },
+                                timeout: 60000
+                            }
+                        });
+
+                        localStorage.setItem("bio_registered_user", name);
+                        loggedInReader = toTitleProperCase(name);
+                        localStorage.setItem("mtr_reader_session_lock", loggedInReader);
+                        alert("🎉 बायोमेट्रिक (Fingerprint) सफलतापूर्वक लिंक हो गया है! अब आप बिना पिन के फिंगरप्रिंट से लॉगिन कर सकते हैं।");
+                        launchDashboard();
+                        triggerSilentBackgroundDataDownload();
+                    } else {
+                        alert("🚨 पिन गलत है, बायोमेट्रिक लिंक नहीं हो सका!");
+                    }
+                }).verifyReaderLogin(name, pin);
+            }
+        } catch (err) {
+            console.error("Biometric Error:", err);
+            showThinAlert("⚠️ बायोमेट्रिक सत्यापन रद्द या फेल हो गया!", true);
+        }
+    }
+    </script>
         
         <!-- 🔴 APK एरर ट्रैकर (यह केवल एरर आने पर ही दिखेगा) -->
         <div id="apkErrorLogger" style="display:none; margin-top:10px; padding:10px; background:#fef2f2; border:1px solid #fca5a5; border-radius:6px; color:#b91c1c; font-size:11px; font-weight:bold; text-align:left; word-break:break-all; white-space:pre-wrap;"></div>
         <div class="app-footer-branding" style="position: relative;">
             Developed by:- Anurag Shakya | 9761414105
-            <span style="display:block; margin-top:4px; font-size:10px; color:#ef4444; font-weight:900;">App Version: V1.0.23</span>
+            <span style="display:block; margin-top:4px; font-size:10px; color:#ef4444; font-weight:900;">App Version: V1.0.24</span>
         </div>
     </div>
     
@@ -957,6 +1086,8 @@
             <div style="display: flex; align-items: center; gap: 8px; flex-shrink: 0;">
                 <button onclick="syncOfflineDataToServer()" class="header-icon-btn" title="Sync Manual Entry to Server" style="color: #10b981; font-size: 16px; padding: 2px;"><i class="fa-solid fa-cloud-arrow-up"></i></button>
                 <button onclick="changeAppThemeNext()" class="header-icon-btn" title="Change App Color" style="color: #facc15; font-size: 15px; padding: 2px;"><i class="fa-solid fa-palette"></i></button>
+                <!-- 🎨 POINT 4: CUSTOM COLOR PICKER BUTTON -->
+                <button onclick="openCustomColorPickerModal()" class="header-icon-btn" title="Custom Theme Color Picker" style="color: #a855f7; font-size: 15px; padding: 2px;"><i class="fa-solid fa-eye-dropper"></i></button>
                 <button onclick="forceAppCodeUpdate()" class="header-icon-btn" title="Download New App Update" style="color: #facc15; font-size: 15px; padding: 2px;"><i class="fa-solid fa-cloud-arrow-down"></i></button>
                 <button onclick="logoutSafely()" class="header-icon-btn logout" title="Logout" style="color: #fda4af; font-size: 14px; padding: 2px; margin-left: 2px;"><i class="fa-solid fa-power-off"></i></button>
             </div>
@@ -1075,8 +1206,31 @@
             </div>
 
             <!-- 🟢 प्रिमियम हाई-कंट्रास्ट लास्ट अपडेटेड बैज -->
-            <div id="lastUpdatedLabel" style="text-align: center; font-size: 11px; font-weight: 900; margin-bottom: 14px; color: #ffffff; background: linear-gradient(90deg, #1e293b, #0f172a); padding: 8px 16px; border-radius: 30px; border: 1px solid #334155; letter-spacing: 0.5px; text-transform: uppercase; display: inline-flex; align-items: center; justify-content: center; gap: 6px; width: 100%; box-sizing: border-box; box-shadow: 0 4px 10px rgba(15,23,42,0.15);">
+            <div id="lastUpdatedLabel" style="text-align: center; font-size: 11px; font-weight: 900; margin-bottom: 12px; color: #ffffff; background: linear-gradient(90deg, #1e293b, #0f172a); padding: 8px 16px; border-radius: 30px; border: 1px solid #334155; letter-spacing: 0.5px; text-transform: uppercase; display: inline-flex; align- items: center; justify-content: center; gap: 6px; width: 100%; box-sizing: border-box; box-shadow: 0 4px 10px rgba(15,23,42,0.15);">
                 <i class="fa-solid fa-clock-rotate-left fa-spin" style="color: #facc15; font-size: 12px;"></i> LAST UPDATED:- <span id="lastUpdatedTimeSpan" style="color: #facc15; margin-left: 2px;">NOT DOWNLOADED YET</span>
+            </div>
+
+            <!-- 📊 POINT 2: INTERACTIVE CIRCULAR PROGRESS RING CARD -->
+            <div class="progress-ring-card">
+                <div>
+                    <div style="font-size: 10px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">OVERALL VISIT COMPLETION</div>
+                    <div id="ringDoneText" style="font-size: 18px; font-weight: 900; color: var(--theme-heading); margin-top: 2px;">0 / 0 Done</div>
+                    <div id="ringPendingText" style="font-size: 11px; font-weight: 700; color: #ef4444; margin-top: 2px;">Pending: 0</div>
+                </div>
+                <div style="position: relative; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
+                    <svg width="60" height="60">
+                        <circle stroke="#e2e8f0" stroke-width="6" fill="transparent" r="24" cx="30" cy="30"/>
+                        <circle id="dashProgressRingSvg" class="progress-ring-circle" stroke="#22c55e" stroke-width="6" stroke-dasharray="150.79" stroke-dashoffset="150.79" stroke-linecap="round" fill="transparent" r="24" cx="30" cy="30"/>
+                    </svg>
+                    <span id="dashProgressPctText" style="position: absolute; font-size: 11px; font-weight: 900; color: var(--theme-primary);">0%</span>
+                </div>
+            </div>
+
+            <!-- 🔍 POINT 3: SKELETON LOADER COMPONENT (SHIMMER EFFECT) -->
+            <div id="appSkeletonLoader" class="skeleton-loader-container">
+                <div class="skeleton-card"><div class="skeleton-line medium"></div><div class="skeleton-line short"></div><div class="skeleton-shimmer"></div></div>
+                <div class="skeleton-card"><div class="skeleton-line medium"></div><div class="skeleton-line short"></div><div class="skeleton-shimmer"></div></div>
+                <div class="skeleton-card"><div class="skeleton-line medium"></div><div class="skeleton-line short"></div><div class="skeleton-shimmer"></div></div>
             </div>
 
             <!-- 🎨 100% प्रिमियम मोबाइल ऐप ड्रॉअर आइकॉन ग्रिड (Workspace Navigation) -->
@@ -1165,6 +1319,23 @@
                     }
                 </style>
 
+                <!-- 🎯 KPI HIGHLIGHT CARDS -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; margin-bottom: 12px;">
+                    <div style="background: linear-gradient(135deg, #f0fdf4, #dcfce7); border: 1px solid #86efac; border-left: 4px solid #22c55e; padding: 10px; border-radius: 10px; text-align: center;">
+                        <div style="font-size: 10px; font-weight: 800; color: #15803d; text-transform: uppercase;">🏆 BEST PERFORMER</div>
+                        <div id="kpi-best-reader" style="font-size: 13px; font-weight: 900; color: #166534; margin-top: 2px;">-</div>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #fef2f2, #fee2e2); border: 1px solid #fca5a5; border-left: 4px solid #ef4444; padding: 10px; border-radius: 10px; text-align: center;">
+                        <div style="font-size: 10px; font-weight: 800; color: #b91c1c; text-transform: uppercase;">🚨 HIGHEST PENDENCY</div>
+                        <div id="kpi-worst-reader" style="font-size: 13px; font-weight: 900; color: #991b1b; margin-top: 2px;">-</div>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #eff6ff, #dbeafe); border: 1px solid #93c5fd; border-left: 4px solid #3b82f6; padding: 10px; border-radius: 10px; text-align: center;">
+                        <div style="font-size: 10px; font-weight: 800; color: #1d4ed8; text-transform: uppercase;">📊 AVG DONE RATE</div>
+                        <div id="kpi-avg-rate" style="font-size: 15px; font-weight: 900; color: #1e40af; margin-top: 2px;">0%</div>
+                    </div>
+                </div>
+
+                <!-- CHARTS GRID -->
                 <div class="perfect-chart-grid" id="analyticsLiveChartEngine">
                     <div class="chart-container-box">
                         <canvas id="chartMainMeterAnalytics"></canvas>
@@ -1175,6 +1346,11 @@
                     <div class="chart-container-box">
                         <canvas id="chartBillDistAnalytics"></canvas>
                     </div>
+                </div>
+
+                <!-- 📊 READER PERFORMANCE BAR CHART -->
+                <div class="chart-container-box" style="height: 250px; margin-bottom: 12px;">
+                    <canvas id="chartReaderComparison"></canvas>
                 </div>
                 <div class="card" style="padding:10px; overflow-x:auto;">
                     <h4 style="font-size:12px; color:var(--theme-primary); margin-bottom:6px; text-transform:uppercase;"><i class="fa-solid fa-table-list"></i> Reader Wise Pendency Matrix</h4>
@@ -1321,7 +1497,7 @@
             
             <div style="text-align: center; margin-top: 25px; padding-top: 15px; border-top: 1px dashed #cbd5e1; color: #64748b;">
                 <div style="font-size: 12px; font-weight: bold;">Developed by: Anurag Shakya</div>
-                <div style="font-size: 11px; color: #ef4444; font-weight: 900; margin-top: 4px;">App Version: V1.0.23</div>
+                <div style="font-size: 11px; color: #ef4444; font-weight: 900; margin-top: 4px;">App Version: V1.0.24</div>
             </div>
         </div>
 
@@ -1374,7 +1550,7 @@
         <div style="width: 100%; height: 40px; clear: both; display: block !important; visibility: hidden; pointer-events: none;"></div>
         
         <div class="card" style="background: rgba(255, 255, 255, 0.7); margin-bottom: 20px; text-align: center; border: 1px dashed #cbd5e1;">
-            <div style="font-size: 11px; color: #ef4444; font-weight: 900; margin-bottom: 3px;">App Version: V1.0.23</div>
+            <div style="font-size: 11px; color: #ef4444; font-weight: 900; margin-bottom: 3px;">App Version: V1.0.24</div>
             <div style="font-size: 12px; color: #1e40af; font-weight: 800; text-transform: uppercase; margin-bottom: 5px;"><i class="fa-solid fa-user-tie"></i> <span id="welcomeTxt">Mr Name: Loading...</span></div>
             <div style="font-size: 11px; font-weight: 700; color: #475569; border-top: 1px solid #cbd5e1; padding-top: 5px;">
                 Developed by:- Er. Anurag Shakya | 9761414105
@@ -2178,11 +2354,12 @@ function executeSafeSyncAndDownloadWorkflow(onComplete) {
         var notifyTabBtn = document.getElementById('btn-tab-notifyadmin');
         var configTabBtn = document.getElementById('btn-tab-configmaker');
 
-        // 🎯 फ़िल्टर लॉक फिक्स: एडमिन स्क्रीन पर बटन को परमानेंट विज़िबल रखना
         var headerFilterBtn = document.getElementById('headerFilterBtn');
         var headerContainer = document.getElementById('headerReaderCheckboxesContainer');
         
-        if (loggedInReader && (loggedInReader.toUpperCase() === "ANURAG SHAKYA" || loggedInReader.toUpperCase() === "ADMIN")) {
+        var isAdminUser = loggedInReader && (loggedInReader.toUpperCase() === "ANURAG SHAKYA" || loggedInReader.toUpperCase() === "ADMIN");
+
+        if (isAdminUser) {
             if(headerFilterBtn) headerFilterBtn.style.setProperty("display", "inline-block", "important");
         } else {
             if(headerFilterBtn) headerFilterBtn.style.setProperty("display", "none", "important");
@@ -2513,6 +2690,9 @@ window.applyHeaderReaderFilter = function() {
             if(isVisitDateMatch(item.finalVisitDate, 0)) today++;
             if(isVisitDateMatch(item.finalVisitDate, 1)) yest++;
         });
+
+        // 📊 POINT 2: UPDATE CIRCULAR PROGRESS RING & TEXT
+        updateProgressRingEngine(done, total);
 
         // =========================================================================
         // 💎 ULTRA-PREMIUM MODERN DASHBOARD CARDS & HEADER LAYOUT ENGINE
@@ -7009,28 +7189,41 @@ function quickViewNavigate(direction) {
         }, 2000);
     });
 
-    // 🟢 वॉयस सर्च फंक्शन इंजन (पूर्णतः फिक्स और क्लोज्ड)
+    // 🟢 वॉयस सर्च फंक्शन इंजन (सुरक्षित व एरर-फ़्री)
     function startVoiceSearch(inputId, containerId) {
         var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        if (!SpeechRecognition) return alert("🚨 आपके ब्राउज़र में वॉइस सर्च सपोर्ट नहीं है!");
+        if (!SpeechRecognition) return alert("🚨 आपके डिवाइस/ब्राउज़र में वॉयस सर्च सपोर्ट नहीं है!");
         
-        var recognition = new SpeechRecognition();
-        recognition.lang = 'hi-IN'; // हिंदी और अंग्रेजी दोनों समझेगा
-        recognition.start();
-        
-        showThinAlert("🎙️ बोलिए, मैं सुन रहा हूँ...", false);
-        
-        recognition.onresult = function(event) {
-            var voiceText = event.results[0][0].transcript;
-            // यदि आवाज के अंत में पूर्णविराम (.) आए तो उसे साफ करने का फिल्टर
-            if(voiceText.endsWith('.')) voiceText = voiceText.slice(0, -1);
-            document.getElementById(inputId).value = voiceText;
+        try {
+            var recognition = new SpeechRecognition();
+            recognition.lang = 'hi-IN';
+            recognition.continuous = false;
+            recognition.interimResults = false;
             
-            showThinAlert("🔍 सर्च किया: " + voiceText, true);
-            if (typeof universalListSearch === 'function') {
-                universalListSearch(inputId, containerId);
-            }
-        };
+            showThinAlert("🎙️ बोलिए, मैं सुन रहा हूँ...", false);
+            recognition.start();
+            
+            recognition.onresult = function(event) {
+                if (event.results && event.results[0] && event.results[0][0]) {
+                    var voiceText = event.results[0][0].transcript || "";
+                    if(voiceText.endsWith('.')) voiceText = voiceText.slice(0, -1);
+                    var targetInput = document.getElementById(inputId);
+                    if (targetInput) {
+                        targetInput.value = voiceText;
+                        showThinAlert("🔍 सर्च किया: " + voiceText, true);
+                        if (typeof universalListSearch === 'function') {
+                            universalListSearch(inputId, containerId);
+                        }
+                    }
+                }
+            };
+
+            recognition.onerror = function(e) {
+                showThinAlert("⚠️ आवाज़ पहचानने में त्रुटि हुई, पुनः प्रयास करें", true);
+            };
+        } catch(err) {
+            alert("🚨 वॉयस सर्च प्रारंभ करने में त्रुटि: " + err.toString());
+        }
     }
 
     // 📸 फ़ोटो को कंप्रेस करके Base64 में बदलने वाला मैट्रिक्स इंजन
@@ -7099,63 +7292,61 @@ function quickViewNavigate(direction) {
         reader.readAsDataURL(file);
     }
 
-    // 📢 स्क्रीन के बिल्कुल बीच में बड़ा पॉप-अप दिखाने का इंजन
+    // 📢 स्क्रीन के बिल्कुल बीच में बड़ा पॉप-अप दिखाने का रोबस्ट इंजन (Timer-Safe)
+    var globalNotificationTimer = null;
     function showGlobalNotification(messageText, lockSeconds) {
         var sec = lockSeconds || 5; 
         var overlay = document.getElementById('globalNotificationOverlay');
         var textNode = document.getElementById('globalNotificationText');
-        var btn = document.getElementById('innerCloseNotificationBtn') || document.getElementById('closeNotificationBtn');
+        var btn = document.getElementById('closeNotificationBtn');
         
         if(!overlay || !textNode || !btn) return;
 
+        if (globalNotificationTimer) clearInterval(globalNotificationTimer);
+
         textNode.innerText = messageText;
-        overlay.style.display = 'flex'; 
+        overlay.style.setProperty("display", "flex", "important"); 
         
         btn.disabled = true;
         btn.style.cursor = 'not-allowed';
         btn.innerHTML = '⚠️ ALERT LOCKED (' + sec + 's)';
         btn.style.background = 'rgba(255,255,255,0.2)';
         btn.style.color = '#ffffff';
-        btn.style.border = '1px solid rgba(255,255,255,0.4)';
 
-        var countdown = setInterval(function() {
+        globalNotificationTimer = setInterval(function() {
             sec--;
             if(sec > 0) {
                 btn.innerHTML = '⚠️ ALERT LOCKED (' + sec + 's)';
             } else {
-                clearInterval(countdown);
+                clearInterval(globalNotificationTimer);
+                globalNotificationTimer = null;
                 btn.disabled = false;
                 btn.style.cursor = 'pointer';
                 btn.style.background = '#ffffff'; 
                 btn.style.color = '#dc2626';
-                btn.style.border = 'none';
                 btn.innerHTML = '<i class="fa-solid fa-circle-check"></i> ठीक है, मैंने पढ़ लिया';
-                btn.style.boxShadow = '0 10px 20px rgba(0,0,0,0.2)';
             }
         }, 1000);
     }
 
-    // दोनों फंक्शन्स को मिलाकर एक परफेक्ट क्लीन इंजन:
-/* 🚀 100% कंबाइंड क्लोज्ड नोटिफिकेशन और फुलस्क्रीन इंजन (टकराव मुक्त) */
-function closeGlobalNotification() {
-    var overlay = document.getElementById('globalNotificationOverlay');
-    var textNode = document.getElementById('globalNotificationText');
-    
-    if(!textNode) return;
-    var msgText = textNode.innerText;
-    
-    // सिर्फ ओवरले (पॉप-अप) को छुपाएं
-    if(overlay) overlay.style.setProperty("display", "none", "important");
-    
-    // 🎯 फिक्स: यहाँ से फुलस्क्रीन मोड एक्टिवेट करने वाली लाइनों को साफ़ कर दिया गया है
-    
-    if(loggedInReader && msgText && msgText !== "महत्वपूर्ण सूचना यहाँ दिखाई देगी...") {
-        try {
-            google.script.run.withFailureHandler(e => console.log("Seen log failed"))
-                             .markNotificationAsSeen(loggedInReader.toUpperCase(), msgText);
-        } catch(e) { console.error("Seen sync failed", e); }
+    /* 🚀 सुरक्षित नोटिफिकेशन बंद करने का इंजन */
+    function closeGlobalNotification() {
+        if (globalNotificationTimer) {
+            clearInterval(globalNotificationTimer);
+            globalNotificationTimer = null;
+        }
+        var overlay = document.getElementById('globalNotificationOverlay');
+        var textNode = document.getElementById('globalNotificationText');
+        
+        if(overlay) overlay.style.setProperty("display", "none", "important");
+        
+        if(textNode && loggedInReader && textNode.innerText && textNode.innerText !== "महत्वपूर्ण सूचना यहाँ दिखाई देगी...") {
+            try {
+                google.script.run.withFailureHandler(function(e){ console.log("Seen log failed"); })
+                                 .markNotificationAsSeen(loggedInReader.toUpperCase(), textNode.innerText);
+            } catch(e) { console.error("Seen sync failed", e); }
+        }
     }
-}
 // बटन पर क्लिक करने पर अगली थीम पर स्विच करने का ड्राइवर
 function changeAppThemeNext() {
     var currentTheme = localStorage.getItem("app_user_selected_color_theme") || "default";
@@ -7428,10 +7619,57 @@ function renderAnalyticsDashboardEngine() {
         
         document.getElementById('analyticsMatrixTableBody').innerHTML = matrixHtml;
 
-        // 📈 Chart.js इंजन रेंडरिंग (3 परफेक्टली डिजाइन्ड डोनट चार्ट्स)
+        // 📈 Chart.js इंजन रेंडरिंग
         if(chartInstanceMainMeter) chartInstanceMainMeter.destroy();
         if(chartInstancePoleMeter) chartInstancePoleMeter.destroy();
         if(chartInstanceBillDist) chartInstanceBillDist.destroy();
+        if(window.chartInstanceReaderComp) window.chartInstanceReaderComp.destroy();
+
+        // 🌟 KPI CARDS COMPUTATION
+        var bestReader = "-", worstReader = "-";
+        var maxDone = -1, maxPnd = -1, totalPctSum = 0;
+        var compNames = [], compDoneArr = [], compPndArr = [];
+
+        sortedReaders.forEach(function(rName) {
+            var rm = readerMatrix[rName];
+            var pct = rm.total > 0 ? Math.round((rm.done / rm.total) * 100) : 0;
+            var pndCount = rm.total - rm.done;
+            totalPctSum += pct;
+
+            if (pct > maxDone) { maxDone = pct; bestReader = rName + " (" + pct + "%)"; }
+            if (pndCount > maxPnd) { maxPnd = pndCount; worstReader = rName + " (" + pndCount + ")"; }
+
+            compNames.push(rName.substring(0, 10));
+            compDoneArr.push(rm.done);
+            compPndArr.push(pndCount);
+        });
+
+        var avgPct = sortedReaders.length > 0 ? Math.round(totalPctSum / sortedReaders.length) : 0;
+        
+        if (document.getElementById('kpi-best-reader')) document.getElementById('kpi-best-reader').innerText = bestReader;
+        if (document.getElementById('kpi-worst-reader')) document.getElementById('kpi-worst-reader').innerText = worstReader;
+        if (document.getElementById('kpi-avg-rate')) document.getElementById('kpi-avg-rate').innerText = avgPct + "%";
+
+        // 📊 READER PERFORMANCE BAR CHART
+        var ctxBar = document.getElementById('chartReaderComparison');
+        if (ctxBar) {
+            window.chartInstanceReaderComp = new Chart(ctxBar, {
+                type: 'bar',
+                data: {
+                    labels: compNames,
+                    datasets: [
+                        { label: 'Visit Done', data: compDoneArr, backgroundColor: '#22c55e' },
+                        { label: 'Pending', data: compPndArr, backgroundColor: '#ef4444' }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: { x: { stacked: true }, y: { stacked: true } },
+                    plugins: { title: { display: true, text: '👥 READER PERFORMANCE COMPARISON (DONE vs PENDING)', font: { size: 11, weight: '800' } } }
+                }
+            });
+        }
 
         var sumArray = function(arr) { return arr.reduce(function(a, b) { return a + b; }, 0); };
 
@@ -7925,6 +8163,97 @@ function submitContactUpdateData() {
     })
     .updateConsumerContactFieldsOnly(rIndex, whatsappVal, emailVal);
 }
+// =========================================================================
+// 📊 POINT 2: CIRCULAR PROGRESS RING & SKELETON ENGINE
+// =========================================================================
+function updateProgressRingEngine(done, total) {
+    var pct = total > 0 ? Math.round((done / total) * 100) : 0;
+    var circle = document.getElementById('dashProgressRingSvg');
+    var pctText = document.getElementById('dashProgressPctText');
+    var doneText = document.getElementById('ringDoneText');
+    var pendingText = document.getElementById('ringPendingText');
+
+    if (circle) {
+        var radius = circle.r.baseVal.value;
+        var circumference = 2 * Math.PI * radius; // ~150.79
+        var offset = circumference - (pct / 100) * circumference;
+        circle.style.strokeDashoffset = offset;
+    }
+
+    if (pctText) pctText.innerText = pct + "%";
+    if (doneText) doneText.innerText = done + " / " + total + " Done";
+    if (pendingText) pendingText.innerText = "Pending: " + (total - done);
+}
+
+function toggleSkeletonShimmerLoader(show) {
+    var loader = document.getElementById('appSkeletonLoader');
+    var mainContent = document.getElementById('listDataContainer');
+    if (!loader) return;
+
+    if (show) {
+        loader.style.display = 'flex';
+        if (mainContent) mainContent.style.opacity = '0.3';
+    } else {
+        loader.style.display = 'none';
+        if (mainContent) mainContent.style.opacity = '1';
+    }
+}
+
+// =========================================================================
+// 🎨 POINT 4: CUSTOM THEME BUILDER & DYNAMIC COLOR PICKER ENGINE
+// =========================================================================
+function openCustomColorPickerModal() {
+    var modal = document.getElementById('customColorPickerModal');
+    if (modal) modal.style.display = 'flex';
+}
+
+function applyCustomUserTheme() {
+    var primaryColor = document.getElementById('customPrimaryColor').value;
+    var headerColor = document.getElementById('customHeaderColor').value;
+
+    document.documentElement.style.setProperty('--theme-primary', primaryColor);
+    document.documentElement.style.setProperty('--theme-border', primaryColor);
+    document.documentElement.style.setProperty('--theme-header-gradient', 'linear-gradient(-45deg, ' + primaryColor + ', ' + headerColor + ', #0f172a)');
+
+    localStorage.setItem("custom_theme_primary", primaryColor);
+    localStorage.setItem("custom_theme_header", headerColor);
+    localStorage.setItem("app_user_selected_color_theme", "custom");
+
+    var modal = document.getElementById('customColorPickerModal');
+    if (modal) modal.style.display = 'none';
+    
+    if (typeof showThinAlert === "function") {
+        showThinAlert("🎨 आपकी कस्टम थीम लागू हो गई है!", true);
+    }
+}
+
+function resetCustomUserTheme() {
+    document.documentElement.style.removeProperty('--theme-primary');
+    document.documentElement.style.removeProperty('--theme-border');
+    document.documentElement.style.removeProperty('--theme-header-gradient');
+
+    localStorage.removeItem("custom_theme_primary");
+    localStorage.removeItem("custom_theme_header");
+    
+    if (typeof applySelectedThemeEngine === "function") {
+        applySelectedThemeEngine("default");
+    }
+    var modal = document.getElementById('customColorPickerModal');
+    if (modal) modal.style.display = 'none';
+}
+
+// ऑटो-लोड सेव्ड कस्टम थीम
+(function loadSavedCustomTheme() {
+    var savedPrimary = localStorage.getItem("custom_theme_primary");
+    var savedHeader = localStorage.getItem("custom_theme_header");
+    var savedThemeMode = localStorage.getItem("app_user_selected_color_theme");
+
+    if (savedThemeMode === "custom" && savedPrimary && savedHeader) {
+        document.documentElement.style.setProperty('--theme-primary', savedPrimary);
+        document.documentElement.style.setProperty('--theme-border', savedPrimary);
+        document.documentElement.style.setProperty('--theme-header-gradient', 'linear-gradient(-45deg, ' + savedPrimary + ', ' + savedHeader + ', #0f172a)');
+    }
+})();
 </script>
 
 <div id="contactUpdateModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15, 23, 42, 0.75); z-index:999999; align-items:center; justify-content:center; backdrop-filter:blur(4px); padding: 15px; box-sizing: border-box;">
@@ -7951,6 +8280,27 @@ function submitContactUpdateData() {
         </div>
         
         <button id="cu-saveBtn" class="btn" style="background:#0ea5e9 !important; box-shadow:0 3px 6px rgba(14,165,233,0.3); margin-bottom:0;" onclick="submitContactUpdateData()">💾 अपडेट सुरक्षित करें</button>
+    </div>
+</div>
+<!-- 🎨 POINT 4: CUSTOM THEME BUILDER / COLOR PICKER MODAL -->
+<div id="customColorPickerModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15, 23, 42, 0.75); z-index:999999; align-items:center; justify-content:center; backdrop-filter:blur(4px); padding: 15px; box-sizing: border-box;">
+    <div style="background:#ffffff; width:100%; max-width:350px; border-radius:14px; padding:20px; box-shadow:0 20px 40px rgba(0,0,0,0.3); position:relative; box-sizing: border-box;">
+        <button onclick="document.getElementById('customColorPickerModal').style.display='none'" style="position:absolute; top:12px; right:12px; background:#ef4444; border:none; color:white; border-radius:50%; width:24px; height:24px; font-size:12px; cursor:pointer; display:flex; align-items:center; justify-content:center;"><i class="fa-solid fa-xmark"></i></button>
+        
+        <h3 style="margin:0 0 15px 0; color:#7c3aed; font-size:15px; font-weight:900; text-align:center; border-bottom:2px solid #f1f5f9; padding-bottom:8px; text-transform:uppercase;"><i class="fa-solid fa-palette"></i> Custom Theme Builder</h3>
+        
+        <div style="margin-bottom:12px;">
+            <label style="font-size:11.5px; font-weight:bold; color:#334155; display:block; margin-bottom:4px;">Primary App Color</label>
+            <input type="color" id="customPrimaryColor" value="#1e40af" style="width:100%; height:40px; border:none; border-radius:6px; cursor:pointer;">
+        </div>
+
+        <div style="margin-bottom:15px;">
+            <label style="font-size:11.5px; font-weight:bold; color:#334155; display:block; margin-bottom:4px;">Header Gradient Color</label>
+            <input type="color" id="customHeaderColor" value="#6b21a8" style="width:100%; height:40px; border:none; border-radius:6px; cursor:pointer;">
+        </div>
+
+        <button class="btn" style="background:#7c3aed !important; margin-bottom:6px;" onclick="applyCustomUserTheme()">✨ Apply Theme</button>
+        <button class="btn btn-back" style="margin-top:0;" onclick="resetCustomUserTheme()">🔄 Reset Theme</button>
     </div>
 </div>
 
