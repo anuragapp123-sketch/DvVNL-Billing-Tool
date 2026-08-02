@@ -19,7 +19,8 @@
 
             fetch(APPS_SCRIPT_URL, {
               method: "POST",
-              mode: "cors", 
+              mode: "cors",
+              redirect: "follow",
               headers: {
                 "Content-Type": "text/plain;charset=utf-8"
               },
@@ -1794,7 +1795,7 @@ var manifestJSON = {
     "short_name": "DvVNL",
     "start_url": currentResolvedUrl,
     "display": "minimal-ui",
-    "scope": "/", 
+    "scope": currentResolvedUrl,
     "background_color": "#0f172a",
     "theme_color": "#0f172a",
     "icons": [
