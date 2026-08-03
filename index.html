@@ -5,7 +5,7 @@
 <script>
   (function() {
     // ⚠️ अपना नया Deployment URL यहाँ पेस्ट करें
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwkB5PbkJN9AbJZKjgwHmuo_lb6d6rCulJmPX-qjgQ06W13MrTlrQW69SxqO92T4eQw_Q/exec";
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbypQAt2oQhV7Zmv_MJGijBRmXO_RsrEXhdRyy16GAZJPsk-RTx_OT6xsLdCk8GfUDFXmA/exec";
 
     function createHandler(successCallback, failureCallback) {
       return new Proxy({}, {
@@ -13,9 +13,24 @@
           return function(...args) {
             console.log("🚀 API Bridge Calling Function: " + propKey);
             
-            // लॉगिन पेज पर लोडर को ऑन करना
+            // 🛑 Recursion Loop Shield: यदि एरर लॉगिंग खुद फेल हो जाए तो लूप को रोकें
+            if (propKey === "logAppErrorToSheet") {
+              fetch(APPS_SCRIPT_URL, {
+                method: "POST",
+                mode: "cors",
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                body: JSON.stringify({ functionName: propKey, arguments: args })
+              }).catch(() => {});
+              return;
+            }
+
+            // लॉगिन पेज पर लोडर ऑन करना
             var loader = document.getElementById('loginLoader') || document.getElementById('globalLoader');
             if(loader) loader.style.display = 'block';
+
+            // 🚀 Timeout & Retry Mechanism (बड़ा डेटा डाउनलोड होने पर क्रैश होने से बचाएगा)
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 90000); // 90 सेकंड्स टाइमआउट
 
             fetch(APPS_SCRIPT_URL, {
               method: "POST",
@@ -24,19 +39,29 @@
               headers: {
                 "Content-Type": "text/plain;charset=utf-8"
               },
+              signal: controller.signal,
               body: JSON.stringify({
                 functionName: propKey,
                 arguments: args
               })
             })
             .then(response => {
-              if (!response.ok) throw new Error('Network response was not ok (Status: ' + response.status + ')');
-              return response.json();
+              clearTimeout(timeoutId);
+              if (!response.ok) {
+                throw new Error('Network response was not ok (Status: ' + response.status + ')');
+              }
+              return response.text(); // डायरेक्ट .json() के स्थान पर text() से रिस्पॉन्स parse
             })
-            .then(data => {
+            .then(textData => {
               if (loader) loader.style.display = 'none';
               
-              // 🎯 गिटहब के लिए रिस्पॉन्स इंजन फिक्स (अगर ऑब्जेक्ट के अंदर डेटा लिपटा हो या डायरेक्ट हो)
+              var data;
+              try {
+                data = JSON.parse(textData);
+              } catch(e) {
+                throw new Error("Invalid JSON server response or Script Timeout");
+              }
+
               var finalData = data;
               if (data && data.data !== undefined) {
                 finalData = data.data;
@@ -52,14 +77,16 @@
               }
             })
             .catch(err => {
+              clearTimeout(timeoutId);
               if (loader) loader.style.display = 'none';
               console.error("API Bridge Fetch Error on " + propKey + ":", err);
               
-              // 🚀 शीट में एरर भेजने का ऑटोमैटिक इंजन (Proxy Call Execution Failures)
+              var errorStr = err.name === 'AbortError' ? 'Error: Request Timeout (Data Large or Net Slow)' : err.toString();
+
+              // 🚀 सुरक्षित एरर लॉगिंग (Message Channel Close फिक्स)
               if (typeof loggedInReader !== 'undefined' && loggedInReader && navigator.onLine) {
                 try {
-                  google.script.run.withSuccessHandler(function(){}).withFailureHandler(function(){})
-                    .logAppErrorToSheet(loggedInReader.toUpperCase(), err.toString(), "Server Call Fail: " + propKey);
+                  runBridge.logAppErrorToSheet(loggedInReader.toUpperCase(), errorStr, "Server Call Fail: " + propKey);
                 } catch(e){}
               }
               
@@ -67,9 +94,9 @@
               var errBox = document.getElementById('apkErrorLogger');
               if(errBox) {
                 errBox.style.display = 'block';
-                errBox.innerText = "🚨 कनेक्शन फेल! विवरण नीचे देखें:\n" + err.toString() + "\n\n💡 समाधान: चेक करें कि Apps Script में Deploy करते समय 'Who has access' को 'Anyone' किया है या नहीं।";
+                errBox.innerText = "🚨 कनेक्शन फेल! विवरण नीचे देखें:\n" + errorStr + "\n\n💡 समाधान:\n1. Check Apps Script Deployment Access -> 'Anyone'\n2. New Deployment करके नया URL डालें।";
               } else {
-                alert("🚨 कनेक्शन एरर: " + err.toString());
+                alert("🚨 कनेक्शन एरर: " + errorStr);
               }
               if (failureCallback) failureCallback(err);
             });
@@ -1205,14 +1232,38 @@
                 <i class="fa-solid fa-clock-rotate-left fa-spin" style="color: #facc15; font-size: 12px;"></i> LAST UPDATED:- <span id="lastUpdatedTimeSpan" style="color: #facc15; margin-left: 2px;">NOT DOWNLOADED YET</span>
             </div>
 
-            <!-- 📊 POINT 2: INTERACTIVE CIRCULAR PROGRESS RING CARD -->
-            <div class="progress-ring-card">
-                <div>
+            <!-- 📊 POINT 2: INTERACTIVE CIRCULAR PROGRESS RING CARD WITH TOP & POOR PERFORMERS -->
+            <div class="progress-ring-card" style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; background: var(--theme-card-bg); border: 1px solid rgba(226, 232, 240, 0.8); border-radius: 14px; padding: 12px; margin-bottom: 12px; box-shadow: 0 4px 15px rgba(15,23,42,0.04);">
+                
+                <!-- 1. बाईं तरफ: प्रोग्रेस डेटा -->
+                <div style="flex: 1; min-width: 130px;">
                     <div style="font-size: 10px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">OVERALL VISIT COMPLETION</div>
                     <div id="ringDoneText" style="font-size: 18px; font-weight: 900; color: var(--theme-heading); margin-top: 2px;">0 / 0 Done</div>
                     <div id="ringPendingText" style="font-size: 11px; font-weight: 700; color: #ef4444; margin-top: 2px;">Pending: 0</div>
                 </div>
-                <div style="position: relative; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
+
+                <!-- 2. बीच में (Part 1): कल के टॉप 3 परफॉर्मर -->
+                <div style="flex: 1.2; min-width: 155px; border-left: 2px dashed #cbd5e1; padding-left: 10px;">
+                    <div style="font-size: 9.5px; font-weight: 900; color: #166534; text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 3px;">
+                        🏆 YEST TOP 3 PERFORMERS
+                    </div>
+                    <div id="yestTop3PerformersList" style="font-size: 10px; font-weight: 700; color: #1e293b; line-height: 1.4;">
+                        <span style="color:#94a3b8;">लोड हो रहा है...</span>
+                    </div>
+                </div>
+
+                <!-- 3. बीच में (Part 2): कल के 3 सबसे कम विज़िट वाले (Poor Performers) -->
+                <div style="flex: 1.2; min-width: 155px; border-left: 2px dashed #fca5a5; padding-left: 10px; border-right: 2px dashed #cbd5e1; padding-right: 10px;">
+                    <div style="font-size: 9.5px; font-weight: 900; color: #b91c1c; text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 3px;">
+                        ⚠️ YEST POOR PERFORMERS
+                    </div>
+                    <div id="yestPoor3PerformersList" style="font-size: 10px; font-weight: 700; color: #1e293b; line-height: 1.4;">
+                        <span style="color:#94a3b8;">लोड हो रहा है...</span>
+                    </div>
+                </div>
+
+                <!-- 4. दाईं तरफ: प्रोग्रेस रिंग (Circle) -->
+                <div style="position: relative; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
                     <svg width="60" height="60">
                         <circle stroke="#e2e8f0" stroke-width="6" fill="transparent" r="24" cx="30" cy="30"/>
                         <circle id="dashProgressRingSvg" class="progress-ring-circle" stroke="#22c55e" stroke-width="6" stroke-dasharray="150.79" stroke-dashoffset="150.79" stroke-linecap="round" fill="transparent" r="24" cx="30" cy="30"/>
@@ -1283,9 +1334,9 @@
                 <div class="stats-grid" id="summaryGridToPrint"></div>
             </div>
 
-            <!-- 📅 एडवांस डेट रिपोर्ट सब-व्यू (From Date -> To Date & Bottom Total Row) -->
+            <!-- 📅 एडवांस डेट रिपोर्ट सब-व्यू (From Date -> To Date, Reader Checkbox Filter & PDF) -->
             <div id="sub-view-datereport" style="display: none;">
-                <div class="card" style="padding: 12px; border: 1px solid #bfdbfe; background: #eff6ff; margin-bottom: 10px; border-radius: 12px;">
+                <div class="card" style="padding: 12px; border: 1px solid #bfdbfe; background: #eff6ff; margin-bottom: 10px; border-radius: 12px; position: relative; z-index: 1000; overflow: visible !important;">
                     <div style="display: flex; gap: 8px; align-items: flex-end; flex-wrap: wrap;">
                         <div style="flex: 1; min-width: 110px;">
                             <label style="font-size: 11px; font-weight: 800; color: #1e40af; margin-bottom: 3px; display: block;">📅 Date From:</label>
@@ -1296,12 +1347,23 @@
                             <input type="date" id="dateFilterPickerTo" style="padding: 7px; font-weight: bold; border: 1px solid #3b82f6; border-radius: 8px; background: #ffffff;" onchange="renderDateWiseReaderSummary()">
                         </div>
                         <div style="flex: 1; min-width: 110px;">
-                            <label style="font-size: 11px; font-weight: 800; color: #1e40af; margin-bottom: 3px; display: block;">🔍 फ़िल्टर:</label>
+                            <label style="font-size: 11px; font-weight: 800; color: #1e40af; margin-bottom: 3px; display: block;">🔍 स्टेटस फ़िल्टर:</label>
                             <select id="dateReportTypeFilter" style="padding: 7px; font-weight: bold; border: 1px solid #3b82f6; border-radius: 8px; background: #ffffff;" onchange="renderDateWiseReaderSummary()">
                                 <option value="ALL">सभी (All Readers)</option>
                                 <option value="PRESENT">उपस्थित (Present > 0)</option>
                                 <option value="ABSENT">अनुपस्थित (Absent = 0)</option>
                             </select>
+                        </div>
+                        <!-- 🎯 एक्सेल-स्टाइल ड्रॉपडाउन (क्लिक करने पर ही साफ़ और सही अलाइनमेंट में खुलेगा) -->
+                        <div style="flex: 1.2; min-width: 160px; position: relative; z-index: 99999;">
+                            <label style="font-size: 11px; font-weight: 800; color: #1e40af; margin-bottom: 3px; display: block;">👤 रीडर चुनें:</label>
+                            <div onclick="window.toggleDateReaderDropdown(event)" style="padding: 7px 10px; font-weight: bold; border: 1px solid #3b82f6; border-radius: 8px; background: #ffffff; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: #1e40af; height: 33px; box-sizing: border-box; user-select: none;">
+                                <span id="dateReaderDropdownLabel" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">सभी रीडर सिलेक्टेड</span>
+                                <i class="fa-solid fa-chevron-down" style="font-size: 10px; margin-left: 4px;"></i>
+                            </div>
+                            <div id="dateReaderCheckboxMenu" style="display: none !important; position: absolute !important; top: 100% !important; right: 0 !important; width: 220px !important; background: #ffffff !important; border: 1px solid #cbd5e1 !important; border-radius: 8px !important; padding: 8px !important; max-height: 260px !important; overflow-y: auto !important; z-index: 999999 !important; box-shadow: 0 10px 25px rgba(0,0,0,0.2) !important; margin-top: 2px !important;">
+                                <div id="dateReaderCheckboxesList" style="display: flex !important; flex-direction: column !important; gap: 4px !important; width: 100% !important;"></div>
+                            </div>
                         </div>
                         <div style="flex: none;">
                             <button onclick="exportDateReportPDF()" class="btn pdf-bg" style="font-size: 11px; padding: 8px 14px; margin-bottom: 0; border-radius: 8px;">
@@ -1324,6 +1386,9 @@
                             <tr style="background: var(--theme-table-th);">
                                 <th style="padding: 6px 4px; text-align: left; position: sticky; left: 0; background: inherit; z-index: 5;">मीटर रीडर नाम</th>
                                 <th style="padding: 6px 4px; text-align: center;">Status</th>
+                                <th style="padding: 6px 4px; text-align: center; color: #1e40af;">First Visit</th>
+                                <th style="padding: 6px 4px; text-align: center; color: #1e40af;">Last Visit</th>
+                                <th style="padding: 6px 4px; text-align: center; color: #7c3aed;">Total Hours</th>
                                 <th style="padding: 6px 4px; text-align: center;">Total Visit</th>
                                 <th style="padding: 6px 4px; text-align: center; color: #166534;">Main MRI</th>
                                 <th style="padding: 6px 4px; text-align: center; color: #b91c1c;">Main Exc</th>
@@ -1332,46 +1397,10 @@
                             </tr>
                         </thead>
                         <tbody id="dateWiseReaderSummaryBody">
-                            <tr><td colspan="7" style="text-align: center; padding: 12px; color: #64748b;">लोड हो रहा है...</td></tr>
+                            <tr><td colspan="10" style="text-align: center; padding: 12px; color: #64748b;">लोड हो रहा है...</td></tr>
                         </tbody>
                         <tfoot id="dateWiseReaderSummaryFoot" style="background: #1e293b; color: #ffffff; font-weight: 900;">
                         </tfoot>
-                    </table>
-                </div>
-            </div>
-
-            <!-- 📅 नया सब-व्यू: डेट फ़िल्टर अनुसार मीटर रीडर समरी -->
-            <div id="sub-view-datereport" style="display: none;">
-                <div class="card" style="padding: 12px; border: 1px solid #bfdbfe; background: #eff6ff; margin-bottom: 12px; border-radius: 12px;">
-                    <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-                        <div style="flex: 1; min-width: 140px;">
-                            <label style="font-size: 11px; font-weight: 800; color: #1e40af; margin-bottom: 3px; display: block;">📅 तिथि चुनें (Select Date):</label>
-                            <input type="date" id="dateFilterPicker" style="padding: 8px; font-weight: bold; border: 1px solid #3b82f6; border-radius: 8px; background: #ffffff;" onchange="renderDateWiseReaderSummary()">
-                        </div>
-                        <button onclick="renderDateWiseReaderSummary()" class="btn" style="flex: none; width: auto; padding: 9px 15px; margin-bottom: 0; background: #1e40af !important; border-radius: 8px; margin-top: 15px;">
-                            <i class="fa-solid fa-filter"></i> देखें
-                        </button>
-                    </div>
-                </div>
-
-                <div class="card" style="padding: 10px; overflow-x: auto;">
-                    <h4 style="font-size: 12px; color: #1e40af; margin-bottom: 8px; text-transform: uppercase; font-weight: 900;">
-                        <i class="fa-solid fa-user-clock"></i> Date-Wise Meter Reader Summary (<span id="selectedDateLabelTxt">आज</span>)
-                    </h4>
-                    <table class="summary-table" style="font-size: 10.5px; width: 100%; white-space: nowrap;">
-                        <thead>
-                            <tr style="background: var(--theme-table-th);">
-                                <th style="padding: 6px 4px; text-align: left; position: sticky; left: 0; background: inherit; z-index: 5;">मीटर रीडर का नाम</th>
-                                <th style="padding: 6px 4px; text-align: center;">Total Visit</th>
-                                <th style="padding: 6px 4px; text-align: center; color: #166534;">Main MRI Done</th>
-                                <th style="padding: 6px 4px; text-align: center; color: #b91c1c;">Main Exception</th>
-                                <th style="padding: 6px 4px; text-align: center; color: #0d9488;">Pole MRI Done</th>
-                                <th style="padding: 6px 4px; text-align: center; color: #c2410c;">Pole Exception</th>
-                            </tr>
-                        </thead>
-                        <tbody id="dateWiseReaderSummaryBody">
-                            <tr><td colspan="6" style="text-align: center; padding: 12px; color: #64748b;">तिथि चुनकर रिपोर्ट देखें...</td></tr>
-                        </tbody>
                     </table>
                 </div>
             </div>
@@ -1940,19 +1969,41 @@ var REPORT_NAMES = { 'main_mri_pending': '1. Main Meter MRI Pending', 'pole_mri_
 
     function parseTrue(val) { if(val === undefined || val === null) return false; var s = val.toString().trim().toUpperCase(); return (s === "TRUE" || s === "YES" || s === "1" || val === true); }
 
+    // 🎯 1. डेट मैचिंग इंजन (Robust Date Format Matching)
     function isVisitDateMatch(dateStr, offsetDays) {
         if (!dateStr) return false;
-        var dStr = dateStr.toString().trim(); if (dStr === "") return false;
-        var parts = dStr.split(/[-/.]/); 
-        var d, m, y;
-        if (parts[0].length === 4) { y = parseInt(parts[0]); m = parseInt(parts[1]) - 1; d = parseInt(parts[2]); } 
-        else { d = parseInt(parts[0]); m = parseInt(parts[1]) - 1; y = parseInt(parts[2]); }
-        var visitDate = new Date(y, m, d);
+        var dStr = dateStr.toString().trim();
+        if (dStr === "" || dStr === "-") return false;
+
         var targetDate = new Date();
         targetDate.setDate(targetDate.getDate() - offsetDays);
-        targetDate.setHours(0, 0, 0, 0); visitDate.setHours(0, 0, 0, 0);
-        return visitDate.getTime() === targetDate.getTime();
+
+        var targetY = targetDate.getFullYear();
+        var targetM = String(targetDate.getMonth() + 1).padStart(2, '0');
+        var targetD = String(targetDate.getDate()).padStart(2, '0');
+
+        var targetISO = targetY + "-" + targetM + "-" + targetD;
+
+        if (dStr.includes(targetISO)) return true;
+
+        var parts = dStr.split(/[-/.]/);
+        if (parts.length === 3) {
+            var y, m, d;
+            if (parts[0].length === 4) {
+                y = parts[0];
+                m = String(parseInt(parts[1])).padStart(2, '0');
+                d = String(parseInt(parts[2])).padStart(2, '0');
+            } else {
+                d = String(parseInt(parts[0])).padStart(2, '0');
+                m = String(parseInt(parts[1])).padStart(2, '0');
+                y = parts[2];
+            }
+            return (y + "-" + m + "-" + d) === targetISO;
+        }
+        return false;
     }
+
+    
 
     function initDatabase(callback) {
         var request = indexedDB.open("MeterReaderOfflineDB", 40); // Version 40 कर दिया ताकि नया बने
@@ -2709,7 +2760,63 @@ window.applyHeaderReaderFilter = function() {
                 if(arrowIcon) arrowIcon.style.transform = "rotate(0deg)";
             }
         }
+
+        // 📅 डेट रिपोर्ट टैब ड्रॉपडाउन को बाहर क्लिक करने पर बंद करने का सुरक्षा कवच
+        var dateMenu = document.getElementById('dateReaderCheckboxMenu');
+        if(dateMenu && dateMenu.style.display === "block") {
+            if(!e.target.closest('#dateReaderCheckboxMenu') && !e.target.closest('[onclick*="toggleDateReaderDropdown"]')) {
+                dateMenu.style.setProperty("display", "none", "important");
+            }
+        }
     });
+
+    // 📅 डेट रिपोर्ट टैब के लिए मीटर रीडर ड्रॉपडाउन टोगल व फ़िल्टर इंजन
+    window.toggleDateReaderDropdown = function(event) {
+        if(event) event.stopPropagation();
+        var menu = document.getElementById('dateReaderCheckboxMenu');
+        if(!menu) return;
+        
+        var currentDisplay = window.getComputedStyle(menu).display;
+        if(currentDisplay === "none") {
+            menu.style.setProperty("display", "block", "important");
+        } else {
+            menu.style.setProperty("display", "none", "important");
+        }
+    };
+
+    window.toggleAllDateReaders = function(masterEl) {
+        var cbs = document.querySelectorAll('.date-reader-cb');
+        cbs.forEach(function(cb) { cb.checked = masterEl.checked; });
+        if(typeof window.updateDateReaderDropdownLabelText === 'function') {
+            window.updateDateReaderDropdownLabelText();
+        }
+    };
+
+    window.updateDateReaderDropdownLabelText = function() {
+        var labelNode = document.getElementById('dateReaderDropdownLabel');
+        var cbs = document.querySelectorAll('.date-reader-cb');
+        var masterSelect = document.getElementById('dateReaderSelectAll');
+        var selectedCount = 0;
+        
+        cbs.forEach(function(cb) { if(cb.checked) selectedCount++; });
+        
+        if(labelNode) {
+            if(masterSelect && masterSelect.checked) {
+                labelNode.innerText = "सभी रीडर सिलेक्टेड";
+            } else if(selectedCount === 0) {
+                labelNode.innerText = "कोई रीडर नहीं चुना";
+            } else if(selectedCount === cbs.length && cbs.length > 0) {
+                if(masterSelect) masterSelect.checked = true;
+                labelNode.innerText = "सभी रीडर सिलेक्टेड";
+            } else {
+                if(masterSelect) masterSelect.checked = false;
+                labelNode.innerText = selectedCount + " रीडर सिलेक्टेड";
+            }
+        }
+        if(typeof renderDateWiseReaderSummary === 'function') {
+            renderDateWiseReaderSummary();
+        }
+    };
 
     function applyAdminReaderFilter() {
         var cbs = document.querySelectorAll('.adm-reader-cb'); 
@@ -2777,16 +2884,27 @@ window.applyHeaderReaderFilter = function() {
         var total = filteredData.length;
         var done = 0, billP = 0, today = 0, yest = 0;
 
+        var yestPerformersMap = {};
+
         filteredData.forEach(function(item) {
             var rStatus = (item.attendStatus || "").toString().toUpperCase();
             if(parseTrue(item.isDone) || rStatus === "ATTEND") done++;
             if(parseTrue(item.isBillAvailableButDistributionPending)) billP++;
             if(isVisitDateMatch(item.finalVisitDate, 0)) today++;
-            if(isVisitDateMatch(item.finalVisitDate, 1)) yest++;
+            
+            // कल की विज़िट्स चेक करना (Offset Days = 1)
+            if(isVisitDateMatch(item.finalVisitDate, 1)) {
+                yest++;
+                var mr = getReaderName(item);
+                if (mr && mr.trim() !== "") {
+                    mr = mr.trim().toUpperCase();
+                    yestPerformersMap[mr] = (yestPerformersMap[mr] || 0) + 1;
+                }
+            }
         });
 
-        // 📊 POINT 2: UPDATE CIRCULAR PROGRESS RING & TEXT
-        updateProgressRingEngine(done, total);
+        // 📊 POINT 2: UPDATE CIRCULAR PROGRESS RING, TEXT & TOP 3 PERFORMERS
+        updateProgressRingEngine(done, total, yestPerformersMap);
 
         // =========================================================================
         // 💎 ULTRA-PREMIUM MODERN DASHBOARD CARDS & HEADER LAYOUT ENGINE
@@ -3074,268 +3192,7 @@ window.applyHeaderReaderFilter = function() {
         }
     }
 
-    // 📅 फिक्स मीटर रीडर्स और डेट-वाइज समरी रेंडरिंग इंजन
-    function renderDateWiseReaderSummary() {
-        if (!db) return;
-        var dateVal = document.getElementById('dateFilterPicker').value;
-        var typeFilter = document.getElementById('dateReportTypeFilter') ? document.getElementById('dateReportTypeFilter').value : "ALL";
-        var tbody = document.getElementById('dateWiseReaderSummaryBody');
-        var dateLabel = document.getElementById('selectedDateLabelTxt');
-        var countBadge = document.getElementById('dateReportSummaryCountBadge');
-        if (!tbody) return;
-
-        if (!dateVal) {
-            tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: #dc2626; font-weight: bold; padding: 12px;">कृपया कोई तारीख चुनें!</td></tr>';
-            return;
-        }
-
-        if (dateLabel) dateLabel.innerText = dateVal;
-
-        var tx = db.transaction("consumers", "readonly");
-        tx.objectStore("consumers").getAll().onsuccess = function(e) {
-            var allData = e.target.result || [];
-            var summaryMap = {};
-            var masterReadersList = new Set();
-
-            // 🎯 1. मीटर रीडर्स की फ़िक्स लिस्ट (Fixed Master List)
-            var FIXED_READER_NAMES = [
-                "AKHILESH KUMAR", "ATUL KUMAR", "GREESH KUMAR", "KESHAV SHAKYA", 
-                "OMKAR SINGH", "RAMAKANT", "RITIK VERMA", "SATENDRA SINGH", 
-                "SHASHANK KUMAR", "SHIVAM", "SHIVAM KUMAR", "SUNIL KUMAR", "VIVEK KUMAR"
-            ];
-
-            // अगर सिस्टम/ड्रॉपडाउन कैश में नए नाम हों तो उन्हें भी ऑटो-ऐड करें
-            try {
-                var cachedReaders = localStorage.getItem("app_global_readers_cache_list");
-                if (cachedReaders) {
-                    var parsedList = JSON.parse(cachedReaders);
-                    if (Array.isArray(parsedList)) {
-                        parsedList.forEach(function(rn) {
-                            if (rn && rn.trim() !== "") FIXED_READER_NAMES.push(rn.trim().toUpperCase());
-                        });
-                    }
-                }
-            } catch (err) {}
-
-            FIXED_READER_NAMES.forEach(function(rn) {
-                var clean = rn.trim().toUpperCase();
-                if (isReaderAllowed(clean)) {
-                    masterReadersList.add(clean);
-                }
-            });
-
-            // 2. फ़िक्स सूची के हर रीडर के लिए 0 काउंट के साथ डेटा तैयार करें
-            Array.from(masterReadersList).sort().forEach(function(rName) {
-                summaryMap[rName] = { totalVisit: 0, mainMriDone: 0, mainException: 0, poleMriDone: 0, poleException: 0 };
-            });
-
-            // 3. सिलेक्टेड तारीख की एंट्रीज मैच करें
-            allData.forEach(function(item) {
-                var rName = getReaderName(item);
-                if (!rName) return;
-                rName = rName.trim().toUpperCase();
-                if (!summaryMap[rName]) return;
-
-                var visitDateRaw = (getRobustKey(item, "FINAL VISIT_DATE") || item.finalVisitDate || "").toString().trim();
-                
-                var matchesDate = false;
-                if (visitDateRaw) {
-                    if (visitDateRaw.includes(dateVal)) matchesDate = true;
-                    else {
-                        var parts = visitDateRaw.split(/[-/.]/);
-                        if (parts.length === 3) {
-                            var d, m, y;
-                            if (parts[0].length === 4) { y = parts[0]; m = String(parseInt(parts[1])).padStart(2, '0'); d = String(parseInt(parts[2])).padStart(2, '0'); }
-                            else { d = String(parseInt(parts[0])).padStart(2, '0'); m = String(parseInt(parts[1])).padStart(2, '0'); y = parts[2]; }
-                            if ((y + '-' + m + '-' + d) === dateVal) matchesDate = true;
-                        }
-                    }
-                }
-
-                if (matchesDate) {
-                    var s = summaryMap[rName];
-                    s.totalVisit++;
-
-                    var mainRem = (getRobustKey(item, "FINAL_MAIN_METER_SITE_REMARK") || item.mainStatusRemark || "").toString().toUpperCase();
-                    var poleRem = (getRobustKey(item, "FINAL_POLE_METER_SITE_REMARK") || item.poleStatusRemark || "").toString().toUpperCase();
-
-                    if (mainRem.includes("MRI DONE") || mainRem.includes("CMRI DONE")) s.mainMriDone++;
-                    if (parseTrue(item.isMainMeterFieldException) || (mainRem !== "" && !mainRem.includes("MRI DONE") && mainRem !== "NOT FOUND" && mainRem !== "-")) s.mainException++;
-
-                    if (poleRem.includes("MRI DONE") || poleRem.includes("CMRI DONE")) s.poleMriDone++;
-                    if (parseTrue(item.isPoleMeterFieldException) || (poleRem !== "" && !poleRem.includes("MRI DONE") && poleRem !== "NOT FOUND" && poleRem !== "-")) s.poleException++;
-                }
-            });
-
-            var readerNames = Object.keys(summaryMap).sort();
-            var renderedCount = 0;
-            var html = "";
-
-            readerNames.forEach(function(rName) {
-                var d = summaryMap[rName];
-                var isAbsent = (d.totalVisit === 0);
-
-                if (typeFilter === "PRESENT" && isAbsent) return;
-                if (typeFilter === "ABSENT" && !isAbsent) return;
-
-                renderedCount++;
-                var rowStyle = isAbsent ? 'background: #fef2f2; border-bottom: 1px solid #fca5a5;' : 'border-bottom: 1px solid #e2e8f0;';
-                var nameColor = isAbsent ? 'color: #991b1b;' : 'color: #0f172a;';
-                var statusBadge = isAbsent 
-                    ? '<span style="background: #ef4444; color: white; font-size: 8.5px; padding: 2px 5px; border-radius: 4px; font-weight: 900;">ABSENT (0)</span>' 
-                    : '<span style="background: #22c55e; color: white; font-size: 8.5px; padding: 2px 5px; border-radius: 4px; font-weight: 900;">PRESENT</span>';
-
-                html += '<tr style="' + rowStyle + ' font-weight: 700;">';
-                html += '<td style="padding: 6px 4px; text-align: left; position: sticky; left: 0; background: inherit; z-index: 4; font-weight: 900; ' + nameColor + '">' + rName + '</td>';
-                html += '<td style="padding: 6px 4px; text-align: center;">' + statusBadge + '</td>';
-                html += '<td style="padding: 6px 4px; text-align: center; font-weight: 900;">' + d.totalVisit + '</td>';
-                html += '<td style="padding: 6px 4px; text-align: center; color: #166534;">' + d.mainMriDone + '</td>';
-                html += '<td style="padding: 6px 4px; text-align: center; color: #b91c1c;">' + d.mainException + '</td>';
-                html += '<td style="padding: 6px 4px; text-align: center; color: #0d9488;">' + d.poleMriDone + '</td>';
-                html += '<td style="padding: 6px 4px; text-align: center; color: #c2410c;">' + d.poleException + '</td>';
-                html += '</tr>';
-            });
-
-            if (countBadge) countBadge.innerText = "Total: " + renderedCount;
-
-            if (renderedCount === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: #dc2626; font-weight: bold; padding: 12px;">कोई रिकॉर्ड नहीं मिला।</td></tr>';
-            } else {
-                tbody.innerHTML = html;
-            }
-        };
-    }
-
-    // 🖨️ PDF एक्सपोर्टर (Date Range + Total Row सपोर्ट)
-    function exportDateReportPDF() {
-        if (typeof window.jspdf === 'undefined') {
-            return customAlert("🚨 PDF Library (jsPDF) लोड नहीं हो पाई है! इंटरनेट कनेक्शन चेक करें।");
-        }
-        
-        var dateFromVal = document.getElementById('dateFilterPickerFrom') ? document.getElementById('dateFilterPickerFrom').value : "";
-        var dateToVal = document.getElementById('dateFilterPickerTo') ? document.getElementById('dateFilterPickerTo').value : "";
-        var filterMode = document.getElementById('dateReportTypeFilter') ? document.getElementById('dateReportTypeFilter').value : "ALL";
-        if (!dateFromVal || !dateToVal) return customAlert("🚨 कृपया शुरुआती और अंतिम तारीख चुनें!");
-
-        var modeLabel = (filterMode === 'ABSENT') ? "Absent Readers Only (0 Entry)" : (filterMode === 'PRESENT' ? "Present Readers Only" : "All Readers Summary");
-        var datePeriodStr = (dateFromVal === dateToVal) ? dateFromVal : (dateFromVal + " to " + dateToVal);
-        showThinAlert("⏳ " + modeLabel + " PDF बन रही है...", false);
-
-        var rows = [];
-        var tbody = document.getElementById('dateWiseReaderSummaryBody');
-        var tfoot = document.getElementById('dateWiseReaderSummaryFoot');
-        
-        if (!tbody) {
-            showThinAlert("🚨 स्क्रीन पर टेबल नहीं मिली!", true);
-            return customAlert("🚨 स्क्रीन पर टेबल नहीं मिली!");
-        }
-
-        var trs = tbody.querySelectorAll('tr');
-
-        trs.forEach(function(tr) {
-            var tds = tr.querySelectorAll('td');
-            if (tds.length >= 7) {
-                var rName = tds[0].innerText.replace(/\n/g, ' ').trim();
-                var status = tds[1].innerText.replace(/\n/g, ' ').trim();
-                var visits = tds[2].innerText.replace(/\n/g, ' ').trim();
-                var mMri = tds[3].innerText.replace(/\n/g, ' ').trim();
-                var mExc = tds[4].innerText.replace(/\n/g, ' ').trim();
-                var pMri = tds[5].innerText.replace(/\n/g, ' ').trim();
-                var pExc = tds[6].innerText.replace(/\n/g, ' ').trim();
-
-                if (!rName.includes("कोई रिकॉर्ड") && !rName.includes("लोड हो रहा")) {
-                    rows.push([rName, status, visits, mMri, mExc, pMri, pExc]);
-                }
-            }
-        });
-
-        if (rows.length === 0) {
-            showThinAlert("🚨 पीडीएफ के लिए कोई डेटा उपलब्ध नहीं है!", true);
-            return customAlert("🚨 इस फ़िल्टर में पीडीएफ बनाने के लिए कोई डेटा नहीं है!");
-        }
-
-        // Tfoot से Total Row निकालना
-        var footRow = [];
-        if (tfoot) {
-            var footTr = tfoot.querySelector('tr');
-            if (footTr) {
-                var footTds = footTr.querySelectorAll('td');
-                if (footTds.length === 6) {
-                    footRow = [
-                        footTds[0].innerText.trim(), "",
-                        footTds[1].innerText.trim(),
-                        footTds[2].innerText.trim(),
-                        footTds[3].innerText.trim(),
-                        footTds[4].innerText.trim(),
-                        footTds[5].innerText.trim()
-                    ];
-                }
-            }
-        }
-
-        try {
-            var doc = new window.jspdf.jsPDF('p', 'pt', 'a4');
-            var pageWidth = doc.internal.pageSize.width;
-
-            doc.setFontSize(16); doc.setTextColor(30, 58, 138); doc.setFont("Helvetica", "bold");
-            doc.text("Date-Wise Meter Reader Attendance Report", pageWidth / 2, 38, { align: 'center' });
-
-            doc.setFontSize(9.5); doc.setTextColor(71, 85, 105); doc.setFont("Helvetica", "normal");
-            doc.text("Period: " + datePeriodStr + "  |  Filter: " + modeLabel + "  |  Total Readers: " + rows.length, 40, 55);
-
-            var autoTableConfig = {
-                head: [["Meter Reader Name", "Status", "Total Visit", "Main MRI", "Main Exc", "Pole MRI", "Pole Exc"]],
-                body: rows,
-                startY: 68,
-                theme: 'grid',
-                styles: { fontSize: 8.5, cellPadding: 5, halign: 'center', textColor: [15, 23, 42] },
-                headStyles: { fillColor: [30, 58, 138], textColor: [255, 255, 255], fontStyle: 'bold', halign: 'center' },
-                columnStyles: { 0: { halign: 'left', fontStyle: 'bold', cellWidth: 140 } },
-                didParseCell: function(data) {
-                    if (data.section === 'body') {
-                        var visitVal = data.row.raw[2];
-                        if (visitVal === "0") {
-                            data.cell.styles.fillColor = [254, 226, 226];
-                            data.cell.styles.textColor = [153, 27, 27];
-                        }
-                    }
-                }
-            };
-
-            if (footRow.length > 0) {
-                autoTableConfig.foot = [footRow];
-                autoTableConfig.footStyles = { fillColor: [30, 41, 59], textColor: [250, 204, 21], fontStyle: 'bold', halign: 'center' };
-            }
-
-            doc.autoTable(autoTableConfig);
-
-            var pageCount = doc.internal.getNumberOfPages();
-            for (var i = 1; i <= pageCount; i++) {
-                doc.setPage(i); doc.setFontSize(8); doc.setTextColor(100, 116, 139);
-                doc.text("DvVNL Billing Tool  |  Er. Anurag Shakya  |  Page " + i + " of " + pageCount, pageWidth / 2, doc.internal.pageSize.height - 15, { align: 'center' });
-            }
-
-            var filename = "Date_Report_" + filterMode + "_" + dateFromVal + "_to_" + dateToVal + ".pdf";
-            
-            if (typeof AndroidBridge !== "undefined" && AndroidBridge.processBase64Download) {
-                var rawBase64 = doc.output('arraybuffer');
-                var uint8 = new Uint8Array(rawBase64); var binary = '';
-                for (var j = 0; j < uint8.byteLength; j++) { binary += String.fromCharCode(uint8[j]); }
-                AndroidBridge.processBase64Download(btoa(binary), "pdf", filename);
-            } else {
-                doc.save(filename);
-            }
-            
-            showThinAlert("🎉 Date Report PDF सफलतापूर्वक डाउनलोड हो गई!", true);
-        } catch(pdfErr) {
-            console.error("PDF Export Crash:", pdfErr);
-            showThinAlert("🚨 PDF बनाने में त्रुटि हुई!", true);
-            customAlert("🚨 PDF बनाने में त्रुटि हुई: " + pdfErr.toString());
-        }
-    }
-
-    // 📅 चुनी हुई तारीख के अनुसार हर मीटर रीडर की समरी रेंडर करने का फ़ंक्शन
-    // 📅 Date From -> Date To रेंज और Grand Total सपोर्ट करने वाला रेंडरर
+    // 📅 Date-Wise Reader Summary Engine (100% Fixed & Dynamic Alignment)
     function renderDateWiseReaderSummary() {
         if (!db) return;
         var dateFromVal = document.getElementById('dateFilterPickerFrom') ? document.getElementById('dateFilterPickerFrom').value : "";
@@ -3348,7 +3205,7 @@ window.applyHeaderReaderFilter = function() {
         if (!tbody) return;
 
         if (!dateFromVal || !dateToVal) {
-            tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: #dc2626; font-weight: bold; padding: 12px;">कृपया शुरुआती और अंतिम तारीख चुनें!</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="10" style="text-align: center; color: #dc2626; font-weight: bold; padding: 12px;">कृपया शुरुआती और अंतिम तारीख चुनें!</td></tr>';
             if(tfoot) tfoot.innerHTML = "";
             return;
         }
@@ -3391,8 +3248,44 @@ window.applyHeaderReaderFilter = function() {
             } catch (err) {}
 
             Array.from(masterReadersList).sort().forEach(function(rName) {
-                summaryMap[rName] = { totalVisit: 0, mainMriDone: 0, mainException: 0, poleMriDone: 0, poleException: 0 };
+                summaryMap[rName] = { 
+                    totalVisit: 0, 
+                    mainMriDone: 0, 
+                    mainException: 0, 
+                    poleMriDone: 0, 
+                    poleException: 0,
+                    timestamps: []
+                };
             });
+
+            // 🎯 डेट रिपोर्ट ड्रॉपडाउन में एक्सेल-स्टाइल क्लीन लिस्ट जनरेटर
+            var dateCbContainer = document.getElementById('dateReaderCheckboxesList');
+            if (dateCbContainer) {
+                var currentCheckedValues = [];
+                var existingCbs = dateCbContainer.querySelectorAll('.date-reader-cb');
+                existingCbs.forEach(function(cb) { if(cb.checked) currentCheckedValues.push(cb.value); });
+                
+                var isFirstBuild = (existingCbs.length === 0);
+
+                var cbHtml = "<label style='display: grid !important; grid-template-columns: 20px 1fr !important; align-items: center !important; gap: 8px !important; font-weight: bold !important; font-size: 11px !important; padding: 6px 4px !important; border-bottom: 1px solid #e2e8f0 !important; cursor: pointer !important; color: #1e40af !important; width: 100% !important; box-sizing: border-box !important; text-align: left !important;' onclick='event.stopPropagation();'>" +
+                             "<input type='checkbox' id='dateReaderSelectAll' " + (isFirstBuild || currentCheckedValues.length === masterReadersList.size ? "checked" : "") + " onchange='window.toggleAllDateReaders(this)' style='margin:0 !important; cursor:pointer !important; width: 14px !important; height: 14px !important;'>" +
+                             "<span style='text-align: left !important; white-space: nowrap !important;'>SELECT ALL (सभी रीडर)</span></label>";
+                             
+                Array.from(masterReadersList).sort().forEach(function(r) {
+                    var isChecked = isFirstBuild || currentCheckedValues.includes(r) ? "checked" : "";
+                    cbHtml += "<label style='display: grid !important; grid-template-columns: 20px 1fr !important; align-items: center !important; gap: 8px !important; font-size: 11px !important; padding: 4px 4px !important; cursor: pointer !important; color: #334155 !important; font-weight: 600 !important; width: 100% !important; box-sizing: border-box !important; text-align: left !important;' onclick='event.stopPropagation();'>" +
+                              "<input type='checkbox' class='date-reader-cb' value='" + r + "' " + isChecked + " onchange='window.updateDateReaderDropdownLabelText()' style='margin:0 !important; cursor:pointer !important; width: 14px !important; height: 14px !important;'>" +
+                              "<span style='text-align: left !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important;'>" + r + "</span></label>";
+                });
+                dateCbContainer.innerHTML = cbHtml;
+            }
+
+            // चुने गए रीडर्स की फ़िल्टर चेकिंग
+            var selectedDateReaders = [];
+            var dateCbs = document.querySelectorAll('.date-reader-cb');
+            dateCbs.forEach(function(cb) { if(cb.checked) selectedDateReaders.push(cb.value); });
+            var dateSelectAll = document.getElementById('dateReaderSelectAll');
+            var isAllDateReaders = (!dateSelectAll || dateSelectAll.checked || dateCbs.length === 0);
 
             allData.forEach(function(item) {
                 var rName = getReaderName(item);
@@ -3400,25 +3293,61 @@ window.applyHeaderReaderFilter = function() {
                 rName = rName.trim().toUpperCase();
                 if (!summaryMap[rName]) return;
 
-                var visitDateRaw = (getRobustKey(item, "FINAL VISIT_DATE") || item.finalVisitDate || "").toString().trim();
+                // 🎯 1. प्राथमिकता: INVENTIVE VISIT DATE ➔ APPSHEET VISIT DATE ➔ FINAL VISIT_DATE
+                var inventVisitDate = (getRobustKey(item, "INVENTIVE VISIT DATE") || getRobustKey(item, "INVENTIVE REVISIT_DATE") || "").toString().trim();
+                var appVisitDate = (getRobustKey(item, "APPSHEET VISIT DATE") || "").toString().trim();
+                var finalVisitDate = (getRobustKey(item, "FINAL VISIT_DATE") || item.finalVisitDate || "").toString().trim();
+
+                var visitDateRaw = "";
+                if (inventVisitDate && inventVisitDate !== "-" && inventVisitDate.toUpperCase() !== "NOT FOUND" && inventVisitDate.toUpperCase() !== "UNDEFINED") {
+                    visitDateRaw = inventVisitDate;
+                } else if (appVisitDate && appVisitDate !== "-" && appVisitDate.toUpperCase() !== "NOT FOUND" && appVisitDate.toUpperCase() !== "UNDEFINED") {
+                    visitDateRaw = appVisitDate;
+                } else {
+                    visitDateRaw = finalVisitDate;
+                }
+
+                var timeStampRaw = (getRobustKey(item, "TIME STAMP") || getRobustKey(item, "TIME STAMP_1") || getRobustKey(item, "TIME STAMP2") || visitDateRaw || "").toString().trim();
                 
                 var matchesDate = false;
-                if (visitDateRaw) {
-                    var itemDateObj = null;
-                    if (visitDateRaw.includes("-") && visitDateRaw.length === 10 && visitDateRaw.indexOf("-") === 4) {
-                        itemDateObj = new Date(visitDateRaw + "T12:00:00");
+                var itemDateObj = null;
+
+                if (visitDateRaw && visitDateRaw !== "-") {
+                    // यदि तारीख में समय भी जुड़ा है (जैसे "2026-08-03 14:30:00") तो केवल तारीख का हिस्सा अलग करें
+                    var cleanDatePart = visitDateRaw.split(" ")[0];
+
+                    if (cleanDatePart.includes("-") && cleanDatePart.indexOf("-") === 4) {
+                        itemDateObj = new Date(cleanDatePart + "T00:00:00");
                     } else {
-                        var parts = visitDateRaw.split(/[-/.]/);
-                        if (parts.length === 3) {
+                        var parts = cleanDatePart.split(/[-/.]/);
+                        if (parts.length >= 3) {
                             var d, m, y;
-                            if (parts[0].length === 4) { y = parts[0]; m = String(parseInt(parts[1])).padStart(2, '0'); d = String(parseInt(parts[2])).padStart(2, '0'); }
-                            else { d = String(parseInt(parts[0])).padStart(2, '0'); m = String(parseInt(parts[1])).padStart(2, '0'); y = parts[2]; }
-                            itemDateObj = new Date(y + "-" + m + "-" + d + "T12:00:00");
+                            if (parts[0].length === 4) { 
+                                y = parts[0]; 
+                                m = String(parseInt(parts[1])).padStart(2, '0'); 
+                                d = String(parseInt(parts[2])).padStart(2, '0'); 
+                            } else { 
+                                d = String(parseInt(parts[0])).padStart(2, '0'); 
+                                m = String(parseInt(parts[1])).padStart(2, '0'); 
+                                y = parts[2]; 
+                                if(y.length === 2) y = "20" + y; // यदि साल 2 अंकों में हो (जैसे 26)
+                            }
+                            itemDateObj = new Date(y + "-" + m + "-" + d + "T00:00:00");
                         }
                     }
 
+                    // यदि ऊपर के तरीकों से Date ऑब्जेक्ट न बने, तो सीधे JavaScript Date का उपयोग करें
+                    if (!itemDateObj || isNaN(itemDateObj.getTime())) {
+                        itemDateObj = new Date(visitDateRaw);
+                    }
+
                     if (itemDateObj && !isNaN(itemDateObj.getTime())) {
-                        if (itemDateObj >= fromDateObj && itemDateObj <= toDateObj) {
+                        // समय को हटाकर केवल YYYY-MM-DD की तुलना करना ताकि UTC/Local timezone का झंझट न रहे
+                        var itemDateString = itemDateObj.getFullYear() + "-" + String(itemDateObj.getMonth() + 1).padStart(2, '0') + "-" + String(itemDateObj.getDate()).padStart(2, '0');
+                        var fromString = fromDateObj.getFullYear() + "-" + String(fromDateObj.getMonth() + 1).padStart(2, '0') + "-" + String(fromDateObj.getDate()).padStart(2, '0');
+                        var toString = toDateObj.getFullYear() + "-" + String(toDateObj.getMonth() + 1).padStart(2, '0') + "-" + String(toDateObj.getDate()).padStart(2, '0');
+
+                        if (itemDateString >= fromString && itemDateString <= toString) {
                             matchesDate = true;
                         }
                     }
@@ -3427,6 +3356,27 @@ window.applyHeaderReaderFilter = function() {
                 if (matchesDate) {
                     var s = summaryMap[rName];
                     s.totalVisit++;
+
+                    if (timeStampRaw && timeStampRaw !== "-") {
+                        var tParsed = new Date(timeStampRaw);
+                        if (!isNaN(tParsed.getTime())) {
+                            s.timestamps.push(tParsed);
+                        } else {
+                            var tMatch = timeStampRaw.match(/(\d{1,2}):(\d{2})(?::(\d{2}))?\s*(AM|PM)?/i);
+                            if (tMatch) {
+                                var hrs = parseInt(tMatch[1]);
+                                var mins = parseInt(tMatch[2]);
+                                var ampm = tMatch[4] ? tMatch[4].toUpperCase() : null;
+
+                                if (ampm === "PM" && hrs < 12) hrs += 12;
+                                if (ampm === "AM" && hrs === 12) hrs = 0;
+
+                                var dObj = itemDateObj ? new Date(itemDateObj) : new Date(fromDateObj);
+                                dObj.setHours(hrs, mins, 0, 0);
+                                s.timestamps.push(dObj);
+                            }
+                        }
+                    }
 
                     var mainRem = (getRobustKey(item, "FINAL_MAIN_METER_SITE_REMARK") || item.mainStatusRemark || "").toString().toUpperCase();
                     var poleRem = (getRobustKey(item, "FINAL_POLE_METER_SITE_REMARK") || item.poleStatusRemark || "").toString().toUpperCase();
@@ -3443,10 +3393,10 @@ window.applyHeaderReaderFilter = function() {
             var renderedCount = 0;
             var html = "";
 
-            // Grand Total रखने वाले वेरिएबल्स
             var grandVisit = 0, grandMainMri = 0, grandMainExc = 0, grandPoleMri = 0, grandPoleExc = 0;
 
             readerNames.forEach(function(rName) {
+                if (!isAllDateReaders && !selectedDateReaders.includes(rName)) return;
                 var d = summaryMap[rName];
                 var isAbsent = (d.totalVisit === 0);
 
@@ -3460,16 +3410,52 @@ window.applyHeaderReaderFilter = function() {
                 grandPoleMri += d.poleMriDone;
                 grandPoleExc += d.poleException;
 
+                var firstVisitStr = "-";
+                var lastVisitStr = "-";
+                var totalHoursStr = "-";
+
+                if (d.timestamps.length > 0) {
+                    d.timestamps.sort(function(a, b) { return a.getTime() - b.getTime(); });
+                    var minTime = d.timestamps[0];
+                    var maxTime = d.timestamps[d.timestamps.length - 1];
+
+                    var formatAMPM = function(dt) {
+                        var h = dt.getHours();
+                        var m = dt.getMinutes();
+                        var ampm = h >= 12 ? 'PM' : 'AM';
+                        h = h % 12;
+                        h = h ? h : 12;
+                        m = m < 10 ? '0' + m : m;
+                        return h + ':' + m + ' ' + ampm;
+                    };
+
+                    firstVisitStr = formatAMPM(minTime);
+                    lastVisitStr = formatAMPM(maxTime);
+
+                    if (d.timestamps.length > 1) {
+                        var diffMs = maxTime.getTime() - minTime.getTime();
+                        var diffHrs = Math.floor(diffMs / (1000 * 60 * 60));
+                        var diffMins = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+                        totalHoursStr = diffHrs + "h " + diffMins + "m";
+                    } else {
+                        totalHoursStr = "0h 0m";
+                    }
+                }
+
                 var rowStyle = isAbsent ? 'background: #fef2f2; border-bottom: 1px solid #fca5a5;' : 'border-bottom: 1px solid #e2e8f0;';
                 var nameColor = isAbsent ? 'color: #991b1b;' : 'color: #0f172a;';
                 var statusBadge = isAbsent 
                     ? '<span style="background: #ef4444; color: white; font-size: 8.5px; padding: 2px 5px; border-radius: 4px; font-weight: 900;">ABSENT (0)</span>' 
                     : '<span style="background: #22c55e; color: white; font-size: 8.5px; padding: 2px 5px; border-radius: 4px; font-weight: 900;">PRESENT</span>';
 
+                // 🎯 10 Callouts/Columns in Order Matching the Table Headers exactly
                 html += '<tr style="' + rowStyle + ' font-weight: 700;">';
                 html += '<td style="padding: 6px 4px; text-align: left; position: sticky; left: 0; background: inherit; z-index: 4; font-weight: 900; ' + nameColor + '">' + rName + '</td>';
                 html += '<td style="padding: 6px 4px; text-align: center;">' + statusBadge + '</td>';
-                html += '<td style="padding: 6px 4px; text-align: center; font-weight: 900;">' + d.totalVisit + '</td>';
+                html += '<td style="padding: 6px 4px; text-align: center; color: #1e40af; font-weight: 800;">' + firstVisitStr + '</td>';
+                html += '<td style="padding: 6px 4px; text-align: center; color: #1e40af; font-weight: 800;">' + lastVisitStr + '</td>';
+                html += '<td style="padding: 6px 4px; text-align: center; color: #7c3aed; font-weight: 900;">' + totalHoursStr + '</td>';
+                html += '<td style="padding: 6px 4px; text-align: center; font-weight: 900; color: #0f172a;">' + d.totalVisit + '</td>';
                 html += '<td style="padding: 6px 4px; text-align: center; color: #166534;">' + d.mainMriDone + '</td>';
                 html += '<td style="padding: 6px 4px; text-align: center; color: #b91c1c;">' + d.mainException + '</td>';
                 html += '<td style="padding: 6px 4px; text-align: center; color: #0d9488;">' + d.poleMriDone + '</td>';
@@ -3480,15 +3466,14 @@ window.applyHeaderReaderFilter = function() {
             if (countBadge) countBadge.innerText = "Total: " + renderedCount;
 
             if (renderedCount === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: #dc2626; font-weight: bold; padding: 12px;">कोई रिकॉर्ड नहीं मिला।</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="10" style="text-align: center; color: #dc2626; font-weight: bold; padding: 12px;">कोई रिकॉर्ड नहीं मिला।</td></tr>';
                 if(tfoot) tfoot.innerHTML = "";
             } else {
                 tbody.innerHTML = html;
                 
-                // 📊 नीचले हिस्से में TOTAL (Grand Total Row) रेंडर करना
                 if(tfoot) {
                     var footHtml = '<tr style="border-top: 2px solid #3b82f6;">';
-                    footHtml += '<td colspan="2" style="padding: 8px 4px; text-align: left; position: sticky; left: 0; background: #1e293b; color: #facc15; font-size: 11px; z-index: 5;">GRAND TOTAL (' + renderedCount + ' READERS)</td>';
+                    footHtml += '<td colspan="5" style="padding: 8px 4px; text-align: left; position: sticky; left: 0; background: #1e293b; color: #facc15; font-size: 11px; z-index: 5;">GRAND TOTAL (' + renderedCount + ' READERS)</td>';
                     footHtml += '<td style="padding: 8px 4px; text-align: center; color: #facc15; font-size: 11.5px;">' + grandVisit + '</td>';
                     footHtml += '<td style="padding: 8px 4px; text-align: center; color: #4ade80;">' + grandMainMri + '</td>';
                     footHtml += '<td style="padding: 8px 4px; text-align: center; color: #fca5a5;">' + grandMainExc + '</td>';
@@ -3499,6 +3484,136 @@ window.applyHeaderReaderFilter = function() {
                 }
             }
         };
+    }
+
+    // 🖨️ PDF Exporter (Exporting All 10 Columns Perfectly)
+    function exportDateReportPDF() {
+        if (typeof window.jspdf === 'undefined') {
+            return customAlert("🚨 PDF Library (jsPDF) लोड नहीं हो पाई है! इंटरनेट कनेक्शन चेक करें।");
+        }
+        
+        var dateFromVal = document.getElementById('dateFilterPickerFrom') ? document.getElementById('dateFilterPickerFrom').value : "";
+        var dateToVal = document.getElementById('dateFilterPickerTo') ? document.getElementById('dateFilterPickerTo').value : "";
+        var filterMode = document.getElementById('dateReportTypeFilter') ? document.getElementById('dateReportTypeFilter').value : "ALL";
+        if (!dateFromVal || !dateToVal) return customAlert("🚨 कृपया शुरुआती और अंतिम तारीख चुनें!");
+
+        var modeLabel = (filterMode === 'ABSENT') ? "Absent Readers Only (0 Entry)" : (filterMode === 'PRESENT' ? "Present Readers Only" : "All Readers Summary");
+        var datePeriodStr = (dateFromVal === dateToVal) ? dateFromVal : (dateFromVal + " to " + dateToVal);
+        showThinAlert("⏳ " + modeLabel + " PDF बन रही है...", false);
+
+        var rows = [];
+        var tbody = document.getElementById('dateWiseReaderSummaryBody');
+        var tfoot = document.getElementById('dateWiseReaderSummaryFoot');
+        
+        if (!tbody) {
+            showThinAlert("🚨 स्क्रीन पर टेबल नहीं मिली!", true);
+            return customAlert("🚨 स्क्रीन पर टेबल नहीं मिली!");
+        }
+
+        var trs = tbody.querySelectorAll('tr');
+
+        trs.forEach(function(tr) {
+            var tds = tr.querySelectorAll('td');
+            if (tds.length >= 10) {
+                var rName = tds[0].innerText.replace(/\n/g, ' ').trim();
+                var status = tds[1].innerText.replace(/\n/g, ' ').trim();
+                var firstV = tds[2].innerText.replace(/\n/g, ' ').trim();
+                var lastV = tds[3].innerText.replace(/\n/g, ' ').trim();
+                var totHrs = tds[4].innerText.replace(/\n/g, ' ').trim();
+                var visits = tds[5].innerText.replace(/\n/g, ' ').trim();
+                var mMri = tds[6].innerText.replace(/\n/g, ' ').trim();
+                var mExc = tds[7].innerText.replace(/\n/g, ' ').trim();
+                var pMri = tds[8].innerText.replace(/\n/g, ' ').trim();
+                var pExc = tds[9].innerText.replace(/\n/g, ' ').trim();
+
+                if (!rName.includes("कोई रिकॉर्ड") && !rName.includes("लोड हो रहा")) {
+                    rows.push([rName, status, firstV, lastV, totHrs, visits, mMri, mExc, pMri, pExc]);
+                }
+            }
+        });
+
+        if (rows.length === 0) {
+            showThinAlert("🚨 पीडीएफ के लिए कोई डेटा उपलब्ध नहीं है!", true);
+            return customAlert("🚨 इस फ़िल्टर में पीडीएफ बनाने के लिए कोई डेटा नहीं है!");
+        }
+
+        var footRow = [];
+        if (tfoot) {
+            var footTr = tfoot.querySelector('tr');
+            if (footTr) {
+                var footTds = footTr.querySelectorAll('td');
+                if (footTds.length >= 6) {
+                    footRow = [
+                        footTds[0].innerText.trim(), "", "", "", "",
+                        footTds[1].innerText.trim(),
+                        footTds[2].innerText.trim(),
+                        footTds[3].innerText.trim(),
+                        footTds[4].innerText.trim(),
+                        footTds[5].innerText.trim()
+                    ];
+                }
+            }
+        }
+
+        try {
+            var doc = new window.jspdf.jsPDF('l', 'pt', 'a4');
+            var pageWidth = doc.internal.pageSize.width;
+
+            doc.setFontSize(16); doc.setTextColor(30, 58, 138); doc.setFont("Helvetica", "bold");
+            doc.text("Date-Wise Meter Reader Attendance & Working Hours Report", pageWidth / 2, 38, { align: 'center' });
+
+            doc.setFontSize(9.5); doc.setTextColor(71, 85, 105); doc.setFont("Helvetica", "normal");
+            doc.text("Period: " + datePeriodStr + "  |  Filter: " + modeLabel + "  |  Total Readers: " + rows.length, 40, 55);
+
+            var autoTableConfig = {
+                head: [["Meter Reader Name", "Status", "First Visit", "Last Visit", "Total Hours", "Total Visit", "Main MRI", "Main Exc", "Pole MRI", "Pole Exc"]],
+                body: rows,
+                startY: 68,
+                theme: 'grid',
+                styles: { fontSize: 8, cellPadding: 4, halign: 'center', textColor: [15, 23, 42] },
+                headStyles: { fillColor: [30, 58, 138], textColor: [255, 255, 255], fontStyle: 'bold', halign: 'center' },
+                columnStyles: { 0: { halign: 'left', fontStyle: 'bold', cellWidth: 110 } },
+                didParseCell: function(data) {
+                    if (data.section === 'body') {
+                        var visitVal = data.row.raw[5];
+                        if (visitVal === "0") {
+                            data.cell.styles.fillColor = [254, 226, 226];
+                            data.cell.styles.textColor = [153, 27, 27];
+                        }
+                    }
+                }
+            };
+
+            if (footRow.length > 0) {
+                autoTableConfig.foot = [footRow];
+                autoTableConfig.footStyles = { fillColor: [30, 41, 59], textColor: [250, 204, 21], fontStyle: 'bold', halign: 'center' };
+            }
+
+            doc.autoTable(autoTableConfig);
+
+            var pageCount = doc.internal.getNumberOfPages();
+            for (var i = 1; i <= pageCount; i++) {
+                doc.setPage(i); doc.setFontSize(8); doc.setTextColor(100, 116, 139);
+                doc.text("DvVNL Billing Tool  |  Er. Anurag Shakya  |  Page " + i + " of " + pageCount, pageWidth / 2, doc.internal.pageSize.height - 15, { align: 'center' });
+            }
+
+            var filename = "Date_Report_Hours_" + filterMode + "_" + dateFromVal + "_to_" + dateToVal + ".pdf";
+            
+            if (typeof AndroidBridge !== "undefined" && AndroidBridge.processBase64Download) {
+                var rawBase64 = doc.output('arraybuffer');
+                var uint8 = new Uint8Array(rawBase64); var binary = '';
+                for (var j = 0; j < uint8.byteLength; j++) { binary += String.fromCharCode(uint8[j]); }
+                AndroidBridge.processBase64Download(btoa(binary), "pdf", filename);
+            } else {
+                doc.save(filename);
+            }
+            
+            showThinAlert("🎉 Date Report PDF डाउनलोड हो गई!", true);
+        } catch(pdfErr) {
+            console.error("PDF Export Crash:", pdfErr);
+            showThinAlert("🚨 PDF बनाने में त्रुटि हुई!", true);
+            customAlert("🚨 PDF बनाने में त्रुटि हुई: " + pdfErr.toString());
+        }
     }
 
     function refreshActiveDataViews() {
@@ -8705,16 +8820,18 @@ function submitContactUpdateData() {
 // =========================================================================
 // 📊 POINT 2: CIRCULAR PROGRESS RING & SKELETON ENGINE
 // =========================================================================
-function updateProgressRingEngine(done, total) {
+function updateProgressRingEngine(done, total, yestPerformersMap) {
     var pct = total > 0 ? Math.round((done / total) * 100) : 0;
     var circle = document.getElementById('dashProgressRingSvg');
     var pctText = document.getElementById('dashProgressPctText');
     var doneText = document.getElementById('ringDoneText');
     var pendingText = document.getElementById('ringPendingText');
+    var top3Container = document.getElementById('yestTop3PerformersList');
+    var poor3Container = document.getElementById('yestPoor3PerformersList');
 
     if (circle) {
         var radius = circle.r.baseVal.value;
-        var circumference = 2 * Math.PI * radius; // ~150.79
+        var circumference = 2 * Math.PI * radius;
         var offset = circumference - (pct / 100) * circumference;
         circle.style.strokeDashoffset = offset;
     }
@@ -8722,6 +8839,56 @@ function updateProgressRingEngine(done, total) {
     if (pctText) pctText.innerText = pct + "%";
     if (doneText) doneText.innerText = done + " / " + total + " Done";
     if (pendingText) pendingText.innerText = "Pending: " + (total - done);
+
+    // 🏆 Top & ⚠️ Poor Performers कैलकुलेशन
+    if (top3Container || poor3Container) {
+        if (!yestPerformersMap || Object.keys(yestPerformersMap).length === 0) {
+            if (top3Container) top3Container.innerHTML = '<span style="color:#dc2626; font-size:10px;">कल कोई विज़िट नहीं हुई!</span>';
+            if (poor3Container) poor3Container.innerHTML = '<span style="color:#dc2626; font-size:10px;">कल कोई विज़िट नहीं हुई!</span>';
+        } else {
+            // हाई विज़िट वाले पहले
+            var sortedPerformers = Object.keys(yestPerformersMap).map(function(name) {
+                return { name: name, count: yestPerformersMap[name] };
+            }).sort(function(a, b) {
+                return b.count - a.count;
+            });
+
+            var yestTotalVisits = sortedPerformers.reduce(function(acc, curr){ return acc + curr.count; }, 0);
+
+            // 1. TOP 3 PERFORMERS (🥇 🥈 🥉)
+            if (top3Container) {
+                var top3 = sortedPerformers.slice(0, 3);
+                var medals = ["🥇", "🥈", "🥉"];
+                var topHtml = "";
+
+                top3.forEach(function(p, idx) {
+                    var pSharePct = yestTotalVisits > 0 ? Math.round((p.count / yestTotalVisits) * 100) : 0;
+                    topHtml += '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">' +
+                               '<span>' + medals[idx] + ' <b>' + p.name + '</b></span>' +
+                               '<span style="color:#059669; font-weight:900;">' + p.count + ' <small style="color:#64748b; font-size:9px;">(' + pSharePct + '%)</small></span>' +
+                               '</div>';
+                });
+                top3Container.innerHTML = topHtml;
+            }
+
+            // 2. POOR 3 PERFORMERS (Lowest Visits - 🚨 ⚠️ 🔻)
+            if (poor3Container) {
+                var poorSorted = sortedPerformers.slice().reverse();
+                var poor3 = poorSorted.slice(0, 3);
+                var warningIcons = ["🚨", "⚠️", "🔻"];
+                var poorHtml = "";
+
+                poor3.forEach(function(p, idx) {
+                    var pSharePct = yestTotalVisits > 0 ? Math.round((p.count / yestTotalVisits) * 100) : 0;
+                    poorHtml += '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">' +
+                                '<span>' + warningIcons[idx] + ' <b style="color:#b91c1c;">' + p.name + '</b></span>' +
+                                '<span style="color:#dc2626; font-weight:900;">' + p.count + ' <small style="color:#64748b; font-size:9px;">(' + pSharePct + '%)</small></span>' +
+                                '</div>';
+                });
+                poor3Container.innerHTML = poorHtml;
+            }
+        }
+    }
 }
 
 function toggleSkeletonShimmerLoader(show) {
