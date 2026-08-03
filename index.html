@@ -17,7 +17,6 @@
             if (propKey === "logAppErrorToSheet") {
               fetch(APPS_SCRIPT_URL, {
                 method: "POST",
-                mode: "cors",
                 headers: { "Content-Type": "text/plain;charset=utf-8" },
                 body: JSON.stringify({ functionName: propKey, arguments: args })
               }).catch(() => {});
@@ -28,14 +27,13 @@
             var loader = document.getElementById('loginLoader') || document.getElementById('globalLoader');
             if(loader) loader.style.display = 'block';
 
-            // 🚀 Timeout & Retry Mechanism (बड़ा डेटा डाउनलोड होने पर क्रैश होने से बचाएगा)
+            // 🚀 Timeout Mechanism (90 सेकंड्स टाइमआउट)
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 90000); // 90 सेकंड्स टाइमआउट
+            const timeoutId = setTimeout(() => controller.abort(), 90000);
 
+            // Google Apps Script Deployments के लिए अनुकूलित POST कॉल
             fetch(APPS_SCRIPT_URL, {
               method: "POST",
-              mode: "cors",
-              redirect: "follow",
               headers: {
                 "Content-Type": "text/plain;charset=utf-8"
               },
@@ -47,10 +45,11 @@
             })
             .then(response => {
               clearTimeout(timeoutId);
-              if (!response.ok) {
+              // Google Apps Script के Redirects में 200 OK के अलावा 302/REDIRECTS आ सकते हैं
+              if (!response.ok && response.status !== 0) {
                 throw new Error('Network response was not ok (Status: ' + response.status + ')');
               }
-              return response.text(); // डायरेक्ट .json() के स्थान पर text() से रिस्पॉन्स parse
+              return response.text();
             })
             .then(textData => {
               if (loader) loader.style.display = 'none';
@@ -83,18 +82,16 @@
               
               var errorStr = err.name === 'AbortError' ? 'Error: Request Timeout (Data Large or Net Slow)' : err.toString();
 
-              // 🚀 सुरक्षित एरर लॉगिंग (Message Channel Close फिक्स)
               if (typeof loggedInReader !== 'undefined' && loggedInReader && navigator.onLine) {
                 try {
                   runBridge.logAppErrorToSheet(loggedInReader.toUpperCase(), errorStr, "Server Call Fail: " + propKey);
                 } catch(e){}
               }
               
-              // स्क्रीन पर साफ़ एरर दिखाने का बॉक्स
               var errBox = document.getElementById('apkErrorLogger');
               if(errBox) {
                 errBox.style.display = 'block';
-                errBox.innerText = "🚨 कनेक्शन फेल! विवरण नीचे देखें:\n" + errorStr + "\n\n💡 समाधान:\n1. Check Apps Script Deployment Access -> 'Anyone'\n2. New Deployment करके नया URL डालें।";
+                errBox.innerText = "🚨 कनेक्शन फेल! विवरण नीचे देखें:\n" + errorStr + "\n\n💡 समाधान:\n1. Check Apps Script Deployment Access -> 'Anyone'\n2. Extensions > Apps Script में जाकर 'New Deployment' करें और नया Web App URL पेस्ट करें।";
               } else {
                 alert("🚨 कनेक्शन एरर: " + errorStr);
               }
