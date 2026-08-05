@@ -15,11 +15,13 @@
             
             // 🛑 Recursion Loop Shield: यदि एरर लॉगिंग खुद फेल हो जाए तो लूप को रोकें
             if (propKey === "logAppErrorToSheet") {
-              fetch(APPS_SCRIPT_URL, {
-                method: "POST",
-                headers: { "Content-Type": "text/plain;charset=utf-8" },
-                body: JSON.stringify({ functionName: propKey, arguments: args })
-              }).catch(() => {});
+              try {
+                fetch(APPS_SCRIPT_URL, {
+                  method: "POST",
+                  headers: { "Content-Type": "text/plain;charset=utf-8" },
+                  body: JSON.stringify({ functionName: propKey, arguments: args })
+                }).catch(function() {});
+              } catch(e) {}
               return;
             }
 
@@ -52,24 +54,26 @@
               return response.text();
             })
             .then(textData => {
+              clearTimeout(timeoutId);
               if (loader) loader.style.display = 'none';
               
               var data;
               try {
                 data = JSON.parse(textData);
               } catch(e) {
-                throw new Error("Invalid JSON server response or Script Timeout");
+                throw new Error("Invalid JSON response from server. Check script execution timeout.");
               }
 
-              var finalData = data;
-              if (data && data.data !== undefined) {
-                finalData = data.data;
-              }
+              var finalData = (data && data.data !== undefined) ? data.data : data;
               
               if (data && (data.success === false || data.error)) {
                 var errMessage = data.error || data.msg || "Unknown Server Error";
                 console.error("GS Execution Error:", errMessage);
-                alert("🚨 सर्वर एरर: " + errMessage);
+                if (typeof showThinAlert === 'function') {
+                  showThinAlert("🚨 सर्वर एरर: " + errMessage, true);
+                } else {
+                  alert("🚨 सर्वर एरर: " + errMessage);
+                }
                 if (failureCallback) failureCallback(errMessage);
               } else {
                 if (successCallback) successCallback(finalData);
@@ -483,13 +487,17 @@
     /* 💎 COMPACT CARD DESIGN (Enterprise Smooth Makeover) */
     .card { 
         background: var(--theme-card-bg); 
-        backdrop-filter: blur(12px); 
-        border-radius: 14px; 
-        padding: 12px;      
-        box-shadow: 0 4px 20px -2px rgba(15,23,42,0.04), 0 2px 6px -1px rgba(15,23,42,0.02); 
-        margin-bottom: 10px; 
-        border: 1px solid rgba(226, 232, 240, 0.8); 
-        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        backdrop-filter: blur(16px); 
+        -webkit-backdrop-filter: blur(16px);
+        border-radius: 18px; 
+        padding: 16px;       
+        box-shadow: 0 10px 30px -5px rgba(15,23,42,0.08), 0 4px 12px -2px rgba(15,23,42,0.03); 
+        margin-bottom: 14px; 
+        border: 1px solid rgba(255, 255, 255, 0.6); 
+        transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
+    }
+    .card:active {
+        transform: scale(0.985);
     }
 
     h2 { font-size: 16px; color: var(--theme-heading); margin-bottom: 2px; font-weight: 900; text-align: center; text-transform: uppercase; }
@@ -599,25 +607,28 @@
     .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; margin-bottom: 8px; }
     .stat-card { 
         background: #ffffff; 
-        padding: 8px 6px; 
-        border-radius: 10px; 
+        padding: 10px 8px; 
+        border-radius: 14px; 
         text-align: center; 
-        box-shadow: 0 4px 6px -1px rgba(15,23,42,0.05); 
+        box-shadow: 0 8px 16px -4px rgba(15,23,42,0.08), 0 2px 4px -1px rgba(15,23,42,0.04); 
         border: 1px solid var(--theme-table-border); 
         cursor: pointer; 
-        min-height: 68px; 
+        min-height: 72px; 
         display: flex; 
         flex-direction: column; 
         justify-content: center; 
         align-items: center; 
-        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
         position: relative;
         overflow: hidden;
     }
+    .stat-card:hover {
+        transform: translateY(-3px) scale(1.02);
+        box-shadow: 0 12px 20px -5px rgba(30,64,175,0.15);
+    }
     .stat-card:active { 
-        transform: scale(0.95); 
-        box-shadow: 0 2px 4px -1px rgba(15, 23, 42, 0.06);
-        background: #f8fafc;
+        transform: scale(0.92); 
+        box-shadow: 0 2px 4px -1px rgba(15, 23, 42, 0.1);
     }
     .stat-val { 
         font-size: 19px; 
@@ -1075,7 +1086,7 @@
         <div id="apkErrorLogger" style="display:none; margin-top:10px; padding:10px; background:#fef2f2; border:1px solid #fca5a5; border-radius:6px; color:#b91c1c; font-size:11px; font-weight:bold; text-align:left; word-break:break-all; white-space:pre-wrap;"></div>
         <div class="app-footer-branding" style="position: relative;">
             Developed by:- Anurag Shakya | 9761414105
-            <span style="display:block; margin-top:4px; font-size:10px; color:#ef4444; font-weight:900;">V1.0.26</span>
+            <span style="display:block; margin-top:4px; font-size:10px; color:#ef4444; font-weight:900;">V1.0.27</span>
         </div>
     </div>
     
@@ -1203,7 +1214,7 @@
                 <!-- रिजल्ट आउटपुट बॉक्स -->
                 <div class="input-group">
                     <label style="color:#6b21a8; font-weight:bold; display: block; margin-bottom: 4px;">Google Sheet में पेस्ट करने लायक कोड (Click to Copy):</label>
-                    <input type="text" id="cfgGeneratedResultOutput" readonly style="background:#ffffff; border:2px solid #c084fc; font-weight:800; color:#4c1d95; text-align:center; padding: 12px; border-radius: 6px; font-size: 14px; width: 100%; box-sizing: border-box;" placeholder="कोड यहाँ दिखाई देगा" onclick="this.select(); document.execCommand('copy');">
+                    <input type="text" id="cfgGeneratedResultOutput" readonly style="background:#ffffff; border:2px solid #c084fc; font-weight:800; color:#4c1d95; text-align:center; padding: 12px; border-radius: 6px; font-size: 14px; width: 100%; box-sizing: border-box;" placeholder="कोड यहाँ दिखाई देगा" onclick="this.select(); if(navigator.clipboard){ navigator.clipboard.writeText(this.value).then(() => showThinAlert('✅ कोड कॉपी हो गया!', true)); } else { document.execCommand('copy'); showThinAlert('✅ कोड कॉपी हो गया!', true); }">
                     <small style="color:#701a75; font-size:11px; display:block; margin-top:6px; text-align:center; font-weight: bold;">💡 बॉक्स पर क्लिक करते ही कोड अपने आप कॉपी हो जाएगा!</small>
                 </div>
             </div>
@@ -1232,6 +1243,12 @@
             <!-- 📊 POINT 2: INTERACTIVE CIRCULAR PROGRESS RING CARD WITH TOP & POOR PERFORMERS -->
             <div class="progress-ring-card" style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; background: var(--theme-card-bg); border: 1px solid rgba(226, 232, 240, 0.8); border-radius: 14px; padding: 12px; margin-bottom: 12px; box-shadow: 0 4px 15px rgba(15,23,42,0.04);">
                 
+                <!-- 🚀 लोड सर्वे बैनर खोलने का बटन -->
+                <button onclick="openLoadSurveyBanner(true)" style="width: 100%; background: linear-gradient(90deg, #0284c7, #0369a1); color: white; border: none; padding: 8px 12px; border-radius: 8px; font-size: 11px; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; box-shadow: 0 2px 6px rgba(2,132,199,0.25);">
+                    <span><i class="fa-solid fa-chart-line" style="color:#facc15;"></i> लोड सर्वे % विश्लेषण (बैनर देखें)</span>
+                    <i class="fa-solid fa-expand" style="font-size: 10px;"></i>
+                </button>
+                
                 <!-- 1. बाईं तरफ: प्रोग्रेस डेटा -->
                 <div style="flex: 1; min-width: 130px;">
                     <div style="font-size: 10px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">OVERALL VISIT COMPLETION</div>
@@ -1242,7 +1259,7 @@
                 <!-- 2. बीच में (Part 1): कल के टॉप 3 परफॉर्मर -->
                 <div style="flex: 1.2; min-width: 155px; border-left: 2px dashed #cbd5e1; padding-left: 10px;">
                     <div style="font-size: 9.5px; font-weight: 900; color: #166534; text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 3px;">
-                        🏆 YEST TOP 3 PERFORMERS
+                        🏆 कल के टॉप 3 प्रदर्शनकर्ता
                     </div>
                     <div id="yestTop3PerformersList" style="font-size: 10px; font-weight: 700; color: #1e293b; line-height: 1.4;">
                         <span style="color:#94a3b8;">लोड हो रहा है...</span>
@@ -1252,7 +1269,7 @@
                 <!-- 3. बीच में (Part 2): कल के 3 सबसे कम विज़िट वाले (Poor Performers) -->
                 <div style="flex: 1.2; min-width: 155px; border-left: 2px dashed #fca5a5; padding-left: 10px; border-right: 2px dashed #cbd5e1; padding-right: 10px;">
                     <div style="font-size: 9.5px; font-weight: 900; color: #b91c1c; text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 3px;">
-                        ⚠️ YEST POOR PERFORMERS
+                        ⚠️ कल के कम विजिट वाले
                     </div>
                     <div id="yestPoor3PerformersList" style="font-size: 10px; font-weight: 700; color: #1e293b; line-height: 1.4;">
                         <span style="color:#94a3b8;">लोड हो रहा है...</span>
@@ -1386,15 +1403,20 @@
                                 <th style="padding: 6px 4px; text-align: center; color: #1e40af;">First Visit</th>
                                 <th style="padding: 6px 4px; text-align: center; color: #1e40af;">Last Visit</th>
                                 <th style="padding: 6px 4px; text-align: center; color: #7c3aed;">Total Hours</th>
-                                <th style="padding: 6px 4px; text-align: center;">Total Visit</th>
+                                <th style="padding: 6px 4px; text-align: center; color: #15803d;">Today Visit</th>
+<th style="padding: 6px 4px; text-align: center; color: #dc2626;">VisiT Pending</th>
                                 <th style="padding: 6px 4px; text-align: center; color: #166534;">Main MRI</th>
+                                <th style="padding: 6px 4px; text-align: center; color: #15803d;">Main LS %</th>
+                                <th style="padding: 6px 4px; text-align: center; color: #dc2626;">No LS Main</th>
                                 <th style="padding: 6px 4px; text-align: center; color: #b91c1c;">Main Exc</th>
                                 <th style="padding: 6px 4px; text-align: center; color: #0d9488;">Pole MRI</th>
+                                <th style="padding: 6px 4px; text-align: center; color: #0f766e;">Pole LS %</th>
+                                <th style="padding: 6px 4px; text-align: center; color: #ea580c;">No LS Pole</th>
                                 <th style="padding: 6px 4px; text-align: center; color: #c2410c;">Pole Exc</th>
                             </tr>
                         </thead>
                         <tbody id="dateWiseReaderSummaryBody">
-                            <tr><td colspan="10" style="text-align: center; padding: 12px; color: #64748b;">लोड हो रहा है...</td></tr>
+                            <tr><td colspan="14" style="text-align: center; padding: 12px; color: #64748b;">लोड हो रहा है...</td></tr>
                         </tbody>
                         <tfoot id="dateWiseReaderSummaryFoot" style="background: #1e293b; color: #ffffff; font-weight: 900;">
                         </tfoot>
@@ -1611,7 +1633,7 @@
             
             <div style="text-align: center; margin-top: 25px; padding-top: 15px; border-top: 1px dashed #cbd5e1; color: #64748b;">
                 <div style="font-size: 12px; font-weight: bold;">Developed by: Anurag Shakya</div>
-                <div style="font-size: 11px; color: #ef4444; font-weight: 900; margin-top: 4px;">V1.0.26</div>
+                <div style="font-size: 11px; color: #ef4444; font-weight: 900; margin-top: 4px;">V1.0.27</div>
             </div>
         </div>
 
@@ -1664,7 +1686,7 @@
         <div style="width: 100%; height: 40px; clear: both; display: block !important; visibility: hidden; pointer-events: none;"></div>
         
         <div class="card" style="background: rgba(255, 255, 255, 0.7); margin-bottom: 20px; text-align: center; border: 1px dashed #cbd5e1;">
-            <div style="font-size: 11px; color: #ef4444; font-weight: 900; margin-bottom: 3px;">V1.0.26</div>
+            <div style="font-size: 11px; color: #ef4444; font-weight: 900; margin-bottom: 3px;">V1.0.27</div>
             <div style="font-size: 12px; color: #1e40af; font-weight: 800; text-transform: uppercase; margin-bottom: 5px;"><i class="fa-solid fa-user-tie"></i> <span id="welcomeTxt">Mr Name: Loading...</span></div>
             <div style="font-size: 11px; font-weight: 700; color: #475569; border-top: 1px solid #cbd5e1; padding-top: 5px;">
                 Developed by:- Er. Anurag Shakya | 9761414105
@@ -1910,33 +1932,30 @@ var REPORT_NAMES = { 'main_mri_pending': '1. Main Meter MRI Pending', 'pole_mri_
         }
     });
 
-    function getReaderName(item) {
-        if (!item) return ""; 
-        
-        // 🎯 पहली प्राथमिकता: सीधे आपके "VISIT LAST MONTH" कॉलम से नाम उठाएगा
-        if (item["VISIT LAST MONTH"] !== undefined && item["VISIT LAST MONTH"] !== null) {
-            return item["VISIT LAST MONTH"].toString().trim();
-        }
-        if (item.visitLastMonth !== undefined && item.visitLastMonth !== null) {
-            return item.visitLastMonth.toString().trim();
-        }
-        
-        // ⚡ गिटहब/प्रॉक्सी सेफ्टी: अगर गिटहब के कारण कॉलम का नाम बदलकर 'visitlastmonth' या छोटे अक्षरों में हो गया हो
-        for (var key in item) { 
-            if (item.hasOwnProperty(key)) {
-                var k = key.toString().replace(/[^a-zA-Z0-9]/g, '').toLowerCase(); 
-                if (k === "visitlastmonth") { 
-                    return item[key] ? item[key].toString().trim() : ""; 
-                } 
-            }
-        }
-        
-        // फॉलबैक बैकअप (अगर ऊपर कोई भी न मिले)
-        if (item["MR NAME"]) return item["MR NAME"].toString().trim();
-        if (item["METER READER NAME"]) return item["METER READER NAME"].toString().trim();
-        
-        return "";
+    window.getReaderName = function(item) {
+    if (!item) return ""; 
+    
+    if (item["VISIT LAST MONTH"] !== undefined && item["VISIT LAST MONTH"] !== null) {
+        return item["VISIT LAST MONTH"].toString().trim();
     }
+    if (item.visitLastMonth !== undefined && item.visitLastMonth !== null) {
+        return item.visitLastMonth.toString().trim();
+    }
+    
+    for (var key in item) { 
+        if (Object.prototype.hasOwnProperty.call(item, key)) {
+            var k = key.toString().replace(/[^a-zA-Z0-9]/g, '').toLowerCase(); 
+            if (k === "visitlastmonth" || k === "mrname" || k === "meterreadername") { 
+                return item[key] ? item[key].toString().trim() : ""; 
+            } 
+        }
+    }
+    
+    if (item["MR NAME"]) return item["MR NAME"].toString().trim();
+    if (item["METER READER NAME"]) return item["METER READER NAME"].toString().trim();
+    
+    return "";
+};
     
     function isBillUploaded(item) {
         if(!item) return false; if(item.isBillUpload !== undefined) return parseTrue(item.isBillUpload);
@@ -2380,18 +2399,16 @@ function executeSafeSyncAndDownloadWorkflow(onComplete) {
     function triggerSilentBackgroundDataDownload(onComplete, isManualClick) {
     if(!loggedInReader) { if(onComplete) onComplete(); return; }
     
-    // लाइव स्टेटस तय करने का इंजन
     var processingText = isManualClick ? "🔄 Manual Master Data Downloading Pls wait..." : "⚡ Auto Master Data Downloading Pls wait...";
     
     if(isDownloadingMasterData) {
-        showThinAlert(processingText, false);
+        if(isManualClick) showThinAlert(processingText, false);
         if(onComplete) onComplete();
         return;
     }
     
     isDownloadingMasterData = true;
-    // फिक्स: शुरुआत में अलर्ट बार को बिना गायब हुए (false) दिखाएं
-    showThinAlert(processingText, false);
+    if(isManualClick) showThinAlert(processingText, false);
 
     var targetUserParam = (loggedInReader.toUpperCase() === "ANURAG SHAKYA") ? "ALL" : loggedInReader.toUpperCase();
     
@@ -2664,18 +2681,16 @@ window.applyHeaderReaderFilter = function() {
             var loaderEl = document.getElementById('globalLoader') || document.getElementById('loginLoader');
             if (loaderEl) loaderEl.style.setProperty("display", "none", "important");
             
-            if(res && res.success) {
+            if(res && (res.success === true || res === true)) {
                 alert("🚀 सूचना सफलतापूर्वक सुरक्षित हो गई! चुने गए लड़कों के अगले डेटा डाउनलोड पर दिखाई देगी।");
-                document.getElementById('notifyMessageText').value = ""; // क्लियर बॉक्स
+                document.getElementById('notifyMessageText').value = ""; 
                 
-                // चेकबॉक्स और ड्रॉपडाउन रीसेट इंजन
                 var masterReset = document.getElementById('notifyTargetMasterSelectAll') || document.getElementById('notifySelectAllRows');
                 if(masterReset) masterReset.checked = false;
                 
                 var cbsReset = document.querySelectorAll('.notify-reader-cb');
                 cbsReset.forEach(function(cb) { cb.checked = false; });
                 
-                // ड्रॉपडाउन बंद करें और लेबल पुराने जैसा करें
                 if(typeof window.updateNotifyDropdownLabelText === 'function') window.updateNotifyDropdownLabelText();
                 
                 var contentBlock = document.getElementById('notifyDropdownMenuContentBlock');
@@ -2683,15 +2698,15 @@ window.applyHeaderReaderFilter = function() {
                 if(contentBlock) contentBlock.style.setProperty("display", "none", "important");
                 if(arrowIcon) arrowIcon.style.transform = "rotate(0deg)";
             } else {
-                alert("🚨 सर्वर एरर: संदेश सेव नहीं हो सका।");
+                alert("🚨 सर्वर एरर: " + (res && res.msg ? res.msg : "संदेश सेव नहीं हो सका।"));
             }
         })
         .withFailureHandler(function(err) {
             var loaderEl = document.getElementById('globalLoader') || document.getElementById('loginLoader');
             if (loaderEl) loaderEl.style.setProperty("display", "none", "important");
-            alert("नेटवर्क एरर: " + err.message);
+            alert("नेटवर्क एरर: " + (err.message || err.toString()));
         })
-        .saveLiveNotificationToServer(finalTargetParam, msgText, lockSec);
+        .saveLiveNotificationToServer(finalTargetParam, msgText, parseInt(lockSec));
     }
 
     // 🟢 फिक्स: 'toggleNotifyDropdownMenu is not defined' एरर को पूरी तरह ठीक करने वाला ग्लोबल बाइंडिंग इंजन
@@ -2847,13 +2862,11 @@ window.applyHeaderReaderFilter = function() {
 
     function updateSummaryStatsRaw() {
     if (!db) {
-        // यदि IndexedDB कनेक्शन रेडी नहीं है तो सुरक्षित रूप से लूप होने दें
-        setTimeout(updateSummaryStatsRaw, 200);
+        setTimeout(updateSummaryStatsRaw, 150);
         return;
     }
 
-    // समरी डैशबोर्ड के लिए फ़िल्टर वैल्यू निकालें
-    var selectedLoadCat = document.getElementById('billLoadCategoryFilter') ? document.getElementById('billLoadCategoryFilter').value : "10";
+    var selectedLoadCat = document.getElementById('billLoadCategoryFilter') ? document.getElementById('billLoadCategoryFilter').value : "ALL";
     
     try {
         var cachedConfigs = localStorage.getItem("app_report_configs_cache");
@@ -2870,27 +2883,37 @@ window.applyHeaderReaderFilter = function() {
         var allConsumersReport = res.reports.find(r => r.key === 'all_consumers_list' || r.key === 'Visit_Data_Consumers');
         var allData = allConsumersReport ? (allConsumersReport.data || []) : [];
         
-        // ⚡ भविष्य के क्विक-लोड के लिए डेटा को ग्लोबल मेमोरी कैशे में सुरक्षित करें
         globalReportsDatabaseCache = allData;
         
         var filteredData = allData.filter(function(item) {
+            if (!isReaderAllowed(getReaderName(item))) return false;
             var itemLoadCat = (item["LOAD_CATOGERY (5,10)"] || "").toString();
             return (selectedLoadCat === "ALL" || itemLoadCat.includes(selectedLoadCat));
         });
 
         var total = filteredData.length;
         var done = 0, billP = 0, today = 0, yest = 0;
-
         var yestPerformersMap = {};
 
         filteredData.forEach(function(item) {
             var rStatus = (item.attendStatus || "").toString().toUpperCase();
-            if(parseTrue(item.isDone) || rStatus === "ATTEND") done++;
-            if(parseTrue(item.isBillAvailableButDistributionPending)) billP++;
-            if(isVisitDateMatch(item.finalVisitDate, 0)) today++;
+            var isItemDone = parseTrue(item.isDone) || rStatus === "ATTEND" || rStatus === "DONE";
             
-            // कल की विज़िट्स चेक करना (Offset Days = 1)
-            if(isVisitDateMatch(item.finalVisitDate, 1)) {
+            if(isItemDone) done++;
+            
+            // बिल पेंडेंसी सटीक गणना
+            var isForBillDist = parseTrue(item.forBillDist) || (getRobustKey(item, "FOR_BILL DISTRIBUTION") || "").toString().toUpperCase() === "YES";
+            var isBillUp = parseTrue(item.isBillUpload) || (getRobustKey(item, "IS BILL UPLOAD") || "").toString().toUpperCase() === "YES";
+            var distStatus = (getRobustKey(item, "DISTRIBUTION STATUS") || item.distStatus || "").toString().toUpperCase();
+            
+            if (isForBillDist && isBillUp && distStatus !== "DISTRIBUTED") {
+                billP++;
+            }
+
+            var vDate = getRobustKey(item, "FINAL VISIT_DATE") || item.finalVisitDate || "";
+            if(isVisitDateMatch(vDate, 0)) today++;
+            
+            if(isVisitDateMatch(vDate, 1)) {
                 yest++;
                 var mr = getReaderName(item);
                 if (mr && mr.trim() !== "") {
@@ -2900,7 +2923,6 @@ window.applyHeaderReaderFilter = function() {
             }
         });
 
-        // 📊 POINT 2: UPDATE CIRCULAR PROGRESS RING, TEXT & TOP 3 PERFORMERS
         updateProgressRingEngine(done, total, yestPerformersMap);
 
         // =========================================================================
@@ -3189,7 +3211,7 @@ window.applyHeaderReaderFilter = function() {
         }
     }
 
-    // 📅 Date-Wise Reader Summary Engine (100% Fixed & Dynamic Alignment)
+    // 📅 Date-Wise Reader Summary Engine (Supports All Readers / Single Reader Day-Wise View)
     function renderDateWiseReaderSummary() {
         if (!db) return;
         var dateFromVal = document.getElementById('dateFilterPickerFrom') ? document.getElementById('dateFilterPickerFrom').value : "";
@@ -3202,7 +3224,7 @@ window.applyHeaderReaderFilter = function() {
         if (!tbody) return;
 
         if (!dateFromVal || !dateToVal) {
-            tbody.innerHTML = '<tr><td colspan="10" style="text-align: center; color: #dc2626; font-weight: bold; padding: 12px;">कृपया शुरुआती और अंतिम तारीख चुनें!</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="15" style="text-align: center; color: #dc2626; font-weight: bold; padding: 12px;">कृपया शुरुआती और अंतिम तारीख चुनें!</td></tr>';
             if(tfoot) tfoot.innerHTML = "";
             return;
         }
@@ -3216,7 +3238,6 @@ window.applyHeaderReaderFilter = function() {
         var tx = db.transaction("consumers", "readonly");
         tx.objectStore("consumers").getAll().onsuccess = function(e) {
             var allData = e.target.result || [];
-            var summaryMap = {};
             var masterReadersList = new Set();
 
             allData.forEach(function(item) {
@@ -3244,18 +3265,7 @@ window.applyHeaderReaderFilter = function() {
                 }
             } catch (err) {}
 
-            Array.from(masterReadersList).sort().forEach(function(rName) {
-                summaryMap[rName] = { 
-                    totalVisit: 0, 
-                    mainMriDone: 0, 
-                    mainException: 0, 
-                    poleMriDone: 0, 
-                    poleException: 0,
-                    timestamps: []
-                };
-            });
-
-            // 🎯 डेट रिपोर्ट ड्रॉपडाउन में एक्सेल-स्टाइल क्लीन लिस्ट जनरेटर
+            // Date Reader Dropdown Menu Builder
             var dateCbContainer = document.getElementById('dateReaderCheckboxesList');
             if (dateCbContainer) {
                 var currentCheckedValues = [];
@@ -3277,12 +3287,290 @@ window.applyHeaderReaderFilter = function() {
                 dateCbContainer.innerHTML = cbHtml;
             }
 
-            // चुने गए रीडर्स की फ़िल्टर चेकिंग
             var selectedDateReaders = [];
             var dateCbs = document.querySelectorAll('.date-reader-cb');
             dateCbs.forEach(function(cb) { if(cb.checked) selectedDateReaders.push(cb.value); });
             var dateSelectAll = document.getElementById('dateReaderSelectAll');
-            var isAllDateReaders = (!dateSelectAll || dateSelectAll.checked || dateCbs.length === 0);
+            var isAllDateReaders = (!dateSelectAll || dateSelectAll.checked || dateCbs.length === 0 || selectedDateReaders.length === masterReadersList.size);
+
+            var restrictedKeywords = ["ANURAG", "KAPIL", "GAURAV"];
+
+            // =========================================================================
+            // 🎯 MODE 1: SINGLE METER READER SELECTED ➔ SHOW DAY-BY-DAY BREAKDOWN
+            // =========================================================================
+            if (!isAllDateReaders && selectedDateReaders.length === 1) {
+                var targetReaderName = selectedDateReaders[0];
+                var dayMap = {};
+
+                // चयनित तारीखों के हर दिन की कीवर्ड एंट्रीज तैयार करें (e.g. 2026-08-01, 2026-08-02...)
+                var tempCurDate = new Date(fromDateObj);
+                while (tempCurDate <= toDateObj) {
+                    var yyyy = tempCurDate.getFullYear();
+                    var mm = String(tempCurDate.getMonth() + 1).padStart(2, '0');
+                    var dd = String(tempCurDate.getDate()).padStart(2, '0');
+                    var dateKey = yyyy + "-" + mm + "-" + dd;
+
+                    dayMap[dateKey] = {
+                        dateStr: dateKey,
+                        totalVisit: 0,
+                        mainMriDone: 0,
+                        mainLsDone: 0,
+                        mainLsNoCount: 0,
+                        mainException: 0,
+                        poleMriDone: 0,
+                        poleLsDone: 0,
+                        poleLsNoCount: 0,
+                        poleException: 0,
+                        timestamps: []
+                    };
+                    tempCurDate.setDate(tempCurDate.getDate() + 1);
+                }
+
+                // कुल असली पेंडेंसी (अपरिवर्तित)
+                var totalReaderPendingCount = 0;
+                allData.forEach(function(item) {
+                    var rName = getReaderName(item);
+                    if (rName && rName.trim().toUpperCase() === targetReaderName) {
+                        var rStatus = (getRobustKey(item, "ATTEND STATUS") || item.attendStatus || "").toString().toUpperCase().trim();
+                        var isItemDone = parseTrue(item.isDone) || rStatus === "ATTEND" || rStatus === "DONE";
+                        if (!isItemDone) {
+                            totalReaderPendingCount++;
+                        }
+                    }
+                });
+
+                // डेटा स्कैनिंग और तारीख के अनुसार समूह बनाना (Grouping)
+                allData.forEach(function(item) {
+                    var rName = getReaderName(item);
+                    if (!rName || rName.trim().toUpperCase() !== targetReaderName) return;
+
+                    var inventVisitDate = (getRobustKey(item, "INVENTIVE VISIT DATE") || getRobustKey(item, "INVENTIVE REVISIT_DATE") || "").toString().trim();
+                    var appVisitDate = (getRobustKey(item, "APPSHEET VISIT DATE") || "").toString().trim();
+                    var finalVisitDate = (getRobustKey(item, "FINAL VISIT_DATE") || item.finalVisitDate || "").toString().trim();
+
+                    var visitDateRaw = "";
+                    if (inventVisitDate && inventVisitDate !== "-" && inventVisitDate.toUpperCase() !== "NOT FOUND" && inventVisitDate.toUpperCase() !== "UNDEFINED") {
+                        visitDateRaw = inventVisitDate;
+                    } else if (appVisitDate && appVisitDate !== "-" && appVisitDate.toUpperCase() !== "NOT FOUND" && appVisitDate.toUpperCase() !== "UNDEFINED") {
+                        visitDateRaw = appVisitDate;
+                    } else {
+                        visitDateRaw = finalVisitDate;
+                    }
+
+                    if (!visitDateRaw || visitDateRaw === "-") return;
+
+                    var cleanDatePart = visitDateRaw.split(" ")[0];
+                    var itemDateObj = null;
+
+                    if (cleanDatePart.includes("-") && cleanDatePart.indexOf("-") === 4) {
+                        itemDateObj = new Date(cleanDatePart + "T00:00:00");
+                    } else {
+                        var parts = cleanDatePart.split(/[-/.]/);
+                        if (parts.length >= 3) {
+                            var d, m, y;
+                            if (parts[0].length === 4) { 
+                                y = parts[0]; m = String(parseInt(parts[1])).padStart(2, '0'); d = String(parseInt(parts[2])).padStart(2, '0'); 
+                            } else { 
+                                d = String(parseInt(parts[0])).padStart(2, '0'); m = String(parseInt(parts[1])).padStart(2, '0'); y = parts[2]; 
+                                if(y.length === 2) y = "20" + y;
+                            }
+                            itemDateObj = new Date(y + "-" + m + "-" + d + "T00:00:00");
+                        }
+                    }
+
+                    if (!itemDateObj || isNaN(itemDateObj.getTime())) {
+                        itemDateObj = new Date(visitDateRaw);
+                    }
+
+                    if (itemDateObj && !isNaN(itemDateObj.getTime())) {
+                        var yyyy = itemDateObj.getFullYear();
+                        var mm = String(itemDateObj.getMonth() + 1).padStart(2, '0');
+                        var dd = String(itemDateObj.getDate()).padStart(2, '0');
+                        var itemDateKey = yyyy + "-" + mm + "-" + dd;
+
+                        if (dayMap[itemDateKey]) {
+                            var dayObj = dayMap[itemDateKey];
+                            dayObj.totalVisit++;
+
+                            var timeStampRaw = (getRobustKey(item, "TIME STAMP") || getRobustKey(item, "TIME STAMP_1") || getRobustKey(item, "TIME STAMP2") || visitDateRaw || "").toString().trim();
+                            if (timeStampRaw && timeStampRaw !== "-") {
+                                var tParsed = new Date(timeStampRaw);
+                                if (!isNaN(tParsed.getTime())) {
+                                    dayObj.timestamps.push(tParsed);
+                                } else {
+                                    var tMatch = timeStampRaw.match(/(\d{1,2}):(\d{2})(?::(\d{2}))?\s*(AM|PM)?/i);
+                                    if (tMatch) {
+                                        var hrs = parseInt(tMatch[1]);
+                                        var mins = parseInt(tMatch[2]);
+                                        var ampm = tMatch[4] ? tMatch[4].toUpperCase() : null;
+                                        if (ampm === "PM" && hrs < 12) hrs += 12;
+                                        if (ampm === "AM" && hrs === 12) hrs = 0;
+                                        var dObj = new Date(itemDateObj);
+                                        dObj.setHours(hrs, mins, 0, 0);
+                                        dayObj.timestamps.push(dObj);
+                                    }
+                                }
+                            }
+
+                            var mainRem = (getRobustKey(item, "FINAL_MAIN_METER_SITE_REMARK") || item.mainStatusRemark || "").toString().toUpperCase();
+                            var poleRem = (getRobustKey(item, "FINAL_POLE_METER_SITE_REMARK") || item.poleStatusRemark || "").toString().toUpperCase();
+
+                            var isMainMriAvail = parseTrue(getRobustKey(item, "IS MRI AVAILABLE (MAIN METER)")) || parseTrue(item.mriAvailableMain) || mainRem.includes("MRI DONE") || mainRem.includes("CMRI DONE");
+                            var hasMainLs = parseTrue(getRobustKey(item, "IS LOAD SURVAY AVAILBLE (MAIN Mtr)")) || parseTrue(item.surveyAvailableMain);
+
+                            var isPoleMriAvail = parseTrue(getRobustKey(item, "IS MRI AVAILABLE (POLE METER)")) || parseTrue(item.mriAvailablePole) || poleRem.includes("MRI DONE") || poleRem.includes("CMRI DONE");
+                            var hasPoleLs = parseTrue(getRobustKey(item, "IS LOAD SURVAY AVAILBLE (Pole Mtr)")) || parseTrue(item.surveyAvailablePole);
+
+                            if (isMainMriAvail) {
+                                dayObj.mainMriDone++;
+                                if (hasMainLs) dayObj.mainLsDone++;
+                                else dayObj.mainLsNoCount++;
+                            }
+                            if (parseTrue(item.isMainMeterFieldException) || (mainRem !== "" && !mainRem.includes("MRI DONE") && mainRem !== "NOT FOUND" && mainRem !== "-")) dayObj.mainException++;
+
+                            if (isPoleMriAvail) {
+                                dayObj.poleMriDone++;
+                                if (hasPoleLs) dayObj.poleLsDone++;
+                                else dayObj.poleLsNoCount++;
+                            }
+                            if (parseTrue(item.isPoleMeterFieldException) || (poleRem !== "" && !poleRem.includes("MRI DONE") && poleRem !== "NOT FOUND" && poleRem !== "-")) dayObj.poleException++;
+                        }
+                    }
+                });
+
+                var dayKeys = Object.keys(dayMap).sort();
+                var html = "";
+                var renderedCount = 0;
+                var grandVisit = 0, grandMainMri = 0, grandMainLsDone = 0, grandMainNoLsSum = 0, grandMainExc = 0, grandPoleMri = 0, grandPoleLsDone = 0, grandPoleNoLsSum = 0, grandPoleExc = 0;
+
+                dayKeys.forEach(function(dKey) {
+                    var d = dayMap[dKey];
+                    var isAbsent = (d.totalVisit === 0);
+
+                    if (typeFilter === "PRESENT" && isAbsent) return;
+                    if (typeFilter === "ABSENT" && !isAbsent) return;
+
+                    renderedCount++;
+                    grandVisit += d.totalVisit;
+                    grandMainMri += d.mainMriDone;
+                    grandMainLsDone += d.mainLsDone;
+                    grandMainNoLsSum += d.mainLsNoCount;
+                    grandMainExc += d.mainException;
+                    grandPoleMri += d.poleMriDone;
+                    grandPoleLsDone += d.poleLsDone;
+                    grandPoleNoLsSum += d.poleLsNoCount;
+                    grandPoleExc += d.poleException;
+
+                    var firstVisitStr = "-";
+                    var lastVisitStr = "-";
+                    var totalHoursStr = "-";
+
+                    if (d.timestamps.length > 0) {
+                        d.timestamps.sort(function(a, b) { return a.getTime() - b.getTime(); });
+                        var minTime = d.timestamps[0];
+                        var maxTime = d.timestamps[d.timestamps.length - 1];
+
+                        var formatAMPM = function(dt) {
+                            var h = dt.getHours();
+                            var m = dt.getMinutes();
+                            var ampm = h >= 12 ? 'PM' : 'AM';
+                            h = h % 12; h = h ? h : 12;
+                            m = m < 10 ? '0' + m : m;
+                            return h + ':' + m + ' ' + ampm;
+                        };
+
+                        firstVisitStr = formatAMPM(minTime);
+                        lastVisitStr = formatAMPM(maxTime);
+
+                        if (d.timestamps.length > 1) {
+                            var diffMs = maxTime.getTime() - minTime.getTime();
+                            var diffHrs = Math.floor(diffMs / (1000 * 60 * 60));
+                            var diffMins = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+                            totalHoursStr = diffHrs + "h " + diffMins + "m";
+                        } else {
+                            totalHoursStr = "0h 0m";
+                        }
+                    }
+
+                    var rowStyle = isAbsent ? 'background: #fef2f2; border-bottom: 1px solid #fca5a5;' : 'border-bottom: 1px solid #e2e8f0;';
+                    var statusBadge = isAbsent 
+                        ? '<span style="background: #ef4444; color: white; font-size: 8.5px; padding: 2px 5px; border-radius: 4px; font-weight: 900;">ABSENT (0)</span>' 
+                        : '<span style="background: #22c55e; color: white; font-size: 8.5px; padding: 2px 5px; border-radius: 4px; font-weight: 900;">PRESENT</span>';
+
+                    var mainLsPctStr = d.mainMriDone > 0 ? Math.round((d.mainLsDone / d.mainMriDone) * 100) + "%" : "-";
+                    var poleLsPctStr = d.poleMriDone > 0 ? Math.round((d.poleLsDone / d.poleMriDone) * 100) + "%" : "-";
+
+                    html += '<tr style="' + rowStyle + ' font-weight: 700;">';
+                    html += '<td style="padding: 6px 4px; text-align: left; position: sticky; left: 0; background: inherit; z-index: 4; font-weight: 900; color: #1e40af;">📅 ' + d.dateStr + ' (' + targetReaderName + ')</td>';
+                    html += '<td style="padding: 6px 4px; text-align: center;">' + statusBadge + '</td>';
+                    html += '<td style="padding: 6px 4px; text-align: center; color: #1e40af; font-weight: 800;">' + firstVisitStr + '</td>';
+                    html += '<td style="padding: 6px 4px; text-align: center; color: #1e40af; font-weight: 800;">' + lastVisitStr + '</td>';
+                    html += '<td style="padding: 6px 4px; text-align: center; color: #7c3aed; font-weight: 900;">' + totalHoursStr + '</td>';
+                    html += '<td style="padding: 6px 4px; text-align: center; font-weight: 900; color: #15803d;">' + d.totalVisit + '</td>';
+                    html += '<td style="padding: 6px 4px; text-align: center; font-weight: 900; color: #b91c1c; background: #fef2f2;">' + totalReaderPendingCount + '</td>';
+                    html += '<td style="padding: 6px 4px; text-align: center; color: #166534;">' + d.mainMriDone + '</td>';
+                    html += '<td style="padding: 6px 4px; text-align: center; color: #15803d; font-weight:900;">' + mainLsPctStr + '</td>';
+                    html += '<td style="padding: 6px 4px; text-align: center; color: #dc2626; font-weight:900;">' + d.mainLsNoCount + '</td>';
+                    html += '<td style="padding: 6px 4px; text-align: center; color: #b91c1c;">' + d.mainException + '</td>';
+                    html += '<td style="padding: 6px 4px; text-align: center; color: #0d9488;">' + d.poleMriDone + '</td>';
+                    html += '<td style="padding: 6px 4px; text-align: center; color: #0f766e; font-weight:900;">' + poleLsPctStr + '</td>';
+                    html += '<td style="padding: 6px 4px; text-align: center; color: #ea580c; font-weight:900;">' + d.poleLsNoCount + '</td>';
+                    html += '<td style="padding: 6px 4px; text-align: center; color: #c2410c;">' + d.poleException + '</td>';
+                    html += '</tr>';
+                });
+
+                if (countBadge) countBadge.innerText = "Total Days: " + renderedCount;
+
+                if (renderedCount === 0) {
+                    tbody.innerHTML = '<tr><td colspan="15" style="text-align: center; color: #dc2626; font-weight: bold; padding: 12px;">इस समयावधि के लिए कोई डेटा नहीं मिला।</td></tr>';
+                    if(tfoot) tfoot.innerHTML = "";
+                } else {
+                    tbody.innerHTML = html;
+                    if(tfoot) {
+                        var grandMainLsPct = grandMainMri > 0 ? Math.round((grandMainLsDone / grandMainMri) * 100) + "%" : "-";
+                        var grandPoleLsPct = grandPoleMri > 0 ? Math.round((grandPoleLsDone / grandPoleMri) * 100) + "%" : "-";
+
+                        var footHtml = '<tr style="border-top: 2px solid #3b82f6;">';
+                        footHtml += '<td colspan="5" style="padding: 8px 4px; text-align: left; position: sticky; left: 0; background: #1e293b; color: #facc15; font-size: 11px; z-index: 5;">TOTAL (' + targetReaderName + ' - ' + renderedCount + ' DAYS)</td>';
+                        footHtml += '<td style="padding: 8px 4px; text-align: center; color: #4ade80; font-size: 11.5px;">' + grandVisit + '</td>';
+                        footHtml += '<td style="padding: 8px 4px; text-align: center; color: #f87171; font-size: 11.5px;">' + totalReaderPendingCount + '</td>';
+                        footHtml += '<td style="padding: 8px 4px; text-align: center; color: #4ade80;">' + grandMainMri + '</td>';
+                        footHtml += '<td style="padding: 8px 4px; text-align: center; color: #4ade80;">' + grandMainLsPct + '</td>';
+                        footHtml += '<td style="padding: 8px 4px; text-align: center; color: #f87171;">' + grandMainNoLsSum + '</td>';
+                        footHtml += '<td style="padding: 8px 4px; text-align: center; color: #fca5a5;">' + grandMainExc + '</td>';
+                        footHtml += '<td style="padding: 8px 4px; text-align: center; color: #2dd4bf;">' + grandPoleMri + '</td>';
+                        footHtml += '<td style="padding: 8px 4px; text-align: center; color: #2dd4bf;">' + grandPoleLsPct + '</td>';
+                        footHtml += '<td style="padding: 8px 4px; text-align: center; color: #fb923c;">' + grandPoleNoLsSum + '</td>';
+                        footHtml += '<td style="padding: 8px 4px; text-align: center; color: #fdba74;">' + grandPoleExc + '</td>';
+                        footHtml += '</tr>';
+                        tfoot.innerHTML = footHtml;
+                    }
+                }
+                return;
+            }
+
+            // =========================================================================
+            // 🎯 MODE 2: ALL READERS / MULTIPLE READERS SELECTED ➔ SHOW ALL READERS SUMMARY
+            // =========================================================================
+            var summaryMap = {};
+            Array.from(masterReadersList).sort().forEach(function(rName) {
+                var isRestricted = restrictedKeywords.some(function(k) { return rName.toUpperCase().includes(k); });
+                if (isRestricted) return;
+
+                summaryMap[rName] = { 
+                    totalVisit: 0, 
+                    realPending: 0, 
+                    mainMriDone: 0, 
+                    mainLsDone: 0, 
+                    mainLsNoCount: 0,
+                    mainException: 0, 
+                    poleMriDone: 0, 
+                    poleLsDone: 0, 
+                    poleLsNoCount: 0,
+                    poleException: 0,
+                    timestamps: []
+                };
+            });
 
             allData.forEach(function(item) {
                 var rName = getReaderName(item);
@@ -3290,7 +3578,19 @@ window.applyHeaderReaderFilter = function() {
                 rName = rName.trim().toUpperCase();
                 if (!summaryMap[rName]) return;
 
-                // 🎯 1. प्राथमिकता: INVENTIVE VISIT DATE ➔ APPSHEET VISIT DATE ➔ FINAL VISIT_DATE
+                var rStatus = (getRobustKey(item, "ATTEND STATUS") || item.attendStatus || "").toString().toUpperCase().trim();
+                var isItemDone = parseTrue(item.isDone) || rStatus === "ATTEND" || rStatus === "DONE";
+                if (!isItemDone) {
+                    summaryMap[rName].realPending++;
+                }
+            });
+
+            allData.forEach(function(item) {
+                var rName = getReaderName(item);
+                if (!rName) return;
+                rName = rName.trim().toUpperCase();
+                if (!summaryMap[rName]) return;
+
                 var inventVisitDate = (getRobustKey(item, "INVENTIVE VISIT DATE") || getRobustKey(item, "INVENTIVE REVISIT_DATE") || "").toString().trim();
                 var appVisitDate = (getRobustKey(item, "APPSHEET VISIT DATE") || "").toString().trim();
                 var finalVisitDate = (getRobustKey(item, "FINAL VISIT_DATE") || item.finalVisitDate || "").toString().trim();
@@ -3305,12 +3605,10 @@ window.applyHeaderReaderFilter = function() {
                 }
 
                 var timeStampRaw = (getRobustKey(item, "TIME STAMP") || getRobustKey(item, "TIME STAMP_1") || getRobustKey(item, "TIME STAMP2") || visitDateRaw || "").toString().trim();
-                
                 var matchesDate = false;
                 var itemDateObj = null;
 
                 if (visitDateRaw && visitDateRaw !== "-") {
-                    // यदि तारीख में समय भी जुड़ा है (जैसे "2026-08-03 14:30:00") तो केवल तारीख का हिस्सा अलग करें
                     var cleanDatePart = visitDateRaw.split(" ")[0];
 
                     if (cleanDatePart.includes("-") && cleanDatePart.indexOf("-") === 4) {
@@ -3320,26 +3618,20 @@ window.applyHeaderReaderFilter = function() {
                         if (parts.length >= 3) {
                             var d, m, y;
                             if (parts[0].length === 4) { 
-                                y = parts[0]; 
-                                m = String(parseInt(parts[1])).padStart(2, '0'); 
-                                d = String(parseInt(parts[2])).padStart(2, '0'); 
+                                y = parts[0]; m = String(parseInt(parts[1])).padStart(2, '0'); d = String(parseInt(parts[2])).padStart(2, '0'); 
                             } else { 
-                                d = String(parseInt(parts[0])).padStart(2, '0'); 
-                                m = String(parseInt(parts[1])).padStart(2, '0'); 
-                                y = parts[2]; 
-                                if(y.length === 2) y = "20" + y; // यदि साल 2 अंकों में हो (जैसे 26)
+                                d = String(parseInt(parts[0])).padStart(2, '0'); m = String(parseInt(parts[1])).padStart(2, '0'); y = parts[2]; 
+                                if(y.length === 2) y = "20" + y;
                             }
                             itemDateObj = new Date(y + "-" + m + "-" + d + "T00:00:00");
                         }
                     }
 
-                    // यदि ऊपर के तरीकों से Date ऑब्जेक्ट न बने, तो सीधे JavaScript Date का उपयोग करें
                     if (!itemDateObj || isNaN(itemDateObj.getTime())) {
                         itemDateObj = new Date(visitDateRaw);
                     }
 
                     if (itemDateObj && !isNaN(itemDateObj.getTime())) {
-                        // समय को हटाकर केवल YYYY-MM-DD की तुलना करना ताकि UTC/Local timezone का झंझट न रहे
                         var itemDateString = itemDateObj.getFullYear() + "-" + String(itemDateObj.getMonth() + 1).padStart(2, '0') + "-" + String(itemDateObj.getDate()).padStart(2, '0');
                         var fromString = fromDateObj.getFullYear() + "-" + String(fromDateObj.getMonth() + 1).padStart(2, '0') + "-" + String(fromDateObj.getDate()).padStart(2, '0');
                         var toString = toDateObj.getFullYear() + "-" + String(toDateObj.getMonth() + 1).padStart(2, '0') + "-" + String(toDateObj.getDate()).padStart(2, '0');
@@ -3364,10 +3656,8 @@ window.applyHeaderReaderFilter = function() {
                                 var hrs = parseInt(tMatch[1]);
                                 var mins = parseInt(tMatch[2]);
                                 var ampm = tMatch[4] ? tMatch[4].toUpperCase() : null;
-
                                 if (ampm === "PM" && hrs < 12) hrs += 12;
                                 if (ampm === "AM" && hrs === 12) hrs = 0;
-
                                 var dObj = itemDateObj ? new Date(itemDateObj) : new Date(fromDateObj);
                                 dObj.setHours(hrs, mins, 0, 0);
                                 s.timestamps.push(dObj);
@@ -3378,10 +3668,24 @@ window.applyHeaderReaderFilter = function() {
                     var mainRem = (getRobustKey(item, "FINAL_MAIN_METER_SITE_REMARK") || item.mainStatusRemark || "").toString().toUpperCase();
                     var poleRem = (getRobustKey(item, "FINAL_POLE_METER_SITE_REMARK") || item.poleStatusRemark || "").toString().toUpperCase();
 
-                    if (mainRem.includes("MRI DONE") || mainRem.includes("CMRI DONE")) s.mainMriDone++;
+                    var isMainMriAvail = parseTrue(getRobustKey(item, "IS MRI AVAILABLE (MAIN METER)")) || parseTrue(item.mriAvailableMain) || mainRem.includes("MRI DONE") || mainRem.includes("CMRI DONE");
+                    var hasMainLs = parseTrue(getRobustKey(item, "IS LOAD SURVAY AVAILBLE (MAIN Mtr)")) || parseTrue(item.surveyAvailableMain);
+
+                    var isPoleMriAvail = parseTrue(getRobustKey(item, "IS MRI AVAILABLE (POLE METER)")) || parseTrue(item.mriAvailablePole) || poleRem.includes("MRI DONE") || poleRem.includes("CMRI DONE");
+                    var hasPoleLs = parseTrue(getRobustKey(item, "IS LOAD SURVAY AVAILBLE (Pole Mtr)")) || parseTrue(item.surveyAvailablePole);
+
+                    if (isMainMriAvail) {
+                        s.mainMriDone++;
+                        if (hasMainLs) s.mainLsDone++;
+                        else s.mainLsNoCount++;
+                    }
                     if (parseTrue(item.isMainMeterFieldException) || (mainRem !== "" && !mainRem.includes("MRI DONE") && mainRem !== "NOT FOUND" && mainRem !== "-")) s.mainException++;
 
-                    if (poleRem.includes("MRI DONE") || poleRem.includes("CMRI DONE")) s.poleMriDone++;
+                    if (isPoleMriAvail) {
+                        s.poleMriDone++;
+                        if (hasPoleLs) s.poleLsDone++;
+                        else s.poleLsNoCount++;
+                    }
                     if (parseTrue(item.isPoleMeterFieldException) || (poleRem !== "" && !poleRem.includes("MRI DONE") && poleRem !== "NOT FOUND" && poleRem !== "-")) s.poleException++;
                 }
             });
@@ -3389,8 +3693,7 @@ window.applyHeaderReaderFilter = function() {
             var readerNames = Object.keys(summaryMap).sort();
             var renderedCount = 0;
             var html = "";
-
-            var grandVisit = 0, grandMainMri = 0, grandMainExc = 0, grandPoleMri = 0, grandPoleExc = 0;
+            var grandVisit = 0, grandRealPending = 0, grandMainMri = 0, grandMainLsDone = 0, grandMainNoLsSum = 0, grandMainExc = 0, grandPoleMri = 0, grandPoleLsDone = 0, grandPoleNoLsSum = 0, grandPoleExc = 0;
 
             readerNames.forEach(function(rName) {
                 if (!isAllDateReaders && !selectedDateReaders.includes(rName)) return;
@@ -3402,9 +3705,14 @@ window.applyHeaderReaderFilter = function() {
 
                 renderedCount++;
                 grandVisit += d.totalVisit;
+                grandRealPending += d.realPending;
                 grandMainMri += d.mainMriDone;
+                grandMainLsDone += d.mainLsDone;
+                grandMainNoLsSum += d.mainLsNoCount;
                 grandMainExc += d.mainException;
                 grandPoleMri += d.poleMriDone;
+                grandPoleLsDone += d.poleLsDone;
+                grandPoleNoLsSum += d.poleLsNoCount;
                 grandPoleExc += d.poleException;
 
                 var firstVisitStr = "-";
@@ -3417,11 +3725,9 @@ window.applyHeaderReaderFilter = function() {
                     var maxTime = d.timestamps[d.timestamps.length - 1];
 
                     var formatAMPM = function(dt) {
-                        var h = dt.getHours();
-                        var m = dt.getMinutes();
+                        var h = dt.getHours(); var m = dt.getMinutes();
                         var ampm = h >= 12 ? 'PM' : 'AM';
-                        h = h % 12;
-                        h = h ? h : 12;
+                        h = h % 12; h = h ? h : 12;
                         m = m < 10 ? '0' + m : m;
                         return h + ':' + m + ' ' + ampm;
                     };
@@ -3445,17 +3751,24 @@ window.applyHeaderReaderFilter = function() {
                     ? '<span style="background: #ef4444; color: white; font-size: 8.5px; padding: 2px 5px; border-radius: 4px; font-weight: 900;">ABSENT (0)</span>' 
                     : '<span style="background: #22c55e; color: white; font-size: 8.5px; padding: 2px 5px; border-radius: 4px; font-weight: 900;">PRESENT</span>';
 
-                // 🎯 10 Callouts/Columns in Order Matching the Table Headers exactly
+                var mainLsPctStr = d.mainMriDone > 0 ? Math.round((d.mainLsDone / d.mainMriDone) * 100) + "%" : "-";
+                var poleLsPctStr = d.poleMriDone > 0 ? Math.round((d.poleLsDone / d.poleMriDone) * 100) + "%" : "-";
+
                 html += '<tr style="' + rowStyle + ' font-weight: 700;">';
                 html += '<td style="padding: 6px 4px; text-align: left; position: sticky; left: 0; background: inherit; z-index: 4; font-weight: 900; ' + nameColor + '">' + rName + '</td>';
                 html += '<td style="padding: 6px 4px; text-align: center;">' + statusBadge + '</td>';
                 html += '<td style="padding: 6px 4px; text-align: center; color: #1e40af; font-weight: 800;">' + firstVisitStr + '</td>';
                 html += '<td style="padding: 6px 4px; text-align: center; color: #1e40af; font-weight: 800;">' + lastVisitStr + '</td>';
                 html += '<td style="padding: 6px 4px; text-align: center; color: #7c3aed; font-weight: 900;">' + totalHoursStr + '</td>';
-                html += '<td style="padding: 6px 4px; text-align: center; font-weight: 900; color: #0f172a;">' + d.totalVisit + '</td>';
+                html += '<td style="padding: 6px 4px; text-align: center; font-weight: 900; color: #15803d;">' + d.totalVisit + '</td>';
+                html += '<td style="padding: 6px 4px; text-align: center; font-weight: 900; color: #b91c1c; background: #fef2f2;">' + d.realPending + '</td>';
                 html += '<td style="padding: 6px 4px; text-align: center; color: #166534;">' + d.mainMriDone + '</td>';
+                html += '<td style="padding: 6px 4px; text-align: center; color: #15803d; font-weight:900;">' + mainLsPctStr + '</td>';
+                html += '<td style="padding: 6px 4px; text-align: center; color: #dc2626; font-weight:900;">' + d.mainLsNoCount + '</td>';
                 html += '<td style="padding: 6px 4px; text-align: center; color: #b91c1c;">' + d.mainException + '</td>';
                 html += '<td style="padding: 6px 4px; text-align: center; color: #0d9488;">' + d.poleMriDone + '</td>';
+                html += '<td style="padding: 6px 4px; text-align: center; color: #0f766e; font-weight:900;">' + poleLsPctStr + '</td>';
+                html += '<td style="padding: 6px 4px; text-align: center; color: #ea580c; font-weight:900;">' + d.poleLsNoCount + '</td>';
                 html += '<td style="padding: 6px 4px; text-align: center; color: #c2410c;">' + d.poleException + '</td>';
                 html += '</tr>';
             });
@@ -3463,18 +3776,25 @@ window.applyHeaderReaderFilter = function() {
             if (countBadge) countBadge.innerText = "Total: " + renderedCount;
 
             if (renderedCount === 0) {
-                tbody.innerHTML = '<tr><td colspan="10" style="text-align: center; color: #dc2626; font-weight: bold; padding: 12px;">कोई रिकॉर्ड नहीं मिला।</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="15" style="text-align: center; color: #dc2626; font-weight: bold; padding: 12px;">कोई रिकॉर्ड नहीं मिला।</td></tr>';
                 if(tfoot) tfoot.innerHTML = "";
             } else {
                 tbody.innerHTML = html;
-                
                 if(tfoot) {
+                    var grandMainLsPct = grandMainMri > 0 ? Math.round((grandMainLsDone / grandMainMri) * 100) + "%" : "-";
+                    var grandPoleLsPct = grandPoleMri > 0 ? Math.round((grandPoleLsDone / grandPoleMri) * 100) + "%" : "-";
+
                     var footHtml = '<tr style="border-top: 2px solid #3b82f6;">';
                     footHtml += '<td colspan="5" style="padding: 8px 4px; text-align: left; position: sticky; left: 0; background: #1e293b; color: #facc15; font-size: 11px; z-index: 5;">GRAND TOTAL (' + renderedCount + ' READERS)</td>';
-                    footHtml += '<td style="padding: 8px 4px; text-align: center; color: #facc15; font-size: 11.5px;">' + grandVisit + '</td>';
+                    footHtml += '<td style="padding: 8px 4px; text-align: center; color: #4ade80; font-size: 11.5px;">' + grandVisit + '</td>';
+                    footHtml += '<td style="padding: 8px 4px; text-align: center; color: #f87171; font-size: 11.5px;">' + grandRealPending + '</td>';
                     footHtml += '<td style="padding: 8px 4px; text-align: center; color: #4ade80;">' + grandMainMri + '</td>';
+                    footHtml += '<td style="padding: 8px 4px; text-align: center; color: #4ade80;">' + grandMainLsPct + '</td>';
+                    footHtml += '<td style="padding: 8px 4px; text-align: center; color: #f87171;">' + grandMainNoLsSum + '</td>';
                     footHtml += '<td style="padding: 8px 4px; text-align: center; color: #fca5a5;">' + grandMainExc + '</td>';
                     footHtml += '<td style="padding: 8px 4px; text-align: center; color: #2dd4bf;">' + grandPoleMri + '</td>';
+                    footHtml += '<td style="padding: 8px 4px; text-align: center; color: #2dd4bf;">' + grandPoleLsPct + '</td>';
+                    footHtml += '<td style="padding: 8px 4px; text-align: center; color: #fb923c;">' + grandPoleNoLsSum + '</td>';
                     footHtml += '<td style="padding: 8px 4px; text-align: center; color: #fdba74;">' + grandPoleExc + '</td>';
                     footHtml += '</tr>';
                     tfoot.innerHTML = footHtml;
@@ -3483,7 +3803,7 @@ window.applyHeaderReaderFilter = function() {
         };
     }
 
-    // 🖨️ PDF Exporter (Exporting All 10 Columns Perfectly)
+    // 🖨️ PDF Exporter (Fixed Font Encoding & Clean Layout)
     function exportDateReportPDF() {
         if (typeof window.jspdf === 'undefined') {
             return customAlert("🚨 PDF Library (jsPDF) लोड नहीं हो पाई है! इंटरनेट कनेक्शन चेक करें।");
@@ -3496,7 +3816,7 @@ window.applyHeaderReaderFilter = function() {
 
         var modeLabel = (filterMode === 'ABSENT') ? "Absent Readers Only (0 Entry)" : (filterMode === 'PRESENT' ? "Present Readers Only" : "All Readers Summary");
         var datePeriodStr = (dateFromVal === dateToVal) ? dateFromVal : (dateFromVal + " to " + dateToVal);
-        showThinAlert("⏳ " + modeLabel + " PDF बन रही है...", false);
+        showThinAlert("⏳ PDF बन रही है...", false);
 
         var rows = [];
         var tbody = document.getElementById('dateWiseReaderSummaryBody');
@@ -3511,20 +3831,34 @@ window.applyHeaderReaderFilter = function() {
 
         trs.forEach(function(tr) {
             var tds = tr.querySelectorAll('td');
-            if (tds.length >= 10) {
-                var rName = tds[0].innerText.replace(/\n/g, ' ').trim();
-                var status = tds[1].innerText.replace(/\n/g, ' ').trim();
-                var firstV = tds[2].innerText.replace(/\n/g, ' ').trim();
-                var lastV = tds[3].innerText.replace(/\n/g, ' ').trim();
-                var totHrs = tds[4].innerText.replace(/\n/g, ' ').trim();
-                var visits = tds[5].innerText.replace(/\n/g, ' ').trim();
-                var mMri = tds[6].innerText.replace(/\n/g, ' ').trim();
-                var mExc = tds[7].innerText.replace(/\n/g, ' ').trim();
-                var pMri = tds[8].innerText.replace(/\n/g, ' ').trim();
-                var pExc = tds[9].innerText.replace(/\n/g, ' ').trim();
+            if (tds.length >= 15) {
+                var rName    = tds[0].innerText.replace(/\n/g, ' ').trim();
+                var status   = tds[1].innerText.replace(/\n/g, ' ').trim();
+                var firstV   = tds[2].innerText.replace(/\n/g, ' ').trim();
+                var lastV    = tds[3].innerText.replace(/\n/g, ' ').trim();
+                var totHrs   = tds[4].innerText.replace(/\n/g, ' ').trim();
+                var visits   = tds[5].innerText.replace(/\n/g, ' ').trim();
+                var realPnd  = tds[6].innerText.replace(/\n/g, ' ').trim();
+                var mMri     = tds[7].innerText.replace(/\n/g, ' ').trim();
+                var mLsPct   = tds[8].innerText.replace(/\n/g, ' ').trim();
+                var mNoLs    = tds[9].innerText.replace(/\n/g, ' ').trim();
+                var mExc     = tds[10].innerText.replace(/\n/g, ' ').trim();
+                var pMri     = tds[11].innerText.replace(/\n/g, ' ').trim();
+                var pLsPct   = tds[12].innerText.replace(/\n/g, ' ').trim();
+                var pNoLs    = tds[13].innerText.replace(/\n/g, ' ').trim();
+                var pExc     = tds[14].innerText.replace(/\n/g, ' ').trim();
 
-                if (!rName.includes("कोई रिकॉर्ड") && !rName.includes("लोड हो रहा")) {
-                    rows.push([rName, status, firstV, lastV, totHrs, visits, mMri, mExc, pMri, pExc]);
+                // 🎯 FIX 1: इमोजी 📅 और अमान्य सिम्बल्स को साफ़ टेक्स्ट "Date: " से बदलना ताकि Ø=ÜA न आए
+                rName = rName.replace(/[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu, 'Date: ').trim();
+                rName = rName.replace(/^📅\s*/, 'Date: ');
+
+                var restrictedKeywords = ["ANURAG", "KAPIL", "GAURAV"];
+                var isRestricted = restrictedKeywords.some(function(k) {
+                    return rName.toUpperCase().includes(k);
+                });
+
+                if (!rName.includes("कोई रिकॉर्ड") && !rName.includes("लोड हो रहा") && !isRestricted) {
+                    rows.push([rName, status, firstV, lastV, totHrs, visits, realPnd, mMri, mLsPct, mNoLs, mExc, pMri, pLsPct, pNoLs, pExc]);
                 }
             }
         });
@@ -3539,14 +3873,20 @@ window.applyHeaderReaderFilter = function() {
             var footTr = tfoot.querySelector('tr');
             if (footTr) {
                 var footTds = footTr.querySelectorAll('td');
-                if (footTds.length >= 6) {
+                if (footTds.length >= 11) {
+                    var footLabel = footTds[0].innerText.trim().replace(/[\u{1F300}-\u{1F9FF}]/gu, '');
                     footRow = [
-                        footTds[0].innerText.trim(), "", "", "", "",
+                        footLabel, "", "", "", "",
                         footTds[1].innerText.trim(),
                         footTds[2].innerText.trim(),
                         footTds[3].innerText.trim(),
                         footTds[4].innerText.trim(),
-                        footTds[5].innerText.trim()
+                        footTds[5].innerText.trim(),
+                        footTds[6].innerText.trim(),
+                        footTds[7].innerText.trim(),
+                        footTds[8].innerText.trim(),
+                        footTds[9].innerText.trim(),
+                        footTds[10].innerText.trim()
                     ];
                 }
             }
@@ -3556,20 +3896,28 @@ window.applyHeaderReaderFilter = function() {
             var doc = new window.jspdf.jsPDF('l', 'pt', 'a4');
             var pageWidth = doc.internal.pageSize.width;
 
-            doc.setFontSize(16); doc.setTextColor(30, 58, 138); doc.setFont("Helvetica", "bold");
-            doc.text("Date-Wise Meter Reader Attendance & Working Hours Report", pageWidth / 2, 38, { align: 'center' });
+            var isSingleReaderMode = rows.length > 0 && rows[0][0].startsWith("Date:");
+            var headerTitle = isSingleReaderMode 
+                ? "Single Meter Reader Day-Wise Visit & Working Hours Report"
+                : "Date-Wise Meter Reader Attendance & Working Hours Report";
 
-            doc.setFontSize(9.5); doc.setTextColor(71, 85, 105); doc.setFont("Helvetica", "normal");
-            doc.text("Period: " + datePeriodStr + "  |  Filter: " + modeLabel + "  |  Total Readers: " + rows.length, 40, 55);
+            doc.setFontSize(15); doc.setTextColor(30, 58, 138); doc.setFont("Helvetica", "bold");
+            doc.text(headerTitle, pageWidth / 2, 35, { align: 'center' });
+
+            doc.setFontSize(9); doc.setTextColor(71, 85, 105); doc.setFont("Helvetica", "normal");
+            doc.text("Period: " + datePeriodStr + "  |  Filter: " + modeLabel + "  |  Total Rows: " + rows.length, 30, 50);
+
+            // 🎯 FIX 2: कॉलम 0 (तारीख/नाम) की चौड़ाई बढ़ाना ताकि टेक्स्ट कट या चिपके नहीं
+            var firstColWidth = isSingleReaderMode ? 145 : 120;
 
             var autoTableConfig = {
-                head: [["Meter Reader Name", "Status", "First Visit", "Last Visit", "Total Hours", "Total Visit", "Main MRI", "Main Exc", "Pole MRI", "Pole Exc"]],
+                head: [["Date / Meter Reader Name", "Status", "First Visit", "Last Visit", "Total Hours", "Today Visit", "VisiT Pending", "Main MRI", "Main LS %", "No LS Main", "Main Exc", "Pole MRI", "Pole LS %", "No LS Pole", "Pole Exc"]],
                 body: rows,
-                startY: 68,
+                startY: 60,
                 theme: 'grid',
-                styles: { fontSize: 8, cellPadding: 4, halign: 'center', textColor: [15, 23, 42] },
-                headStyles: { fillColor: [30, 58, 138], textColor: [255, 255, 255], fontStyle: 'bold', halign: 'center' },
-                columnStyles: { 0: { halign: 'left', fontStyle: 'bold', cellWidth: 110 } },
+                styles: { fontSize: 7.5, cellPadding: 3.5, halign: 'center', textColor: [15, 23, 42] },
+                headStyles: { fillColor: [30, 58, 138], textColor: [255, 255, 255], fontStyle: 'bold', halign: 'center', fontSize: 8 },
+                columnStyles: { 0: { halign: 'left', fontStyle: 'bold', cellWidth: firstColWidth } },
                 didParseCell: function(data) {
                     if (data.section === 'body') {
                         var visitVal = data.row.raw[5];
@@ -3605,7 +3953,7 @@ window.applyHeaderReaderFilter = function() {
                 doc.save(filename);
             }
             
-            showThinAlert("🎉 Date Report PDF डाउनलोड हो गई!", true);
+            showThinAlert("🎉 Date Report PDF सफलतापूर्वक डाउनलोड हो गई!", true);
         } catch(pdfErr) {
             console.error("PDF Export Crash:", pdfErr);
             showThinAlert("🚨 PDF बनाने में त्रुटि हुई!", true);
@@ -3702,9 +4050,15 @@ window.applyHeaderReaderFilter = function() {
         viewHistoryStack = [];
         if(loggedInReader) { localStorage.removeItem("app_current_form_item_" + loggedInReader); localStorage.removeItem("app_active_report_type_ctx_" + loggedInReader); }
         
-        // 🚀 Sidebar और Header में नाम अपडेट करना (सुरक्षित तरीके से)
+        // 🌅 समय अनुसार ग्रीटिंग्स इंजन (Greetings Engine)
+        var hr = new Date().getHours();
+        var greeting = "शुभ प्रभात ☀️";
+        if(hr >= 12 && hr < 17) greeting = "नमस्कार/गुड आफ्टरनून 🌤️";
+        else if(hr >= 17) greeting = "गुड इवनिंग 🌙";
+
+        // 🚀 Sidebar और Header में नाम + ग्रीटिंग अपडेट करना
         var welcomeNode = document.getElementById('welcomeTxt');
-        if(welcomeNode) welcomeNode.innerText = "Mr Name: " + toTitleProperCase(loggedInReader); 
+        if(welcomeNode) welcomeNode.innerText = greeting + " | " + toTitleProperCase(loggedInReader); 
         
         var sidebarName = document.getElementById('sidebarMrName');
         if(sidebarName) sidebarName.innerText = toTitleProperCase(loggedInReader);
@@ -3724,12 +4078,19 @@ window.applyHeaderReaderFilter = function() {
             
             // 🎯 चूंकि बटन सीधे HTML में एडमिन सेक्शन के अंदर सेट है, इसलिए यहाँ सिर्फ उसे विज़िबल (On) करना है
             if(visitTabBtn) {
-                visitTabBtn.style.setProperty("display", "flex", "important");
-            }
+            visitTabBtn.style.setProperty("display", "flex", "important");
         }
-        
-        navigateToViewRaw('appDashboardView');
     }
+    
+    navigateToViewRaw('appDashboardView');
+
+    // 🚀 डैशबोर्ड लॉन्च होते ही स्वचालित चेक करें कि क्या इस समय स्लॉट में बैनर दिखाना है
+    setTimeout(function() {
+        if (typeof openLoadSurveyBanner === "function") {
+            openLoadSurveyBanner(false);
+        }
+    }, 1200);
+}
 
     // ⚡ ULTRA-FAST SEARCH ENGINE (INDEXEDDB MEMORY CACHE CONTEXT)
 var appSearchDatabaseCache = null; // बार-बार DB लोड होने से रोकने के लिए ग्लोबल कैशे
@@ -3772,19 +4133,25 @@ function universalListSearch(inputId, containerId) {
             executeFastCacheSearch(searchKeywords, dataPool, container, containerId);
         };
 
-        if (appSearchDatabaseCache && appSearchDatabaseCache.length > 0) {
+        if (globalReportsDatabaseCache && globalReportsDatabaseCache.length > 0) {
+            searchAction(globalReportsDatabaseCache);
+        } else if (appSearchDatabaseCache && appSearchDatabaseCache.length > 0) {
             searchAction(appSearchDatabaseCache);
         } else {
-            if(!db) return;
-            var tx = db.transaction("consumers", "readonly");
-            var store = tx.objectStore("consumers");
-            var req = store.getAll();
-            req.onsuccess = function(e) {
-                appSearchDatabaseCache = e.target.result || [];
-                searchAction(appSearchDatabaseCache);
-            };
+            if (!db) return;
+            try {
+                var tx = db.transaction("consumers", "readonly");
+                var store = tx.objectStore("consumers");
+                var req = store.getAll();
+                req.onsuccess = function(e) {
+                    appSearchDatabaseCache = e.target.result || [];
+                    searchAction(appSearchDatabaseCache);
+                };
+            } catch (err) {
+                console.error("Transaction error during search:", err);
+            }
         }
-    }, 120); // 120ms Debounce से टाइपिंग के दौरान ऐप अटकेगा नहीं // डिले को घटाकर १०ms किया ताकि वैल्यू पेस्ट होते ही बिना गायब हुए लॉक हो जाए
+    }, 50); // 50ms Debounce तेजी से रेस्पॉन्स के लिए // 120ms Debounce से टाइपिंग के दौरान ऐप अटकेगा नहीं // डिले को घटाकर १०ms किया ताकि वैल्यू पेस्ट होते ही बिना गायब हुए लॉक हो जाए
 }
 
 // ⚡ सुपर-फास्ट कैशे डीप सर्च ड्राइवर (उपभोक्ता के सम्पूर्ण अंदरूनी डेटाबेस से मिलान)
@@ -4120,7 +4487,8 @@ function updateSearchBadgeCount(containerId, visibleCount, isLocked) {
         
         // 🎯 [डेटा लॉस सुरक्षा]: अगर पुराना कोई ड्राफ्ट इस उपभोक्ता का सेव्ड है तो उसे ऑटो-फ़िल करें
         try {
-            var draftKey = "form_draft_" + accNo;
+            var currentAccNo = accountNo || (record ? record.accountNo : "");
+            var draftKey = "form_draft_" + currentAccNo;
             var savedDraft = localStorage.getItem(draftKey);
             if (savedDraft) {
                 var draftObj = JSON.parse(savedDraft);
@@ -4132,7 +4500,6 @@ function updateSearchBadgeCount(containerId, visibleCount, isLocked) {
                     document.getElementById('f-receiverMobile').value = draftObj.recMobile || "";
             }
             
-            // लाइव ड्राफ्ट ट्रैकर एक्टिवेट करें
             var trackDraft = function() {
                 var currentDraft = {
                     remark: document.getElementById('f-editablePrefetchedRemark') ? document.getElementById('f-editablePrefetchedRemark').value : "",
@@ -4142,11 +4509,10 @@ function updateSearchBadgeCount(containerId, visibleCount, isLocked) {
                 localStorage.setItem(draftKey, JSON.stringify(currentDraft));
             };
             
-            // इवेंट्स बाइंड करें
             if(document.getElementById('f-editablePrefetchedRemark')) document.getElementById('f-editablePrefetchedRemark').oninput = trackDraft;
             if(document.getElementById('f-billReceiverName')) document.getElementById('f-billReceiverName').oninput = trackDraft;
             if(document.getElementById('f-receiverMobile')) document.getElementById('f-receiverMobile').oninput = trackDraft;
-        } catch(e) { console.log("Draft engine initialized"); }
+        } catch(e) { console.log("Draft engine error bypassed", e); }
     };
 }
 
@@ -7317,17 +7683,14 @@ function triggerSilentBackgroundSync() {
         var tx = db.transaction("consumers", "readonly");
         var req = tx.objectStore("consumers").getAll();
         
-        // 🚀 सिंटैक्स एरर फिक्स: एरे लूप का क्लोजिंग ब्रैकेट (}); सही ढंग से बंद किया गया
-        // 🚀 सिंटैक्स एरर फिक्स: फालतू एक्स्ट्रा '}' ब्रैकेट को पूरी तरह हटाकर एरे लूप को क्लोज किया गया
-        // 🚀 सिंटैक्स एरर फिक्स: एक्स्ट्रा बचे हुए '}' को पूरी तरह हटाकर सिंटैक्स बैलेंस्ड किया गया
         req.onsuccess = function(e) {
             var allConsumers = e.target.result || [];
             allConsumers.forEach(function(item) {
                 var rn = getReaderName(item);
-                if(rn && rn.toUpperCase() === readerName.toUpperCase()) {
+                if (rn && rn.toUpperCase() === readerName.toUpperCase()) {
                     var rStatus = item["ATTEND STATUS"] ? item["ATTEND STATUS"].toString().toUpperCase() : "";
                     var isDone = item.isDone === true || item.isDone === "true" || rStatus === "ATTEND" || rStatus === "DONE";
-                    if(!isDone) {
+                    if (!isDone) {
                         readerData.push(item);
                     }
                 }
@@ -7684,8 +8047,61 @@ function quickViewNavigate(direction) {
         }
     }, 1000);
 </script>
-<div id="quickViewModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15, 23, 42, 0.75); z-index:99999; align-items:center; justify-content:center; backdrop-filter:blur(4px); box-sizing: border-box; padding: 10px;">
-    <div id="qvSwipeBox" style="background:#ffffff; width:100%; max-width:480px; height:90vh; max-height:92vh; display:flex; flex-direction:column; border-radius:16px; position:relative; padding:20px 24px 30px 24px; box-shadow:0 25px 50px -12px rgba(0,0,0,0.3); transition: transform 0.2s; box-sizing: border-box;">
+<!-- 📊 फुल-स्क्रीन लोड सर्वे बैनर मॉडुल -->
+<div id="loadSurveyBannerModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15, 23, 42, 0.85); z-index:999999; align-items:center; justify-content:center; backdrop-filter:blur(8px); padding: 15px; box-sizing: border-box;">
+    <div style="background: var(--theme-card-bg, #ffffff); width:100%; max-width:480px; max-height:85vh; border-radius:20px; padding:20px; box-shadow:0 25px 50px -12px rgba(0,0,0,0.5); border:1px solid rgba(255,255,255,0.2); position:relative; display:flex; flex-direction:column; overflow:hidden;">
+        
+        <!-- ऊपरी क्लोज़ (✕) बटन -->
+        <button onclick="closeLoadSurveyBanner()" style="position:absolute; top:15px; right:15px; background:#ef4444; border:none; color:white; border-radius:50%; width:32px; height:32px; font-size:16px; font-weight:bold; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 10px rgba(239,68,68,0.4); z-index:10;">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+
+        <!-- बैनर हेडर -->
+        <div style="text-align:center; margin-bottom:15px; border-bottom:2px solid var(--theme-table-border, #e2e8f0); padding-bottom:10px;">
+            <div style="font-size:16px; font-weight:900; color:var(--theme-heading, #0f172a); text-transform:uppercase; letter-spacing:0.5px;">
+                <i class="fa-solid fa-chart-line" style="color:#3b82f6;"></i> मेन मीटर लोड सर्वे विश्लेषण
+            </div>
+            <div style="font-size:11px; color:#64748b; font-weight:700; margin-top:3px;">
+                उच्चतम एवं न्यूनतम लोड सर्वे % वाले मीटर रीडर्स
+            </div>
+        </div>
+
+        <!-- मुख्य स्क्रॉलेबल कंटेंट क्षेत्र -->
+        <div style="overflow-y:auto; flex:1; padding-right:4px;">
+            
+            <!-- 🏆 उच्चतम लोड सर्वे % (Top Performers) -->
+            <div style="background:linear-gradient(135deg, #f0fdf4, #dcfce7); border:1px solid #86efac; border-left:5px solid #22c55e; border-radius:12px; padding:12px; margin-bottom:12px;">
+                <div style="font-size:12px; font-weight:900; color:#166534; text-transform:uppercase; margin-bottom:8px; display:flex; align-items:center; gap:6px;">
+                    🏆 उच्चतम लोड सर्वे % (Top Performers)
+                </div>
+                <div id="bannerTopLoadSurveyList" style="font-size:12px; font-weight:700; color:#1e293b;">
+                    लोड हो रहा है...
+                </div>
+            </div>
+
+            <!-- ⚠️ न्यूनतम लोड सर्वे % (Lower Performers) -->
+            <div style="background:linear-gradient(135deg, #fef2f2, #fee2e2); border:1px solid #fca5a5; border-left:5px solid #ef4444; border-radius:12px; padding:12px; margin-bottom:12px;">
+                <div style="font-size:12px; font-weight:900; color:#b91c1c; text-transform:uppercase; margin-bottom:8px; display:flex; align-items:center; gap:6px;">
+                    ⚠️ न्यूनतम लोड सर्वे % (Lower Performers)
+                </div>
+                <div id="bannerPoorLoadSurveyList" style="font-size:12px; font-weight:700; color:#1e293b;">
+                    लोड हो रहा है...
+                </div>
+            </div>
+
+        </div>
+
+        <!-- नीचे का मुख्य "बंद करें" बटन -->
+        <div style="margin-top:15px; text-align:center;">
+            <button onclick="closeLoadSurveyBanner()" class="btn" style="background: linear-gradient(90deg, #1e40af, #1d4ed8) !important; margin-bottom:0; font-size:13px; padding:10px; border-radius:10px;">
+                <i class="fa-solid fa-circle-check"></i> बंद करें
+            </button>
+        </div>
+    </div>
+</div>
+
+<div id="quickViewModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15, 23, 42, 0.65); z-index:99999; align-items:center; justify-content:center; backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); box-sizing: border-box; padding: 10px;">
+    <div id="qvSwipeBox" style="background:rgba(255, 255, 255, 0.95); backdrop-filter:blur(16px); width:100%; max-width:480px; height:90vh; max-height:92vh; display:flex; flex-direction:column; border-radius:22px; position:relative; padding:20px 24px 30px 24px; box-shadow:0 30px 60px -12px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.4); transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); box-sizing: border-box;">
         
         <button onclick="document.getElementById('quickViewModal').style.display='none'" style="position:absolute; top:12px; right:12px; background:#ef4444; border:2px solid #fff; color:white; border-radius:50%; width:32px; height:32px; font-size:14px; cursor:pointer; box-shadow:0 4px 10px rgba(239,68,68,0.3); z-index:15; display:flex; align-items:center; justify-content:center;"><i class="fa-solid fa-xmark"></i></button>
 
@@ -7694,7 +8110,7 @@ function quickViewNavigate(direction) {
         <div id="quickViewContent" style="display:grid; grid-template-columns:85px minmax(0, 1fr); gap:12px 10px; align-items:start; margin-bottom:10px; overflow-y:auto; flex:1; padding-right:4px; box-sizing: border-box;-webkit-overflow-scrolling: touch;">
         </div>
 
-        <button id="quickViewEditBtn" onclick="" style="position:absolute; bottom:15px; right:20px; background:#10b981; color:white; border:2px solid #fff; border-radius:50%; width:48px; height:48px; font-size:18px; cursor:pointer; box-shadow:0 6px 15px rgba(16,185,129,0.4); z-index:15; display:flex; align-items:center; justify-content:center;" title="Edit Offline Form"><i class="fa-solid fa-pen-to-square"></i></button>
+        <button id="quickViewEditBtn" style="position:absolute; bottom:15px; right:20px; background:#10b981; color:white; border:2px solid #fff; border-radius:50%; width:48px; height:48px; font-size:18px; cursor:pointer; box-shadow:0 6px 15px rgba(16,185,129,0.4); z-index:15; display:flex; align-items:center; justify-content:center;" title="Edit Offline Form"><i class="fa-solid fa-pen-to-square"></i></button>
 
         <button onclick="quickViewNavigate(-1)" style="position:absolute; top:50%; left:6px; transform:translateY(-50%); background:rgba(245,158,11,0.95); color:#fff; border:2px solid #fff; border-radius:50%; width:36px; height:30px; font-size:14px; cursor:pointer; box-shadow:0 4px 8px rgba(0,0,0,0.15); z-index:15; display:flex; align-items:center; justify-content:center;"><i class="fa-solid fa-chevron-left"></i></button>
         <button onclick="quickViewNavigate(1)" style="position:absolute; top:50%; right:6px; transform:translateY(-50%); background:rgba(245,158,11,0.95); color:#fff; border:2px solid #fff; border-radius:50%; width:36px; height:30px; font-size:14px; cursor:pointer; box-shadow:0 4px 8px rgba(0,0,0,0.15); z-index:15; display:flex; align-items:center; justify-content:center;"><i class="fa-solid fa-chevron-right"></i></button>
@@ -8085,44 +8501,7 @@ document.addEventListener("DOMContentLoaded", function() {
     setTimeout(function() { clearInterval(supremeBannerKillTimer); }, 6000);
 });// 🟢 फिक्स: टेक्स्ट बॉक्स के डेटा को 100% सटीक और क्रैश-प्रूफ शीट कंडीशन में बदलने वाला एडवांस इंजन
     // 🟢 फिक्स: टेक्स्ट बॉक्स के डेटा को 100% सटीक और क्रैश-प्रूफ शीट कंडीशन में बदलने वाला एडवांस इंजन (डुपिलकेशन मुक्त)
-window.generateSheetConfigString = function() {
-    var inputNode = document.getElementById('cfgCustomInputTextArea');
-    var outputNode = document.getElementById('cfgGeneratedResultOutput');
-    if (!inputNode || !outputNode) return;
-    
-    var rawInput = inputNode.value.trim();
-    if (rawInput === "") {
-        outputNode.value = "";
-        alert("🚨 कृपया बॉक्स में अपनी कंडीशन्स टाइप करें!");
-        return;
-    }
-    
-    var cleanLines = rawInput.split(',').map(function(line) { 
-        var str = line.trim();
-        if (str.indexOf('=') !== -1) {
-            var operator = str.indexOf('!=') !== -1 ? "!=" : "=";
-            var parts = str.split(operator);
-            
-            if (parts.length === 2) {
-                var key = parts[0].trim();
-                var val = parts[1].trim();
-                if (val.indexOf('|') !== -1) {
-                    val = val.split('|').map(function(v) { return v.trim(); }).join('|');
-                }
-                return key + operator + val;
-            }
-        }
-        return str;
-    }).filter(function(line) { 
-        return line !== ""; 
-    });
-    
-    var finalCodeString = cleanLines.join(",");
-    outputNode.value = finalCodeString;
-    if(typeof showThinAlert === 'function') {
-        showThinAlert("🚀 कोड सफलतापूर्वक जनरेट हो गया है!", true);
-    }
-};
+// Duplicate block removed to prevent scope collision.
     // 📊 वैश्विक चार्ट इंस्टेंस होल्डर्स (3 स्प्लिट आसान इंजन)
 var chartInstanceMainMeter = null;
 var chartInstancePoleMeter = null;
@@ -8180,14 +8559,28 @@ function renderAnalyticsDashboardEngine() {
                 m.done++;
             }
 
-            // 🎯 चार्ट ट्रैकिंग: रीयल-टाइम पेंडेंसी वेरिएबल्स कैलकुलेशन
+            // 🎯 नया लोड सर्वे एवं MRI लॉजिक (True / False / Blank Handling)
+            var isMainMriTrue = parseTrue(getRobustKey(item, "IS MRI AVAILABLE (MAIN METER)")) || parseTrue(item.mriAvailableMain);
+            var isMainLsTrue  = parseTrue(getRobustKey(item, "IS LOAD SURVAY AVAILBLE (MAIN Mtr)")) || parseTrue(item.surveyAvailableMain);
+
+            var isPoleMriTrue = parseTrue(getRobustKey(item, "IS MRI AVAILABLE (POLE METER)")) || parseTrue(item.mriAvailablePole);
+            var isPoleLsTrue  = parseTrue(getRobustKey(item, "IS LOAD SURVAY AVAILBLE (Pole Mtr)")) || parseTrue(item.surveyAvailablePole);
+
+            // No Load Survey Main: MRI True होना चाहिए और Load Survey False या Blank/Empty होना चाहिए
+            if (isMainMriTrue && !isMainLsTrue) {
+                m.mainLsPnd++;
+            }
+
+            // No Load Survey Pole: MRI True होना चाहिए और Load Survey False या Blank/Empty होना चाहिए
+            if (isPoleMriTrue && !isPoleLsTrue) {
+                m.poleLsPnd++;
+            }
+
             if (!parseTrue(item.isDone) && rStatus !== "ATTEND") {
                 if (parseTrue(item.isMainMeterMriPending)) m.mainMriPnd++;
-                if (parseTrue(item.isMriButNoLoadSurveyMain)) m.mainLsPnd++;
                 if (parseTrue(item.isMainMeterFieldException)) m.mainExcPnd++;
 
                 if (parseTrue(item.isPoleMeterMriPending)) m.poleMriPnd++;
-                if (parseTrue(item.isMriButNoLoadSurveyPole)) m.poleLsPnd++;
                 if (parseTrue(item.isPoleMeterFieldException)) m.poleExcPnd++;
             }
             if (parseTrue(item.isBilledButNoBillAvailable) || parseTrue(item.isBillAvailableButPrintPending)) m.billPnd++;
@@ -8370,11 +8763,11 @@ function renderAnalyticsDashboardEngine() {
             }
         };
 
-        // १. मेन मीटर चार्ट
+        // १. मेन मीटर चार्ट (Updated UI Label: No Load Survey Main)
         chartInstanceMainMeter = new Chart(document.getElementById('chartMainMeterAnalytics'), {
             type: 'doughnut', 
             data: { 
-                labels: ['MRI Pending', 'LS Pending', 'Field Exception'], 
+                labels: ['MRI Pending', 'No Load Survey Main', 'Field Exception'], 
                 datasets: [{ 
                     data: [sumArray(mainMriArr), sumArray(mainLsArr), sumArray(mainExcArr)], 
                     backgroundColor: ['#6366f1', '#ec4899', '#f59e0b'] 
@@ -8383,11 +8776,11 @@ function renderAnalyticsDashboardEngine() {
             options: { ...perfectChartOptions, plugins: { ...perfectChartOptions.plugins, title: { display: true, text: '⚡ MAIN METER PENDENCY BREAKUP', font: { size: 11, weight: '800' }, color: '#0f172a', padding: { bottom: 10 } } } }
         });
 
-        // २. पोल मीटर चार्ट
+        // २. पोल मीटर चार्ट (Updated UI Label: No Load Survey Pole)
         chartInstancePoleMeter = new Chart(document.getElementById('chartPoleMeterAnalytics'), {
             type: 'doughnut', 
             data: { 
-                labels: ['MRI Pending', 'LS Pending', 'Field Exception'], 
+                labels: ['MRI Pending', 'No Load Survey Pole', 'Field Exception'], 
                 datasets: [{ 
                     data: [sumArray(poleMriArr), sumArray(poleLsArr), sumArray(poleExcArr)], 
                     backgroundColor: ['#06b6d4', '#14b8a6', '#ef4444'] 
@@ -8834,8 +9227,19 @@ function updateProgressRingEngine(done, total, yestPerformersMap) {
     }
 
     if (pctText) pctText.innerText = pct + "%";
-    if (doneText) doneText.innerText = done + " / " + total + " Done";
-    if (pendingText) pendingText.innerText = "Pending: " + (total - done);
+        if (doneText) doneText.innerText = done + " / " + total + " Done";
+        if (pendingText) pendingText.innerText = "Pending: " + (total - done);
+
+        // 🎉 100% विज़िट्स कम्पलीट होने पर आतिशबाज़ी सेलिब्रेशन एलर्ट
+        if (pct === 100 && total > 0) {
+            var celebratedKey = "celebrated_100_pct_" + new Date().toDateString();
+            if (!localStorage.getItem(celebratedKey)) {
+                localStorage.setItem(celebratedKey, "true");
+                setTimeout(function() {
+                    customAlert("🎉 बधाई हो! आज की 100% विज़िट्स सफलतापूर्वक पूरी हो चुकी हैं! 🏆🌟", "🎉");
+                }, 800);
+            }
+        }
 
     // 🏆 Top & ⚠️ Poor Performers कैलकुलेशन
     if (top3Container || poor3Container) {
@@ -8852,36 +9256,53 @@ function updateProgressRingEngine(done, total, yestPerformersMap) {
 
             var yestTotalVisits = sortedPerformers.reduce(function(acc, curr){ return acc + curr.count; }, 0);
 
-            // 1. TOP 3 PERFORMERS (🥇 🥈 🥉)
+            // Restricted Keywords (ANURAG, KAPIL, GAURAV नाम या उपनाम वाले सभी यूज़र्स को हटाने के लिए)
+            var restrictedKeywords = ["ANURAG", "KAPIL", "GAURAV"];
+            var filteredPerformers = sortedPerformers.filter(function(p) {
+                var upperName = p.name.toUpperCase().trim();
+                return !restrictedKeywords.some(function(keyword) {
+                    return upperName.includes(keyword);
+                });
+            });
+
+            // 1. कल के बेहतरीन प्रदर्शन (Top 3 Performers - Hindi)
             if (top3Container) {
-                var top3 = sortedPerformers.slice(0, 3);
+                var top3 = filteredPerformers.slice(0, 3);
                 var medals = ["🥇", "🥈", "🥉"];
                 var topHtml = "";
 
-                top3.forEach(function(p, idx) {
-                    var pSharePct = yestTotalVisits > 0 ? Math.round((p.count / yestTotalVisits) * 100) : 0;
-                    topHtml += '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">' +
-                               '<span>' + medals[idx] + ' <b>' + p.name + '</b></span>' +
-                               '<span style="color:#059669; font-weight:900;">' + p.count + ' <small style="color:#64748b; font-size:9px;">(' + pSharePct + '%)</small></span>' +
-                               '</div>';
-                });
+                if (top3.length === 0) {
+                    topHtml = '<span style="color:#64748b; font-size:10px;">कोई डेटा उपलब्ध नहीं</span>';
+                } else {
+                    top3.forEach(function(p, idx) {
+                        var pSharePct = yestTotalVisits > 0 ? Math.round((p.count / yestTotalVisits) * 100) : 0;
+                        topHtml += '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">' +
+                                   '<span>' + medals[idx] + ' <b>' + p.name + '</b></span>' +
+                                   '<span style="color:#059669; font-weight:900;">' + p.count + ' <small style="color:#64748b; font-size:9px;">(' + pSharePct + '%)</small></span>' +
+                                   '</div>';
+                    });
+                }
                 top3Container.innerHTML = topHtml;
             }
 
-            // 2. POOR 3 PERFORMERS (Lowest Visits - 🚨 ⚠️ 🔻)
+            // 2. कल के कम प्रदर्शन वाले (Poor Performers - Hindi)
             if (poor3Container) {
-                var poorSorted = sortedPerformers.slice().reverse();
+                var poorSorted = filteredPerformers.slice().reverse();
                 var poor3 = poorSorted.slice(0, 3);
                 var warningIcons = ["🚨", "⚠️", "🔻"];
                 var poorHtml = "";
 
-                poor3.forEach(function(p, idx) {
-                    var pSharePct = yestTotalVisits > 0 ? Math.round((p.count / yestTotalVisits) * 100) : 0;
-                    poorHtml += '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">' +
-                                '<span>' + warningIcons[idx] + ' <b style="color:#b91c1c;">' + p.name + '</b></span>' +
-                                '<span style="color:#dc2626; font-weight:900;">' + p.count + ' <small style="color:#64748b; font-size:9px;">(' + pSharePct + '%)</small></span>' +
-                                '</div>';
-                });
+                if (poor3.length === 0) {
+                    poorHtml = '<span style="color:#64748b; font-size:10px;">कोई डेटा उपलब्ध नहीं</span>';
+                } else {
+                    poor3.forEach(function(p, idx) {
+                        var pSharePct = yestTotalVisits > 0 ? Math.round((p.count / yestTotalVisits) * 100) : 0;
+                        poorHtml += '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">' +
+                                    '<span>' + warningIcons[idx] + ' <b style="color:#b91c1c;">' + p.name + '</b></span>' +
+                                    '<span style="color:#dc2626; font-weight:900;">' + p.count + ' <small style="color:#64748b; font-size:9px;">(' + pSharePct + '%)</small></span>' +
+                                    '</div>';
+                    });
+                }
                 poor3Container.innerHTML = poorHtml;
             }
         }
@@ -8905,6 +9326,143 @@ function toggleSkeletonShimmerLoader(show) {
 // =========================================================================
 // 🎨 POINT 4: CUSTOM THEME BUILDER & DYNAMIC COLOR PICKER ENGINE
 // =========================================================================
+// 📊 स्वचालित 3-टाइम ऑटो-पॉपअप बैनर कंट्रोलर (सुबह, दोपहर, शाम)
+function openLoadSurveyBanner(isManualClick) {
+    var modal = document.getElementById('loadSurveyBannerModal');
+    if (!modal) return;
+
+    if (isManualClick === true) {
+        modal.style.setProperty("display", "flex", "important");
+        calculateAndRenderLoadSurveyData();
+        return;
+    }
+
+    // 🕒 समय और तारीख चेक इंजन (दिन में 3 बार)
+    var now = new Date();
+    var hour = now.getHours();
+    var todayKey = now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate();
+    
+    var timeSlot = "";
+    if (hour >= 5 && hour < 12) {
+        timeSlot = "MORNING";   // सुबह 5 बजे से दोपहर 12 बजे तक
+    } else if (hour >= 12 && hour < 17) {
+        timeSlot = "AFTERNOON"; // दोपहर 12 बजे से शाम 5 बजे तक
+    } else {
+        timeSlot = "EVENING";   // शाम 5 बजे से रात/सुबह तक
+    }
+
+    var storageKey = "load_survey_banner_shown_" + todayKey + "_" + timeSlot;
+    var alreadyShown = localStorage.getItem(storageKey);
+
+    if (!alreadyShown) {
+        modal.style.setProperty("display", "flex", "important");
+        calculateAndRenderLoadSurveyData();
+        localStorage.setItem(storageKey, "true");
+    }
+}
+
+function closeLoadSurveyBanner() {
+    var modal = document.getElementById('loadSurveyBannerModal');
+    if (modal) {
+        modal.style.setProperty("display", "none", "important");
+    }
+}
+
+// 📈 मेन मीटर लोड सर्वे प्रतिशत की गणना और रेंडरिंग इंजन
+function calculateAndRenderLoadSurveyData() {
+    if (!db) return;
+    
+    var topListContainer = document.getElementById('bannerTopLoadSurveyList');
+    var poorListContainer = document.getElementById('bannerPoorLoadSurveyList');
+    
+    // प्रतिबंधित नाम (Anurag Shakya, Kapil, Gaurav)
+    var restrictedNames = ["ANURAG SHAKYA", "KAPIL", "GAURAV"];
+
+    var tx = db.transaction("consumers", "readonly");
+    tx.objectStore("consumers").getAll().onsuccess = function(e) {
+        var allConsumers = e.target.result || [];
+        var readerSurveyMap = {};
+
+        allConsumers.forEach(function(item) {
+            var rName = getReaderName(item);
+            if (!rName || rName.trim() === "") return;
+            rName = rName.trim().toUpperCase();
+
+            // Restricted Keywords (ANURAG, KAPIL, GAURAV नाम या उपनाम वाले सभी यूज़र्स को हटाने के लिए)
+            var restrictedKeywords = ["ANURAG", "KAPIL", "GAURAV"];
+            if (restrictedKeywords.some(function(k) { return rName.includes(k); })) return;
+
+            if (!readerSurveyMap[rName]) {
+                readerSurveyMap[rName] = { mriCount: 0, surveyCount: 0 };
+            }
+
+            var mainRem = (getRobustKey(item, "FINAL_MAIN_METER_SITE_REMARK") || item.mainStatusRemark || "").toString().toUpperCase();
+            var hasSurvey = parseTrue(getRobustKey(item, "IS LOAD SURVAY AVAILBLE (MAIN Mtr)")) || parseTrue(item.surveyAvailableMain);
+
+            // यदि MRI हुई है
+            if (mainRem.includes("MRI DONE") || mainRem.includes("CMRI DONE")) {
+                readerSurveyMap[rName].mriCount++;
+                if (hasSurvey) {
+                    readerSurveyMap[rName].surveyCount++;
+                }
+            }
+        });
+
+        var performers = Object.keys(readerSurveyMap).map(function(name) {
+            var data = readerSurveyMap[name];
+            var pct = data.mriCount > 0 ? Math.round((data.surveyCount / data.mriCount) * 100) : 0;
+            return {
+                name: name,
+                mriCount: data.mriCount,
+                surveyCount: data.surveyCount,
+                pct: pct
+            };
+        }).filter(function(p) { return p.mriCount > 0; });
+
+        // उच्चतम % के आधार पर सॉर्ट करें
+        performers.sort(function(a, b) { return b.pct - a.pct; });
+
+        // 1. उच्चतम लोड सर्वे % (Top Performers)
+        if (topListContainer) {
+            var top3 = performers.slice(0, 3);
+            var medals = ["🥇", "🥈", "🥉"];
+            var topHtml = "";
+
+            if (top3.length === 0) {
+                topHtml = '<div style="color:#64748b; font-size:11px; text-align:center;">कोई डेटा उपलब्ध नहीं है</div>';
+            } else {
+                top3.forEach(function(p, idx) {
+                    topHtml += '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; padding-bottom: 4px; border-bottom: 1px dashed #bbf7d0;">' +
+                               '<span>' + medals[idx] + ' <b>' + p.name + '</b></span>' +
+                               '<span style="color:#15803d; font-weight:900;">' + p.pct + '% <small style="color:#64748b; font-size:10px;">(' + p.surveyCount + '/' + p.mriCount + ')</small></span>' +
+                               '</div>';
+                });
+            }
+            topListContainer.innerHTML = topHtml;
+        }
+
+        // 2. न्यूनतम लोड सर्वे % (Lower Performers)
+        if (poorListContainer) {
+            var poorSorted = performers.slice().reverse();
+            var poor3 = poorSorted.slice(0, 3);
+            var warningIcons = ["🚨", "⚠️", "🔻"];
+            var poorHtml = "";
+
+            if (poor3.length === 0) {
+                poorHtml = '<div style="color:#64748b; font-size:11px; text-align:center;">कोई डेटा उपलब्ध नहीं है</div>';
+            } else {
+                poor3.forEach(function(p, idx) {
+                    poorHtml += '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; padding-bottom: 4px; border-bottom: 1px dashed #fecdd3;">' +
+                                '<span>' + warningIcons[idx] + ' <b style="color:#b91c1c;">' + p.name + '</b></span>' +
+                                '<span style="color:#dc2626; font-weight:900;">' + p.pct + '% <small style="color:#64748b; font-size:10px;">(' + p.surveyCount + '/' + p.mriCount + ')</small></span>' +
+                                '</div>';
+                });
+            }
+            poorListContainer.innerHTML = poorHtml;
+        }
+    };
+}
+
 function openCustomColorPickerModal() {
     var modal = document.getElementById('customColorPickerModal');
     if (modal) modal.style.display = 'flex';
