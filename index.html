@@ -1087,7 +1087,7 @@
         <div id="apkErrorLogger" style="display:none; margin-top:10px; padding:10px; background:#fef2f2; border:1px solid #fca5a5; border-radius:6px; color:#b91c1c; font-size:11px; font-weight:bold; text-align:left; word-break:break-all; white-space:pre-wrap;"></div>
         <div class="app-footer-branding" style="position: relative;">
             Developed by:- Anurag Shakya | 9761414105
-            <span style="display:block; margin-top:4px; font-size:10px; color:#ef4444; font-weight:900;">V1.0.27</span>
+            <span style="display:block; margin-top:4px; font-size:10px; color:#ef4444; font-weight:900;">V1.0.28</span>
         </div>
     </div>
     
@@ -1438,7 +1438,7 @@
                                 <span id="dateReaderDropdownLabel" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">सभी रीडर सिलेक्टेड</span>
                                 <i class="fa-solid fa-chevron-down" style="font-size: 10px; margin-left: 4px;"></i>
                             </div>
-                            <div id="dateReaderCheckboxMenu" style="display: none !important; position: absolute !important; top: 100% !important; right: 0 !important; width: 220px !important; background: #ffffff !important; border: 1px solid #cbd5e1 !important; border-radius: 8px !important; padding: 8px !important; max-height: 260px !important; overflow-y: auto !important; z-index: 999999 !important; box-shadow: 0 10px 25px rgba(0,0,0,0.2) !important; margin-top: 2px !important;">
+                            <div id="dateReaderCheckboxMenu" style="display: none !important; position: absolute !important; top: 100% !important; right: 0 !important; width: 220px !important; background: #ffffff !important; border: 1px solid #cbd5e1 !important; border-radius: 8px !important; padding: 8px !important; max-height: 260px !important; overflow-y: auto !important; z-index: 9999999 !important; box-shadow: 0 10px 25px rgba(0,0,0,0.3) !important; margin-top: 2px !important; touch-action: auto !important; -webkit-overflow-scrolling: touch !important;">
                                 <div id="dateReaderCheckboxesList" style="display: flex !important; flex-direction: column !important; gap: 4px !important; width: 100% !important;"></div>
                             </div>
                         </div>
@@ -1696,7 +1696,7 @@
             
             <div style="text-align: center; margin-top: 25px; padding-top: 15px; border-top: 1px dashed #cbd5e1; color: #64748b;">
                 <div style="font-size: 12px; font-weight: bold;">Developed by: Anurag Shakya</div>
-                <div style="font-size: 11px; color: #ef4444; font-weight: 900; margin-top: 4px;">V1.0.27</div>
+                <div style="font-size: 11px; color: #ef4444; font-weight: 900; margin-top: 4px;">V1.0.28</div>
             </div>
         </div>
 
@@ -1749,7 +1749,7 @@
         <div style="width: 100%; height: 40px; clear: both; display: block !important; visibility: hidden; pointer-events: none;"></div>
         
         <div class="card" style="background: rgba(255, 255, 255, 0.7); margin-bottom: 20px; text-align: center; border: 1px dashed #cbd5e1;">
-            <div style="font-size: 11px; color: #ef4444; font-weight: 900; margin-bottom: 3px;">V1.0.27</div>
+            <div style="font-size: 11px; color: #ef4444; font-weight: 900; margin-bottom: 3px;">V1.0.28</div>
             <div style="font-size: 12px; color: #1e40af; font-weight: 800; text-transform: uppercase; margin-bottom: 5px;"><i class="fa-solid fa-user-tie"></i> <span id="welcomeTxt">Mr Name: Loading...</span></div>
             <div style="font-size: 11px; font-weight: 700; color: #475569; border-top: 1px solid #cbd5e1; padding-top: 5px;">
                 Developed by:- Er. Anurag Shakya | 9761414105
@@ -1949,7 +1949,7 @@ var COLUMNS_BILL_ADDITIONS = ["BILLED DATE", "BILL PRINT TAG", "IS BILL SEND BY 
 var REPORT_COL_MAP = {
     "DIVISION": "division", "ACCOUNT NO": "accountNo", "Consumer Type": "consumerType", "Consumer Catogary": "consumerCatogary", "Process Final": "processFinal",
     "CONSUMER-NAME": "consumerName", "ADDRESS": "address", "Master Mobile Number": "masterMobileNumber", "LOAD IN KW": "loadGroup", 
-    "LAST MONTH FINAL MM NO Executive": "lastMmNo", "LAST MONTH FINAL MM MAKE": "lastMmMake", "FINAL VISIT_DATE": "finalVisitDate",
+    "LAST MONTH FINAL MM NO.": "lastMmNo", "LAST MONTH FINAL MM MAKE": "lastMmMake", "FINAL VISIT_DATE": "finalVisitDate",
     "EXCEPTION TYPE (MAIN METER)": "mainMeterFieldException", "FINAL_MAIN_METER_SITE_REMARK": "mainStatusRemark", "REMARK": "preFetchedRemark",
     "IS MRI AVAILABLE (MAIN METER)": "mriAvailableMain", "IS LOAD SURVAY AVAILBLE (MAIN Mtr)": "surveyAvailableMain",
     "LAST MONTH FINAL PM NO.": "lastPmNo", "LAST MONTH FINAL PM MAKE": "lastPmMake", "EXCEPTION TYPE (POLE METER)": "poleMeterFieldException",
@@ -2481,16 +2481,24 @@ function executeSafeSyncAndDownloadWorkflow(onComplete) {
     var targetUserParam = (loggedInReader.toUpperCase() === "ANURAG SHAKYA") ? "ALL" : loggedInReader.toUpperCase();
     
     google.script.run.withSuccessHandler(function(bulkData) {
-        try {
-            if(bulkData && bulkData.consumers && bulkData.consumers.length > 0) {
-                var tx = db.transaction("consumers", "readwrite"); 
-                var store = tx.objectStore("consumers"); 
-                store.clear();
-                bulkData.consumers.forEach(function(item) { store.put(item); });
-                appSearchDatabaseCache = null; 
+            try {
+                if(bulkData && bulkData.consumers && bulkData.consumers.length > 0) {
+                    var tx = db.transaction("consumers", "readwrite"); 
+                    var store = tx.objectStore("consumers"); 
+                    store.clear();
+                    bulkData.consumers.forEach(function(item) { store.put(item); });
+                    appSearchDatabaseCache = null; 
 
-                tx.oncomplete = function() {
-                    if(bulkData && bulkData.reportConfigs) {
+                    // 🛡️ FIX: यदि मोबाइल स्टोरेज फुल होने से DB फेल हो जाए तो सिस्टम लॉक न हो
+                    tx.onerror = function(err) {
+                        isDownloadingMasterData = false;
+                        showThinAlert("🚨 डेटाबेस एरर (मेमोरी फुल या क्रैश)।", true);
+                        if(onComplete) onComplete();
+                    };
+
+                    tx.oncomplete = function() {
+                      try {
+                        if(bulkData && bulkData.reportConfigs) {
                         var parsedConfigs = bulkData.reportConfigs;
                         if (typeof parsedConfigs === "string") {
                             try { parsedConfigs = JSON.parse(parsedConfigs); } catch(e) { console.error("Config parse err", e); }
@@ -2529,26 +2537,31 @@ function executeSafeSyncAndDownloadWorkflow(onComplete) {
                     }
                     
                     if(document.getElementById('formView').style.display !== "block") {
-                        refreshActiveDataViews();
-                    } else {
-                        updateSummaryStatsRaw(); 
-                    }
-                    
-                    isDownloadingMasterData = false;
-                    
-                    if(loggedInReader) {
-                        try {
-                            google.script.run
-                                .withSuccessHandler(function(){ console.log("Download time logged."); })
-                                .withFailureHandler(function(e){ console.error("Download log failed silently", e); })
-                                .updateReaderLastDownload(loggedInReader.toUpperCase());
-                        } catch(e) { console.error("Download log setup failed", e); }
-                    }
+                refreshActiveDataViews();
+            } else {
+                updateSummaryStatsRaw(); 
+            }
+            
+            if(loggedInReader) {
+                try {
+                    google.script.run
+                        .withSuccessHandler(function(){ console.log("Download time logged."); })
+                        .withFailureHandler(function(e){ console.error("Download log failed silently", e); })
+                        .updateReaderLastDownload(loggedInReader.toUpperCase());
+                } catch(e) { console.error("Download log setup failed", e); }
+            }
 
-                    // 🎯 🔒 सफलता का संदेश आने पर ही बैनर बदला जाएगा और 4 सेकंड बाद खुद गायब होगा
-                    showThinAlert("🎉 Master Data Downloaded Successfully!", true);
-                    if(onComplete) onComplete();
-                };
+            showThinAlert("🎉 Master Data Downloaded Successfully!", true);
+            
+            } catch(uiErr) {
+                console.error("UI Update Error after DB Sync:", uiErr);
+                showThinAlert("🚨 UI अपडेट में त्रुटि।", true);
+            } finally {
+                // 🛡️ FIX: चाहे जो हो जाए, लोडिंग बैनर और फ्लैग को हटाना अनिवार्य है (यह ऐप को अटकने नहीं देगा)
+                isDownloadingMasterData = false;
+                if(onComplete) onComplete();
+            }
+        };
             } else { 
                 isDownloadingMasterData = false;
                 showThinAlert("⚠️ डेटा प्राप्त नहीं हुआ या खाली है!", true);
@@ -7434,6 +7447,10 @@ function exportAllMRSummaryPDF() {
         
         entryData.mainMeterStatus = mainStatus; 
         entryData.editablePrefetchedRemark = editableRem; 
+        
+        // ✅ ऐप्स स्क्रिप्ट के सेफ़-अपडेट के साथ सिंक करने के लिए
+        entryData.mainStatusRemark = mainStatus;
+        entryData.poleStatusRemark = poleStatus;
         
         if(mainStatus === "Cmri Done" || mainStatus === "Communication Error" || mainStatus === "Meter Lead/Sensor Faulty" || mainStatus === "Single Phase Meter" || mainStatus === "China Meter/Sem I-Electronic Meter/Electro Mechnical Meter") {
             if(!document.getElementById('f-kwh').value) return customAlert("🚨 कृपया 'वर्तमान KWH रीडिंग' दर्ज करें!");
