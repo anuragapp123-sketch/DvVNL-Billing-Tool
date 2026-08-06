@@ -5,7 +5,7 @@
 <script>
   (function() {
     // ⚠️ अपना नया Deployment URL यहाँ पेस्ट करें
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbypQAt2oQhV7Zmv_MJGijBRmXO_RsrEXhdRyy16GAZJPsk-RTx_OT6xsLdCk8GfUDFXmA/exec";
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxGeTs7AS1evockOW_aBeiXy_WObmK-Fp4Kfr8Qwp1zeP-5fLcrmoBDCD-Fd2cbdcRyRA/exec";
 
     function createHandler(successCallback, failureCallback) {
       return new Proxy({}, {
@@ -1307,13 +1307,12 @@
 
             <!-- 📊 सब-व्यू 1: डैशबोर्ड (हाई-इम्पैक्ट प्रीमियम लेआउट) -->
 <div id="sub-view-cards" style="display: block;">
-    
-    <!-- 📄 कलरफुल डैशबोर्ड PDF डाउनलोड बटन -->
-    <div style="display: flex; justify-content: flex-end; margin-bottom: 10px;">
-        <button onclick="downloadColorfulDashboardPDF()" class="btn pdf-bg" style="width: auto; padding: 8px 16px; font-size: 11.5px; font-weight: 800; border-radius: 8px; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 10px rgba(220,38,38,0.25); margin-bottom: 0;" title="स्क्रीन जैसा कलरफुल PDF डाउनलोड करें">
-            <i class="fa-solid fa-file-pdf" style="font-size: 14px;"></i> Download Colorful Dashboard PDF
-        </button>
-    </div>
+    <!-- 📄 केवल कलरफुल डैशबोर्ड PDF का आइकॉन बटन -->
+<div style="display: flex; justify-content: flex-end; margin-bottom: 10px;">
+    <button onclick="downloadColorfulDashboardPDF()" class="btn pdf-bg" style="width: 40px; height: 38px; padding: 0; display: inline-flex; align-items: center; justify-content: center; border-radius: 8px; box-shadow: 0 4px 10px rgba(220,38,38,0.25); margin-bottom: 0;" title="Download Colorful Dashboard PDF">
+        <i class="fa-solid fa-file-pdf" style="font-size: 16px;"></i>
+    </button>
+</div>
                 <!-- 🚀 8 तारीख मासिक टारगेट और रेड अलर्ट बैनर कार्ड -->
                 <div id="monthlyTargetBannerBox" style="width: 100%; margin-bottom: 12px; box-sizing: border-box;"></div>
 
@@ -1979,21 +1978,21 @@ var REPORT_NAMES = { 'main_mri_pending': '1. Main Meter MRI Pending', 'pole_mri_
         return pad(d.getDate()) + "/" + pad(d.getMonth()+1) + "/" + d.getFullYear() + " " + pad(d.getHours()) + ":" + pad(d.getMinutes());
     }
 
-    // ⏳ डिवाइस के हिसाब से डायनामिक टाइमिंग चेक (कंप्यूटर: 15 मिनट, मोबाइल: 7 मिनट)
-    document.addEventListener("visibilitychange", function() {
-        if (document.visibilityState === 'visible' && navigator.onLine && loggedInReader) {
-            var lastSyncMs = localStorage.getItem("last_sync_time_ms_" + loggedInReader);
-            var timeDiff = lastSyncMs ? (new Date().getTime() - parseInt(lastSyncMs)) : Infinity;
-            
-            // चेक करें कि यूजर डेस्कटॉप मोड पर है या नहीं
-            var isDesktopMode = window.innerWidth > 768 || document.body.classList.contains('desktop-force');
-            var allowedTimeGap = isDesktopMode ? (15 * 60 * 1000) : (7 * 60 * 1000); // कंप्यूटर: 15 min, मोबाइल: 7 min
-            
-            if (timeDiff > allowedTimeGap) {
-                triggerSilentBackgroundDataDownload(null, false); 
-            }
+    // ⏳ डिवाइस के हिसाब से डायनामिक टाइमिंग चेक (कंप्यूटर: 4 घंटे, मोबाइल: 1 घंटा)
+document.addEventListener("visibilitychange", function() {
+    if (document.visibilityState === 'visible' && navigator.onLine && loggedInReader) {
+        var lastSyncMs = localStorage.getItem("last_sync_time_ms_" + loggedInReader);
+        var timeDiff = lastSyncMs ? (new Date().getTime() - parseInt(lastSyncMs)) : Infinity;
+        
+        // चेक करें कि यूजर डेस्कटॉप मोड पर है या नहीं
+        var isDesktopMode = window.innerWidth > 768 || document.body.classList.contains('desktop-force');
+        var allowedTimeGap = isDesktopMode ? (4 * 60 * 60 * 1000) : (1 * 60 * 60 * 1000); // कंप्यूटर: 4 hours, मोबाइल: 1 hour
+        
+        if (timeDiff > allowedTimeGap) {
+            triggerSilentBackgroundDataDownload(null, false); 
         }
-    });
+    }
+});
 
     window.getReaderName = function(item) {
     if (!item) return ""; 
@@ -2243,16 +2242,16 @@ var REPORT_NAMES = { 'main_mri_pending': '1. Main Meter MRI Pending', 'pole_mri_
             } else { 
                 document.getElementById('appSplashScreen').style.display = "none";
                 
-                // ⏳ ऐप रीस्टोर होने पर डायनामिक डिफरेंस चेक (कंप्यूटर: 15 मिनट, मोबाइल: 7 मिनट)
-                var lastSyncMs = localStorage.getItem("last_sync_time_ms_" + loggedInReader);
-                var timeDiff = lastSyncMs ? (new Date().getTime() - parseInt(lastSyncMs)) : Infinity;
-                
-                var isDesktopMode = window.innerWidth > 768 || document.body.classList.contains('desktop-force');
-                var allowedTimeGap = isDesktopMode ? (15 * 60 * 1000) : (7 * 60 * 1000);
-                
-                if(timeDiff > allowedTimeGap) { 
-                    executeSafeSyncAndDownloadWorkflow();
-                }
+                // ⏳ ऐप रीस्टोर होने पर डायनामिक डिफरेंस चेक (कंप्यूटर: 4 घंटे, मोबाइल: 1 घंटा)
+var lastSyncMs = localStorage.getItem("last_sync_time_ms_" + loggedInReader);
+var timeDiff = lastSyncMs ? (new Date().getTime() - parseInt(lastSyncMs)) : Infinity;
+
+var isDesktopMode = window.innerWidth > 768 || document.body.classList.contains('desktop-force');
+var allowedTimeGap = isDesktopMode ? (4 * 60 * 60 * 1000) : (1 * 60 * 60 * 1000); // कंप्यूटर: 4 hours, मोबाइल: 1 hour
+
+if(timeDiff > allowedTimeGap) { 
+    executeSafeSyncAndDownloadWorkflow();
+}
             }
         } else {
             document.getElementById('appSplashScreen').style.display = "none";
@@ -3374,7 +3373,7 @@ window.applyHeaderReaderFilter = function() {
             var dateSelectAll = document.getElementById('dateReaderSelectAll');
             var isAllDateReaders = (!dateSelectAll || dateSelectAll.checked || dateCbs.length === 0 || selectedDateReaders.length === masterReadersList.size);
 
-            var restrictedKeywords = ["ANURAG", "KAPIL", "GAURAV"];
+            var restrictedKeywords = ["ANURAG", "KAPIL", "GAURAV", "GIRISH", "GREESH"];
 
             // =========================================================================
             // 🎯 MODE 1: SINGLE METER READER SELECTED ➔ SHOW DAY-BY-DAY BREAKDOWN
@@ -3933,7 +3932,7 @@ window.applyHeaderReaderFilter = function() {
                 rName = rName.replace(/[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu, 'Date: ').trim();
                 rName = rName.replace(/^📅\s*/, 'Date: ');
 
-                var restrictedKeywords = ["ANURAG", "KAPIL", "GAURAV"];
+                var restrictedKeywords = ["ANURAG", "KAPIL", "GAURAV", "GIRISH", "GREESH"];
                 var isRestricted = restrictedKeywords.some(function(k) {
                     return rName.toUpperCase().includes(k);
                 });
@@ -9415,7 +9414,7 @@ function calculateAndRenderVisitLeaderboardSection() {
     var poor3Container = document.getElementById('yestPoor3PerformersList');
     if (!top3Container && !poor3Container) return;
 
-    var restrictedKeywords = ["ANURAG", "KAPIL", "GAURAV"];
+    var restrictedKeywords = ["ANURAG", "KAPIL", "GAURAV", "GIRISH", "GREESH"];
 
     var tx = db.transaction("consumers", "readonly");
     tx.objectStore("consumers").getAll().onsuccess = function(e) {
@@ -9482,7 +9481,7 @@ function calculateAndRenderVisitLeaderboardSection() {
 // ⚡ लोड सर्वे विश्लेषण - पूरे डिस्कॉम के सभी मीटर रीडर्स का डेटाबेस स्कैन
 function renderLoadSurveyDashboardSection() {
     if (!db) return;
-    var restrictedKeywords = ["ANURAG", "KAPIL", "GAURAV"];
+    var restrictedKeywords = ["ANURAG", "KAPIL", "GAURAV", "GIRISH", "GREESH"];
 
     var tx = db.transaction("consumers", "readonly");
     tx.objectStore("consumers").getAll().onsuccess = function(e) {
@@ -9649,7 +9648,7 @@ function calculateAndRenderLoadSurveyData() {
     var poorListContainer = document.getElementById('bannerPoorLoadSurveyList');
     
     // प्रतिबंधित नाम (Anurag Shakya, Kapil, Gaurav)
-    var restrictedNames = ["ANURAG SHAKYA", "KAPIL", "GAURAV"];
+    var restrictedKeywords = ["ANURAG", "KAPIL", "GAURAV", "GIRISH", "GREESH"];
 
     var tx = db.transaction("consumers", "readonly");
     tx.objectStore("consumers").getAll().onsuccess = function(e) {
@@ -9662,7 +9661,7 @@ function calculateAndRenderLoadSurveyData() {
             rName = rName.trim().toUpperCase();
 
             // Restricted Keywords (ANURAG, KAPIL, GAURAV नाम या उपनाम वाले सभी यूज़र्स को हटाने के लिए)
-            var restrictedKeywords = ["ANURAG", "KAPIL", "GAURAV"];
+           var restrictedKeywords = ["ANURAG", "KAPIL", "GAURAV", "GIRISH", "GREESH"];
             if (restrictedKeywords.some(function(k) { return rName.includes(k); })) return;
 
             if (!readerSurveyMap[rName]) {
@@ -9797,54 +9796,56 @@ function downloadColorfulDashboardPDF() {
         return alert("🚨 html2canvas लाइब्रेरी लोड नहीं हो सकी! कृपया इंटरनेट कनेक्शन चेक करें।");
     }
 
-    showThinAlert("⏳ बड़े फ़ॉन्ट में HD डैशबोर्ड PDF बन रही है, कृपया प्रतीक्षा करें...", false);
+    showThinAlert("⏳ HD डैशबोर्ड PDF बन रही है, कृपया प्रतीक्षा करें...", false);
 
-    // 🎯 1. अस्थायी रूप से फ़ॉन्ट साइज़ और पैडिंग को बढ़ाकर HD ज़ूम देना
+    // 🎯 1. लेआउट को चौड़ा और साफ़ दिखाने के लिए अस्थायी स्टाइल (Desktop View Simulation)
     var originalStyle = dashboardElement.getAttribute("style") || "";
-    
-    // फ़ॉन्ट का आकार बढ़ाने के लिए टेम्परेरी स्टाइल लागू करना
-    dashboardElement.style.fontSize = "16px";
-    dashboardElement.style.zoom = "1.25"; // 125% ज़ूम जिससे फ़ॉन्ट काफी बड़ा और साफ़ दिखेगा
+    dashboardElement.style.width = "1400px"; // फिक्स चौड़ाई ताकि मोबाइल पर सिकुड़े नहीं
+    dashboardElement.style.maxWidth = "none";
+    dashboardElement.style.fontSize = "15px";
 
     // स्क्रीन कैप्चर ऑप्शंस (High Resolution HD Capture)
     var options = {
-        scale: 2, // 2x High-Density Pixel Scale
+        scale: 3, // 3x High-Density Pixel Scale (फटने से बचाने के लिए)
         useCORS: true,
         allowTaint: true,
         backgroundColor: '#f8fafc',
-        logging: false
+        logging: false,
+        windowWidth: 1400
     };
 
     html2canvas(dashboardElement, options).then(function(canvas) {
-        // 🎯 कैप्चर पूरा होने के तुरंत बाद स्टाइल वापस ओरिजिनल कर दें ताकि स्क्रीन का यूआई न बिगड़े
+        // 🎯 कैप्चर पूरा होने के तुरंत बाद स्टाइल वापस ओरिजिनल कर दें
         dashboardElement.setAttribute("style", originalStyle);
 
         try {
-            var imgData = canvas.toDataURL('image/jpeg', 1.0);
+            var imgData = canvas.toDataURL('image/jpeg', 0.98);
             
-            // A3 / A4 बड़े फॉर्मेट में ऑटो-फिटिंग
-            var pdf = new window.jspdf.jsPDF('p', 'pt', 'a3'); // A3 साइज़ बड़े फ़ॉन्ट के लिए सबसे बेस्ट रहता है
+            // A3 बड़े फॉर्मेट में ऑटो-फिटिंग ताकि कोई डेटा कटे नहीं
+            var pdf = new window.jspdf.jsPDF('p', 'pt', 'a3'); 
             var pdfWidth = pdf.internal.pageSize.getWidth();
             var pdfHeight = pdf.internal.pageSize.getHeight();
             
-            var imgWidth = pdfWidth - 40; // 20pt मार्जिन
+            var imgWidth = pdfWidth - 40; // 20pt मार्जिन दोनों तरफ
             var imgHeight = (canvas.height * imgWidth) / canvas.width;
 
+            var heightLeft = imgHeight;
+            var position = 20;
+
             // पेज 1 पर इमेज लगाना
-            pdf.addImage(imgData, 'JPEG', 20, 20, imgWidth, imgHeight);
+            pdf.addImage(imgData, 'JPEG', 20, position, imgWidth, imgHeight);
+            heightLeft -= (pdfHeight - 40);
 
-            // यदि कंटेंट 1 पेज से ज़्यादा लंबा हो तो अगला पेज जोड़ना
-            var heightLeft = imgHeight - (pdfHeight - 40);
-            var position = 20 - (pdfHeight - 40);
-
+            // यदि कंटेंट लंबा हो तो अगला पेज जोड़ना
             while (heightLeft > 0) {
+                position = heightLeft - imgHeight + 20;
                 pdf.addPage();
                 pdf.addImage(imgData, 'JPEG', 20, position, imgWidth, imgHeight);
                 heightLeft -= (pdfHeight - 40);
-                position -= (pdfHeight - 40);
             }
 
-            var filename = "HD_LargeFont_Dashboard_" + getFormattedDateTimeForFile() + ".pdf";
+            // 🎯 फ़ाइल का नया नाम: Dashboard Report Data Date Time फॉर्मेट में
+            var filename = "Dashboard_Report_Data_" + getFormattedDateTimeForFile() + ".pdf";
 
             // 🚀 एंड्रॉइड APK एवं ब्राउज़र दोनों के लिए सेविंग सपोर्ट
             if (typeof AndroidBridge !== "undefined" && AndroidBridge.processBase64Download) {
@@ -9854,12 +9855,19 @@ function downloadColorfulDashboardPDF() {
                 for (var j = 0; j < uint8.byteLength; j++) {
                     binary += String.fromCharCode(uint8[j]);
                 }
-                AndroidBridge.processBase64Download(btoa(binary), "pdf", filename);
+                
+                if (typeof AndroidBridge.processBase64DownloadWithFileName === "function") {
+                    AndroidBridge.processBase64DownloadWithFileName(btoa(binary), "pdf", filename);
+                } else if (AndroidBridge.processBase64Download.length >= 3) {
+                    AndroidBridge.processBase64Download(btoa(binary), "pdf", filename);
+                } else {
+                    AndroidBridge.processBase64Download(btoa(binary), "pdf");
+                }
             } else {
                 pdf.save(filename);
             }
 
-            showThinAlert("🎉 बड़े और साफ़ फ़ॉन्ट में PDF डाउनलोड सफल!", true);
+            showThinAlert("🎉 PDF सफलतापूर्वक डाउनलोड हो गई!", true);
         } catch(err) {
             dashboardElement.setAttribute("style", originalStyle);
             console.error("Colorful PDF Generation Error:", err);
