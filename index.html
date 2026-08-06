@@ -5,7 +5,7 @@
 <script>
   (function() {
     // ⚠️ अपना नया Deployment URL यहाँ पेस्ट करें
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwrp0wf26dNadUmHDcu_0y_xJyGzeEXxjUeY7wCYC35IyejLn6Iq5u_157_TyWCLQSSDA/exec";
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbypQAt2oQhV7Zmv_MJGijBRmXO_RsrEXhdRyy16GAZJPsk-RTx_OT6xsLdCk8GfUDFXmA/exec";
 
     function createHandler(successCallback, failureCallback) {
       return new Proxy({}, {
@@ -151,6 +151,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
     <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
     <style>
     /* 🎨 NAVIGATION & DYNAMIC MULTI-THEME ENGINE */
@@ -1236,65 +1237,12 @@
             </div>
 
             <!-- 🟢 प्रिमियम हाई-कंट्रास्ट लास्ट अपडेटेड बैज -->
-            <div id="lastUpdatedLabel" style="text-align: center; font-size: 11px; font-weight: 900; margin-bottom: 12px; color: #ffffff; background: linear-gradient(90deg, #1e293b, #0f172a); padding: 8px 16px; border-radius: 30px; border: 1px solid #334155; letter-spacing: 0.5px; text-transform: uppercase; display: inline-flex; align- items: center; justify-content: center; gap: 6px; width: 100%; box-sizing: border-box; box-shadow: 0 4px 10px rgba(15,23,42,0.15);">
+            <div id="lastUpdatedLabel" style="text-align: center; font-size: 11px; font-weight: 900; margin-bottom: 12px; color: #ffffff; background: linear-gradient(90deg, #1e293b, #0f172a); padding: 8px 16px; border-radius: 30px; border: 1px solid #334155; letter-spacing: 0.5px; text-transform: uppercase; display: inline-flex; align-items: center; justify-content: center; gap: 6px; width: 100%; box-sizing: border-box; box-shadow: 0 4px 10px rgba(15,23,42,0.15);">
                 <i class="fa-solid fa-clock-rotate-left fa-spin" style="color: #facc15; font-size: 12px;"></i> LAST UPDATED:- <span id="lastUpdatedTimeSpan" style="color: #facc15; margin-left: 2px;">NOT DOWNLOADED YET</span>
             </div>
 
-            <!-- 📊 POINT 2: INTERACTIVE CIRCULAR PROGRESS RING CARD WITH TOP & POOR PERFORMERS -->
-            <div class="progress-ring-card" style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; background: var(--theme-card-bg); border: 1px solid rgba(226, 232, 240, 0.8); border-radius: 14px; padding: 12px; margin-bottom: 12px; box-shadow: 0 4px 15px rgba(15,23,42,0.04);">
-                
-                <!-- 🚀 लोड सर्वे बैनर खोलने का बटन -->
-                <button onclick="openLoadSurveyBanner(true)" style="width: 100%; background: linear-gradient(90deg, #0284c7, #0369a1); color: white; border: none; padding: 8px 12px; border-radius: 8px; font-size: 11px; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; box-shadow: 0 2px 6px rgba(2,132,199,0.25);">
-                    <span><i class="fa-solid fa-chart-line" style="color:#facc15;"></i> लोड सर्वे % विश्लेषण (बैनर देखें)</span>
-                    <i class="fa-solid fa-expand" style="font-size: 10px;"></i>
-                </button>
-                
-                <!-- 1. बाईं तरफ: प्रोग्रेस डेटा -->
-                <div style="flex: 1; min-width: 130px;">
-                    <div style="font-size: 10px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">OVERALL VISIT COMPLETION</div>
-                    <div id="ringDoneText" style="font-size: 18px; font-weight: 900; color: var(--theme-heading); margin-top: 2px;">0 / 0 Done</div>
-                    <div id="ringPendingText" style="font-size: 11px; font-weight: 700; color: #ef4444; margin-top: 2px;">Pending: 0</div>
-                </div>
-
-                <!-- 2. बीच में (Part 1): कल के टॉप 3 परफॉर्मर -->
-                <div style="flex: 1.2; min-width: 155px; border-left: 2px dashed #cbd5e1; padding-left: 10px;">
-                    <div style="font-size: 9.5px; font-weight: 900; color: #166534; text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 3px;">
-                        🏆 कल के टॉप 3 प्रदर्शनकर्ता
-                    </div>
-                    <div id="yestTop3PerformersList" style="font-size: 10px; font-weight: 700; color: #1e293b; line-height: 1.4;">
-                        <span style="color:#94a3b8;">लोड हो रहा है...</span>
-                    </div>
-                </div>
-
-                <!-- 3. बीच में (Part 2): कल के 3 सबसे कम विज़िट वाले (Poor Performers) -->
-                <div style="flex: 1.2; min-width: 155px; border-left: 2px dashed #fca5a5; padding-left: 10px; border-right: 2px dashed #cbd5e1; padding-right: 10px;">
-                    <div style="font-size: 9.5px; font-weight: 900; color: #b91c1c; text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 3px;">
-                        ⚠️ कल के कम विजिट वाले
-                    </div>
-                    <div id="yestPoor3PerformersList" style="font-size: 10px; font-weight: 700; color: #1e293b; line-height: 1.4;">
-                        <span style="color:#94a3b8;">लोड हो रहा है...</span>
-                    </div>
-                </div>
-
-                <!-- 4. दाईं तरफ: प्रोग्रेस रिंग (Circle) -->
-                <div style="position: relative; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                    <svg width="60" height="60">
-                        <circle stroke="#e2e8f0" stroke-width="6" fill="transparent" r="24" cx="30" cy="30"/>
-                        <circle id="dashProgressRingSvg" class="progress-ring-circle" stroke="#22c55e" stroke-width="6" stroke-dasharray="150.79" stroke-dashoffset="150.79" stroke-linecap="round" fill="transparent" r="24" cx="30" cy="30"/>
-                    </svg>
-                    <span id="dashProgressPctText" style="position: absolute; font-size: 11px; font-weight: 900; color: var(--theme-primary);">0%</span>
-                </div>
-            </div>
-
-            <!-- 🔍 POINT 3: SKELETON LOADER COMPONENT (SHIMMER EFFECT) -->
-            <div id="appSkeletonLoader" class="skeleton-loader-container">
-                <div class="skeleton-card"><div class="skeleton-line medium"></div><div class="skeleton-line short"></div><div class="skeleton-shimmer"></div></div>
-                <div class="skeleton-card"><div class="skeleton-line medium"></div><div class="skeleton-line short"></div><div class="skeleton-shimmer"></div></div>
-                <div class="skeleton-card"><div class="skeleton-line medium"></div><div class="skeleton-line short"></div><div class="skeleton-shimmer"></div></div>
-            </div>
-
-           <!-- 🎨 100% प्रिमियम मोबाइल ऐप ड्रॉअर आइकॉन ग्रिड (Single Line 5-Column Navigation) -->
-            <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; background: #ffffff; padding: 8px 4px; border-radius: 14px; margin-bottom: 14px; border: 1px solid #e2e8f0; box-shadow: 0 4px 10px rgba(0,0,0,0.02); width: 100%; box-sizing: border-box; clear: both;">
+            <!-- 🎨 100% प्रिमियम मोबाइल ऐप ड्रॉअर आइकॉन ग्रिड (Single Line 6-Column Navigation) -->
+            <div style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; background: #ffffff; padding: 8px 4px; border-radius: 14px; margin-bottom: 14px; border: 1px solid #e2e8f0; box-shadow: 0 4px 10px rgba(0,0,0,0.02); width: 100%; box-sizing: border-box; clear: both;">
                 <style>
                     .app-drawer-icon-btn {
                         display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -1313,41 +1261,156 @@
                     .app-drawer-icon-btn.active-pill .app-drawer-icon-circle { background: #eff6ff !important; border-color: #bfdbfe !important; transform: scale(1.05); box-shadow: 0 4px 8px rgba(30,64,175,0.08); }
                 </style>
 
-                <!-- बटन 1: डैशबोर्ड -->
+                <!-- बटन 1: डैशबोर्ड (टारगेट, प्रोग्रेस रिंग और एनालिटिक्स) -->
                 <button id="sub-tab-cards-btn" class="app-drawer-icon-btn active-pill" onclick="switchSubSummary('cards')">
                     <div class="app-drawer-icon-circle"><i class="fa-solid fa-chart-simple" style="color: #1e40af; font-size: 13px;"></i></div>
                     <span>डैशबोर्ड</span>
                 </button>
 
-                <!-- बटन 2: डेट रिपोर्ट -->
+                <!-- बटन 2: Summary (सभी डायनामिक कार्ड्स) -->
+                <button id="sub-tab-summarycards-btn" class="app-drawer-icon-btn" onclick="switchSubSummary('summarycards')">
+                    <div class="app-drawer-icon-circle"><i class="fa-solid fa-boxes-stacked" style="color: #8b5cf6; font-size: 13px;"></i></div>
+                    <span>Summary</span>
+                </button>
+
+                <!-- बटन 3: डेट रिपोर्ट -->
                 <button id="sub-tab-datereport-btn" class="app-drawer-icon-btn" onclick="switchSubSummary('datereport')">
                     <div class="app-drawer-icon-circle"><i class="fa-solid fa-calendar-check" style="color: #2563eb; font-size: 13px;"></i></div>
                     <span>डेट रिपोर्ट</span>
                 </button>
 
-                <!-- बटन 3: Reports -->
+                <!-- बटन 4: Reports -->
                 <button id="sub-tab-table-btn" class="app-drawer-icon-btn" onclick="switchSubSummary('table')">
                     <div class="app-drawer-icon-circle"><i class="fa-solid fa-list-check" style="color: #0d9488; font-size: 13px;"></i></div>
                     <span>Reports</span>
                 </button>
 
-                <!-- बटन 4: All Bills -->
+                <!-- बटन 5: All Bills -->
                 <button id="sub-tab-bills-btn" class="app-drawer-icon-btn" onclick="openReportRowDirect('all_bills_report')">
                     <div class="app-drawer-icon-circle"><i class="fa-solid fa-file-invoice-dollar" style="color: #ea580c; font-size: 13px;"></i></div>
                     <span>All Bills</span>
                 </button>
 
-                <!-- बटन 5: All Consumers -->
+                <!-- बटन 6: All Consumers -->
                 <button id="sub-tab-consumers-btn" class="app-drawer-icon-btn" onclick="openReportRowDirect('Visit_Data_Consumers')">
                     <div class="app-drawer-icon-circle"><i class="fa-solid fa-users" style="color: #4f46e5; font-size: 13px;"></i></div>
                     <span>Consumers</span>
                 </button>
             </div>
-            
-            <div id="sub-view-cards" style="display: block;">
-                <div class="stats-grid" id="summaryGridToPrint"></div>
+
+            <!-- 🔍 SKELETON LOADER COMPONENT -->
+            <div id="appSkeletonLoader" class="skeleton-loader-container">
+                <div class="skeleton-card"><div class="skeleton-line medium"></div><div class="skeleton-line short"></div><div class="skeleton-shimmer"></div></div>
+                <div class="skeleton-card"><div class="skeleton-line medium"></div><div class="skeleton-line short"></div><div class="skeleton-shimmer"></div></div>
+                <div class="skeleton-card"><div class="skeleton-line medium"></div><div class="skeleton-line short"></div><div class="skeleton-shimmer"></div></div>
             </div>
 
+            <!-- 📊 सब-व्यू 1: डैशबोर्ड (हाई-इम्पैक्ट प्रीमियम लेआउट) -->
+<div id="sub-view-cards" style="display: block;">
+    
+    <!-- 📄 कलरफुल डैशबोर्ड PDF डाउनलोड बटन -->
+    <div style="display: flex; justify-content: flex-end; margin-bottom: 10px;">
+        <button onclick="downloadColorfulDashboardPDF()" class="btn pdf-bg" style="width: auto; padding: 8px 16px; font-size: 11.5px; font-weight: 800; border-radius: 8px; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 10px rgba(220,38,38,0.25); margin-bottom: 0;" title="स्क्रीन जैसा कलरफुल PDF डाउनलोड करें">
+            <i class="fa-solid fa-file-pdf" style="font-size: 14px;"></i> Download Colorful Dashboard PDF
+        </button>
+    </div>
+                <!-- 🚀 8 तारीख मासिक टारगेट और रेड अलर्ट बैनर कार्ड -->
+                <div id="monthlyTargetBannerBox" style="width: 100%; margin-bottom: 12px; box-sizing: border-box;"></div>
+
+                <!-- 1. ऊपरी सेक्शन: 3 बॉक्स + प्रतिशत गोल चक्र (Work Completion) -->
+                <div class="card" style="padding: 12px; margin-bottom: 12px; background: #ffffff;">
+                    <div style="display: flex; gap: 10px; align-items: center; justify-content: space-between; flex-wrap: wrap;">
+                        <!-- 3 काउंट डिब्बे -->
+                        <div style="flex: 1; min-width: 180px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px;">
+                            <div style="background: #eff6ff; border: 1px solid #bfdbfe; padding: 8px; border-radius: 10px; text-align: center;">
+                                <div style="font-size: 9.5px; font-weight: 800; color: #1e40af; text-transform: uppercase;">कुल उपभोक्ता</div>
+                                <div id="paperTotalCount" style="font-size: 16px; font-weight: 900; color: #1e3a8a; margin-top: 2px;">0</div>
+                            </div>
+                            <div style="background: #f0fdf4; border: 1px solid #bbf7d0; padding: 8px; border-radius: 10px; text-align: center;">
+                                <div style="font-size: 9.5px; font-weight: 800; color: #15803d; text-transform: uppercase;">विजिट हो चुकी</div>
+                                <div id="paperDoneCount" style="font-size: 16px; font-weight: 900; color: #166534; margin-top: 2px;">0</div>
+                            </div>
+                            <div style="background: #fef2f2; border: 1px solid #fca5a5; padding: 8px; border-radius: 10px; text-align: center; grid-column: span 2;">
+                                <div style="font-size: 9.5px; font-weight: 800; color: #b91c1c; text-transform: uppercase;">विजिट पेंडिंग</div>
+                                <div id="paperPendingCount" style="font-size: 16px; font-weight: 900; color: #dc2626; margin-top: 2px;">0</div>
+                            </div>
+                        </div>
+
+                        <!-- वर्क का प्रतिशत (गोल चक्र) -->
+                        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; background: #fafafa; border: 1px solid #e2e8f0; padding: 8px 14px; border-radius: 12px; min-width: 110px;">
+                            <div style="font-size: 9px; font-weight: 900; color: #475569; margin-bottom: 4px; text-transform: uppercase;">वर्क का प्रतिशत</div>
+                            <div style="position: relative; width: 55px; height: 55px; display: flex; align-items: center; justify-content: center;">
+                                <svg width="55" height="55">
+                                    <circle stroke="#e2e8f0" stroke-width="5" fill="transparent" r="22" cx="27.5" cy="27.5"/>
+                                    <circle id="dashProgressRingSvg" class="progress-ring-circle" stroke="#22c55e" stroke-width="5" stroke-dasharray="138.23" stroke-dashoffset="138.23" stroke-linecap="round" fill="transparent" r="22" cx="27.5" cy="27.5"/>
+                                </svg>
+                                <span id="dashProgressPctText" style="position: absolute; font-size: 10.5px; font-weight: 900; color: #15803d;">0%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. विजिट का विश्लेषण (Top 5 & Last 5) -->
+                <div class="card" style="padding: 12px; margin-bottom: 12px; background: #ffffff;">
+                    <div style="font-size: 12px; font-weight: 900; color: #1e40af; border-bottom: 2px solid #bfdbfe; padding-bottom: 4px; margin-bottom: 10px; text-transform: uppercase; display: flex; justify-content: space-between; align-items: center;">
+                        <span><i class="fa-solid fa-chart-line"></i> विजिट का विश्लेषण (सभी रीडर्स)</span>
+                        <span style="font-size: 9px; background: #eff6ff; color: #1d4ed8; padding: 2px 6px; border-radius: 4px; font-weight: 800;">LIVE LEADERBOARD</span>
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px;">
+                        <!-- कल के सबसे अधिक विजिट वाले मीटर रीडर (Top-5) -->
+                        <div style="background: #f0fdf4; border: 1px solid #86efac; border-radius: 10px; padding: 10px;">
+                            <div style="font-size: 10.5px; font-weight: 900; color: #166534; margin-bottom: 8px; border-bottom: 1px dashed #bbf7d0; padding-bottom: 4px;">🏆 कल के सबसे अधिक विजिट वाले (TOP-5)</div>
+                            <div id="yestTop3PerformersList" style="font-size: 10px; font-weight: 700;">लोड हो रहा है...</div>
+                        </div>
+                        <!-- कल के सबसे कम विजिट वाले मीटर रीडर (Last-5) -->
+                        <div style="background: #fef2f2; border: 1px solid #fca5a5; border-radius: 10px; padding: 10px;">
+                            <div style="font-size: 10.5px; font-weight: 900; color: #b91c1c; margin-bottom: 8px; border-bottom: 1px dashed #fecdd3; padding-bottom: 4px;">⚠️ कल के सबसे कम विजिट वाले (LAST-5)</div>
+                            <div id="yestPoor3PerformersList" style="font-size: 10px; font-weight: 700;">लोड हो रहा है...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. लोड सर्वे का विश्लेषण (मेन मीटर Top-5 & Last-5) -->
+                <div class="card" style="padding: 12px; margin-bottom: 12px; background: #ffffff;">
+                    <div style="font-size: 12px; font-weight: 900; color: #0284c7; border-bottom: 2px solid #bae6fd; padding-bottom: 4px; margin-bottom: 10px; text-transform: uppercase; display: flex; justify-content: space-between; align-items: center;">
+                        <span><i class="fa-solid fa-bolt"></i> लोड सर्वे का विश्लेषण (मेन मीटर)</span>
+                        <span style="font-size: 9px; background: #f0f9ff; color: #0369a1; padding: 2px 6px; border-radius: 4px; font-weight: 800;">MAIN METER</span>
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px;">
+                        <div style="background: #f0f9ff; border: 1px solid #7dd3fc; border-radius: 10px; padding: 10px;">
+                            <div style="font-size: 10.5px; font-weight: 900; color: #0369a1; margin-bottom: 8px; border-bottom: 1px dashed #bae6fd; padding-bottom: 4px;">⚡ सबसे अधिक लोड सर्वे वाले (TOP-5)</div>
+                            <div id="mainMeterTopSurveyList" style="font-size: 10px; font-weight: 700;">लोड हो रहा है...</div>
+                        </div>
+                        <div style="background: #fff7ed; border: 1px solid #fdba74; border-radius: 10px; padding: 10px;">
+                            <div style="font-size: 10.5px; font-weight: 900; color: #c2410c; margin-bottom: 8px; border-bottom: 1px dashed #fed7aa; padding-bottom: 4px;">📉 सबसे कम लोड सर्वे वाले (LAST-5)</div>
+                            <div id="mainMeterPoorSurveyList" style="font-size: 10px; font-weight: 700;">लोड हो रहा है...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. लोड सर्वे का विश्लेषण (पोल मीटर Top-5 & Last-5) -->
+                <div class="card" style="padding: 12px; margin-bottom: 12px; background: #ffffff;">
+                    <div style="font-size: 12px; font-weight: 900; color: #0f766e; border-bottom: 2px solid #99f6e4; padding-bottom: 4px; margin-bottom: 10px; text-transform: uppercase; display: flex; justify-content: space-between; align-items: center;">
+                        <span><i class="fa-solid fa-box"></i> लोड सर्वे का विश्लेषण (पोल मीटर)</span>
+                        <span style="font-size: 9px; background: #f0fdf4; color: #0f766e; padding: 2px 6px; border-radius: 4px; font-weight: 800;">POLE METER</span>
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px;">
+                        <div style="background: #f0fdf4; border: 1px solid #a7f3d0; border-radius: 10px; padding: 10px;">
+                            <div style="font-size: 10.5px; font-weight: 900; color: #047857; margin-bottom: 8px; border-bottom: 1px dashed #a7f3d0; padding-bottom: 4px;">⚡ सबसे अधिक लोड सर्वे वाले (TOP-5)</div>
+                            <div id="poleMeterTopSurveyList" style="font-size: 10px; font-weight: 700;">लोड हो रहा है...</div>
+                        </div>
+                        <div style="background: #fdf2f8; border: 1px solid #fbcfe8; border-radius: 10px; padding: 10px;">
+                            <div style="font-size: 10.5px; font-weight: 900; color: #be185d; margin-bottom: 8px; border-bottom: 1px dashed #fbcfe8; padding-bottom: 4px;">📉 सबसे कम लोड सर्वे वाले (LAST-5)</div>
+                            <div id="poleMeterPoorSurveyList" style="font-size: 10px; font-weight: 700;">लोड हो रहा है...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 📊 सब-व्यू 2: SUMMARY (बटनों के नीचे - सभी डायनामिक कार्ड्स) -->
+            <div id="sub-view-summarycards" style="display: none;">
+                <div class="stats-grid" id="summaryGridToPrint"></div>
+            </div>
             <!-- 📅 एडवांस डेट रिपोर्ट सब-व्यू (From Date -> To Date, Reader Checkbox Filter & PDF) -->
             <div id="sub-view-datereport" style="display: none;">
                 <div class="card" style="padding: 12px; border: 1px solid #bfdbfe; background: #eff6ff; margin-bottom: 10px; border-radius: 12px; position: relative; z-index: 1000; overflow: visible !important;">
@@ -2330,17 +2393,20 @@ function renderDivisionDropdownHTML(divSet, select, currentSelection) {
         var el = document.getElementById('thinDarkAlert');
         var txt = document.getElementById('thinDarkAlertTxt');
         if(el && txt) {
+            // यदि कोई पुराना टाइमआउट चल रहा है तो उसे तुरंत रद्द करें
             if (window.thinAlertTimer) {
                 clearTimeout(window.thinAlertTimer);
                 window.thinAlertTimer = null;
             }
             txt.innerText = msg;
-            el.style.display = "block";
+            el.style.setProperty("display", "block", "important");
+
+            // केवल तभी बैनर खुद बंद होगा जब autoHide = true पास किया गया हो
             if (autoHide) {
                 window.thinAlertTimer = setTimeout(function(){ 
-                    if(el) el.style.display = "none"; 
+                    if(el) el.style.setProperty("display", "none", "important"); 
                     window.thinAlertTimer = null;
-                }, 4000);
+                }, 4000); // सफलता का संदेश आने के 4 सेकंड बाद बैनर हटेगा
             }
         }
     }
@@ -2402,13 +2468,15 @@ function executeSafeSyncAndDownloadWorkflow(onComplete) {
     var processingText = isManualClick ? "🔄 Manual Master Data Downloading Pls wait..." : "⚡ Auto Master Data Downloading Pls wait...";
     
     if(isDownloadingMasterData) {
-        if(isManualClick) showThinAlert(processingText, false);
+        // यदि डाउनलोड पहले से चल रहा है तो बैनर को स्क्रीन पर लॉक रखें
+        showThinAlert(processingText, false);
         if(onComplete) onComplete();
         return;
     }
     
     isDownloadingMasterData = true;
-    if(isManualClick) showThinAlert(processingText, false);
+    // 🔒 मुख्य फिक्स: बैनर को परमानेंट लॉक (false) किया गया है, यह तब तक नहीं हटेगा जब तक सफलता का मैसेज न आ जाए
+    showThinAlert(processingText, false);
 
     var targetUserParam = (loggedInReader.toUpperCase() === "ANURAG SHAKYA") ? "ALL" : loggedInReader.toUpperCase();
     
@@ -2422,22 +2490,17 @@ function executeSafeSyncAndDownloadWorkflow(onComplete) {
                 appSearchDatabaseCache = null; 
 
                 tx.oncomplete = function() {
-    if(bulkData && bulkData.reportConfigs) {
-        // 🚀 गिटहब/APK प्रॉक्सी बाईपास: अगर डेटा स्ट्रिंग के रूप में लिपटा है तो उसे फ़ोर्स पार्स करें
-        var parsedConfigs = bulkData.reportConfigs;
-        if (typeof parsedConfigs === "string") {
-            try { parsedConfigs = JSON.parse(parsedConfigs); } catch(e) { console.error("Config parse err", e); }
-        }
-        
-        // एक और सुरक्षा कवच: यदि अभी भी ऑब्जेक्ट के अंदर डेटा हो
-        if (parsedConfigs && parsedConfigs.data !== undefined) {
-            parsedConfigs = parsedConfigs.data;
-        }
-        
-        // सुनिश्चित करें कि यह हमेशा एक Array ही रहे ताकि .find() या .filter() फेल न हो
-        globalReportConfigs = Array.isArray(parsedConfigs) ? parsedConfigs : [];
-        localStorage.setItem("app_report_configs_cache", JSON.stringify(globalReportConfigs));
-    }
+                    if(bulkData && bulkData.reportConfigs) {
+                        var parsedConfigs = bulkData.reportConfigs;
+                        if (typeof parsedConfigs === "string") {
+                            try { parsedConfigs = JSON.parse(parsedConfigs); } catch(e) { console.error("Config parse err", e); }
+                        }
+                        if (parsedConfigs && parsedConfigs.data !== undefined) {
+                            parsedConfigs = parsedConfigs.data;
+                        }
+                        globalReportConfigs = Array.isArray(parsedConfigs) ? parsedConfigs : [];
+                        localStorage.setItem("app_report_configs_cache", JSON.stringify(globalReportConfigs));
+                    }
                     var currentDateTimeStr = new Date().toLocaleString('en-IN');
                     localStorage.setItem("data_last_updated_" + loggedInReader, currentDateTimeStr);
                     localStorage.setItem("last_sync_time_ms_" + loggedInReader, new Date().getTime()); 
@@ -2452,16 +2515,13 @@ function executeSafeSyncAndDownloadWorkflow(onComplete) {
                     buildAdminMultiSelectCheckbox(bulkData.consumers); 
                     populateDivisionFilter(bulkData.consumers);
                     
-                    // 🎯 फ़िक्स: डेटा डाउनलोड पूरा होते ही लिस्ट रेंडर करने से पहले दोबारा ड्रॉपडाउन सिंक करें
                     if(typeof renderNewListTab === 'function') {
                         setTimeout(function() { populateDivisionFilter(bulkData.consumers); }, 50);
                     }
 
-                    // 🟢 नया: डेटा डाउनलोड होते ही एडमिन द्वारा भेजा गया लाइव मैसेज स्क्रीन पर लॉक करना
                     if (bulkData && bulkData.activeNotification) {
-                        var nData = bulkData.activeNotification; // ऑब्जेक्ट: { text: "...", lockTime: 5, target: "..." }
+                        var nData = bulkData.activeNotification;
                         var userMe = loggedInReader.toUpperCase();
-                        // 🎯 कोमा से अलग किए गए नामों की लिस्ट में अपना नाम खोजना
                         var allowedTargetsList = nData.target ? nData.target.split(",") : [];
                         if (nData.target === "ALL" || allowedTargetsList.includes(userMe)) {
                             showGlobalNotification(nData.text, parseInt(nData.lockTime));
@@ -2476,7 +2536,6 @@ function executeSafeSyncAndDownloadWorkflow(onComplete) {
                     
                     isDownloadingMasterData = false;
                     
-                    // 🚀 लाइव ट्रैकिंग: एरर फिक्स - प्रॉक्सी ब्रिज के नियम के अनुसार success/failure handlers के साथ कॉल
                     if(loggedInReader) {
                         try {
                             google.script.run
@@ -2486,21 +2545,24 @@ function executeSafeSyncAndDownloadWorkflow(onComplete) {
                         } catch(e) { console.error("Download log setup failed", e); }
                     }
 
-                    // फिक्स: काम पूरा होते ही 'true' पास किया ताकि 4 सेकंड बाद यह अपने आप स्क्रीन से हट जाए
+                    // 🎯 🔒 सफलता का संदेश आने पर ही बैनर बदला जाएगा और 4 सेकंड बाद खुद गायब होगा
                     showThinAlert("🎉 Master Data Downloaded Successfully!", true);
                     if(onComplete) onComplete();
                 };
             } else { 
                 isDownloadingMasterData = false;
+                showThinAlert("⚠️ डेटा प्राप्त नहीं हुआ या खाली है!", true);
                 if(onComplete) onComplete(); 
             }
         } catch(error) {
             isDownloadingMasterData = false;
+            showThinAlert("🚨 प्रक्रिया में त्रुटि: " + error.toString(), true);
             if(onComplete) onComplete();
         }
     }).withFailureHandler(function(error) {
         isDownloadingMasterData = false;
-        showThinAlert("Data Download Failed! Please check internet.", true);
+        // 🔒 डाउनलोड फेल होने पर ही एरर अलर्ट आएगा और 5 सेकंड बाद बंद होगा
+        showThinAlert("🚨 Master Data Download Failed! Please check internet.", true);
         if(onComplete) onComplete();
     }).getBulkDashboardData(targetUserParam);
 }
@@ -3157,12 +3219,14 @@ window.applyHeaderReaderFilter = function() {
 
     function switchSubSummary(subTabName) {
         var cardsView = document.getElementById('sub-view-cards');
+        var summaryCardsView = document.getElementById('sub-view-summarycards');
         var tableView = document.getElementById('sub-view-table');
         var analyticsView = document.getElementById('sub-view-analytics');
         var dateReportView = document.getElementById('sub-view-datereport');
         
         var btns = {
             'cards': document.getElementById('sub-tab-cards-btn'),
+            'summarycards': document.getElementById('sub-tab-summarycards-btn'),
             'datereport': document.getElementById('sub-tab-datereport-btn'),
             'table': document.getElementById('sub-tab-table-btn'),
             'all_bills': document.getElementById('sub-tab-bills-btn'),
@@ -3174,6 +3238,7 @@ window.applyHeaderReaderFilter = function() {
         }
 
         if(cardsView) cardsView.style.setProperty("display", "none", "important");
+        if(summaryCardsView) summaryCardsView.style.setProperty("display", "none", "important");
         if(tableView) tableView.style.setProperty("display", "none", "important");
         if(analyticsView) analyticsView.style.setProperty("display", "none", "important");
         if(dateReportView) dateReportView.style.setProperty("display", "none", "important");
@@ -3181,6 +3246,9 @@ window.applyHeaderReaderFilter = function() {
         if(subTabName === 'cards') {
             if(cardsView) cardsView.style.setProperty("display", "block", "important");
             if(btns['cards']) btns['cards'].classList.add('active-pill');
+        } else if(subTabName === 'summarycards') {
+            if(summaryCardsView) summaryCardsView.style.setProperty("display", "block", "important");
+            if(btns['summarycards']) btns['summarycards'].classList.add('active-pill');
         } else if(subTabName === 'datereport') {
             if(dateReportView) dateReportView.style.setProperty("display", "block", "important");
             if(btns['datereport']) btns['datereport'].classList.add('active-pill');
@@ -9208,16 +9276,21 @@ function submitContactUpdateData() {
     .updateConsumerContactFieldsOnly(rIndex, whatsappVal, emailVal);
 }
 // =========================================================================
-// 📊 POINT 2: CIRCULAR PROGRESS RING & SKELETON ENGINE
+// 📊 POINT 2: DASHBOARD PROGRESS & LEADERBOARD ENGINE (UPDATED)
 // =========================================================================
 function updateProgressRingEngine(done, total, yestPerformersMap) {
     var pct = total > 0 ? Math.round((done / total) * 100) : 0;
     var circle = document.getElementById('dashProgressRingSvg');
     var pctText = document.getElementById('dashProgressPctText');
-    var doneText = document.getElementById('ringDoneText');
-    var pendingText = document.getElementById('ringPendingText');
-    var top3Container = document.getElementById('yestTop3PerformersList');
-    var poor3Container = document.getElementById('yestPoor3PerformersList');
+    
+    // कागज़ी नक्शे के ऊपरी 3 काउंट डिब्बे
+    var pTotalNode = document.getElementById('paperTotalCount');
+    var pDoneNode = document.getElementById('paperDoneCount');
+    var pPendingNode = document.getElementById('paperPendingCount');
+
+    if (pTotalNode) pTotalNode.innerText = total;
+    if (pDoneNode) pDoneNode.innerText = done;
+    if (pPendingNode) pPendingNode.innerText = (total - done);
 
     if (circle) {
         var radius = circle.r.baseVal.value;
@@ -9227,86 +9300,269 @@ function updateProgressRingEngine(done, total, yestPerformersMap) {
     }
 
     if (pctText) pctText.innerText = pct + "%";
-        if (doneText) doneText.innerText = done + " / " + total + " Done";
-        if (pendingText) pendingText.innerText = "Pending: " + (total - done);
 
-        // 🎉 100% विज़िट्स कम्पलीट होने पर आतिशबाज़ी सेलिब्रेशन एलर्ट
-        if (pct === 100 && total > 0) {
-            var celebratedKey = "celebrated_100_pct_" + new Date().toDateString();
-            if (!localStorage.getItem(celebratedKey)) {
-                localStorage.setItem(celebratedKey, "true");
-                setTimeout(function() {
-                    customAlert("🎉 बधाई हो! आज की 100% विज़िट्स सफलतापूर्वक पूरी हो चुकी हैं! 🏆🌟", "🎉");
-                }, 800);
-            }
-        }
+    // 🎯 ------------------ 8 तारीख टारगेट एवं लाइव प्रोग्रेस बार लॉजिक ------------------ 🎯
+    var bannerContainer = document.getElementById('monthlyTargetBannerBox');
+    if (bannerContainer) {
+        var now = new Date();
+        var currentDay = now.getDate();
+        var pendingTotal = total - done;
 
-    // 🏆 Top & ⚠️ Poor Performers कैलकुलेशन
-    if (top3Container || poor3Container) {
-        if (!yestPerformersMap || Object.keys(yestPerformersMap).length === 0) {
-            if (top3Container) top3Container.innerHTML = '<span style="color:#dc2626; font-size:10px;">कल कोई विज़िट नहीं हुई!</span>';
-            if (poor3Container) poor3Container.innerHTML = '<span style="color:#dc2626; font-size:10px;">कल कोई विज़िट नहीं हुई!</span>';
-        } else {
-            // हाई विज़िट वाले पहले
-            var sortedPerformers = Object.keys(yestPerformersMap).map(function(name) {
-                return { name: name, count: yestPerformersMap[name] };
-            }).sort(function(a, b) {
-                return b.count - a.count;
-            });
-
-            var yestTotalVisits = sortedPerformers.reduce(function(acc, curr){ return acc + curr.count; }, 0);
-
-            // Restricted Keywords (ANURAG, KAPIL, GAURAV नाम या उपनाम वाले सभी यूज़र्स को हटाने के लिए)
-            var restrictedKeywords = ["ANURAG", "KAPIL", "GAURAV"];
-            var filteredPerformers = sortedPerformers.filter(function(p) {
-                var upperName = p.name.toUpperCase().trim();
-                return !restrictedKeywords.some(function(keyword) {
-                    return upperName.includes(keyword);
+        // 🚨 केस 1: 8 तारीख के बाद भी पेंडेंसी बची होना (RED ALERT)
+        if (currentDay > 8 && pendingTotal > 0) {
+            bannerContainer.innerHTML = 
+                '<div style="background: linear-gradient(135deg, #fef2f2, #fee2e2); border: 2px solid #ef4444; border-radius: 14px; padding: 12px; text-align: center; box-shadow: 0 10px 20px rgba(239,68,68,0.2); animation: pulse 2s infinite;">' +
+                    '<div style="color: #b91c1c; font-size: 13px; font-weight: 900; margin-bottom: 4px; text-transform: uppercase;">' +
+                        '<i class="fa-solid fa-triangle-exclamation fa-beat" style="margin-right: 5px;"></i> 🚨 समय सीमा समाप्त रेड अलर्ट 🚨' +
+                    '</div>' +
+                    '<div style="color: #7f1d1d; font-size: 11px; font-weight: 700; line-height: 1.4; margin-bottom: 6px;">' +
+                        'आपने तय समय सीमा (8 तारीख) में अपना काम खत्म नहीं किया है। कृपया जल्द से जल्द इसको खत्म करें!' +
+                    '</div>' +
+                    '<div style="background: #dc2626; color: white; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 900; display: inline-block;">' +
+                        'Total Visit Pending: ' + pendingTotal +
+                    '</div>' +
+                '</div>';
+        } 
+        // 🎯 केस 2: 1 से 8 तारीख के बीच डेली टारगेट + लाइव प्रोग्रेस बार
+        else if (currentDay <= 8 && total > 0) {
+            var remainingDays = (8 - currentDay) + 1;
+            var todayTarget = Math.ceil(pendingTotal / remainingDays);
+            
+            var todayDoneVisits = 0;
+            if (globalReportsDatabaseCache && Array.isArray(globalReportsDatabaseCache)) {
+                globalReportsDatabaseCache.forEach(function(item) {
+                    if (isReaderAllowed(getReaderName(item))) {
+                        var vDate = getRobustKey(item, "FINAL VISIT_DATE") || item.finalVisitDate || "";
+                        if (isVisitDateMatch(vDate, 0)) todayDoneVisits++;
+                    }
                 });
-            });
-
-            // 1. कल के बेहतरीन प्रदर्शन (Top 3 Performers - Hindi)
-            if (top3Container) {
-                var top3 = filteredPerformers.slice(0, 3);
-                var medals = ["🥇", "🥈", "🥉"];
-                var topHtml = "";
-
-                if (top3.length === 0) {
-                    topHtml = '<span style="color:#64748b; font-size:10px;">कोई डेटा उपलब्ध नहीं</span>';
-                } else {
-                    top3.forEach(function(p, idx) {
-                        var pSharePct = yestTotalVisits > 0 ? Math.round((p.count / yestTotalVisits) * 100) : 0;
-                        topHtml += '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">' +
-                                   '<span>' + medals[idx] + ' <b>' + p.name + '</b></span>' +
-                                   '<span style="color:#059669; font-weight:900;">' + p.count + ' <small style="color:#64748b; font-size:9px;">(' + pSharePct + '%)</small></span>' +
-                                   '</div>';
-                    });
-                }
-                top3Container.innerHTML = topHtml;
             }
 
-            // 2. कल के कम प्रदर्शन वाले (Poor Performers - Hindi)
-            if (poor3Container) {
-                var poorSorted = filteredPerformers.slice().reverse();
-                var poor3 = poorSorted.slice(0, 3);
-                var warningIcons = ["🚨", "⚠️", "🔻"];
-                var poorHtml = "";
+            var todayPending = todayTarget - todayDoneVisits;
+            if (todayPending < 0) todayPending = 0;
 
-                if (poor3.length === 0) {
-                    poorHtml = '<span style="color:#64748b; font-size:10px;">कोई डेटा उपलब्ध नहीं</span>';
-                } else {
-                    poor3.forEach(function(p, idx) {
-                        var pSharePct = yestTotalVisits > 0 ? Math.round((p.count / yestTotalVisits) * 100) : 0;
-                        poorHtml += '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">' +
-                                    '<span>' + warningIcons[idx] + ' <b style="color:#b91c1c;">' + p.name + '</b></span>' +
-                                    '<span style="color:#dc2626; font-weight:900;">' + p.count + ' <small style="color:#64748b; font-size:9px;">(' + pSharePct + '%)</small></span>' +
-                                    '</div>';
-                    });
-                }
-                poor3Container.innerHTML = poorHtml;
-            }
+            // 📊 प्रोग्रेस बार प्रतिशत कैलकुलेशन
+            var targetPct = todayTarget > 0 ? Math.min(100, Math.round((todayDoneVisits / todayTarget) * 100)) : 0;
+
+            bannerContainer.innerHTML = 
+                '<div style="background: linear-gradient(135deg, #f0fdf4, #eff6ff); border: 1px solid #3b82f6; border-left: 5px solid #1e40af; border-radius: 12px; padding: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">' +
+                    '<div style="font-size: 10.5px; font-weight: 900; color: #1e40af; text-transform: uppercase; margin-bottom: 6px; border-bottom: 1px dashed #bfdbfe; padding-bottom: 4px; display: flex; justify-content: space-between;">' +
+                        '<span><i class="fa-solid fa-bullseye" style="color: #ea580c;"></i> दैनिक लक्ष्य (8 तारीख तक)</span>' +
+                        '<span style="background:#dbeafe; color:#1e40af; padding:1px 6px; border-radius:10px;">बचे दिन: ' + remainingDays + '</span>' +
+                    '</div>' +
+                    '<div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; text-align: center;">' +
+                        '<div style="background: #ffffff; padding: 5px; border-radius: 6px; border: 1px solid #e2e8f0;">' +
+                            '<div style="font-size: 9px; font-weight: 800; color: #64748b;">Total VisiT Pending</div>' +
+                            '<div style="font-size: 14px; font-weight: 900; color: #dc2626;">' + pendingTotal + '</div>' +
+                        '</div>' +
+                        '<div style="background: #ffffff; padding: 5px; border-radius: 6px; border: 1px solid #e2e8f0;">' +
+                            '<div style="font-size: 9px; font-weight: 800; color: #64748b;">आज का टारगेट</div>' +
+                            '<div style="font-size: 14px; font-weight: 900; color: #1e40af;">' + todayTarget + '</div>' +
+                        '</div>' +
+                        '<div style="background: #ffffff; padding: 5px; border-radius: 6px; border: 1px solid #e2e8f0;">' +
+                            '<div style="font-size: 9px; font-weight: 800; color: #64748b;">आज की विजिट</div>' +
+                            '<div style="font-size: 14px; font-weight: 900; color: #16a34a;">' + todayDoneVisits + '</div>' +
+                        '</div>' +
+                        '<div style="background: #ffffff; padding: 5px; border-radius: 6px; border: 1px solid #e2e8f0;">' +
+                            '<div style="font-size: 9px; font-weight: 800; color: #64748b;">pending visit in target</div>' +
+                            '<div style="font-size: 14px; font-weight: 900; color: #d97706;">' + todayPending + '</div>' +
+                        '</div>' +
+                    '</div>' +
+                    '<!-- 📊 विजुअल प्रोग्रेस बार -->' +
+                    '<div style="margin-top: 8px;">' +
+                        '<div style="background: #e2e8f0; border-radius: 10px; height: 8px; width: 100%; overflow: hidden;">' +
+                            '<div style="background: linear-gradient(90deg, #10b981, #059669); height: 100%; width: ' + targetPct + '%; transition: width 0.5s ease;"></div>' +
+                        '</div>' +
+                        '<div style="display: flex; justify-content: space-between; font-size: 9px; font-weight: 800; margin-top: 3px; color: #475569;">' +
+                            '<span>🎯 प्रगति लक्ष्य</span>' +
+                            '<span style="color:#059669;">' + targetPct + '% पूरा</span>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>';
+        } else {
+            bannerContainer.innerHTML = "";
         }
     }
+
+    // 🏆 1. विजिट विश्लेषण - सभी रीडर्स का लीडरबोर्ड
+    calculateAndRenderVisitLeaderboardSection();
+
+    // ⚡ 2. लोड सर्वे विश्लेषण (मेन मीटर & पोल मीटर Top-5 / Last-5)
+    renderLoadSurveyDashboardSection();
+}
+
+// 🏆 पूरे डेटाबेस के सभी मीटर रीडर्स के लिए विजिट लीडरबोर्ड (Top-5 & Last-5)
+function calculateAndRenderVisitLeaderboardSection() {
+    if (!db) return;
+    var top3Container = document.getElementById('yestTop3PerformersList');
+    var poor3Container = document.getElementById('yestPoor3PerformersList');
+    if (!top3Container && !poor3Container) return;
+
+    var restrictedKeywords = ["ANURAG", "KAPIL", "GAURAV"];
+
+    var tx = db.transaction("consumers", "readonly");
+    tx.objectStore("consumers").getAll().onsuccess = function(e) {
+        var allConsumers = e.target.result || [];
+        var yestMap = {};
+
+        allConsumers.forEach(function(item) {
+            var rName = getReaderName(item);
+            if (!rName || rName.trim() === "") return;
+            rName = rName.trim().toUpperCase();
+
+            if (restrictedKeywords.some(function(k) { return rName.includes(k); })) return;
+
+            var vDate = getRobustKey(item, "FINAL VISIT_DATE") || item.finalVisitDate || "";
+            if (isVisitDateMatch(vDate, 1)) { // कल की विज़िट
+                yestMap[rName] = (yestMap[rName] || 0) + 1;
+            }
+        });
+
+        var sortedPerformers = Object.keys(yestMap).map(function(name) {
+            return { name: name, count: yestMap[name] };
+        }).sort(function(a, b) { return b.count - a.count; });
+
+        // 🥇 Top-5 Visit Performers
+        if (top3Container) {
+            var top5 = sortedPerformers.slice(0, 5);
+            var rankBadges = ["🥇", "🥈", "🥉", "4️⃣", "5️⃣"];
+            var topHtml = "";
+
+            if (top5.length === 0) {
+                topHtml = '<span style="color:#64748b; font-size:10px;">कल कोई विज़िट नहीं हुई!</span>';
+            } else {
+                top5.forEach(function(p, idx) {
+                    topHtml += '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px; padding:2px 4px; background:#ffffff; border-radius:6px; border:1px solid #dcfce7;">' +
+                               '<span>' + rankBadges[idx] + ' <b style="color:#0f172a;">' + p.name + '</b></span>' +
+                               '<span style="background:#dcfce7; color:#15803d; padding:1px 6px; border-radius:10px; font-weight:900;">' + p.count + ' Visits</span>' +
+                               '</div>';
+                });
+            }
+            top3Container.innerHTML = topHtml;
+        }
+
+        // ⚠️ Last-5 Visit Performers
+        if (poor3Container) {
+            var poor5 = sortedPerformers.slice().reverse().slice(0, 5);
+            var warningBadges = ["🚨", "⚠️", "🔻", "🔸", "🔹"];
+            var poorHtml = "";
+
+            if (poor5.length === 0) {
+                poorHtml = '<span style="color:#64748b; font-size:10px;">कल कोई विज़िट नहीं हुई!</span>';
+            } else {
+                poor5.forEach(function(p, idx) {
+                    poorHtml += '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px; padding:2px 4px; background:#ffffff; border-radius:6px; border:1px solid #fecdd3;">' +
+                                '<span>' + warningBadges[idx] + ' <b style="color:#b91c1c;">' + p.name + '</b></span>' +
+                                '<span style="background:#fee2e2; color:#dc2626; padding:1px 6px; border-radius:10px; font-weight:900;">' + p.count + ' Visits</span>' +
+                                '</div>';
+                });
+            }
+            poor3Container.innerHTML = poorHtml;
+        }
+    };
+}
+
+// ⚡ लोड सर्वे विश्लेषण - पूरे डिस्कॉम के सभी मीटर रीडर्स का डेटाबेस स्कैन
+function renderLoadSurveyDashboardSection() {
+    if (!db) return;
+    var restrictedKeywords = ["ANURAG", "KAPIL", "GAURAV"];
+
+    var tx = db.transaction("consumers", "readonly");
+    tx.objectStore("consumers").getAll().onsuccess = function(e) {
+        var allConsumers = e.target.result || [];
+        var mainMap = {}, poleMap = {};
+
+        allConsumers.forEach(function(item) {
+            var rName = getReaderName(item);
+            if (!rName || rName.trim() === "") return;
+            rName = rName.trim().toUpperCase();
+
+            // प्रतिबंध चेक
+            if (restrictedKeywords.some(function(k) { return rName.includes(k); })) return;
+
+            if (!mainMap[rName]) mainMap[rName] = { mri: 0, ls: 0 };
+            if (!poleMap[rName]) poleMap[rName] = { mri: 0, ls: 0 };
+
+            var mainRem = (getRobustKey(item, "FINAL_MAIN_METER_SITE_REMARK") || item.mainStatusRemark || "").toString().toUpperCase();
+            var poleRem = (getRobustKey(item, "FINAL_POLE_METER_SITE_REMARK") || item.poleStatusRemark || "").toString().toUpperCase();
+
+            var hasMainLs = parseTrue(getRobustKey(item, "IS LOAD SURVAY AVAILBLE (MAIN Mtr)")) || parseTrue(item.surveyAvailableMain);
+            var hasPoleLs = parseTrue(getRobustKey(item, "IS LOAD SURVAY AVAILBLE (Pole Mtr)")) || parseTrue(item.surveyAvailablePole);
+
+            if (mainRem.includes("MRI DONE") || mainRem.includes("CMRI DONE")) {
+                mainMap[rName].mri++;
+                if (hasMainLs) mainMap[rName].ls++;
+            }
+
+            if (poleRem.includes("MRI DONE") || poleRem.includes("CMRI DONE")) {
+                poleMap[rName].mri++;
+                if (hasPoleLs) poleMap[rName].ls++;
+            }
+        });
+
+        // 1. मेन मीटर लोड सर्वे रैंकिंग
+        var mainList = Object.keys(mainMap).map(function(n) {
+            var d = mainMap[n];
+            return { name: n, pct: d.mri > 0 ? Math.round((d.ls / d.mri) * 100) : 0, ls: d.ls, mri: d.mri };
+        }).filter(function(x) { return x.mri > 0; }).sort(function(a,b){ return b.pct - a.pct; });
+
+        // 2. पोल मीटर लोड सर्वे रैंकिंग
+        var poleList = Object.keys(poleMap).map(function(n) {
+            var d = poleMap[n];
+            return { name: n, pct: d.mri > 0 ? Math.round((d.ls / d.mri) * 100) : 0, ls: d.ls, mri: d.mri };
+        }).filter(function(x) { return x.mri > 0; }).sort(function(a,b){ return b.pct - a.pct; });
+
+        // रेंडरिंग
+        renderSurveyListHtml('mainMeterTopSurveyList', mainList.slice(0, 5), true);
+        renderSurveyListHtml('mainMeterPoorSurveyList', mainList.slice().reverse().slice(0, 5), false);
+
+        renderSurveyListHtml('poleMeterTopSurveyList', poleList.slice(0, 5), true);
+        renderSurveyListHtml('poleMeterPoorSurveyList', poleList.slice().reverse().slice(0, 5), false);
+    };
+}
+
+// 🎨 कलर-कोडेड बैज के साथ लोड सर्वे लिस्ट रेंडरर
+function renderSurveyListHtml(elemId, list, isTop) {
+    var node = document.getElementById(elemId);
+    if (!node) return;
+    if (!list || list.length === 0) {
+        node.innerHTML = '<span style="color:#94a3b8; font-size:10px;">डेटा उपलब्ध नहीं</span>';
+        return;
+    }
+
+    var html = "";
+    var rankIcons = isTop ? ["🥇", "🥈", "🥉", "4️⃣", "5️⃣"] : ["🚨", "⚠️", "🔻", "🔸", "🔹"];
+
+    list.forEach(function(p, idx) {
+        var badgeBg = isTop ? "#dcfce7" : "#fee2e2";
+        var badgeColor = isTop ? "#15803d" : "#be185d";
+        var borderColor = isTop ? "#bbf7d0" : "#fbcfe8";
+
+        html += '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px; padding:3px 5px; background:#ffffff; border-radius:6px; border:1px solid ' + borderColor + ';">' +
+                '<span>' + rankIcons[idx] + ' <b style="color:#0f172a;">' + p.name + '</b></span>' +
+                '<span style="background:' + badgeBg + '; color:' + badgeColor + '; padding:1px 6px; border-radius:10px; font-weight:900;">' + 
+                    p.pct + '% <small style="color:#64748b; font-weight:700;">(' + p.ls + '/' + p.mri + ')</small>' +
+                '</span>' +
+                '</div>';
+    });
+    node.innerHTML = html;
+}
+
+function renderSurveyListHtml(elemId, list, colorHex) {
+    var node = document.getElementById(elemId);
+    if (!node) return;
+    if (!list || list.length === 0) {
+        node.innerHTML = '<span style="color:#94a3b8;">डेटा उपलब्ध नहीं</span>';
+        return;
+    }
+    var html = "";
+    list.forEach(function(p, idx) {
+        html += '<div style="display:flex; justify-content:space-between; margin-bottom:2px;">' +
+                '<span>' + (idx + 1) + '. <b>' + p.name + '</b></span>' +
+                '<span style="color:' + colorHex + '; font-weight:900;">' + p.pct + '% <small style="color:#64748b;">(' + p.ls + '/' + p.mri + ')</small></span>' +
+                '</div>';
+    });
+    node.innerHTML = html;
 }
 
 function toggleSkeletonShimmerLoader(show) {
@@ -9515,6 +9771,90 @@ function resetCustomUserTheme() {
         document.documentElement.style.setProperty('--theme-header-gradient', 'linear-gradient(-45deg, ' + savedPrimary + ', ' + savedHeader + ', #0f172a)');
     }
 })();
+// 📄 स्क्रीन जैसा बड़े फ़ॉन्ट वाला सुपर-क्लियर कलरफुल डैशबोर्ड PDF डाउनलोड करने का इंजन
+function downloadColorfulDashboardPDF() {
+    var dashboardElement = document.getElementById('sub-view-cards');
+    if (!dashboardElement) return alert("🚨 डैशबोर्ड लेआउट नहीं मिला!");
+
+    if (typeof html2canvas === 'undefined') {
+        return alert("🚨 html2canvas लाइब्रेरी लोड नहीं हो सकी! कृपया इंटरनेट कनेक्शन चेक करें।");
+    }
+
+    showThinAlert("⏳ बड़े फ़ॉन्ट में HD डैशबोर्ड PDF बन रही है, कृपया प्रतीक्षा करें...", false);
+
+    // 🎯 1. अस्थायी रूप से फ़ॉन्ट साइज़ और पैडिंग को बढ़ाकर HD ज़ूम देना
+    var originalStyle = dashboardElement.getAttribute("style") || "";
+    
+    // फ़ॉन्ट का आकार बढ़ाने के लिए टेम्परेरी स्टाइल लागू करना
+    dashboardElement.style.fontSize = "16px";
+    dashboardElement.style.zoom = "1.25"; // 125% ज़ूम जिससे फ़ॉन्ट काफी बड़ा और साफ़ दिखेगा
+
+    // स्क्रीन कैप्चर ऑप्शंस (High Resolution HD Capture)
+    var options = {
+        scale: 2, // 2x High-Density Pixel Scale
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#f8fafc',
+        logging: false
+    };
+
+    html2canvas(dashboardElement, options).then(function(canvas) {
+        // 🎯 कैप्चर पूरा होने के तुरंत बाद स्टाइल वापस ओरिजिनल कर दें ताकि स्क्रीन का यूआई न बिगड़े
+        dashboardElement.setAttribute("style", originalStyle);
+
+        try {
+            var imgData = canvas.toDataURL('image/jpeg', 1.0);
+            
+            // A3 / A4 बड़े फॉर्मेट में ऑटो-फिटिंग
+            var pdf = new window.jspdf.jsPDF('p', 'pt', 'a3'); // A3 साइज़ बड़े फ़ॉन्ट के लिए सबसे बेस्ट रहता है
+            var pdfWidth = pdf.internal.pageSize.getWidth();
+            var pdfHeight = pdf.internal.pageSize.getHeight();
+            
+            var imgWidth = pdfWidth - 40; // 20pt मार्जिन
+            var imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+            // पेज 1 पर इमेज लगाना
+            pdf.addImage(imgData, 'JPEG', 20, 20, imgWidth, imgHeight);
+
+            // यदि कंटेंट 1 पेज से ज़्यादा लंबा हो तो अगला पेज जोड़ना
+            var heightLeft = imgHeight - (pdfHeight - 40);
+            var position = 20 - (pdfHeight - 40);
+
+            while (heightLeft > 0) {
+                pdf.addPage();
+                pdf.addImage(imgData, 'JPEG', 20, position, imgWidth, imgHeight);
+                heightLeft -= (pdfHeight - 40);
+                position -= (pdfHeight - 40);
+            }
+
+            var filename = "HD_LargeFont_Dashboard_" + getFormattedDateTimeForFile() + ".pdf";
+
+            // 🚀 एंड्रॉइड APK एवं ब्राउज़र दोनों के लिए सेविंग सपोर्ट
+            if (typeof AndroidBridge !== "undefined" && AndroidBridge.processBase64Download) {
+                var rawBase64 = pdf.output('arraybuffer');
+                var uint8 = new Uint8Array(rawBase64);
+                var binary = '';
+                for (var j = 0; j < uint8.byteLength; j++) {
+                    binary += String.fromCharCode(uint8[j]);
+                }
+                AndroidBridge.processBase64Download(btoa(binary), "pdf", filename);
+            } else {
+                pdf.save(filename);
+            }
+
+            showThinAlert("🎉 बड़े और साफ़ फ़ॉन्ट में PDF डाउनलोड सफल!", true);
+        } catch(err) {
+            dashboardElement.setAttribute("style", originalStyle);
+            console.error("Colorful PDF Generation Error:", err);
+            showThinAlert("🚨 PDF जनरेट करने में त्रुटि हुई!", true);
+            alert("🚨 PDF बनाने में त्रुटि हुई: " + err.toString());
+        }
+    }).catch(function(error) {
+        dashboardElement.setAttribute("style", originalStyle);
+        console.error("html2canvas Error:", error);
+        showThinAlert("🚨 स्क्रीन कैप्चर फेल हुआ!", true);
+    });
+}
 </script>
 
 <div id="contactUpdateModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15, 23, 42, 0.75); z-index:999999; align-items:center; justify-content:center; backdrop-filter:blur(4px); padding: 15px; box-sizing: border-box;">
