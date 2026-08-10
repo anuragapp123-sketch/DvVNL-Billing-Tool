@@ -5480,113 +5480,21 @@ async function downloadSelectedMergedPDF() {
         var record = e.target.result; if(!record) return;
         var rows = [];
         var mrName = getReaderName(record) || "N/A";
-        var currentUserLower = (loggedInReader || "").toString().trim().toUpperCase();
-
-        // 👦 सुरक्षा कवच: अगर लॉग-इन यूजर एडमिन नहीं है, तो मोड को जबरदस्ती 'MASTER_COLS' (17 लिमिटेड कॉलम्स) पर सेट करें
-        if (currentUserLower !== "ANURAG SHAKYA" && currentUserLower !== "ADMIN") {
-            mode = 'MASTER_COLS';
-        }
         
-        var ALL_SHEET_COLS = [
-                "CONSUMER REMARK", "SUB REMARK", "BILLING CYCLE", "LOAD TYPE (H-L-T)", "IS MAIN METER VISIT", 
-                "DIVISION", "AREA TYPE", "METER READER NAME", "VISIT BY", "METER_READER_NAME (ISSPL)", 
-                "VISIT LAST MONTH", "ASSINED USER ISSPL", "MR LOGIN (UGO)", "MR MOBILE NO.", "ACCOUNT NO", 
-                "BOOK NUMBER", "CONNECTION NUMBER", "SUB DIVISION CODE", "SUB DIVISION NAME", "AGENCY-STATUS", 
-                "CONSUMER-TYPE", "CONSUMER TYPE", "MASTER-SUBSTATION NAME", "MASTER-FEEDER-NAME", "SUBSTATION-NAME", 
-                "FEEDER-NAME", "ST", "CONSUMER CATOGARY", "ACTVITY", "ACTIVITY IN ISSPL APP", "Activity By MR", 
-                "PROCESS FINAL", "CONSUMER-NAME", "ADDRESS", "Master Mobile Number", "LOAD", "UNIT", "LOAD IN KW", 
-                "LOAD GROUP (5,10,50)", "LOAD_CATOGERY (5,10)", "LOAD_WISE GROUP (5,10,25,50,75,100)", 
-                "LOAD TAG H-LT", "LOAD GROUP", "IS NET METER", "LAST MONTH VS FINAL VISITED METER", 
-                "FINAL VISITED METER NUMBER VS BILLED METER NUMBER", "SITE METER APPSHEET VS FINAL VISITED METER NUMBER", 
-                "FINAL VISITED METER NUMBER VS BILLED METER MAKE", "FINAL MAIN VS FINAL POLE MTR MISMATCH", 
-                "LAST MONTH MAIN VS LAST MONTH POLE MTR MISMATCH", "MAIN METER MF", "BILLED METER NUMBER", 
-                "MASTER METER NUMBER", "MASTER METER MAKE", "FIELD METER NUMBER", "FIELD METER MAKE", "METER_TYPE", 
-                "FINAL VISITED POLE MTR NO.", "LAST MONTH FINAL MM NO.", "LAST MONTH FINAL MM MAKE", 
-                "FINAL VISITED MAIN METER NUMBER", "FINAL VISITED MAIN METER MAKE", "SITE METER NUMBER_APPSHEET", 
-                "SITE METER MAKE_APPSHEET", "INENTIVE VISIT METER NUMBER", "INVENTIVE VISIT METER MAKE", 
-                "REVISIT- MAIN MTR NO.", "REVISIT-MAIN MTR MAKE", "METER_ LOCATION", "ATTEND STATUS", "FINAL VISIT DATE", 
-                "APPSHEET VISIT DATE", "INVENTIVE VISIT DATE", "INVENTIVE REVISIT_DATE", "TIME STAMP_1", 
-                "BILLABLE -NOT-BILLABLE", "EXCEPTION TYPE (MAIN METER)", "LAST_MONTH SITE REMARK", 
-                "FINAL_MAIN_METER_SITE_REMARK", "APPSHEET MAIN METER SITE REMARK", "INVENTIVE MAIN METER SITE REMARK", 
-                "INVENTIVE REVISIT SITE REMARK (MAIN MTR)", "REMARK", "INVENTIVE GENRAL REMARK", "INVENTIVE APP REMARK", 
-                "LAST MONTH MRI (MAIN MTR)", "IS MRI AVAILABLE (MAIN METER)", "FIELD METER MRI AVAILABLE", 
-                "IS VISITED MRI AVAILABLE", "FINAL VISITED MAIN METER MRI AVAILABLE", 
-                "MAIN FIELD METER MRI AVAILABLE BY MTR NO.", "INVENTIVE VISITED MAIN METER MRI AVAILABLE BY MTR NO.", 
-                "APPSHEET VISITED MAIN METER MRI AVAILABLE BY MTR NO.", "LAST MONTH FINAL MM MRI AVAILABLE BY M N.", 
-                "REVISIT METER MRI AVAILABLE BY MTR NO.", "IS METER RTC CORRECT", "RTC DATE", 
-                "IS LOAD SURVAY AVAILBLE (MAIN Mtr)", "MRI DATE", "MRI KWH", "MRI KVAH", "MRI MD KW", "MRI MD KVA", 
-                "MANUAL KWH", "MANUAL KVAH", "MANUAL KW", "MANUAL KVA", "APPSHEET-KWH", "APPSHEET-KVAH", 
-                "APPSHEET-KW", "APPSHEET-KVA", "INVENTIVE KWH", "INVENTIVE KVAH", "INVENTIVE MD KW", "INVENTIVE MD KVA", 
-                "NEW KWH", "NEW KVAH", "MD", "LAST MONTH KWH", "LAST MONTH KVAH", "LAST MONTH CONSUMPTION KWH", 
-                "LAST MONTH CONSUMPTION KVAH", "LAST MONTH MD", "LAST MONTH BILL BASE", 
-                "LAST MONTH VS FINAL VISITED METER POLE", "LAST MONTH VS FINAL VISITED METER POLE MAKE", 
-                "SAI PORTAL VS FINAL VISITED POLE", "LAST MONTH FINAL POLE MTR VS SAI PORTAL MTR NO.", 
-                "LAST MONTH FINAL POLE MTR VS INVENTIVE (FIELD MTR NO.) PORTAL MTR NO.", 
-                "LAST MONTH FINAL POLE MTR VS INVENTIVE (FIELD MTR NO.) PORTAL MTR MAKE.", 
-                "APPSHEET VS FINAL VISITED POLE MTR NO.", "POLE METER MF (INVENTIVE PORTAL)", 
-                "POLE METER MF (SAI PORTAL)", "SAI PORTAL POLE MTR NO.", "FIELD METER NUMBER (POLE)", 
-                "FIELD METER MAKE (POLE)", "POLE METER STATUS", "FINAL VISIT MAIN MTR VS FINAL VISITE POLE MTR", 
-                "FINAL VISIT MAIN MTR", "LAST MONTH FINAL PM NO.", "LAST MONTH FINAL PM MAKE", 
-                "FINAL VISITED POLE METER NO.", "FINAL VISITED POLE METER MAKE", "APPSHEET VISIT POLE METER NUMBER", 
-                "APPSHEET VISIT POLE METER MAKE", "INVENTIVE VISIT POLE METER NUMBER", "INVENTIVE VISIT POLE METER MAKE", 
-                "REVISIT- POLE MTR NO.", "REVISIT-POLE MTR MAKE", "LAST MONTH POLE SITE REMARK", "ATTEND STATUS (POLE)", 
-                "LOAD TAG", "IS POLE METER VISIT", "EXCEPTION TYPE (POLE METER)", "FINAL_POLE_METER_SITE_REMARK", 
-                "APPSHEET POLE METER SITE REMARK", "INVENTIVE POLE METER SITE REMARK", 
-                "INVENTIVE REVISIT SITE REMARK (POLE MTR)", "INVENTIVE POLE METER GENRAL REMARK", 
-                "LAST MONTH MRI (POLE MTR)", "IS MRI AVAILABLE (POLE METER)", "FIELD METER MRI (POLE) AVAILABLE", 
-                "VISITED METER MRI (POLE) AVAILABLE", "FINAL METER MRI (POLE) AVAILABLE BY MTR NO.", 
-                "FIELD METER MRI (POLE) AVAILABLE BY MTR NO.", "INVENTIVE VISITED METER MRI (POLE) AVAILABLE BY MTR NO.", 
-                "APPSHEET METER MRI (POLE) AVAILABLE BY MTR NO.", "LAST MONTHMETER MRI (POLE) AVAILABLE BY MTR NO.", 
-                "REVISIT METER MRI (POLE) AVAILABLE BY MTR NO.", "POLE METER RTC CORRECT", "POLE RTC DATE", 
-                "POLE METER MRI DATE TIME", "IS LOAD SURVAY AVAILBLE (Pole Mtr)", "MAIN METER PHOTO", "POLE METER PHOTO", 
-                "FINAL BILLING STATUS _MANUAL", "BILLING TYPE_MANUAL", "BILL AUTO TAG_MANUAL", "BILLING STATUS", 
-                "BILLED DATE", "BILL_BASE", "BILL_TYPE", "MR_SOURCE_CODE", "DUE DATE", "LAST PAY DATE", "PAYBLE AMOUNT", 
-                "DATA SOURCE NAME", "READING SOURCE TYPE", "PROCESSING DATE", "EXPORT STATUS", "EXPORT FAILURE MESSAGE", 
-                "ACCOUNT ID FOR BILL DISTRIBUTION", "MR NAME FOR BILL DISTRIBUTION", "Folder Creater", "Pdf Name", 
-                "234For Copy Folder", "BILL PRINT TAG", "IS BILL SEND BY WHATUP", "BILL_GROUP", "FOR_BILL DISTRIBUTION", 
-                "IS BILL UPLOAD", "BILL UPLOAD DATE", "BILL DOWNLOAD LINK", "ERROR (BILL NOT DOWNLOAD)", "IS BILL PRINT", 
-                "BILL PRINT DATE", "FINAL BILLING TAG", "DISTRIBUTION STATUS", "BILL DELIVERED DATE", "BILL RECEIVER NAME", 
-                "CONSUMER MOBILE NUMBER", "MOBILE NUMBER NEW", "TIME STAMP2", "M_BILL_DELIVERD_DATE", "M_BILL RECEIVER NAME", 
-                "M_CONSUMER MOBILE NUMBER", "M_BILL RECEIVER IMAGE", "M_REMARK", "SAI-BILL DISTRIBUTION STATUS", 
-                "SAI-BILL DELIVERED DATE", "SAI-BILL RECEIVER NAME", "SAI-CONSUMER MOBILE NUMBER", "New Whatsup No.", 
-                "MAIN METER READING MONTH LAST MONTH", "MAIN MTR KWH CONSUMPTION", "MAIN MTR KVAH CONSUMPTION", 
-                "MAIN MTR MD KW UHI", "MAIN METER MD KVA UHI", "MAIN_MTR_MF", "MAIN METER CONSUMPTION KWH WITH MF", 
-                "MAIN METER CONSUMPTION KVAH WITH MF", "POLE METER READING DATE CURRENT MONTH", 
-                "POLE METER READING MONTH LAST MONTH", "POLE MTR KWH CONSUMPTION", "POLE MTR KVAH CONSUMPTION", 
-                "POLE METER MD KW UHI", "POLE METER MD KVA UHI", "POLE_MTR_MF", "POLE METER CONSUMPTION KWH WITH MF", 
-                "POLE METER CONSUMPTION KVAH WITH MF", "MAIN & POLE METER CONSUMPTION DIFFRENCE KVAH", 
-                "MAIN & POLE METER CONSUMPTION DIFFRENCE KVAH %", "MAIN & POLE METER MD DIFFRENCE KVA WITH MF", 
-                "MAIN & POLE METER MD DIFFRENCE KVA %", "IF PENDING IN ANY LIST"
+        // 🎯 केवल चुनिंदा जरूरी 18 कॉलम्स जो PDF में आने चाहिए
+        var reqCols = [
+            "DIVISION", "ACCOUNT NO", "CONSUMER-NAME", "ADDRESS", "LOAD IN KW", 
+            "LOAD GROUP (5-10-50)", "FINAL VISIT DATE", "LAST MONTH FINAL MM NO.", 
+            "LAST MONTH FINAL MM MAKE", "EXCEPTION TYPE (MAIN METER)", 
+            "FINAL_MAIN_METER_SITE_REMARK", "REMARK", "FINAL_POLE_METER_SITE_REMARK",
+            "IS MRI AVAILABLE (MAIN METER)", "LAST MONTH FINAL PM NO.", 
+            "LAST MONTH FINAL PM MAKE", "EXCEPTION TYPE (POLE METER)", "IS MRI AVAILABLE (POLE METER)", "MR NAME"
         ];
 
-        if(mode === 'FULL') {
-            ALL_SHEET_COLS.forEach(function(colName) {
-                var val = getRobustKey(record, colName);
-                var displayVal = val !== undefined && val !== null && val.toString().trim() !== "" ? val.toString() : "-";
-                rows.push([colName, displayVal]);
-            });
-        } else if (mode === 'MASTER_COLS' || mode === 'STANDARD') {
-            var reqCols = [
-                "DIVISION", "ACCOUNT NO", "CONSUMER-NAME", "ADDRESS", "LOAD IN KW", 
-                "LOAD GROUP (5-10-50)", "FINAL VISIT DATE", "LAST MONTH FINAL MM NO.", 
-                "LAST MONTH FINAL MM MAKE", "EXCEPTION TYPE (MAIN METER)", 
-                "FINAL_MAIN_METER_SITE_REMARK", "REMARK", "FINAL_POLE_METER_SITE_REMARK",
-                "IS MRI AVAILABLE (MAIN METER)", "LAST MONTH FINAL PM NO.", 
-                "LAST MONTH FINAL PM MAKE", "EXCEPTION TYPE (POLE METER)", "IS MRI AVAILABLE (POLE METER)"
-            ];
-            if(reqCols.indexOf("MR NAME") === -1) reqCols.push("MR NAME");
-
-            rows = reqCols.map(function(k) {
-                var val = (k === "MR NAME") ? getReaderName(record) : getRobustKey(record, k);
-                return [k, val !== undefined && val !== null && val.toString().trim() !== "" ? val.toString() : "-"];
-            });
-        } else {
-            var reqCols = ["DIVISION", "ACCOUNT NO", "CONSUMER-NAME", "ADDRESS", "Master Mobile Number", "Consumer Type", "Consumer Catogary", "LOAD IN KW", "Process Final", "LAST MONTH FINAL MM NO.", "LAST MONTH FINAL MM MAKE", "EXCEPTION TYPE (MAIN METER)", "FINAL_MAIN_METER_SITE_REMARK", "IS MRI AVAILABLE (MAIN METER)", "IS LOAD SURVAY AVAILBLE (MAIN Mtr)", "LAST MONTH FINAL PM NO.", "LAST MONTH FINAL PM MAKE", "EXCEPTION TYPE (POLE METER)", "FINAL_POLE_METER_SITE_REMARK", "IS MRI AVAILABLE (POLE METER)", "IS LOAD SURVAY AVAILBLE (Pole Mtr)"].concat(COLUMNS_BILL_ADDITIONS).concat(["MR NAME", "FINAL VISIT_DATE", "REMARK", "TIME STAMP", "ATTEND STATUS"]);
-            rows = reqCols.map(function(k) {
-                var val = (k === "MR NAME") ? getReaderName(record) : getRobustKey(record, k);
-                return [k, val !== undefined && val !== null && val.toString().trim() !== "" ? val.toString() : "-"];
-            });
-        }
+        rows = reqCols.map(function(k) {
+            var val = (k === "MR NAME") ? getReaderName(record) : getRobustKey(record, k);
+            return [k, val !== undefined && val !== null && val.toString().trim() !== "" ? val.toString() : "-"];
+        });
         
         var doc = new window.jspdf.jsPDF({ orientation: 'landscape', unit: 'pt', format: 'a4' });
         doc.setFontSize(16); doc.setTextColor(15, 23, 42); doc.setFont("Helvetica", "bold");
@@ -5615,12 +5523,25 @@ async function downloadSelectedMergedPDF() {
         }
         
         var filename = "Consumer_" + accNo + "_" + getFormattedDateTimeForFile() + ".pdf";
-        if (navigator.userAgent.match(/Android/i)) {
-            var pdfBase64 = doc.output('datauristring');
-            window.location.href = pdfBase64;
-            showThinAlert("🎉 PDF डाउनलोड होना शुरू हो गया है...", true);
+        if (typeof AndroidBridge !== "undefined" && AndroidBridge.processBase64Download) {
+            var rawBase64 = doc.output('arraybuffer');
+            var uint8 = new Uint8Array(rawBase64); var binary = '';
+            for (var j = 0; j < uint8.byteLength; j++) { binary += String.fromCharCode(uint8[j]); }
+            AndroidBridge.processBase64Download(btoa(binary), "pdf", filename);
+            showThinAlert("🎉 PDF डाउनलोड शुरू हुआ...", true);
         } else {
-            doc.save(filename);
+            // Universal Blob Download Engine (GitHub / Web Safe)
+            var blob = doc.output('blob');
+            var link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            setTimeout(function() {
+                document.body.removeChild(link);
+                URL.revokeObjectURL(link.href);
+            }, 100);
+            showThinAlert("🎉 PDF डाउनलोड सफल!", true);
         }
     };
 }
@@ -6354,7 +6275,6 @@ function openReportRowDirect(reportKey) {
             doc.text('Report Prepared By: DvVNL Billing Tool | Er. Anurag Shakya | Mo: 9761414105 - Page ' + i + ' of ' + pageCount, doc.internal.pageSize.width / 2, doc.internal.pageSize.height - 15, { align: 'center' }); 
         }
         
-        // --- 🚀 एंड्रॉइड APK डाउनलोड मैनेजर ब्रिज बाईपास लॉजिक - Dynamic Name Enabled ---
         var filename = pdfDisplayTitle.replace(/[^a-zA-Z0-9_ ]/g, "").replace(/\s+/g, "_") + "_" + getFormattedDateTimeForFile() + ".pdf";
         if (typeof AndroidBridge !== "undefined" && AndroidBridge.processBase64Download) {
             var rawBase64 = doc.output('arraybuffer');
@@ -6362,16 +6282,21 @@ function openReportRowDirect(reportKey) {
             var binary = '';
             for (var j = 0; j < uint8.byteLength; j++) { binary += String.fromCharCode(uint8[j]); }
             var base64String = btoa(binary);
-            
-            // 🎯 पीडीएफ के लिए भी तीसरा पैरामीटर (सही नाम) पास करें
             AndroidBridge.processBase64Download(base64String, "pdf", filename);
             showThinAlert("🎉 Report PDF डाउनलोड होना शुरू हो गया है...", true);
-        } else if (navigator.userAgent.match(/Android/i)) {
-            var pdfBase64 = doc.output('datauristring');
-            window.location.href = pdfBase64;
-            showThinAlert("🎉 Report PDF डाउनलोड होना शुरू हो गया है...", true);
         } else {
-            doc.save(filename);
+            // Universal GitHub / Web Browsers Failsafe Download
+            var blob = doc.output('blob');
+            var link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            setTimeout(function() {
+                document.body.removeChild(link);
+                URL.revokeObjectURL(link.href);
+            }, 100);
+            showThinAlert("🎉 Report PDF डाउनलोड सफल!", true);
         }
     };
 }
@@ -7461,114 +7386,78 @@ function exportAllMRSummaryPDF() {
     }
 }
 
-    function saveToIndexedDB(entryData) {
+    // ⚡ Single-Pass Ultra-Fast Save Engine (Instant UI Hide & Parallel DB Save)
+function saveToIndexedDB(entryData) {
     if (!db) return alert("डेटाबेस एरर: कृपया ऐप को दोबारा लोड करें!");
     
-    // 1. saved_entries में डेटा डालने का ट्रांजैक्शन
-    var tx = db.transaction("saved_entries", "readwrite"); 
-    var store = tx.objectStore("saved_entries");
-    store.put(entryData);
+    // 🚀 1. UI को बिना किसी डिले के तुरंत रेस्पॉन्स दें (0.01 सेकंड में फॉर्म बंद और कार्ड गायब)
+    var allItems = document.querySelectorAll('.list-item');
+    allItems.forEach(function(el) {
+        if(el.innerHTML.includes(entryData.accountNo)) {
+            el.style.setProperty("display", "none", "important");
+        }
+    });
+
+    document.getElementById('formView').style.setProperty("display", "none", "important");
+    
+    var dashView = document.getElementById('appDashboardView');
+    if (dashView) dashView.style.setProperty("display", "block", "important");
+
+    if (activeReportType && activeReportType !== "") {
+        var repDetailCont = document.getElementById('reportDetailContainer');
+        if (repDetailCont) repDetailCont.style.setProperty("display", "block", "important");
+    } else {
+        var lastActiveTab = localStorage.getItem("app_current_tab_state_" + loggedInReader) || "summary";
+        if (typeof switchTab === 'function') switchTab(lastActiveTab);
+    }
+
+    var mainContainerNode = document.getElementById('mainAppContainer');
+    if (mainContainerNode) {
+        mainContainerNode.style.removeProperty("min-height");
+        mainContainerNode.style.setProperty("padding-bottom", "140px", "important");
+    }
+
+    showThinAlert("✅ एंट्री सुरक्षित!", true);
+
+    // 🚀 2. बैकग्राउंड में दोनों टेबल्स को एक साथ सिंगल ट्रांजैक्शन में अपडेट करें
+    var tx = db.transaction(["saved_entries", "consumers"], "readwrite"); 
+    
+    // saved_entries में सेव
+    tx.objectStore("saved_entries").put(entryData);
+    
+    // consumers में स्टेटस डन करना
+    var consumerStore = tx.objectStore("consumers");
+    consumerStore.get(entryData.accountNo).onsuccess = function(ev) {
+        var item = ev.target.result;
+        if(item) {
+            item.isDone = true;
+            item.attendStatus = "ATTEND";
+            item["ATTEND STATUS"] = "ATTEND";
+            if(entryData.formType === "BILL_DIST") {
+                item.distStatus = "DISTRIBUTED";
+                item["DISTRIBUTION STATUS"] = "DISTRIBUTED";
+            }
+            consumerStore.put(item);
+        }
+    };
     
     tx.oncomplete = function() {
         if(loggedInReader) { 
             localStorage.removeItem("app_current_form_item_" + loggedInReader); 
         }
-        
-        // 2. मुख्य उपभोक्ताओं के स्टोर में स्टेटस अपडेट
-        var upTx = db.transaction("consumers", "readwrite");
-        upTx.objectStore("consumers").get(entryData.accountNo).onsuccess = function(ev) {
-            var item = ev.target.result;
-            if(item) {
-                item.isDone = true;
-                item.attendStatus = "ATTEND";
-                item["ATTEND STATUS"] = "ATTEND";
-                if(entryData.formType === "BILL_DIST") {
-                    item.distStatus = "DISTRIBUTED";
-                    item["DISTRIBUTION STATUS"] = "DISTRIBUTED";
-                }
-                ev.target.source.put(item);
-            }
-        };
-        
-        // 3. UI रिफ्रेश और गूगल शीट इंस्टेंट सिंक इंजन
-        upTx.oncomplete = function() {
-            // 🚀 [Instant UI Patch]: बिना किसी डिले के स्क्रीन से कार्ड को तुरंत गायब करें
-            var allItems = document.querySelectorAll('.list-item');
-            allItems.forEach(function(el) {
-                if(el.innerHTML.includes(entryData.accountNo)) {
-                    el.style.setProperty("display", "none", "important");
-                }
-            });
 
-            // काउंटर्स तुरंत अपडेट करें
-            if (typeof updateSummaryStatsRaw === 'function') updateSummaryStatsRaw();
+        // भारी बैकग्राउंड सिंक और रेंडरिंग को यूआई फ्री होने के बाद चलाएं
+        setTimeout(function() {
+            if (typeof triggerSilentBackgroundSync === 'function') triggerSilentBackgroundSync();
+            else if (typeof syncOfflineDataToServer === 'function' && navigator.onLine) syncOfflineDataToServer();
             
-            // 🚀 [शीट सिंक लॉकिंग फिक्स]: शीट में डेटा तुरंत भेजने के लिए मजबूर (Force) करें
-            setTimeout(function() {
-                if (typeof window.triggerSilentBackgroundSync === 'function') {
-                    window.triggerSilentBackgroundSync();
-                } else if (typeof triggerSilentBackgroundSync === 'function') {
-                    triggerSilentBackgroundSync();
-                } else if (typeof syncOfflineDataToServer === 'function' && navigator.onLine) {
-                    // बैकअप: अगर साइलेंट सिंक किसी वजह से मिस हो, तो डायरेक्ट सर्वर सिंक चलाएं
-                    syncOfflineDataToServer();
-                }
+            if (typeof checkSyncStatus === 'function') checkSyncStatus();
+        }, 300);
+    };
 
-                if (typeof window.checkSyncStatus === 'function') {
-                    window.checkSyncStatus();
-                } else if (typeof checkSyncStatus === 'function') {
-                    checkSyncStatus();
-                }
-            }, 300); // 300ms का डिले दिया है ताकि डेटाबेस ट्रांजैक्शन फ्री हो जाए और शीट तक डेटा पक्का पहुंचे
-            
-            // लिस्ट रेंडरिंग को थोड़ा समय दें
-            setTimeout(function() {
-                if (typeof renderBillDistributionList === 'function') renderBillDistributionList();
-                if (typeof renderNewListTab === 'function') renderNewListTab();
-                if (activeReportType && typeof applyRemarkGroupFilter === 'function') applyRemarkGroupFilter();
-            }, 100);
-            
-            // 🎯 ULTIMATE BLANK SCREEN FIX: एंट्री सेव होने के बाद 100% सुरक्षित पैरेंट व्यू रीस्टोरेशन
-            
-            // 1. सबसे पहले मुख्य डैशबोर्ड और रिपोर्ट लेआउट के डिस्प्ले को फ़ोर्स ऑन करें
-            var dashView = document.getElementById('appDashboardView');
-            if (dashView) { dashView.style.setProperty("display", "block", "important"); }
-            
-            if (activeReportType && activeReportType !== "") {
-                // नियम 1: अगर किसी सब-रिपोर्ट के अंदर से फॉर्म खुला था, तो उस रिपोर्ट के कंटेनर को ऑन रखें
-                var repDetailCont = document.getElementById('reportDetailContainer');
-                if (repDetailCont) { repDetailCont.style.setProperty("display", "block", "important"); }
-                
-                // फॉर्म को बंद करें
-                document.getElementById('formView').style.setProperty("display", "none", "important");
-                
-                // लिस्ट को डेटाबेस सिंक के बाद रेंडर होने के लिए 50ms का सेफ़्टी डिले दें
-                setTimeout(function() {
-                    if (typeof applyRemarkGroupFilter === 'function') { applyRemarkGroupFilter(); }
-                }, 50);
-            } else {
-                // नियम 2: अगर उपभोक्ता (List) या बिल वितरण (Billdist) टैब से एंट्री की थी
-                var lastActiveTab = localStorage.getItem("app_current_tab_state_" + loggedInReader) || "summary";
-                
-                // फॉर्म को बंद करें
-                document.getElementById('formView').style.setProperty("display", "none", "important");
-                
-                if (typeof switchTab === 'function') {
-                    switchTab(lastActiveTab); 
-                } else {
-                    navigateToViewRaw('appDashboardView');
-                }
-            }
-            
-            // 2. पैरेंट कंटेनर का पैडिंग लेआउट वापस सामान्य (Original) करें
-            var mainContainerNode = document.getElementById('mainAppContainer');
-            if (mainContainerNode) {
-                mainContainerNode.style.removeProperty("min-height");
-                mainContainerNode.style.setProperty("padding-bottom", "140px", "important");
-            }
-            
-            showThinAlert("✅ एंट्री सुरक्षित! शीट में डेटा भेजा जा रहा है...", true);
-        };
+    tx.onerror = function(err) {
+        console.error("Save Transaction Error:", err);
+        alert("🚨 सेव करने में त्रुटि हुई, कृपया पुनः प्रयास करें।");
     };
 }
 // 🚀 बैकग्राउंड में ऑफलाइन सेव डेटा को गूगल शीट पर ऑटो-सिंक करने वाला गायब इंजन
@@ -9121,7 +9010,16 @@ function exportAnalyticsReportPDF() {
             AndroidBridge.processBase64Download(btoa(binary), "pdf", filename);
             showThinAlert("🎉 शानदार लेआउट के साथ पीडीएफ डाउनलोड सफल!", true);
         } else {
-            doc.save(filename);
+            var blob = doc.output('blob');
+            var link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            setTimeout(function() {
+                document.body.removeChild(link);
+                URL.revokeObjectURL(link.href);
+            }, 100);
             showThinAlert("🎉 फॉर्म डाउनलोड सफल!", true);
         }
     };
@@ -9816,6 +9714,7 @@ function downloadColorfulDashboardPDF() {
         <button id="cu-saveBtn" class="btn" style="background:#0ea5e9 !important; box-shadow:0 3px 6px rgba(14,165,233,0.3); margin-bottom:0;" onclick="submitContactUpdateData()">💾 अपडेट सुरक्षित करें</button>
     </div>
 </div>
+
 <!-- 🎨 POINT 4: CUSTOM THEME BUILDER / COLOR PICKER MODAL -->
 <div id="customColorPickerModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15, 23, 42, 0.75); z-index:999999; align-items:center; justify-content:center; backdrop-filter:blur(4px); padding: 15px; box-sizing: border-box;">
     <div style="background:#ffffff; width:100%; max-width:350px; border-radius:14px; padding:20px; box-shadow:0 20px 40px rgba(0,0,0,0.3); position:relative; box-sizing: border-box;">
@@ -9838,5 +9737,6 @@ function downloadColorfulDashboardPDF() {
     </div>
 </div>
 
+</div> <!-- mainAppContainer क्लोजिंग टैग -->
 </body>
 </html>
