@@ -5,7 +5,7 @@
 <script>
   (function() {
     // ⚠️ अपना नया Deployment URL यहाँ पेस्ट करें
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwhZiGktt7pY8DfqzGd_WuxL9R8V6p0p2VRFLxzw783EaT8ZTIHl47JTRLgmSdmoPznjg/exec";
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxy_G9ao1tymlhMW7w-hwPW3re9UmQEvue2IFWnpUuFx5jvuPPLSHlaXFIdB4PSQtLpPQ/exec";
 
     function createHandler(successCallback, failureCallback) {
       return new Proxy({}, {
@@ -487,15 +487,13 @@
     
     /* 💎 COMPACT CARD DESIGN (Enterprise Smooth Makeover) */
     .card { 
-        background: var(--theme-card-bg); 
-        backdrop-filter: blur(16px); 
-        -webkit-backdrop-filter: blur(16px);
+        background: #ffffff; 
         border-radius: 18px; 
         padding: 16px;       
-        box-shadow: 0 10px 30px -5px rgba(15,23,42,0.08), 0 4px 12px -2px rgba(15,23,42,0.03); 
+        box-shadow: 0 4px 12px rgba(15,23,42,0.06); 
         margin-bottom: 14px; 
-        border: 1px solid rgba(255, 255, 255, 0.6); 
-        transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
+        border: 1px solid #e2e8f0; 
+        transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
     .card:active {
         transform: scale(0.985);
@@ -1813,16 +1811,7 @@
                         <div class="input-group"><label id="lbl-mainNo">Site Meter No. (Main) *</label><input type="text" id="f-mainNo" oninput="this.value = this.value.toUpperCase();"></div>
                         <div class="input-group"><label id="lbl-mainMake">Site Meter Make (Main) *</label><select id="f-mainMake"><option value="">-- मेक चुनें --</option></select></div>
                     </div>
-                    <div class="input-group">
-                        <label style="color:#dc2626;">Image (Main) - PHOTO (अनिवार्य) *</label>
-                        <div class="camera-btn-container">
-                            <label for="f-mainPhoto" class="camera-label-btn">📸 Click Photo</label>
-                            <input type="file" id="f-mainPhoto" accept="image/*" capture="camera" style="display: none;" onchange="processAndCompressPhotoMatrixEngine(event, 'main')">
-                            <span id="feedback-main" style="font-size:11px; color:#059669; font-weight:bold;"></span>
-                            <input type="hidden" id="f-mainPhotoCompressedBase64">
-                        </div>
                     </div>
-                </div>
                 
                 <div id="poleMeterFormBlock">
                     <div class="section-title">पोल मीटर विवरण (Pole Meter)</div>
@@ -1830,15 +1819,6 @@
                     <div id="poleMeterFieldsContainer">
                         <div class="input-group"><label id="lbl-poleNo">Site Meter No. (Pole)</label><input type="text" id="f-poleNo" oninput="this.value = this.value.toUpperCase();"></div>
                         <div class="input-group"><label id="lbl-poleMake">Site Meter Make (Pole)</label><select id="f-poleMake"><option value="">-- मेक चुनें --</option></select></div>
-                    </div>
-                    <div class="input-group">
-                        <label style="color:#dc2626;">Image (Pole) - PHOTO (अनिवार्य) *</label>
-                        <div class="camera-btn-container">
-                            <label for="f-polePhoto" class="camera-label-btn">📸 Click Photo</label>
-                            <input type="file" id="f-polePhoto" accept="image/*" capture="camera" style="display: none;" onchange="processAndCompressPhotoMatrixEngine(event, 'pole')">
-                            <span id="feedback-pole" style="font-size:11px; color:#059669; font-weight:bold;"></span>
-                            <input type="hidden" id="f-polePhotoCompressedBase64">
-                        </div>
                     </div>
                 </div>
                 <div class="input-group"><label style="color:#6b21a8; font-weight:bold;">REMARK (Site Remark - अनिवार्य):</label><textarea id="f-editablePrefetchedRemark" rows="2" placeholder="टिप्पणी लिखना अनिवार्य है..."></textarea></div>
@@ -1995,28 +1975,8 @@ document.addEventListener("visibilitychange", function() {
 });
 
     window.getReaderName = function(item) {
-    if (!item) return ""; 
-    
-    if (item["VISIT LAST MONTH"] !== undefined && item["VISIT LAST MONTH"] !== null) {
-        return item["VISIT LAST MONTH"].toString().trim();
-    }
-    if (item.visitLastMonth !== undefined && item.visitLastMonth !== null) {
-        return item.visitLastMonth.toString().trim();
-    }
-    
-    for (var key in item) { 
-        if (Object.prototype.hasOwnProperty.call(item, key)) {
-            var k = key.toString().replace(/[^a-zA-Z0-9]/g, '').toLowerCase(); 
-            if (k === "visitlastmonth" || k === "mrname" || k === "meterreadername") { 
-                return item[key] ? item[key].toString().trim() : ""; 
-            } 
-        }
-    }
-    
-    if (item["MR NAME"]) return item["MR NAME"].toString().trim();
-    if (item["METER READER NAME"]) return item["METER READER NAME"].toString().trim();
-    
-    return "";
+    if (!item) return "";
+    return item["VISIT LAST MONTH"] || item.visitLastMonth || item["MR NAME"] || item["METER READER NAME"] || item.mrName || "";
 };
     
     function isBillUploaded(item) {
@@ -2024,26 +1984,23 @@ document.addEventListener("visibilitychange", function() {
         return false;
     }
 
-    function getRobustKey(obj, searchKey) {
-        if(!obj || !searchKey) return ""; 
-        searchKey = searchKey.toString().replace(/[\n\r]/g, '').trim(); // शीट की नई लाइन/स्पेस हटाएँ
-        if(obj[searchKey] !== undefined && obj[searchKey] !== null && obj[searchKey] !== "") return obj[searchKey];
-        
-        var mapKey = REPORT_COL_MAP[searchKey]; 
-        if(mapKey && obj[mapKey] !== undefined && obj[mapKey] !== null && obj[mapKey] !== "") return obj[mapKey];
-        
-        var cleanSearch = searchKey.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
-        if(cleanSearch === 'loadinkw') cleanSearch = 'loadgroup'; 
-        if(cleanSearch === 'mno' || cleanSearch === 'mastermobilenumber') cleanSearch = 'meterno';
-        if(cleanSearch === 'consumertype') cleanSearch = 'consumertype'; 
-        if(cleanSearch === 'consumercatogary') cleanSearch = 'consumercatogary';
-        
-        for(var k in obj) { 
-            var cleanK = k.toString().replace(/[^a-zA-Z0-9]/g, '').toLowerCase(); 
-            if(cleanK === cleanSearch && obj[k] !== undefined && obj[k] !== null && obj[k] !== "") return obj[k]; 
-        }
-        return "";
+    // ⚡ High-Speed Direct Key Lookup (No Expensive Regex Loops)
+function getRobustKey(obj, searchKey) {
+    if (!obj || !searchKey) return "";
+    
+    // Direct Object Match
+    if (obj[searchKey] !== undefined && obj[searchKey] !== null && obj[searchKey] !== "") {
+        return obj[searchKey];
     }
+    
+    // Direct Map Lookup
+    var mapKey = REPORT_COL_MAP[searchKey];
+    if (mapKey && obj[mapKey] !== undefined && obj[mapKey] !== null && obj[mapKey] !== "") {
+        return obj[mapKey];
+    }
+    
+    return "";
+}
 
     function parseTrue(val) { if(val === undefined || val === null) return false; var s = val.toString().trim().toUpperCase(); return (s === "TRUE" || s === "YES" || s === "1" || val === true); }
 
@@ -2291,22 +2248,26 @@ if(timeDiff > allowedTimeGap) {
         }).verifyReaderLogin(name, pin);
     }
 
-    function isReaderAllowed(itemReader) {
-        var r = itemReader ? itemReader.toString().trim().toUpperCase() : "";
-        
-        // सुरक्षा कवच: अगर लॉग-इन रीडर का नाम खाली है, तो सुरक्षा के लिए फॉल्स करें
-        var currentUser = loggedInReader ? loggedInReader.toString().trim().toUpperCase() : "";
-        if (!currentUser) return false;
-
-        if(currentUser === "ANURAG SHAKYA") { 
-            var selectAllCb = document.getElementById('adminSelectAll');
-            if(selectAllCb && !selectAllCb.checked && adminSelectedReaders.length === 0) return false;
-            if(adminSelectedReaders.length === 0 || (selectAllCb && selectAllCb.checked)) return true;
-            return adminSelectedReaders.includes(r); 
-        }
-        if(!r) return false;
-        return r === currentUser;
+    var cachedCurrentUser = "";
+function getCachedCurrentUser() {
+    if (!cachedCurrentUser && loggedInReader) {
+        cachedCurrentUser = loggedInReader.toString().trim().toUpperCase();
     }
+    return cachedCurrentUser;
+}
+
+function isReaderAllowed(itemReader) {
+    if (!itemReader) return false;
+    var r = itemReader.toString().trim().toUpperCase();
+    var currentUser = getCachedCurrentUser();
+    if (!currentUser) return false;
+
+    if (currentUser === "ANURAG SHAKYA") {
+        if (adminSelectedReaders.length === 0) return true;
+        return adminSelectedReaders.includes(r);
+    }
+    return r === currentUser;
+}
     // 🟢 नया बैकएंड फंक्शन: एडमिन का लाइव नोटिफिकेशन शीट में सुरक्षित करने के लिए
 function saveLiveNotificationToServer(targetReader, messageText, lockSeconds) {
   try {
@@ -4183,17 +4144,13 @@ function universalListSearch(inputId, containerId) {
     if (!inputNode) return;
     
     var rawInput = inputNode.value || "";
-    // 🎯 फिक्स 1 (पेस्ट फिक्स): पेस्ट करते समय आने वाले इनविजिबल कैरेक्टर्स (जैसे \ज, \क, हिडन स्पेस) को पूरी तरह साफ करना
-    var cleanInput = rawInput.replace(/[\r\n\t\u200B-\u200D\uFEFF]/g, ' ').replace(/\s+/g, ' ').toUpperCase().trim();
+    var cleanInput = rawInput.trim().toUpperCase();
     var container = document.getElementById(containerId);
     if (!container) return;
 
-    var searchKeywords = cleanInput.split(/\s+/).filter(function(k) { return k !== ""; });
-
-    if (searchKeywords.length === 0) {
+    if (cleanInput === "") {
         appSearchDatabaseCache = null; 
-        // 🎯 फिक्स 2 (एक्टिव टैब क्लास सेफ्टी): .tab-btn.active को सही से ढूँढना ताकि डेटा ब्लैंक न हो
-        var currentTabNode = document.querySelector('.tab-bar .tab-btn.active') || document.querySelector('.tab-btn.active');
+        var currentTabNode = document.querySelector('.tab-bar .tab-btn.active');
         if (currentTabNode) {
             var activeTabName = currentTabNode.id.replace('btn-tab-', '');
             if (activeTabName === 'list' && typeof renderNewListTab === 'function') renderNewListTab();
@@ -4203,35 +4160,21 @@ function universalListSearch(inputId, containerId) {
         return;
     }
 
-    if (!db) return;
+    var searchKeywords = cleanInput.split(/\s+/);
 
-    // 🎯 फिक्स 3 (इंस्टेंट रिस्पॉन्स): ३०ms का डिले कभी-कभी पेस्ट होने के तुरंत बाद चलने वाले रेंडरर से टकराता था।
-    // अब यह टाइमर क्लियर होकर बिना किसी यूआई लैग या गायब होने की समस्या के तुरंत सर्च रन करेगा।
     if (globalSearchLockTimer) clearTimeout(globalSearchLockTimer);
     globalSearchLockTimer = setTimeout(function() {
-        var searchAction = function(dataPool) {
+        var dataPool = globalReportsDatabaseCache || appSearchDatabaseCache;
+        if (dataPool && dataPool.length > 0) {
             executeFastCacheSearch(searchKeywords, dataPool, container, containerId);
-        };
-
-        if (globalReportsDatabaseCache && globalReportsDatabaseCache.length > 0) {
-            searchAction(globalReportsDatabaseCache);
-        } else if (appSearchDatabaseCache && appSearchDatabaseCache.length > 0) {
-            searchAction(appSearchDatabaseCache);
-        } else {
-            if (!db) return;
-            try {
-                var tx = db.transaction("consumers", "readonly");
-                var store = tx.objectStore("consumers");
-                var req = store.getAll();
-                req.onsuccess = function(e) {
-                    appSearchDatabaseCache = e.target.result || [];
-                    searchAction(appSearchDatabaseCache);
-                };
-            } catch (err) {
-                console.error("Transaction error during search:", err);
-            }
+        } else if (db) {
+            var tx = db.transaction("consumers", "readonly");
+            tx.objectStore("consumers").getAll().onsuccess = function(e) {
+                appSearchDatabaseCache = e.target.result || [];
+                executeFastCacheSearch(searchKeywords, appSearchDatabaseCache, container, containerId);
+            };
         }
-    }, 50); // 50ms Debounce तेजी से रेस्पॉन्स के लिए // 120ms Debounce से टाइपिंग के दौरान ऐप अटकेगा नहीं // डिले को घटाकर १०ms किया ताकि वैल्यू पेस्ट होते ही बिना गायब हुए लॉक हो जाए
+    }, 150);
 }
 
 // ⚡ सुपर-फास्ट कैशे डीप सर्च ड्राइवर (उपभोक्ता के सम्पूर्ण अंदरूनी डेटाबेस से मिलान)
@@ -4381,9 +4324,13 @@ function executeFastCacheSearch(searchKeywords, allData, container, containerId)
     }
 
     // 🎯 फिक्स 5: डोम को एक शॉट में ओवरराइड करना, फालतू कार्ड्स स्क्रीन से बिल्कुल साफ़ हो जाएंगे
+    var displayItems = matchedItemsHtml.slice(0, 100);
+    if (matchedItemsHtml.length > 100) {
+        displayItems.push('<div style="text-align:center; padding:10px; color:#1e40af; font-weight:bold;">💡 कुल परिणाम ' + matchedItemsHtml.length + ' हैं। केवल शुरुआती 100 दिखाए जा रहे हैं, सटीक परिणाम के लिए सर्च नाम/अकाउंट नंबर और गहरा करें।</div>');
+    }
     container.innerHTML = matchedItemsHtml.length === 0 ? 
         '<div style="text-align:center; padding:25px; color:#ef4444; font-weight:bold;">🚨 कोई परिणाम नहीं मिला!</div>' : 
-        matchedItemsHtml.join('');
+        displayItems.join('');
 
     updateSearchBadgeCount(containerId, matchedCount, true);
 }
@@ -7469,18 +7416,7 @@ function exportAllMRSummaryPDF() {
         var mMake = document.getElementById('f-mainMake').value.trim().toUpperCase();
         var pNo = document.getElementById('f-poleNo').value.trim().toUpperCase(); 
         var pMake = document.getElementById('f-poleMake').value.trim().toUpperCase();
-        
-        // फिक्स: सीधे छुपे हुए बेस64 इनपुट बॉक्स से वैल्यू उठाएं, न कि फाइल इनपुट की .value से
-        var mainPhoto = document.getElementById('f-mainPhotoCompressedBase64') ? document.getElementById('f-mainPhotoCompressedBase64').value : "";
-        
-        if(!mainPhoto && mainStatus !== "No Meter At Site") { return customAlert("🚨 कृपया 'Main Meter' की फोटो लें!"); }
-        
         var poleStatus = document.getElementById('f-poleStatus').value; 
-        var polePhoto = document.getElementById('f-polePhotoCompressedBase64') ? document.getElementById('f-polePhotoCompressedBase64').value : "";
-        
-        if(poleStatus && poleStatus !== "No Meter At Site" && poleStatus !== "POLE METER NOT INSTALLED" && !polePhoto) { 
-            return customAlert("🚨 कृपया 'Pole Meter' की फोटो लें!"); 
-        }
         
         entryData.mainMeterStatus = mainStatus; 
         entryData.editablePrefetchedRemark = editableRem; 
@@ -7507,8 +7443,8 @@ function exportAllMRSummaryPDF() {
         entryData.poleMeterStatus = poleStatus; 
         entryData.poleMeterNo = pNo; 
         entryData.poleMeterMake = pMake;
-        entryData.mainPhotoData = mainPhoto; 
-        entryData.polePhotoData = polePhoto; 
+        entryData.mainPhotoData = ""; 
+        entryData.polePhotoData = ""; 
         
         // 🚀 ट्रांजैक्शन और सेविंग के दौरान आने वाले एरर को कैच करने के लिए सुरक्षित क्लोजर
         try {
@@ -7708,75 +7644,24 @@ function triggerSilentBackgroundSync() {
     }
     
     function destroyActiveSessionsOnExit() {
-        // 1. पूरा लोकल सेशन्स, थीम्स और फ़िल्टर्स साफ़ करें
         localStorage.clear(); 
         loggedInReader = ""; 
         adminSelectedReaders = [];
         
         try {
             if(document.getElementById('entryForm')) document.getElementById('entryForm').reset();
-            // 🎯 फिक्स: डेस्कटॉप साइडबार और लेआउट की क्लासेस तुरंत हटाएँ ताकि लॉगिन स्क्रीन न बिगड़े
             document.body.classList.remove('desktop-force');
         } catch(e) {}
 
-        // व्यू को बिना किसी लेआउट गड़बड़ी के सीधे रीसेट करने का इंजन
-        var handleViewSwitch = function() {
-            // सभी संभावित डैशबोर्ड व्यूज और टैब्स को पूरी तरह छुपाएं
-            var views = ['appSplashScreen', 'splashLoaderView', 'loginLoader', 'appDashboardView', 'reportDetailContainer', 'formView', 'view-summary', 'view-list', 'view-billdist', 'view-visitdata', 'view-reports', 'view-filter'];
-            views.forEach(function(id) {
-                var el = document.getElementById(id);
-                if (el) el.style.setProperty("display", "none", "important");
-            });
-
-            // मुख्य कंटेनर को ऑन करें और उसकी साइड पैडिंग रीसेट करें
-            var appMainNode = document.getElementById('mainAppContainer') || document.querySelector('.container');
-            if (appMainNode) {
-                appMainNode.style.setProperty("display", "block", "important");
-                appMainNode.style.setProperty("padding-left", "0px", "important"); 
-                appMainNode.style.setProperty("padding-right", "0px", "important");
-            }
-
-            // लॉगिन व्यू को स्क्रीन पर जबरदस्ती लाएं
-            var loginNode = document.getElementById('loginView');
-            if (loginNode) {
-                loginNode.style.setProperty("display", "block", "important");
-                
-                // इनपुट्स खाली करें
-                var rInput = document.getElementById('readerDropdown');
-                var pInput = document.getElementById('loginPin');
-                if (rInput) rInput.value = "";
-                if (pInput) pInput.value = "";
-                
-                // 🚀 अल्टीमेट फिक्स: ब्राउज़र मेमोरी और सेशन्स को 100% क्लीन करने के लिए एक टाइमस्टैम्प के साथ पेज फ्रेश रीलोड करें
-                setTimeout(function() {
-                    var cleanUrl = window.location.href.split('?')[0];
-                    window.location.href = cleanUrl + '?logout=' + new Date().getTime();
-                }, 150);
-            } else {
-                window.location.reload();
-            }
-        };
-
-        // 2. ⚡ IndexedDB कनेक्शन को सुरक्षित रूप से बंद करें
         if(db) { 
             try { 
                 db.close(); 
                 db = null;  
-            } catch(e) { console.error("Database close error:", e); } 
+            } catch(e) {} 
         } 
         
-        // 🎯 सबसे पहले व्यू को स्विच करें ताकि यूजर को ब्लैंक स्क्रीन न दिखे (Instant UI Response)
-        handleViewSwitch();
-        
-        // 3. बैकग्राउंड में डेटाबेस डिलीट होने दें (यह ब्लॉक भी हो तो लॉगिन स्क्रीन पर असर नहीं पड़ेगा)
-        try {
-            var req = indexedDB.deleteDatabase("MeterReaderOfflineDB");
-            req.onsuccess = function () { console.log("DB deleted."); }; 
-            req.onerror = function () { console.error("DB delete failed."); };
-            req.onblocked = function () { console.warn("DB delete blocked."); };
-        } catch(dbErr) {
-            console.error("IndexedDB critical delete error bypassed:", dbErr);
-        }
+        var cleanUrl = window.location.href.split('?')[0];
+        window.location.href = cleanUrl + '?logout=' + new Date().getTime();
     }
     
     function toTitleProperCase(str) { 
@@ -8083,55 +7968,36 @@ function quickViewNavigate(direction) {
     }
 }
     function evaluateCustomCondition(item, conditionStr) {
-        if (!conditionStr || conditionStr.trim() === "") return true; 
+    if (!conditionStr || !item) return true; 
 
-        // पुरानी JS कंडीशन सपोर्ट
-        if (conditionStr.indexOf("item.") !== -1) {
-            try { return eval(conditionStr); } catch(e) { return false; }
-        }
+    var conditions = conditionStr.split(',');
+    for (var i = 0; i < conditions.length; i++) {
+        var cond = conditions[i];
+        var isNotEqual = cond.indexOf('!=') !== -1;
+        var parts = isNotEqual ? cond.split('!=') : cond.split('=');
 
-        var conditions = conditionStr.split(',');
-        for (var i = 0; i < conditions.length; i++) {
-            // != और = दोनों को सपोर्ट करने के लिए नया लॉजिक
-            var operator = "=";
-            var parts = conditions[i].split('!=');
-            if (parts.length === 2) {
-                operator = "!=";
-            } else {
-                parts = conditions[i].split('=');
-            }
+        if (parts.length === 2) {
+            var searchKey = parts[0].trim();
+            var expectedVal = parts[1].trim().toUpperCase();
+            var actualVal = (getRobustKey(item, searchKey) || "").toString().toUpperCase().trim();
 
-            if (parts.length === 2) {
-                var searchKey = parts[0].trim();
-                var expectedVal = parts[1].trim().toUpperCase();
-                
-                var actualVal = getRobustKey(item, searchKey);
-                actualVal = (actualVal !== undefined && actualVal !== null) ? actualVal.toString().toUpperCase().trim() : "";
-
-                if (operator === "=") {
-                    if (expectedVal === "TRUE" || expectedVal === "YES" || expectedVal === "1") {
-                        if (actualVal !== "TRUE" && actualVal !== "YES" && actualVal !== "1") return false;
-                    } 
-                    else if (expectedVal === "FALSE" || expectedVal === "NO" || expectedVal === "0") {
-                        if (actualVal !== "FALSE" && actualVal !== "NO" && actualVal !== "0" && actualVal !== "") return false;
-                    } 
-                    else {
-                        // 🚀 MULTIPLE VALUES (|) SUPPORT
-                        if (expectedVal.indexOf('|') !== -1) {
-                            var allowedValues = expectedVal.split('|');
-                            if (!allowedValues.includes(actualVal)) return false;
-                        } else {
-                            if (actualVal !== expectedVal) return false;
-                        }
-                    }
-                } else if (operator === "!=") {
-                    // 🚀 NOT EQUAL (!=) SUPPORT (ताकि MRI DONE को हटा सकें)
-                    if (actualVal === expectedVal) return false;
+            if (!isNotEqual) {
+                if (expectedVal === "TRUE" || expectedVal === "YES") {
+                    if (actualVal !== "TRUE" && actualVal !== "YES" && actualVal !== "1") return false;
+                } else if (expectedVal === "FALSE" || expectedVal === "NO") {
+                    if (actualVal !== "FALSE" && actualVal !== "NO" && actualVal !== "0" && actualVal !== "") return false;
+                } else if (expectedVal.indexOf('|') !== -1) {
+                    if (expectedVal.split('|').indexOf(actualVal) === -1) return false;
+                } else {
+                    if (actualVal !== expectedVal) return false;
                 }
+            } else {
+                if (actualVal === expectedVal) return false;
             }
         }
-        return true; 
     }
+    return true; 
+}
     // 🚀 फिक्स: बिना ऐप क्रैश या ब्लैंक स्क्रीन किए गूगल सैंडबॉक्स में हार्ड-रिफ्रेश ड्राइवर
     function forceAppCodeUpdate() {
         customConfirm("क्या आप ऐप का नया वर्शन (New Update) डाउनलोड करना चाहते हैं? इससे ऐप रीस्टार्ट होगा।", function() {
@@ -8433,8 +8299,8 @@ function quickViewNavigate(direction) {
                 var canvas = document.createElement('canvas');
                 var ctx = canvas.getContext('2d');
 
-                var MAX_WIDTH = 800;
-                var MAX_HEIGHT = 800;
+                var MAX_WIDTH = 500;
+                var MAX_HEIGHT = 500;
                 var width = img.width;
                 var height = img.height;
 
@@ -8955,7 +8821,7 @@ function exportAnalyticsReportPDF() {
             
             // 🎯 एचडी मैट्रिक्स इंजन: कैनवास को हाई-रिज़ॉल्यूशन ऑफस्क्रीन कैनवास पर 3x स्केल करके रेंडर करना ताकि ब्लर होना बंद हो जाए
             var processCanvasHD = function(srcCanvas) {
-                var scaleFactor = 3; // 3 गुना ज्यादा पिक्सल (Ultra HD Quality)
+                var scaleFactor = 1.5; // Fast & Mobile Optimized
                 var hdCanvas = document.createElement("canvas");
                 hdCanvas.width = srcCanvas.width * scaleFactor;
                 hdCanvas.height = srcCanvas.height * scaleFactor;
@@ -9848,7 +9714,7 @@ function downloadColorfulDashboardPDF() {
 
     // स्क्रीन कैप्चर ऑप्शंस (High Resolution HD Capture)
     var options = {
-        scale: 3, // 3x High-Density Pixel Scale (फटने से बचाने के लिए)
+        scale: 1.5, // Lightweight Fast Scale
         useCORS: true,
         allowTaint: true,
         backgroundColor: '#f8fafc',
