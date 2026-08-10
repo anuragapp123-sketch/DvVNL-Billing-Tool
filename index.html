@@ -5,7 +5,7 @@
 <script>
   (function() {
     // ⚠️ अपना नया Deployment URL यहाँ पेस्ट करें
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxGeTs7AS1evockOW_aBeiXy_WObmK-Fp4Kfr8Qwp1zeP-5fLcrmoBDCD-Fd2cbdcRyRA/exec";
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwhZiGktt7pY8DfqzGd_WuxL9R8V6p0p2VRFLxzw783EaT8ZTIHl47JTRLgmSdmoPznjg/exec";
 
     function createHandler(successCallback, failureCallback) {
       return new Proxy({}, {
@@ -2477,7 +2477,7 @@ function executeSafeSyncAndDownloadWorkflow(onComplete) {
     // 🔒 मुख्य फिक्स: बैनर को परमानेंट लॉक (false) किया गया है, यह तब तक नहीं हटेगा जब तक सफलता का मैसेज न आ जाए
     showThinAlert(processingText, false);
 
-    var targetUserParam = (loggedInReader.toUpperCase() === "ANURAG SHAKYA") ? "ALL" : loggedInReader.toUpperCase();
+    var targetUserParam = "ALL";
     
     google.script.run.withSuccessHandler(function(bulkData) {
             try {
@@ -6130,138 +6130,175 @@ function openReportRowDirect(reportKey) {
     function getVisibleDataFromContainer(containerId) {
         var accNos = []; 
         var items = document.querySelectorAll('#' + containerId + ' .list-item');
+        
         items.forEach(function(item) { 
-            if(item.offsetParent !== null) { 
-                var accMatch = item.innerHTML.match(/A\/C:\s*([^\s|<]+)/); 
-                if(accMatch) accNos.push(accMatch[1].trim()); 
+            // 🎯 चेक करें कि रो (Element) स्क्रीन पर छुपी हुई न हो
+            var isHidden = item.style.display === 'none' || window.getComputedStyle(item).display === 'none';
+            if (!isHidden) { 
+                var accMatch = null;
+                // 1. onclick से खाता संख्या निकालें
+                var onclickAttr = item.getAttribute('onclick') || '';
+                var matchAttr = onclickAttr.match(/['"]([0-9A-Za-z]+)['"]/);
+                if (matchAttr && matchAttr[1]) {
+                    accMatch = matchAttr[1];
+                } else {
+                    // 2. HTML से खाता संख्या (A/C:) निकालें
+                    var textMatch = item.innerHTML.match(/A\/C:\s*([0-9A-Za-z]+)/i);
+                    if (textMatch && textMatch[1]) accMatch = textMatch[1];
+                }
+                if (accMatch) accNos.push(accMatch.trim()); 
             } 
         }); 
+        
+        // 🎯 अगर किसी कारण से डोम से अकाउंट नंबर न निकल पाएं, तो ग्लोबल मेमोरी कैशे से लें
+        if (accNos.length === 0 && globalReportsDatabaseCache && globalReportsDatabaseCache.length > 0) {
+            globalReportsDatabaseCache.forEach(function(item) {
+                if (item && item.accountNo && isReaderAllowed(getReaderName(item))) {
+                    accNos.push(item.accountNo.toString().trim());
+                }
+            });
+        }
         
         if (accNos.length === 0) {
             var activeAcc = document.querySelector('.accordion-content[style*="display: block"]');
             if (activeAcc) {
-                var accMatch = activeAcc.id.match(/visit_acc_([^\s|<]+)/);
-                if(accMatch) accNos.push(accMatch[1].trim());
+                var accMatch = activeAcc.id.match(/visit_acc_([0-9A-Za-z]+)/i);
+                if (accMatch) accNos.push(accMatch[1].trim());
             }
         }
-        return accNos; 
+        return Array.from(new Set(accNos)); 
     }
 
-    // --- UNIVERSAL EXPORT (LIST/VISITS/REPORTS) ---
-function universalExportToExcel(tabName) {
-    var accNos = getVisibleDataFromContainer(tabName === 'list' ? 'listDataContainer' : tabName === 'billdist' ? 'billDistributionContainer' : tabName === 'visitdata' ? 'visitDataListContainer' : 'reportListContainer');
-    if(accNos.length === 0) return alert("कोई डेटा उपलब्ध नहीं है!");
-    
-    var reportNameStr = tabName.toUpperCase();
-    var currentTabKey = activeReportType; // डिफ़ॉल्ट
+    function universalExportToExcel(tabName) {
+        var containerId = tabName === 'list' ? 'listDataContainer' : tabName === 'billdist' ? 'billDistributionContainer' : tabName === 'visitdata' ? 'visitDataListContainer' : 'reportListContainer';
+        var accNos = getVisibleDataFromContainer(containerId);
+        
+        var reportNameStr = tabName.toUpperCase();
+        var currentTabKey = activeReportType; 
 
-    if(tabName === 'list') {
-        currentTabKey = "all_consumers_list";
-        // फ़िक्स: पेंडिंग या अटेंड फ़िल्टर के आधार पर एक्सेल फ़ाइल का सटीक नाम तय करना
-        var currentFilterStatus = document.getElementById('listStatusFilter') ? document.getElementById('listStatusFilter').value : "PENDING";
-        if (currentFilterStatus === "PENDING") {
-            reportNameStr = "VisiT_Pending Consumers List";
-        } else {
-            reportNameStr = "Attend COnsumers List";
+        if(tabName === 'list') {
+            currentTabKey = "all_consumers_list";
+            var currentFilterStatus = document.getElementById('listStatusFilter') ? document.getElementById('listStatusFilter').value : "PENDING";
+            reportNameStr = (currentFilterStatus === "PENDING") ? "VisiT_Pending Consumers List" : "Attend Consumers List";
+        } else if(tabName === 'billdist') {
+            reportNameStr = "Bill Distribution Pending";
+            currentTabKey = "all_bills_report";
+        } else if(tabName === 'visitdata') {
+            reportNameStr = "All Visits Data";
+            currentTabKey = "all_consumers_list";
+        } else if(tabName === 'reports' && activeReportType) {
+            reportNameStr = REPORT_NAMES[activeReportType] || activeReportType;
+            currentTabKey = activeReportType;
         }
-    }
-    if(tabName === 'billdist') {
-        reportNameStr = "Bill Distribution Pending";
-        currentTabKey = "all_bills_report"; // या बिलिंग से संबंधित कुंजी
-    }
-    if(tabName === 'visitdata') {
-        reportNameStr = "All Visits Data";
-        currentTabKey = "all_consumers_list";
-    }
-    if(tabName === 'reports' && activeReportType) {
-        reportNameStr = REPORT_NAMES[activeReportType] || activeReportType;
-        currentTabKey = activeReportType;
-    }
-    
-    var filename = reportNameStr.replace(/[\\/:*?"<>|]/g, "").replace(/\s+/g, "_") + "_" + getFormattedDateTimeForFile(); 
-    
-    // 🚀 अल्टीमेट लाइव कॉलम पार्सर (सभी टैब्स के लिए सटीक मैपिंग)
-    var reqCols = [];
-    var matchedConfig = globalReportConfigs.find(function(c) { return c.key === currentTabKey; });
-    
-    if (matchedConfig && matchedConfig.reqColumnsStr) {
-        reqCols = matchedConfig.reqColumnsStr.split(",").map(function(s) { return s.replace(/[\n\r]/g, '').trim(); });
-        if(reqCols.indexOf("MR NAME") === -1) reqCols.push("MR NAME");
-    } else {
-        // फॉलबैक: यदि कॉन्फ़िगरेशन न मिले
-        var isBilling = (tabName === 'billdist' || currentTabKey === 'all_bills_report' || currentTabKey === 'billed_no_bill' || currentTabKey === 'bill_print_pending' || currentTabKey === 'bill_dist_pending');
-        reqCols = isBilling ? COLUMNS_MASTER_STD.concat(COLUMNS_BILL_ADDITIONS).concat(["MR NAME"]) : COLUMNS_MASTER_STD.concat(["MR NAME"]);
-    }
-    
-    var fullData = []; var tx = db.transaction("consumers", "readonly");
-    tx.objectStore("consumers").openCursor().onsuccess = function(e) { 
-        var cursor = e.target.result; 
-        if(cursor) { 
-            if(accNos.includes(cursor.value.accountNo)) { fullData.push(cursor.value); }
-            cursor.continue(); 
-        } 
-    };
-    tx.oncomplete = function() { 
-        fullData.sort(function(a, b) {
-            var nameA = (getReaderName(a) || "").toUpperCase().trim();
-            var nameB = (getReaderName(b) || "").toUpperCase().trim();
-            return nameA.localeCompare(nameB);
-        });
+        
+        var filename = reportNameStr.replace(/[\\/:*?"<>|]/g, "").replace(/\s+/g, "_") + "_" + getFormattedDateTimeForFile(); 
+        
+        var reqCols = [];
+        var matchedConfig = globalReportConfigs.find(function(c) { return c.key === currentTabKey; });
+        
+        if (matchedConfig && matchedConfig.reqColumnsStr) {
+            reqCols = matchedConfig.reqColumnsStr.split(",").map(function(s) { return s.replace(/[\n\r]/g, '').trim(); });
+            if(reqCols.indexOf("MR NAME") === -1) reqCols.push("MR NAME");
+        } else {
+            var isBilling = (tabName === 'billdist' || currentTabKey === 'all_bills_report' || currentTabKey === 'billed_no_bill' || currentTabKey === 'bill_print_pending' || currentTabKey === 'bill_dist_pending');
+            reqCols = isBilling ? COLUMNS_MASTER_STD.concat(COLUMNS_BILL_ADDITIONS).concat(["MR NAME"]) : COLUMNS_MASTER_STD.concat(["MR NAME"]);
+        }
+        
+        var processAndDownloadExcel = function(fullData) {
+            if(!fullData || fullData.length === 0) {
+                return alert("🚨 एक्सेल के लिए कोई डेटा उपलब्ध नहीं है!");
+            }
 
-        // 🎨 प्रोफेशनल हेडर रो स्टाइलिंग (Dark Blue Background & Bold White Text)
-        var aoa = [reqCols.map(function(c) { 
-            return { 
-                v: c, 
-                s: { 
-                    font: { sz: 10, color: { rgb: "FFFFFF" }, bold: true }, 
-                    fill: { fgColor: { rgb: "1E3A8A" } }, 
-                    alignment: { vertical: "center", horizontal: "center", wrapText: true } 
-                } 
-            }; 
-        })];
-        
-        fullData.forEach(function(item) { 
-            aoa.push(reqCols.map(function(c) { 
-                var val = (c === "MR NAME") ? getReaderName(item) : getRobustKey(item, c); 
-                return { v: (val||"").toString() }; 
-            })); 
-        });
-        
-        var wb = XLSX.utils.book_new(); 
-        var ws = XLSX.utils.aoa_to_sheet(aoa);
-        
-        // 🚀 ऑटोमैटिक कॉलम विड्थ इंजन (ताकि डेटा कभी आपस में न चिपके)
-        var colWidths = reqCols.map(function(c, columnIndex) {
-            var maxLength = c.length; // हेडर की लंबाई से शुरुआत करें
-            for (var r = 1; r < aoa.length; r++) {
-                var cellValue = aoa[r][columnIndex] ? aoa[r][columnIndex].v : "";
-                if (cellValue.length > maxLength) {
-                    maxLength = cellValue.length;
+            fullData.sort(function(a, b) {
+                var nameA = (getReaderName(a) || "").toUpperCase().trim();
+                var nameB = (getReaderName(b) || "").toUpperCase().trim();
+                return nameA.localeCompare(nameB);
+            });
+
+            var aoa = [reqCols.map(function(c) { 
+                return { 
+                    v: c, 
+                    s: { 
+                        font: { sz: 10, color: { rgb: "FFFFFF" }, bold: true }, 
+                        fill: { fgColor: { rgb: "1E3A8A" } }, 
+                        alignment: { horizontal: "center", vertical: "center", wrapText: true } 
+                    } 
+                }; 
+            })];
+            
+            fullData.forEach(function(item) { 
+                aoa.push(reqCols.map(function(c) { 
+                    var val = (c === "MR NAME") ? getReaderName(item) : getRobustKey(item, c); 
+                    return { v: (val !== undefined && val !== null) ? val.toString() : "" }; 
+                })); 
+            });
+            
+            var wb = XLSX.utils.book_new(); 
+            var ws = XLSX.utils.aoa_to_sheet(aoa);
+            
+            var colWidths = reqCols.map(function(c, columnIndex) {
+                var maxLength = c.length;
+                for (var r = 1; r < aoa.length; r++) {
+                    var cellValue = aoa[r][columnIndex] ? aoa[r][columnIndex].v : "";
+                    if (cellValue.length > maxLength) {
+                        maxLength = cellValue.length;
+                    }
+                }
+                return { wch: Math.min(maxLength + 3, 50) };
+            });
+            ws['!cols'] = colWidths;
+            
+            XLSX.utils.book_append_sheet(wb, ws, "Data");
+            
+            var wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'base64' });
+            var targetFilename = filename + '.xlsx';
+
+            if (typeof AndroidBridge !== "undefined" && AndroidBridge.processBase64Download) {
+                AndroidBridge.processBase64Download(wbout, "excel", targetFilename);
+                showThinAlert("🎉 Excel डाउनलोड शुरू हो गया है...", true);
+            } else {
+                try {
+                    var byteCharacters = atob(wbout);
+                    var byteNumbers = new Array(byteCharacters.length);
+                    for (var i = 0; i < byteCharacters.length; i++) {
+                        byteNumbers[i] = byteCharacters.charCodeAt(i);
+                    }
+                    var byteArray = new Uint8Array(byteNumbers);
+                    var blob = new Blob([byteArray], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+                    var blobUrl = URL.createObjectURL(blob);
+                    
+                    var link = document.createElement('a');
+                    link.href = blobUrl;
+                    link.download = targetFilename;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    showThinAlert("🎉 Excel डाउनलोड सफल!", true);
+                } catch(e) {
+                    var link = document.createElement('a');
+                    link.href = "data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64," + wbout;
+                    link.download = targetFilename;
+                    link.click();
                 }
             }
-            return { wch: maxLength + 3 }; // थोड़ा अतिरिक्त स्पेस पैडिंग के लिए
-        });
-        ws['!cols'] = colWidths;
-        
-        XLSX.utils.book_append_sheet(wb, ws, "Data");
-        
-        // --- 🚀 एंड्रॉइड APK डाउनलोड मैनेजर नेटिव ब्रिज लॉजिक - Dynamic Name Enabled ---
-        var wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'base64' });
-        var targetFilename = filename + '.xlsx';
+        };
 
-        if (typeof AndroidBridge !== "undefined" && AndroidBridge.processBase64Download) {
-            // 🎯 सीधे जावा के 3-पैरामीटर वाले मेथड को डायनामिक नाम पास करें
-            AndroidBridge.processBase64Download(wbout, "excel", targetFilename);
-            showThinAlert("🎉 " + reportNameStr + " एक्सेल डाउनलोड शुरू हो गया है...", true);
-        } else {
-            var base64Data = "data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64," + wbout;
-            var link = document.createElement('a');
-            link.href = base64Data;
-            link.download = targetFilename;
-            link.click();
-        }
-    };
-}
+        if (!db) return alert("🚨 डेटाबेस रेडी नहीं है!");
+        
+        var fullData = []; 
+        var tx = db.transaction("consumers", "readonly");
+        tx.objectStore("consumers").getAll().onsuccess = function(e) { 
+            var allRecords = e.target.result || [];
+            var normalizedAccNos = accNos.map(function(a) { return a.toString().trim().toUpperCase(); });
+            
+            fullData = allRecords.filter(function(item) {
+                if (!item || !item.accountNo) return false;
+                var itemAcc = item.accountNo.toString().trim().toUpperCase();
+                return normalizedAccNos.length === 0 || normalizedAccNos.includes(itemAcc);
+            });
+            processAndDownloadExcel(fullData);
+        };
+    }
     function generateUniversalPDF(tabName) {
     var accNos = getVisibleDataFromContainer(tabName === 'list' ? 'listDataContainer' : tabName === 'billdist' ? 'billDistributionContainer' : tabName === 'visitdata' ? 'visitDataListContainer' : 'reportListContainer');
     if(accNos.length === 0) return customAlert("कोई डेटा उपलब्ध नहीं है!");
@@ -6399,7 +6436,8 @@ function universalExportToExcel(tabName) {
             var cursor = e.target.result;
             if(cursor) {
                 var val = cursor.value;
-                if(isReaderAllowed(getReaderName(val))) { fullData.push(val); }
+                // सभी रीडर्स के डेटा को डैशबोर्ड विश्लेषण के लिए शामिल करें
+                fullData.push(val);
                 cursor.continue();
             }
         };
@@ -8614,11 +8652,14 @@ function renderAnalyticsDashboardEngine() {
         var allData = e.target.result || [];
         var readerMatrix = {};
         
+        var restrictedKeywords = ["ANURAG", "KAPIL", "GAURAV", "GIRISH", "GREESH"];
         allData.forEach(function(item) {
             var rName = getReaderName(item);
             if (!rName) return;
             rName = rName.trim().toUpperCase();
-            if (!isReaderAllowed(rName)) return; // ग्लोबल एक्सेल फ़िल्टर सिंक Check
+            
+            // प्रतिबंधित यूज़र्स को छोड़कर सभी रीडर्स का कम्पेरिज़न चार्ट में डेटा दिखाएगा
+            if (restrictedKeywords.some(function(k) { return rName.includes(k); })) return;
 
             if (!readerMatrix[rName]) {
                 readerMatrix[rName] = { 
@@ -9429,7 +9470,8 @@ function calculateAndRenderVisitLeaderboardSection() {
             if (restrictedKeywords.some(function(k) { return rName.includes(k); })) return;
 
             var vDate = getRobustKey(item, "FINAL VISIT_DATE") || item.finalVisitDate || "";
-            if (isVisitDateMatch(vDate, 1)) { // कल की विज़िट
+            // यदि कल की विज़िट डेट मैच होती है तो हर रीडर का काउंट जोड़ें
+            if (isVisitDateMatch(vDate, 1)) {
                 yestMap[rName] = (yestMap[rName] || 0) + 1;
             }
         });
