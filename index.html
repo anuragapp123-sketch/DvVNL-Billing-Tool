@@ -5,7 +5,7 @@
 <script>
   (function() {
     // ⚠️ अपना नया Deployment URL यहाँ पेस्ट करें
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby5S1UCEnNq4TGvihk4c-2nmEweRWXqo3q1MJt4yQhBGnVQdFPKPWm4ANgZbiVIEdrCjg/exec";
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxMIvvxkFtKSzmDlAX8NTKOTMCc0M8wnV_GIAGOCrqF9N33Uo6MbNqkQwosRjiMoYtQ1A/exec";
 
     function createHandler(successCallback, failureCallback) {
       return new Proxy({}, {
@@ -2514,6 +2514,11 @@ function getRobustKey(obj, searchKey) {
     }
 
     function checkUserSessionRetentionState() {
+        // यदि यूआरएल में लॉगआउट फ्लैग हो तो सेशन तुरंत हटाएं
+        if (window.location.search.indexOf("logout") !== -1) {
+            localStorage.removeItem("mtr_reader_session_lock");
+        }
+
         var activeSession = localStorage.getItem("mtr_reader_session_lock");
         if(activeSession) {
             loggedInReader = toTitleProperCase(activeSession);
@@ -4409,6 +4414,15 @@ window.applyHeaderReaderFilter = function() {
     }
 
     function navigateToViewRaw(viewId) {
+        // किसी भी व्यू में जाने पर स्प्लैश स्क्रीन हमेशा बंद रहेगी
+        var splash = document.getElementById('appSplashScreen');
+        if (splash) {
+            splash.style.setProperty("display", "none", "important");
+            splash.style.setProperty("visibility", "hidden", "important");
+            splash.style.setProperty("opacity", "0", "important");
+            splash.style.setProperty("z-index", "-9999", "important");
+        }
+
         document.getElementById('loginView').style.display = (viewId === 'loginView') ? "block" : "none";
         document.getElementById('formView').style.display = (viewId === 'formView') ? "block" : "none";
         document.getElementById('appDashboardView').style.display = (viewId === 'appDashboardView' || viewId === 'reportDetailContainer') ? "block" : "none";
@@ -8098,25 +8112,73 @@ function triggerSilentBackgroundSync() {
         };
     }
     
-    function destroyActiveSessionsOnExit() {
-        localStorage.clear(); 
+    function destroyActiveSessionsOnExit() { 
+        // 1. लोकल स्टोरेज से सेशन और कैशे साफ़ करें
+        try {
+            localStorage.removeItem("mtr_reader_session_lock");
+            localStorage.removeItem("app_current_view_state_" + loggedInReader);
+            localStorage.removeItem("app_current_tab_state_" + loggedInReader);
+            localStorage.removeItem("app_current_form_item_" + loggedInReader);
+            localStorage.removeItem("app_active_report_type_ctx_" + loggedInReader);
+            localStorage.clear();
+        } catch(e) {}
+
         loggedInReader = ""; 
         adminSelectedReaders = [];
-        
-        try {
+        currentActiveHub = "";
+        viewHistoryStack = [];
+        globalReportsDatabaseCache = null;
+        appSearchDatabaseCache = null;
+
+        // 2. फॉर्म और इनपुट रीसेट करें
+        try { 
             if(document.getElementById('entryForm')) document.getElementById('entryForm').reset();
+            if(document.getElementById('loginPin')) document.getElementById('loginPin').value = "";
             document.body.classList.remove('desktop-force');
         } catch(e) {}
 
-        if(db) { 
-            try { 
-                db.close(); 
-                db = null;  
-            } catch(e) {} 
-        } 
-        
-        var cleanUrl = window.location.href.split('?')[0];
-        window.location.href = cleanUrl + '?logout=' + new Date().getTime();
+        // 3. सभी मोडल व ओवरले बंद करें
+        var overlays = ['customDialogOverlay', 'quickViewModal', 'dateDrilldownModal', 'contactUpdateModal', 'globalNotificationOverlay', 'dataDownloadInstructionScreen'];
+        overlays.forEach(function(id) {
+            var el = document.getElementById(id);
+            if(el) el.style.setProperty("display", "none", "important");
+        });
+
+        // 4. बॉटम बार और डैशबोर्ड छुपाएं
+        var bottomBar = document.getElementById('dynamicBottomTabBar');
+        if(bottomBar) bottomBar.style.setProperty("display", "none", "important");
+
+        var appDash = document.getElementById('appDashboardView');
+        if(appDash) appDash.style.setProperty("display", "none", "important");
+
+        var formV = document.getElementById('formView');
+        if(formV) formV.style.setProperty("display", "none", "important");
+
+        var repDet = document.getElementById('reportDetailContainer');
+        if(repDet) repDet.style.setProperty("display", "none", "important");
+
+        // 5. ⚡ स्प्लैश स्क्रीन को तुरंत पूरी तरह बंद करें और लॉगिन व्यू लाएं
+        var splash = document.getElementById('appSplashScreen');
+        if (splash) {
+            splash.style.setProperty("display", "none", "important");
+            splash.style.setProperty("visibility", "hidden", "important");
+            splash.style.setProperty("opacity", "0", "important");
+            splash.style.setProperty("z-index", "-9999", "important");
+        }
+
+        // लॉगिन स्क्रीन को टॉप-लेवल पर एक्टिवेट करें
+        navigateToViewRaw('loginView');
+
+        // 6. रीडर्स लिस्ट को बिना देरी के लोकल कैशे से तुरंत रिफ्रेश करें
+        try {
+            var cachedList = localStorage.getItem("app_global_readers_cache_list");
+            if (cachedList) {
+                populateDropdownHTMLBlock(JSON.parse(cachedList));
+            }
+        } catch(e) {}
+
+        window.scrollTo(0, 0);
+        showThinAlert("✅ सफलतापूर्वक लॉगआउट हो गया!", true);
     }
     
     function toTitleProperCase(str) { 
