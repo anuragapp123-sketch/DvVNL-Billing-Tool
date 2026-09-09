@@ -33,9 +33,11 @@
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 90000);
 
-            // Google Apps Script Deployments के लिए अनुकूलित POST कॉल
+            // Google Apps Script Deployments के लिए CORS और 302 Redirect सुरक्षित POST कॉल
             fetch(APPS_SCRIPT_URL, {
               method: "POST",
+              mode: "cors",
+              redirect: "follow",
               headers: {
                 "Content-Type": "text/plain;charset=utf-8"
               },
@@ -47,8 +49,7 @@
             })
             .then(response => {
               clearTimeout(timeoutId);
-              // Google Apps Script के Redirects में 200 OK के अलावा 302/REDIRECTS आ सकते हैं
-              if (!response.ok && response.status !== 0) {
+              if (!response.ok && response.type !== "opaque") {
                 throw new Error('Network response was not ok (Status: ' + response.status + ')');
               }
               return response.text();
@@ -1373,28 +1374,7 @@
             </div>
         </div>
 
-        <!-- ⚙️ टैब 3: सिंगल इनपुट बॉक्स कंडीशन कनवर्टर पैनल (डैशबोर्ड के अंदर फिक्स) -->
-        <div id="view-configmaker" class="tab-content" style="display: none; width: 100%; box-sizing: border-box;">
-            <div class="card" style="border: 1px solid #c084fc; background: #faf5ff; padding: 15px; margin-bottom: 20px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(168,85,247,0.1); width: 100%; box-sizing: border-box;">
-                <h3 style="color:#6b21a8; font-size: 14px; font-weight:900; margin-bottom:12px; border-bottom:2px solid #e9d5ff; padding-bottom:6px; text-align: left;"><i class="fa-solid fa-gears"></i> Report Condition Generator</h3>
-                
-                <!-- सिंगल मल्टी-कंडीशन इनपुट बॉक्स -->
-                <div class="card" style="background:#ffffff; border:1px solid #e9d5ff; padding:12px; margin-bottom:15px; border-radius: 8px;">
-                    <label style="font-weight:bold; color:#6b21a8; display: block; margin-bottom: 6px; font-size: 13px;">अपनी कंडीशन्स यहाँ लिखें (Write Multiple Conditions):</label>
-                    <textarea id="cfgCustomInputTextArea" rows="3" style="width: 100%; padding: 10px; border: 2px solid #cbd5e1; border-radius: 6px; font-size: 13px; font-weight: 700; color: #0f172a; background: #ffffff; resize: vertical; box-sizing: border-box;" placeholder="उदाहरण: FINAL_MAIN_METER_SITE_REMARK=MRI DONE,IS BILL UPLOAD=NO"></textarea>
-                    <small style="color:#701a75; font-size:10.5px; display:block; margin-top:6px; font-weight: 600; line-height: 1.4;">💡 सुझाव: अलग-अलग नियमों को अलग करने के लिए बीच में कोमा (,) का प्रयोग करें।</small>
-                </div>
-
-                <button onclick="generateSheetConfigString()" class="btn" style="background: linear-gradient(90deg, #7c3aed, #6b21a8) !important; color: white; border: none; padding: 12px; border-radius: 6px; font-size: 14px; font-weight: 700; width: 100%; cursor: pointer; box-shadow: 0 4px 6px rgba(124,58,237,0.2); margin-bottom:15px;"><i class="fa-solid fa-wand-magic-sparkles"></i> Generate Config Code</button>
-
-                <!-- रिजल्ट आउटपुट बॉक्स -->
-                <div class="input-group">
-                    <label style="color:#6b21a8; font-weight:bold; display: block; margin-bottom: 4px;">Google Sheet में पेस्ट करने लायक कोड (Click to Copy):</label>
-                    <input type="text" id="cfgGeneratedResultOutput" readonly style="background:#ffffff; border:2px solid #c084fc; font-weight:800; color:#4c1d95; text-align:center; padding: 12px; border-radius: 6px; font-size: 14px; width: 100%; box-sizing: border-box;" placeholder="कोड यहाँ दिखाई देगा" onclick="this.select(); if(navigator.clipboard){ navigator.clipboard.writeText(this.value).then(() => showThinAlert('✅ कोड कॉपी हो गया!', true)); } else { document.execCommand('copy'); showThinAlert('✅ कोड कॉपी हो गया!', true); }">
-                    <small style="color:#701a75; font-size:11px; display:block; margin-top:6px; text-align:center; font-weight: bold;">💡 बॉक्स पर क्लिक करते ही कोड अपने आप कॉपी हो जाएगा!</small>
-                </div>
-            </div>
-        </div>
+        
 
         <div id="view-summary" class="tab-content" style="display: block;">
             
@@ -1774,6 +1754,13 @@
         </div>
 
         <div id="view-list" class="tab-content" style="display: none;">
+            <!-- ⬅ Consumers टैब के लिए होम बैक बार -->
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; background: #ffffff; padding: 10px 14px; border-radius: 12px; border: 1.5px solid #cbd5e1; box-shadow: 0 2px 6px rgba(0,0,0,0.04);">
+                <button onclick="resetToHubLanding()" class="btn-back" style="margin: 0; padding: 8px 16px; font-size: 12px; font-weight: 800; border-radius: 8px; background: #0f172a; color: #ffffff; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+                    <i class="fa-solid fa-arrow-left"></i> मेन मेन्यू (Home)
+                </button>
+                <span style="font-size: 13px; font-weight: 900; color: #1e40af; text-transform: uppercase;">Consumers Directory</span>
+            </div>
             <div class="universal-header-actions">
                 <button onclick="universalExportToExcel('list')" class="export-btn excel-bg" title="Download Excel"><i class="fa-solid fa-file-excel"></i> Excel</button>
                 <button onclick="generateUniversalPDF('list')" class="export-btn pdf-bg" title="Download PDF"><i class="fa-solid fa-file-pdf"></i> PDF</button>
@@ -1794,6 +1781,13 @@
         </div>
 
         <div id="view-billdist" class="tab-content" style="display: none;">
+            <!-- ⬅ Bill Distribution टैब के लिए होम बैक बार -->
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; background: #ffffff; padding: 10px 14px; border-radius: 12px; border: 1.5px solid #cbd5e1; box-shadow: 0 2px 6px rgba(0,0,0,0.04);">
+                <button onclick="resetToHubLanding()" class="btn-back" style="margin: 0; padding: 8px 16px; font-size: 12px; font-weight: 800; border-radius: 8px; background: #0f172a; color: #ffffff; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+                    <i class="fa-solid fa-arrow-left"></i> मेन मेन्यू (Home)
+                </button>
+                <span style="font-size: 13px; font-weight: 900; color: #1e40af; text-transform: uppercase;">Bills & Distribution</span>
+            </div>
     <div class="universal-header-actions">
     <button onclick="universalExportToExcel('billdist')" class="export-btn excel-bg"><i class="fa-solid fa-file-excel"></i></button>
     <button onclick="generateUniversalPDF('billdist')" class="export-btn pdf-bg"><i class="fa-solid fa-file-pdf"></i></button>
@@ -1857,21 +1851,13 @@
                 </div>
             </div>
 
-            <!-- 🛠️ केवल एडमिन के लिए साइडबार मेनू पैनल -->
+            <!-- 🛠️ Admin Control Panel (English Labels & No Master Export Icons) -->
             <div id="sidebarAdminControlSection" style="display: none; margin-bottom: 15px; background: #faf5ff; border: 1px solid #e9d5ff; padding: 10px; border-radius: 8px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);">
                 <div style="font-size: 11px; font-weight: 900; color: #6b21a8; text-transform: uppercase; margin-bottom: 8px; border-bottom: 1px dashed #c084fc; padding-bottom: 4px;"><i class="fa-solid fa-user-shield"></i> Admin Control Panel</div>
                 <div style="display: flex; flex-direction: column; gap: 6px;">
                     <button onclick="switchTab('summary'); switchSubSummary('analytics'); toggleReportSidebar(false);" class="report-menu-btn" style="margin-bottom:0; padding:10px; background:#ffffff; border-color:#d8b4fe; color:#6b21a8;"><span style="font-weight:700;"><i class="fa-solid fa-chart-pie" style="color:#9333ea; margin-right:6px;"></i> Analytics Dashboard</span><i class="fa-solid fa-chevron-right" style="font-size:10px; color:#c084fc;"></i></button>
-                    <button onclick="switchTab('notifyadmin'); toggleReportSidebar(false);" class="report-menu-btn" style="margin-bottom:0; padding:10px; background:#ffffff; border-color:#d8b4fe; color:#6b21a8;"><span style="font-weight:700;"><i class="fa-solid fa-paper-plane" style="color:#7c3aed; margin-right:6px;"></i> लाइव सूचना सेंडर</span><i class="fa-solid fa-chevron-right" style="font-size:10px; color:#c084fc;"></i></button>
-                    <button onclick="switchTab('configmaker'); toggleReportSidebar(false);" class="report-menu-btn" style="margin-bottom:0; padding:10px; background:#ffffff; border-color:#d8b4fe; color:#6b21a8;"><span style="font-weight:700;"><i class="fa-solid fa-sliders" style="color:#7c3aed; margin-right:6px;"></i> रिपोर्ट कन्फिग मेकर</span><i class="fa-solid fa-chevron-right" style="font-size:10px; color:#c084fc;"></i></button>
-                </div>
-            </div>
-            
-            <div class="universal-header-actions" style="margin-bottom: 10px; justify-content:space-between; border-bottom: 1px solid #cbd5e1; padding-bottom:10px;">
-                <span style="font-size: 12px; font-weight: bold; color: #0f172a;">Master Export:</span>
-                <div>
-                    <button onclick="exportAdminFilterMasterExcel()" class="export-btn excel-bg"><i class="fa-solid fa-file-excel"></i></button>
-                    <button onclick="exportAdminFilterMasterPDF()" class="export-btn pdf-bg"><i class="fa-solid fa-file-pdf"></i></button>
+                    <button onclick="switchTab('notifyadmin'); toggleReportSidebar(false);" class="report-menu-btn" style="margin-bottom:0; padding:10px; background:#ffffff; border-color:#d8b4fe; color:#6b21a8;"><span style="font-weight:700;"><i class="fa-solid fa-paper-plane" style="color:#7c3aed; margin-right:6px;"></i> Live Notification Sender</span><i class="fa-solid fa-chevron-right" style="font-size:10px; color:#c084fc;"></i></button>
+                    <button onclick="switchTab('configmaker'); toggleReportSidebar(false);" class="report-menu-btn" style="margin-bottom:0; padding:10px; background:#ffffff; border-color:#d8b4fe; color:#6b21a8;"><span style="font-weight:700;"><i class="fa-solid fa-sliders" style="color:#7c3aed; margin-right:6px;"></i> Report Config Maker</span><i class="fa-solid fa-chevron-right" style="font-size:10px; color:#c084fc;"></i></button>
                 </div>
             </div>
             
@@ -2102,9 +2088,7 @@ document.getElementById('manifest-placeholder').setAttribute('href', URL.createO
 
 var deferredPrompt;
 window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
     deferredPrompt = e;
-    var installBtn = document.getElementById('forceAppCodeUpdate'); 
 });
 
 // 🎨 वैश्विक थीम लिस्ट इंजन
@@ -2157,7 +2141,7 @@ var REPORT_NAMES = { 'main_mri_pending': '1. Main Meter MRI Pending', 'pole_mri_
         return pad(d.getDate()) + "/" + pad(d.getMonth()+1) + "/" + d.getFullYear() + " " + pad(d.getHours()) + ":" + pad(d.getMinutes());
     }
 
-    // ⚡ INSTANT RESUME REFRESH: कंप्यूटर पर ऑटो-डाउनलोड पूरी तरह ब्लॉक
+    // ⚡ 5-MINUTE THROTTLED RESUME REFRESH (कम से कम 5 मिनट बाद ही ऑटो-डाउनलोड होगा)
 document.addEventListener("visibilitychange", function() {
     // 💻 कंप्यूटर मोड में टैब स्विच करने पर ऑटो डाउनलोड नहीं होगा
     if (window.isDesktopDevice) return;
@@ -2166,7 +2150,8 @@ document.addEventListener("visibilitychange", function() {
         var lastSyncMs = localStorage.getItem("last_sync_time_ms_" + loggedInReader);
         var timeDiff = lastSyncMs ? (new Date().getTime() - parseInt(lastSyncMs)) : Infinity;
         
-        if (timeDiff > 10000) { 
+        // 5 मिनट = 5 * 60 * 1000 = 300,000 मिलीसेकंड्स
+        if (timeDiff > 300000) { 
             triggerSilentBackgroundDataDownload(null, false); 
         }
     }
@@ -2468,38 +2453,43 @@ function getRobustKey(obj, searchKey) {
         });
     };
 
+    // 📱 Android Studio APK & Browser Step-by-Step Back Engine
+    window.handleAndroidBack = function() {
+        // 1. अगर कोई भी मोडल खुला है तो पहले सिर्फ वह बंद होगा
+        var modals = ['dateDrilldownModal', 'quickViewModal', 'contactUpdateModal', 'loadSurveyBannerModal'];
+        for (var i = 0; i < modals.length; i++) {
+            var m = document.getElementById(modals[i]);
+            if (m && (m.style.display === "flex" || m.style.display === "block")) {
+                m.style.display = "none";
+                return true; // Android को बताएं कि स्टेप हैंडल हो गया
+            }
+        }
+
+        // 2. अगर साइडबार मेन्यू खुला है तो बंद करें
+        var sidebar = document.getElementById('reportsMenuContainer');
+        if (sidebar && sidebar.classList.contains('open')) {
+            toggleReportSidebar(false);
+            return true;
+        }
+
+        // 3. अगर एंट्री फॉर्म खुला है
+        var formNode = document.getElementById('formView');
+        if (formNode && formNode.style.display === "block") {
+            customConfirm("एंट्री फॉर्म खुला हुआ है! क्या आप बिना सेव किये पीछे जाना चाहते हैं?", function() { 
+                navigateBack(); 
+            });
+            return true;
+        }
+
+        // 4. सामान्य नेविगेशन चलाएं
+        navigateBack();
+        return true;
+    };
+
     function setupSafetyPopBackState() {
-        history.pushState({page: 1}, "DvVNL", window.location.href);
+        history.pushState({ page: 'root' }, "DvVNL", window.location.href);
         window.onpopstate = function(event) {
-            history.pushState({page: 1}, "DvVNL", window.location.href);
-
-            // 1. अगर कोई भी पॉपअप मॉडल खुला है तो पहले सिर्फ वह बंद होगा
-            var modals = ['dateDrilldownModal', 'quickViewModal', 'contactUpdateModal', 'customColorPickerModal', 'loadSurveyBannerModal'];
-            for (var i = 0; i < modals.length; i++) {
-                var m = document.getElementById(modals[i]);
-                if (m && (m.style.display === "flex" || m.style.display === "block")) {
-                    m.style.display = "none";
-                    return;
-                }
-            }
-
-            // 2. साइडबार मेन्यू खुला हो तो बंद करें
-            var sidebar = document.getElementById('reportsMenuContainer');
-            if (sidebar && sidebar.classList.contains('open')) {
-                toggleReportSidebar(false);
-                return;
-            }
-
-            // 3. अगर एंट्री फॉर्म खुला है तो कन्फर्म करके स्टेप पीछे जाएं
-            if (document.getElementById('formView') && document.getElementById('formView').style.display === "block") {
-                customConfirm("एंट्री फॉर्म खुला हुआ है! क्या आप बिना सेव किये पीछे जाना चाहते हैं?", function() { 
-                    navigateBack(); 
-                });
-                return;
-            }
-
-            // 4. स्टेप-बाय-स्टेप पीछे जाएं
-            navigateBack();
+            window.handleAndroidBack();
         };
     }
 
@@ -2989,8 +2979,6 @@ function executeSafeSyncAndDownloadWorkflow(onComplete) {
         var filterTabBtn = document.getElementById('btn-tab-filter');
         var visitTabBtn = document.getElementById('btn-tab-visitdata');
         var notifyTabBtn = document.getElementById('btn-tab-notifyadmin');
-        var configTabBtn = document.getElementById('btn-tab-configmaker');
-
         var headerFilterBtn = document.getElementById('headerFilterBtn');
         var headerContainer = document.getElementById('headerReaderCheckboxesContainer');
         
@@ -3003,14 +2991,12 @@ function executeSafeSyncAndDownloadWorkflow(onComplete) {
             if(filterTabBtn) filterTabBtn.style.setProperty("display", "none", "important"); 
             if(visitTabBtn) visitTabBtn.style.setProperty("display", "none", "important"); 
             if(notifyTabBtn) notifyTabBtn.style.setProperty("display", "none", "important"); 
-            if(configTabBtn) configTabBtn.style.setProperty("display", "none", "important"); 
             return; 
         }
         
         if(filterTabBtn) filterTabBtn.style.setProperty("display", "flex", "important"); 
         if(visitTabBtn) visitTabBtn.style.setProperty("display", "flex", "important");
         if(notifyTabBtn) notifyTabBtn.style.setProperty("display", "flex", "important");
-        if(configTabBtn) configTabBtn.style.setProperty("display", "flex", "important");
         
         var dataArray = consumersList || [];
         var readerSet = new Set(); 
@@ -3639,7 +3625,7 @@ window.applyHeaderReaderFilter = function() {
         });
         appSearchDatabaseCache = null; // सर्च कैशे मेमोरी रीसेट
 
-        var tabs = ['summary', 'list', 'billdist', 'visitdata', 'reports', 'filter', 'notifyadmin', 'configmaker'];
+        var tabs = ['summary', 'list', 'billdist', 'visitdata', 'reports', 'filter', 'notifyadmin'];
         
         tabs.forEach(function(t) { 
             var view = document.getElementById('view-' + t); 
@@ -3686,7 +3672,7 @@ window.applyHeaderReaderFilter = function() {
         viewHistoryStack = [];
         
         // अन्य सभी गैर-समरी टैब्स को छुपाएं
-        var otherViews = ['list', 'billdist', 'visitdata', 'reports', 'filter', 'notifyadmin', 'configmaker', 'mdm'];
+        var otherViews = ['list', 'billdist', 'visitdata', 'reports', 'filter', 'notifyadmin', 'mdm'];
         otherViews.forEach(function(v) {
             var el = document.getElementById('view-' + v);
             if (el) el.style.setProperty("display", "none", "important");
@@ -3727,8 +3713,9 @@ window.applyHeaderReaderFilter = function() {
 
     // 2. 4 कार्ड्स में से किसी एक पर क्लिक करने पर संबंधित डेटा व बॉटम सब-टैब्स लोड करना
     function selectHubMode(hubName, isBackNavigation) {
-        if (!isBackNavigation && currentActiveHub && currentActiveHub !== hubName) {
-            viewHistoryStack.push({ type: 'hub', hubName: currentActiveHub });
+        if (!isBackNavigation) {
+            viewHistoryStack.push({ type: 'hub', hubName: currentActiveHub || 'home' });
+            history.pushState({ page: 'hub_' + hubName }, "", window.location.href);
         }
         currentActiveHub = hubName;
 
@@ -4489,12 +4476,13 @@ window.applyHeaderReaderFilter = function() {
 
         // 4. अगर कोई सब-हब (Dashboard/Consumers/Bills/Reports) खुला है तो 4 मुख्य कार्ड्स (Home) पर जाएं
         var hubCards = document.getElementById('mainHubCardsContainer');
-        if (currentActiveHub !== "" || (hubCards && hubCards.style.display === "none")) {
+        if (currentActiveHub !== "" || (hubCards && (hubCards.style.display === "none" || window.getComputedStyle(hubCards).display === "none"))) {
             resetToHubLanding();
+            history.pushState({ page: 'root' }, "DvVNL", window.location.href);
             return;
         }
 
-        // 5. अगर बिल्कुल मुख्य होम पर ही हैं और दोबारा बैक दबाया तो लॉगआउट कन्फर्मेशन
+        // 5. केवल और केवल तभी लॉगआउट पूछेगा जब आप बिल्कुल मेन होम स्क्रीन (4 मुख्य कार्ड्स) पर हों
         logoutSafely();
     }
 
@@ -8414,6 +8402,7 @@ function triggerSilentBackgroundSync() {
         var modalNode = document.getElementById('quickViewModal');
         modalNode.setAttribute('data-current-mode', mode || '');
         modalNode.style.display = 'flex';
+        history.pushState({ page: 'modal_quickview' }, "", window.location.href);
     };
 }
 
@@ -9373,29 +9362,7 @@ function exportAnalyticsReportPDF() {
         doc.save(filename);
     }
 }
-// 🟢 नया फंक्शन: टेक्स्ट बॉक्स के डेटा को डायरेक्ट क्लीन शीट कंडीशन फॉर्मेट में बदलना
-    window.generateSheetConfigString = function() {
-        var inputNode = document.getElementById('cfgCustomInputTextArea');
-        var outputNode = document.getElementById('cfgGeneratedResultOutput');
-        if (!inputNode || !outputNode) return;
-        
-        var rawInput = inputNode.value.trim();
-        if (rawInput === "") {
-            outputNode.value = "";
-            alert("🚨 कृपया बॉक्स में अपनी कंडीशन्स टाइप करें!");
-            return;
-        }
-        
-        // यूज़र द्वारा लिखे गए नियमों को साफ़ (Clean) करना
-        var cleanLines = rawInput.split(',').map(function(line) { 
-            return line.trim(); 
-        }).filter(function(line) { 
-            return line !== ""; 
-        });
-        
-        var finalCodeString = cleanLines.join(",");
-        outputNode.value = finalCodeString;
-    };
+
     function exportConsumerReadingFormPDF(accNo) {
     if (typeof window.jspdf === 'undefined') return alert("🚨 PDF Library (jsPDF) लोड नहीं हो पाई है!");
     if (!db) return alert("🚨 डेटाबेस रेडी नहीं है!");
