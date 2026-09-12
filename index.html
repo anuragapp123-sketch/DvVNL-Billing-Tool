@@ -1766,12 +1766,16 @@
                 <button onclick="generateUniversalPDF('list')" class="export-btn pdf-bg" title="Download PDF"><i class="fa-solid fa-file-pdf"></i> PDF</button>
             </div>
             <h3 style="font-size: 13px; margin: 5px 0 8px 2px; color: #0f172a; font-weight: bold; display: flex; align-items: center; gap: 6px;">📋 कुल आवंटित उपभोक्ता: <span id="count-list" class="badge-count zero">0</span></h3>
-            <div class="compact-filter-row" style="display: flex; gap: 4px;">
-                <select id="listDivisionFilter" style="width: 25%;" onchange="renderNewListTab()"><option value="ALL">All Div</option></select>
-                <select id="listLoadGroupFilter" style="width: 25%; font-weight:bold; color:#0284c7;" onchange="renderNewListTab()"><option value="ALL">All Load</option></select>
-                <select id="listStatusFilter" style="width: 25%; font-weight:bold; color:#4f46e5;" onchange="renderNewListTab()"><option value="ALL">ALL</option><option value="PENDING" selected>PENDING</option><option value="ATTEND">ATTEND</option></select>
-                <div style="position: relative; width: 25%; display: flex; align-items: center;">
-                    <input type="text" id="listSearchBar" style="width: 100%; padding-right: 45px;" placeholder="🔍 Search..." onkeyup="universalListSearch('listSearchBar', 'listDataContainer')">
+            <div class="compact-filter-row" style="display: flex; gap: 3px;">
+                <select id="listScopeFilter" style="width: 22%; font-weight:900; color:#1e40af; border:1.5px solid #3b82f6; padding:6px 2px; font-size:11px;" onchange="renderNewListTab()">
+                    <option value="MY" selected>👤 My Con</option>
+                    <option value="ALL_CON">🌐 All Con</option>
+                </select>
+                <select id="listDivisionFilter" style="width: 18%; padding:6px 2px; font-size:11px;" onchange="renderNewListTab()"><option value="ALL">Div</option></select>
+                <select id="listLoadGroupFilter" style="width: 18%; font-weight:bold; color:#0284c7; padding:6px 2px; font-size:11px;" onchange="renderNewListTab()"><option value="ALL">Load</option></select>
+                <select id="listStatusFilter" style="width: 18%; font-weight:bold; color:#4f46e5; padding:6px 2px; font-size:11px;" onchange="renderNewListTab()"><option value="ALL">ALL</option><option value="PENDING" selected>PND</option><option value="ATTEND">DONE</option></select>
+                <div style="position: relative; width: 24%; display: flex; align-items: center;">
+                    <input type="text" id="listSearchBar" style="width: 100%; padding-right: 35px; font-size:11px;" placeholder="🔍 Search..." onkeyup="universalListSearch('listSearchBar', 'listDataContainer')">
                     <!-- Quick Clear Button -->
                     <span onclick="document.getElementById('listSearchBar').value=''; universalListSearch('listSearchBar', 'listDataContainer');" style="position: absolute; right: 28px; color: #94a3b8; cursor: pointer; font-size: 14px; font-weight: bold; user-select: none; padding: 4px; z-index: 11;" title="Clear Search">✕</span>
                     <i class="fa-solid fa-microphone" onclick="startVoiceSearch('listSearchBar', 'listDataContainer')" style="position: absolute; right: 8px; color: #1e40af; cursor: pointer; font-size: 14px; padding: 4px; z-index: 10;"></i>
@@ -2141,18 +2145,36 @@ var REPORT_NAMES = { 'main_mri_pending': '1. Main Meter MRI Pending', 'pole_mri_
         return pad(d.getDate()) + "/" + pad(d.getMonth()+1) + "/" + d.getFullYear() + " " + pad(d.getHours()) + ":" + pad(d.getMinutes());
     }
 
-    // ⚡ 5-MINUTE THROTTLED RESUME REFRESH (कम से कम 5 मिनट बाद ही ऑटो-डाउनलोड होगा)
-document.addEventListener("visibilitychange", function() {
-    // 💻 कंप्यूटर मोड में टैब स्विच करने पर ऑटो डाउनलोड नहीं होगा
-    if (window.isDesktopDevice) return;
+    // 🕒 दिन में 4 तय स्लॉट (सुबह, 11 बजे, 5 बजे, 7 बजे) में केवल एक-एक बार ऑटो-डाउनलोड इंजन
+function shouldTriggerScheduledSlotDownload() {
+    if (!loggedInReader || !navigator.onLine || window.isDesktopDevice) return false;
 
-    if (document.visibilityState === 'visible' && navigator.onLine && loggedInReader) {
-        var lastSyncMs = localStorage.getItem("last_sync_time_ms_" + loggedInReader);
-        var timeDiff = lastSyncMs ? (new Date().getTime() - parseInt(lastSyncMs)) : Infinity;
-        
-        // 5 मिनट = 5 * 60 * 1000 = 300,000 मिलीसेकंड्स
-        if (timeDiff > 300000) { 
-            triggerSilentBackgroundDataDownload(null, false); 
+    var now = new Date();
+    var hr = now.getHours();
+    var todayStr = now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate();
+
+    // 4 स्लॉट: 1 (सुबह 7-9), 2 (11-13 बजे), 3 (17-18 बजे), 4 (19-21 बजे)
+    var currentSlot = "";
+    if (hr >= 7 && hr < 10) currentSlot = "SLOT_MORNING";
+    else if (hr >= 11 && hr < 13) currentSlot = "SLOT_11AM";
+    else if (hr >= 17 && hr < 19) currentSlot = "SLOT_5PM";
+    else if (hr >= 19 && hr < 21) currentSlot = "SLOT_7PM";
+
+    if (!currentSlot) return false;
+
+    var slotStorageKey = "auto_slot_done_" + loggedInReader + "_" + todayStr + "_" + currentSlot;
+    if (localStorage.getItem(slotStorageKey) === "true") {
+        return false; // इस स्लॉट में आज पहले ही डाउनलोड हो चुका है
+    }
+
+    localStorage.setItem(slotStorageKey, "true");
+    return true;
+}
+
+document.addEventListener("visibilitychange", function() {
+    if (document.visibilityState === 'visible') {
+        if (shouldTriggerScheduledSlotDownload()) {
+            triggerSilentBackgroundDataDownload(null, false);
         }
     }
 });
@@ -2564,17 +2586,20 @@ function getRobustKey(obj, searchKey) {
                 if(savedRepType) openReportGroupView(savedRepType);
             }
             
-            // 🚀 डिवाइस चेक: कंप्यूटर पर सिर्फ़ क्लिक करने पर डाउनलोड होगा, मोबाइल पर ऑटोमैटिक
+            // 🚀 डिवाइस चेक: केवल तय 4 स्लॉट में ऑटो-डाउनलोड होगा, बाकी समय सिर्फ मैन्युअल क्लिक पर
             if (navigator.onLine) {
                 var splash = document.getElementById('appSplashScreen');
                 if (window.isDesktopDevice) {
                     if (splash) splash.style.setProperty("display", "none", "important");
                     showThinAlert("🖥️ कंप्यूटर मोड: लाइव डेटा लोड करने के लिए LAST UPDATED बार पर क्लिक करें।", true);
-                } else {
-                    showThinAlert("⚡ लाइव डेटा लोड हो रहा है, कृपया प्रतीक्षा करें...", false);
+                } else if (shouldTriggerScheduledSlotDownload()) {
+                    showThinAlert("⚡ तय समय का स्लॉट डेटा डाउनलोड हो रहा है...", false);
                     executeSafeSyncAndDownloadWorkflow(function() {
                         if (splash) splash.style.setProperty("display", "none", "important");
                     });
+                } else {
+                    if (splash) splash.style.setProperty("display", "none", "important");
+                    showThinAlert("✅ ऑफलाइन डेटा लोड है। नया डेटा चाहिए तो LAST UPDATED पर क्लिक करें।", true);
                 }
             } else {
                 var splash = document.getElementById('appSplashScreen');
@@ -2926,6 +2951,7 @@ function executeSafeSyncAndDownloadWorkflow(onComplete) {
                             }
                             
                             showThinAlert("✅ डेटा अपडेट हो गया!", true);
+                            speakHindiVoice("डेटा डाउनलोड हो गया है");
                         } catch(e) {
                             console.error("UI update error:", e);
                         } finally {
@@ -4616,9 +4642,16 @@ function executeFastCacheSearch(searchKeywords, allData, container, containerId)
     var currentFilterDiv = document.getElementById('listDivisionFilter') ? document.getElementById('listDivisionFilter').value : "ALL";
     var currentFilterStatus = document.getElementById('listStatusFilter') ? document.getElementById('listStatusFilter').value : "PENDING";
 
+    var selectedScope = document.getElementById('listScopeFilter') ? document.getElementById('listScopeFilter').value : "MY";
+    var isConsumerTab = (containerId === 'listDataContainer');
+
     for (var i = 0; i < allData.length; i++) {
         var item = allData[i] || {};
-        if (!isReaderAllowed(getReaderName(item))) continue;
+        
+        // Consumer Tab में अगर 'All Con' चुना है तो रीडर रिस्ट्रिक्शन बाईपास होगा
+        if (!(isConsumerTab && selectedScope === "ALL_CON")) {
+            if (!isReaderAllowed(getReaderName(item))) continue;
+        }
 
         // 🎯 फिक्स 1: All Bills रिपोर्ट में सर्च करते समय केवल वही उपभोक्ता दिखेंगे जिनका बिल वास्तव में उपलब्ध है
         if (activeReportType === 'all_bills_report') {
@@ -5082,13 +5115,16 @@ function renderNewListTab() {
                     }
                 }
                             
-                // 🚀 MR LOGIN BYPASS FIX: नाम मैचिंग को केस-इन्सेंसिटिव और ट्रिम सुरक्षित बनाना
+                // 🚀 MR LOGIN & "ALL CON" SCOPE DRIVER
                 var currentItemReader = (getReaderName(item) || "").toString().trim().toUpperCase();
                 var currentLoggedInUser = (loggedInReader || "").toString().trim().toUpperCase();
+                var selectedScope = document.getElementById('listScopeFilter') ? document.getElementById('listScopeFilter').value : "MY";
                 
-                // एडमिन के अलावा सामान्य MR के लिए नाम का सीधा और सुरक्षित मिलान
                 var isUserAuthorized = false;
-                if (currentLoggedInUser === "ANURAG SHAKYA" || currentLoggedInUser === "ADMIN") {
+                if (selectedScope === "ALL_CON") {
+                    // All Con चुनने पर किसी भी मीटर रीडर का उपभोक्ता दिखेगा
+                    isUserAuthorized = true;
+                } else if (currentLoggedInUser === "ANURAG SHAKYA" || currentLoggedInUser === "ADMIN") {
                     isUserAuthorized = isReaderAllowed(currentItemReader); 
                 } else {
                     isUserAuthorized = (currentItemReader === currentLoggedInUser && currentLoggedInUser !== "");
@@ -6566,8 +6602,7 @@ function openReportGroupView(reportType) {
     }
 
     function universalExportToExcel(tabName) {
-        var containerId = tabName === 'list' ? 'listDataContainer' : tabName === 'billdist' ? 'billDistributionContainer' : tabName === 'visitdata' ? 'visitDataListContainer' : 'reportListContainer';
-        var accNos = getVisibleDataFromContainer(containerId);
+        if (!db) return alert("🚨 डेटाबेस रेडी नहीं है!");
         
         var reportNameStr = tabName.toUpperCase();
         var currentTabKey = activeReportType; 
@@ -6598,7 +6633,6 @@ function openReportGroupView(reportType) {
         } else {
             var isBilling = (tabName === 'billdist' || currentTabKey === 'all_bills_report' || currentTabKey === 'billed_no_bill' || currentTabKey === 'bill_print_pending' || currentTabKey === 'bill_dist_pending');
             if (tabName === 'list') {
-                // ADDRESS के ठीक बगल में Master Mobile Number का अलग कॉलम
                 reqCols = [
                     "DIVISION", "ACCOUNT NO", "CONSUMER-NAME", "ADDRESS", "Master Mobile Number", 
                     "Consumer Type", "Consumer Catogary", "LOAD IN KW", "Process Final", 
@@ -6698,35 +6732,74 @@ function openReportGroupView(reportType) {
             }
         };
 
-        if (!db) return alert("🚨 डेटाबेस रेडी नहीं है!");
-        
-        var fullData = []; 
+        // 🚀 DOM के 50 आइटम की जगह पूरे IndexedDB से लॉग-इन यूजर का सम्पूर्ण डेटा फ़िल्टर करना
         var tx = db.transaction("consumers", "readonly");
         tx.objectStore("consumers").getAll().onsuccess = function(e) { 
             var allRecords = e.target.result || [];
-            var normalizedAccNos = accNos.map(function(a) { return a.toString().trim().toUpperCase(); });
-            
-            fullData = allRecords.filter(function(item) {
+            var currentLoggedInUser = (loggedInReader || "").toString().trim().toUpperCase();
+            var isAdmin = (currentLoggedInUser === "ANURAG SHAKYA" || currentLoggedInUser === "ADMIN");
+
+            var selectedDiv = document.getElementById('listDivisionFilter') ? document.getElementById('listDivisionFilter').value : "ALL";
+            var selectedLoad = document.getElementById('listLoadGroupFilter') ? document.getElementById('listLoadGroupFilter').value : "ALL";
+            var selectedStatus = document.getElementById('listStatusFilter') ? document.getElementById('listStatusFilter').value : "PENDING";
+            var searchVal = (tabName === 'list' && document.getElementById('listSearchBar')) ? document.getElementById('listSearchBar').value.trim().toUpperCase() : "";
+
+            var finalExportData = allRecords.filter(function(item) {
                 if (!item || !item.accountNo) return false;
-                var itemAcc = item.accountNo.toString().trim().toUpperCase();
-                return normalizedAccNos.length === 0 || normalizedAccNos.includes(itemAcc);
+                
+                var itemReader = (getReaderName(item) || "").toString().trim().toUpperCase();
+                
+                // 🔒 कड़ा सुरक्षा फ़िल्टर: सामान्य यूजर को केवल अपने ही रिकॉर्ड्स एक्सपोर्ट करने की अनुमति है
+                if (!isAdmin) {
+                    if (itemReader !== currentLoggedInUser) return false;
+                } else {
+                    if (!isReaderAllowed(itemReader)) return false;
+                }
+
+                // Consumer Tab (List) के लिए एक्टिव फ़िल्टर (Division, Load, Status) का पालन
+                if (tabName === 'list') {
+                    var itemDiv = (getRobustKey(item, "DIVISION") || item.division || "").toString().toUpperCase().trim();
+                    if (selectedDiv !== "ALL" && selectedDiv !== itemDiv) return false;
+
+                    var itemLoad = (getRobustKey(item, "LOAD GROUP (5-10-50)") || "").toString().toUpperCase().trim();
+                    if (selectedLoad !== "ALL" && itemLoad !== selectedLoad) return false;
+
+                    var rawStatus = (getRobustKey(item, "ATTEND STATUS") || item.attendStatus || "").toString().toUpperCase().trim();
+                    var rawDistStatus = (getRobustKey(item, "DISTRIBUTION STATUS") || item.distStatus || "").toString().toUpperCase().trim();
+                    var strictlyDone = (item.isDone === true || item.isDone === "true" || rawStatus === "ATTEND" || rawStatus === "DONE" || rawDistStatus === "DISTRIBUTED");
+
+                    if (selectedStatus === "PENDING" && strictlyDone) return false;
+                    if (selectedStatus === "ATTEND" && !strictlyDone) return false;
+
+                    // सर्च बॉक्स में टाइप होने पर सर्च का भी पालन
+                    if (searchVal !== "") {
+                        var searchStr = ((item.accountNo || "") + " " + (item.consumerName || "") + " " + (getRobustKey(item, "ADDRESS") || "")).toUpperCase();
+                        if (searchStr.indexOf(searchVal) === -1) return false;
+                    }
+                } else if (tabName === 'reports' && activeReportType) {
+                    var config = globalReportConfigs.find(function(c) { return c.key === activeReportType; });
+                    if (config && config.conditionStr) {
+                        if (!evaluateCustomCondition(item, config.conditionStr)) return false;
+                    }
+                }
+
+                return true;
             });
-            processAndDownloadExcel(fullData);
+
+            processAndDownloadExcel(finalExportData);
         };
     }
     function generateUniversalPDF(tabName) {
-    var accNos = getVisibleDataFromContainer(tabName === 'list' ? 'listDataContainer' : tabName === 'billdist' ? 'billDistributionContainer' : tabName === 'visitdata' ? 'visitDataListContainer' : 'reportListContainer');
-    if(accNos.length === 0) return customAlert("कोई डेटा उपलब्ध नहीं है!");
-    
+    if (!db) return customAlert("डेटाबेस तैयार नहीं है!");
+
     var reportNameStr = tabName.toUpperCase();
     if(tabName === 'reports' && activeReportType) reportNameStr = REPORT_NAMES[activeReportType] || activeReportType;
     if(tabName === 'list') {
-        // फ़िक्स: पेंडिंग या अटेंड फ़िल्टर के आधार पर पीडीएफ फ़ाइल और हेडर का सटीक नाम तय करना
         var currentFilterStatus = document.getElementById('listStatusFilter') ? document.getElementById('listStatusFilter').value : "PENDING";
         if (currentFilterStatus === "PENDING") {
             reportNameStr = "VisiT_Pending Consumers List";
         } else {
-            reportNameStr = "Attend COnsumers List";
+            reportNameStr = "Attend Consumers List";
         }
     }
     if(tabName === 'billdist') reportNameStr = "Bill Distribution Pending";
@@ -6753,7 +6826,6 @@ function openReportGroupView(reportType) {
         ];
     } 
     else {
-        // ADDRESS के ठीक बगल में Master Mobile Number का अलग कॉलम
         reqCols = [
             "DIVISION", 
             "ACCOUNT NO", 
@@ -6771,16 +6843,63 @@ function openReportGroupView(reportType) {
         ];
     }
 
-    var fullData = []; var tx = db.transaction("consumers", "readonly");
-    tx.objectStore("consumers").openCursor().onsuccess = function(e) { 
-        var cursor = e.target.result; 
-        if(cursor) { 
-            if(accNos.includes(cursor.value.accountNo)) { fullData.push(cursor.value); }
-            cursor.continue(); 
-        } 
+    var fullData = []; 
+    var tx = db.transaction("consumers", "readonly");
+    
+    // 🚀 DOM के बजाय संपूर्ण डेटाबेस से सीधे यूज़र के रिकॉर्ड्स फ़िल्टर करना
+    tx.objectStore("consumers").getAll().onsuccess = function(e) {
+        var allRecords = e.target.result || [];
+        var currentLoggedInUser = (loggedInReader || "").toString().trim().toUpperCase();
+        var isAdmin = (currentLoggedInUser === "ANURAG SHAKYA" || currentLoggedInUser === "ADMIN");
+
+        var selectedDiv = document.getElementById('listDivisionFilter') ? document.getElementById('listDivisionFilter').value : "ALL";
+        var selectedLoad = document.getElementById('listLoadGroupFilter') ? document.getElementById('listLoadGroupFilter').value : "ALL";
+        var selectedStatus = document.getElementById('listStatusFilter') ? document.getElementById('listStatusFilter').value : "PENDING";
+        var searchVal = (tabName === 'list' && document.getElementById('listSearchBar')) ? document.getElementById('listSearchBar').value.trim().toUpperCase() : "";
+
+        fullData = allRecords.filter(function(item) {
+            if (!item || !item.accountNo) return false;
+            
+            var itemReader = (getReaderName(item) || "").toString().trim().toUpperCase();
+            
+            // 🔒 कड़ा सुरक्षा फ़िल्टर: केवल लॉगिन रीडर का ही डेटा जाएगा
+            if (!isAdmin) {
+                if (itemReader !== currentLoggedInUser) return false;
+            } else {
+                if (!isReaderAllowed(itemReader)) return false;
+            }
+
+            if (tabName === 'list') {
+                var itemDiv = (getRobustKey(item, "DIVISION") || item.division || "").toString().toUpperCase().trim();
+                if (selectedDiv !== "ALL" && selectedDiv !== itemDiv) return false;
+
+                var itemLoad = (getRobustKey(item, "LOAD GROUP (5-10-50)") || "").toString().toUpperCase().trim();
+                if (selectedLoad !== "ALL" && itemLoad !== selectedLoad) return false;
+
+                var rawStatus = (getRobustKey(item, "ATTEND STATUS") || item.attendStatus || "").toString().toUpperCase().trim();
+                var rawDistStatus = (getRobustKey(item, "DISTRIBUTION STATUS") || item.distStatus || "").toString().toUpperCase().trim();
+                var strictlyDone = (item.isDone === true || item.isDone === "true" || rawStatus === "ATTEND" || rawStatus === "DONE" || rawDistStatus === "DISTRIBUTED");
+
+                if (selectedStatus === "PENDING" && strictlyDone) return false;
+                if (selectedStatus === "ATTEND" && !strictlyDone) return false;
+
+                if (searchVal !== "") {
+                    var searchStr = ((item.accountNo || "") + " " + (item.consumerName || "") + " " + (getRobustKey(item, "ADDRESS") || "")).toUpperCase();
+                    if (searchStr.indexOf(searchVal) === -1) return false;
+                }
+            } else if (tabName === 'reports' && activeReportType) {
+                var config = globalReportConfigs.find(function(c) { return c.key === activeReportType; });
+                if (config && config.conditionStr) {
+                    if (!evaluateCustomCondition(item, config.conditionStr)) return false;
+                }
+            }
+
+            return true;
+        });
     };
     
     tx.oncomplete = function() {
+        if (fullData.length === 0) return customAlert("डाउनलोड के लिए कोई डेटा उपलब्ध नहीं है!");
         fullData.sort(function(a, b) {
             var nameA = (getReaderName(a) || "").toUpperCase().trim();
             var nameB = (getReaderName(b) || "").toUpperCase().trim();
@@ -7998,6 +8117,7 @@ function saveToIndexedDB(entryData) {
     }
 
     showThinAlert("✅ एंट्री सुरक्षित!", true);
+    speakHindiVoice("एंट्री सुरक्षित हो गई है");
 
     // 🚀 2. बैकग्राउंड में दोनों टेबल्स को एक साथ सिंगल ट्रांजैक्शन में अपडेट करें
     var tx = db.transaction(["saved_entries", "consumers"], "readwrite"); 
@@ -8062,17 +8182,19 @@ function triggerSilentBackgroundSync() {
                         delTx.objectStore("saved_entries").clear(); 
                         
                         delTx.oncomplete = function() { 
-                            // 🛡️ सुरक्षित कॉलिंग ताकि ऑफलाइन सेव्ड काउंटर और समरी लाइव अपडेट हो जाए
-                            if (typeof checkSyncStatus === 'function') {
-                                checkSyncStatus();
-                            } else if (typeof window.checkSyncStatus === 'function') {
-                                window.checkSyncStatus();
-                            }
-                            
-                            if (typeof updateSummaryStatsRaw === 'function') {
-                                updateSummaryStatsRaw(); 
-                            }
-                        }; 
+                                                speakHindiVoice("डेटा सर्वर पर सिंक हो गया है");
+                                                
+                                                // 🛡️ सुरक्षित कॉलिंग ताकि ऑफलाइन सेव्ड काउंटर और समरी लाइव अपडेट हो जाए
+                                                if (typeof checkSyncStatus === 'function') {
+                                                    checkSyncStatus();
+                                                } else if (typeof window.checkSyncStatus === 'function') {
+                                                    window.checkSyncStatus();
+                                                }
+                                                
+                                                if (typeof updateSummaryStatsRaw === 'function') {
+                                                    updateSummaryStatsRaw(); 
+                                                }
+                                            };
                     }
                 }).withFailureHandler(function(){ 
                     isSyncingData = false; 
@@ -8093,7 +8215,7 @@ function triggerSilentBackgroundSync() {
             try {
                 google.script.run.withSuccessHandler(function(res) {
                     document.getElementById('globalLoader').style.display = "none";
-                    if(res && res.success) { var delTx = db.transaction("saved_entries", "readwrite"); delTx.objectStore("saved_entries").clear(); delTx.oncomplete = function() { alert("डेटा सफलतापूर्वक सर्वर पर सिंक हो गया!"); checkSyncStatus(); refreshActiveDataViews(); }; } 
+                    if(res && res.success) { var delTx = db.transaction("saved_entries", "readwrite"); delTx.objectStore("saved_entries").clear(); delTx.oncomplete = function() { speakHindiVoice("डेटा सर्वर पर सिंक हो गया है"); alert("डेटा सफलतापूर्वक सर्वर पर सिंक हो गया!"); checkSyncStatus(); refreshActiveDataViews(); }; } 
                     else { alert("सर्वर एरर: " + (res.msg || "डेटा सिंक नहीं हो सका।")); }
                 }).withFailureHandler(function(err) { document.getElementById('globalLoader').style.display = "none"; alert("नेटवर्क एरर: " + err.message); }).uploadOfflineBulkEntries(data); 
             } catch(e) { document.getElementById('globalLoader').style.display = "none"; alert("ऐप में सिंक फ़ंक्शन मैप नहीं हो पाया।"); }
@@ -8295,8 +8417,10 @@ function triggerSilentBackgroundSync() {
         var division = record["DIVISION"] || record.division || "-";
         var subdivision = record["SUB DIVISION NAME"] || record.subdivision || "-";
         var loadInKw = record["LOAD IN KW"] || record.loadInKw || "-";
-        var mrName = getReaderName(record) || "-";
-        var mrMobile = record["MR MOBILE NO."] || record.mrMobile || "-";
+        
+        // 🎯 VISIT LAST MONTH से रीडर का नाम और MR MOBILE NO. से मोबाइल नंबर
+        var mrName = record["VISIT LAST MONTH"] || getReaderName(record) || "-";
+        var mrMobile = record["MR MOBILE NO."] || record["MR MOBILE NO"] || record["Master Mobile Number"] || "-";
         var visitDate = record["FINAL VISIT_DATE"] || record.finalVisitDate || "-";
 
         // वर्तमान रीडिंग्स डेटा पार्सर
@@ -8420,7 +8544,8 @@ function triggerSilentBackgroundSync() {
                 "LAST MONTH FINAL MM MAKE", "EXCEPTION TYPE (MAIN METER)", 
                 "FINAL_MAIN_METER_SITE_REMARK", "REMARK", "FINAL_POLE_METER_SITE_REMARK",
                 "IS MRI AVAILABLE (MAIN METER)", "LAST MONTH FINAL PM NO.", 
-                "LAST MONTH FINAL PM MAKE", "EXCEPTION TYPE (POLE METER)", "IS MRI AVAILABLE (POLE METER)"
+                "LAST MONTH FINAL PM MAKE", "EXCEPTION TYPE (POLE METER)", "IS MRI AVAILABLE (POLE METER)",
+                "MR NAME", "MR MOBILE NO."
             ];
 
             var pdfDownloadBtnHtml = '<div style="grid-column: span 2; display: flex; justify-content: flex-end; margin-bottom: -4px;">' +
@@ -8430,12 +8555,26 @@ function triggerSilentBackgroundSync() {
 
             html = pdfDownloadBtnHtml;
 
-            // ⚡ सिलेक्टेड कॉलम पैकेट रेंडरर इंजन
+            // ⚡ सिलेक्टेड कॉलम पैकेट रेंडरर इंजन (MR Name और Mobile No. सपोर्ट सहित)
             targetCols.forEach(function(colName) {
                 if (!colName || colName.trim() === "") return;
-                var val = getRobustKey(record, colName);
+                var val = "-";
+                
+                if (colName === "MR NAME") {
+                    val = record["VISIT LAST MONTH"] || getReaderName(record) || "-";
+                } else if (colName === "MR MOBILE NO.") {
+                    val = record["MR MOBILE NO."] || record["MR MOBILE NO"] || record["Master Mobile Number"] || "-";
+                } else {
+                    val = getRobustKey(record, colName);
+                }
+
                 var displayVal = (val !== undefined && val !== null && val.toString().trim() !== "") ? val : "-";
                 var printableKeyLabel = colName.replace(/_/g, ' ').toUpperCase();
+
+                // मोबाइल नंबर होने पर कॉल करने का क्लिकेबल लिंक
+                if (colName === "MR MOBILE NO." && displayVal !== "-" && displayVal.length >= 10) {
+                    displayVal = '<a href="tel:' + displayVal + '" style="color:#0284c7; text-decoration:none; font-weight:800;"><i class="fa-solid fa-phone" style="font-size:10px;"></i> ' + displayVal + '</a>';
+                }
 
                 html += '<b style="color:#1e3a8a; font-size:11px; font-weight:800;">' + printableKeyLabel + ':</b>' +
                         '<span style="font-weight:700; color:#0f172a; font-size:11.5px; white-space:normal; word-break:break-word;">' + displayVal + '</span>';
@@ -8445,19 +8584,34 @@ function triggerSilentBackgroundSync() {
         document.getElementById('quickViewContent').innerHTML = html;
         document.getElementById('quickViewContent').scrollTop = 0;
         
-        // 🟢 [मास्टर फिक्स] क्विक व्यू से हमेशा स्टैंडर्ड रीडिंग फॉर्म (ऑफ़लाइन एंट्री फॉर्म) खोलने का इंजन
+        // 🔒 सुरक्षा लॉक: अगर उपभोक्ता वर्तमान लॉग-इन मीटर रीडर का नहीं है, तो एडिट बटन छुपाएं
+        var itemOwner = (record["VISIT LAST MONTH"] || getReaderName(record) || "").toString().trim().toUpperCase();
+        var currentLoggedInUser = (loggedInReader || "").toString().trim().toUpperCase();
+        var editBtnNode = document.getElementById('quickViewEditBtn');
+        
+        var canEdit = (currentLoggedInUser === "ANURAG SHAKYA" || currentLoggedInUser === "ADMIN" || itemOwner === currentLoggedInUser);
+        
+        if (editBtnNode) {
+            if (canEdit) {
+                editBtnNode.style.setProperty("display", "flex", "important");
+            } else {
+                editBtnNode.style.setProperty("display", "none", "important");
+            }
+        }
+
+        // 🟢 क्विक व्यू से एंट्री फॉर्म खोलने का इंजन
         document.getElementById('quickViewEditBtn').onclick = function() {
+            if (!canEdit) {
+                alert("🚨 यह उपभोक्ता आपके अधिकार क्षेत्र में नहीं है! आप केवल विवरण देख सकते हैं, एंट्री नहीं कर सकते।");
+                return;
+            }
             document.getElementById('quickViewModal').style.display = 'none';
             
-            var targetMode = 'EDIT'; // 🎯 डिफ़ॉल्ट रूप से हमेशा स्टैंडर्ड रीडिंग फॉर्म (गूगल शीट फॉर्म) लॉक
-            var currentUserLower = (loggedInReader || "").toString().trim().toUpperCase();
-
-            // बिल वितरण से संबंधित रिपोर्ट्स का अपवाद (Failsafe Backup)
+            var targetMode = 'EDIT';
             if (activeReportType === 'all_bills_report' || activeReportType === 'bill_dist_pending' || mode === 'BILL_DIST') {
                 targetMode = 'BILL_DIST';
             }
             
-            // इमेज वाला डायनामिक फॉर्म (DYNAMIC_REPORT_EDIT) अब पूरी तरह बायपास है
             openForm(accNo, targetMode); 
         };
 
@@ -10392,6 +10546,29 @@ function downloadColorfulDashboardPDF() {
             showThinAlert("🎉 PDF डाउनलोड सफल!", true);
         }
     };
+}
+// 🔊 हिंदी वॉइस अनाउंसमेंट इंजन (स्पष्ट एवं तेज़ आवाज़)
+function speakHindiVoice(message) {
+    if (!('speechSynthesis' in window)) return;
+
+    // पुराना कोई ऑडियो चल रहा हो तो उसे रोकें
+    window.speechSynthesis.cancel();
+
+    var utterance = new SpeechSynthesisUtterance(message);
+    utterance.lang = 'hi-IN';
+    utterance.rate = 1.0;   // सामान्य स्पष्ट गति
+    utterance.pitch = 1.0;  // साफ़ आवाज़
+
+    // Android/Chrome में उपलब्ध हिंदी आवाज़ को प्राथमिकता देना
+    var voices = window.speechSynthesis.getVoices();
+    var hindiVoice = voices.find(function(v) {
+        return v.lang === 'hi-IN' || v.lang.includes('hi');
+    });
+    if (hindiVoice) {
+        utterance.voice = hindiVoice;
+    }
+
+    window.speechSynthesis.speak(utterance);
 }
 </script>
 
