@@ -885,7 +885,61 @@
     </div>
   </div>
 
-  <div id="thinDarkAlert" style="display:none; position:fixed; top:0; left:0; width:100%; background:#0f172a; color:#facc15; font-size:12px; font-weight:bold; text-align:center; padding:8px; z-index:99999; box-shadow:0 2px 4px rgba(0,0,0,0.5);"><i class="fa-solid fa-cloud-arrow-down fa-fade"></i> <span id="thinDarkAlertTxt">Master Data Downloading In Process Pls wait...</span></div>
+  <!-- 🚀 क्लिकेबल अलर्ट: क्लिक पर डाउनलोड शुरू और अपने आप पतली स्ट्रिप में कन्वर्ट होने वाला बॉक्स -->
+  <div id="thinDarkAlert" onclick="handleNotificationClickToDownload()" style="display:none; position:fixed; z-index:9999999; box-sizing:border-box; cursor:pointer; user-select:none; transition:all 0.3s cubic-bezier(0.4, 0, 0.2, 1);">
+    <style>
+      @keyframes popInAlert {
+        from { transform: translate(-50%, -50%) scale(0.85); opacity: 0; }
+        to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+      }
+      /* बीच वाला बड़ा बॉक्स स्टाइल */
+      .alert-center-modal {
+        top: 50% !important;
+        left: 50% !important;
+        transform: translate(-50%, -50%) !important;
+        background: rgba(15, 23, 42, 0.96) !important;
+        color: #ffffff !important;
+        padding: 16px 22px !important;
+        border-radius: 18px !important;
+        border: 2px solid #3b82f6 !important;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.65), 0 0 25px rgba(59, 130, 246, 0.35) !important;
+        backdrop-filter: blur(10px) !important;
+        -webkit-backdrop-filter: blur(10px) !important;
+        min-width: 270px !important;
+        max-width: 86vw !important;
+        text-align: center !important;
+        animation: popInAlert 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+      /* बिल्कुल पतली टॉप स्ट्रिप स्टाइल (स्क्रीन खाली, काम जारी) */
+      .alert-slim-topbar {
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        width: 100% !important;
+        transform: none !important;
+        background: #0f172a !important;
+        color: #facc15 !important;
+        font-size: 11px !important;
+        font-weight: 800 !important;
+        text-align: center !important;
+        padding: 5px 10px !important;
+        border: none !important;
+        border-bottom: 1.5px solid #3b82f6 !important;
+        border-radius: 0 !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4) !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 8px !important;
+      }
+    </style>
+    <div id="alertIconWrapper" style="font-size:24px; color:#facc15; margin-bottom:6px;">
+      <i class="fa-solid fa-cloud-arrow-down fa-bounce"></i>
+    </div>
+    <div id="thinDarkAlertTxt" style="font-size:14px; font-weight:800; line-height:1.35; letter-spacing:0.3px; color:#f8fafc;">
+      Master Data Downloading In Process Pls wait...
+    </div>
+  </div>
 
   <div id="globalNotificationOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15,23,42,0.75); z-index:9999999; align-items:center; justify-content:center; backdrop-filter:blur(5px); box-sizing:border-box;" onclick="event.stopPropagation();">
     <div id="globalNotificationBox" style="background:#ffffff; width:90%; max-width:400px; min-height:220px; border-radius:20px; padding:25px 20px; text-align:center; box-shadow:0 25px 50px -12px rgba(0,0,0,0.4); border:3px solid #1e40af; position:relative; display:flex; flex-direction:column; justify-content:space-between; animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); overscroll-behavior:contain;" onclick="event.stopPropagation();">
@@ -2087,8 +2141,16 @@ var manifestJSON = {
     ]
 };
 
-var manifestBlob = new Blob([JSON.stringify(manifestJSON)], {type: 'application/json'});
-document.getElementById('manifest-placeholder').setAttribute('href', URL.createObjectURL(manifestBlob));
+try {
+    var manifestBlob = new Blob([JSON.stringify(manifestJSON)], {type: 'application/manifest+json'});
+    var manifestUrl = URL.createObjectURL(manifestBlob);
+    var manifestPlaceholder = document.getElementById('manifest-placeholder');
+    if (manifestPlaceholder) {
+        manifestPlaceholder.setAttribute('href', manifestUrl);
+    }
+} catch(manifestErr) {
+    console.warn("Manifest Blob bypass in sandbox:", manifestErr);
+}
 
 var deferredPrompt;
 window.addEventListener('beforeinstallprompt', (e) => {
@@ -2606,6 +2668,11 @@ function getRobustKey(obj, searchKey) {
                 if (splash) splash.style.setProperty("display", "none", "important");
                 showThinAlert("⚠️ इंटरनेट बंद है! केवल ऑफलाइन डेटा दिखाया जा रहा है।", true);
             }
+
+            // 📢 1 घंटे से पुराने डेटा की तुरंत जांच एवं वॉयस अनाउंसमेंट
+            setTimeout(function() {
+                checkDataAgeAndAlertUser();
+            }, 1200);
         } else {
             document.getElementById('appSplashScreen').style.display = "none";
             navigateToViewRaw('loginView');
@@ -2763,26 +2830,107 @@ function renderDivisionDropdownHTML(divSet, select, currentSelection) {
     }
 }
 
-    function showThinAlert(msg, autoHide) {
+    // 🚀 नोटिफिकेशन पर क्लिक करने पर डाउनलोडिंग शुरू और बॉक्स को तुरंत बिल्कुल पतला (Slim) करने का इंजन
+    function handleNotificationClickToDownload() {
+        var el = document.getElementById('thinDarkAlert');
+        if (!el) return;
+
+        // अगर पहले से डाउनलोड चल रहा है तो री-ट्रिगर न करें
+        if (isDownloadingMasterData) {
+            turnAlertToSlimTop("⚡ डेटा डाउनलोड हो रहा है, आप अपना कार्य जारी रखें...");
+            return;
+        }
+
+        // 1. तुरंत पतली टॉप बार में बदलें ताकि नीचे की पूरी स्क्रीन खाली हो जाए
+        turnAlertToSlimTop("⚡ डाउनलोडिंग शुरू... आप अपना कार्य जारी रख सकते हैं");
+
+        // 2. मास्टर डेटा डाउनलोडिंग शुरू करें
+        if (typeof triggerSilentBackgroundDataDownload === 'function') {
+            triggerSilentBackgroundDataDownload(function() {
+                // डाउनलोड पूरा होने पर सूचना देकर बार बंद करें
+                showThinAlert("✅ नया डेटा डाउनलोड हो गया!", true);
+            }, true);
+        }
+    }
+
+    // नोटिफिकेशन को बिल्कुल पतली स्ट्रिप में कन्वर्ट करने का हेल्पर
+    function turnAlertToSlimTop(msgText) {
+        var el = document.getElementById('thinDarkAlert');
+        var txt = document.getElementById('thinDarkAlertTxt');
+        var iconWrapper = document.getElementById('alertIconWrapper');
+        if (!el) return;
+
+        el.className = "alert-slim-topbar";
+        if (iconWrapper) {
+            iconWrapper.style.fontSize = "13px";
+            iconWrapper.style.marginBottom = "0px";
+            iconWrapper.innerHTML = '<i class="fa-solid fa-arrows-rotate fa-spin" style="color:#38bdf8;"></i>';
+        }
+        if (txt) {
+            txt.style.fontSize = "11px";
+            txt.innerText = msgText;
+        }
+    }
+
+    function showThinAlert(msg, autoHide, forceSlim) {
         if (autoHide === undefined) autoHide = true;
         var el = document.getElementById('thinDarkAlert');
         var txt = document.getElementById('thinDarkAlertTxt');
-        if(el && txt) {
-            // यदि कोई पुराना टाइमआउट चल रहा है तो उसे तुरंत रद्द करें
-            if (window.thinAlertTimer) {
-                clearTimeout(window.thinAlertTimer);
-                window.thinAlertTimer = null;
-            }
-            txt.innerText = msg;
-            el.style.setProperty("display", "block", "important");
+        var iconWrapper = document.getElementById('alertIconWrapper');
+        if (!el || !txt) return;
 
-            // केवल तभी बैनर खुद बंद होगा जब autoHide = true पास किया गया हो
-            if (autoHide) {
-                window.thinAlertTimer = setTimeout(function(){ 
-                    if(el) el.style.setProperty("display", "none", "important"); 
-                    window.thinAlertTimer = null;
-                }, 4000); // सफलता का संदेश आने के 4 सेकंड बाद बैनर हटेगा
+        if (window.thinAlertTimer) {
+            clearTimeout(window.thinAlertTimer);
+            window.thinAlertTimer = null;
+        }
+
+        var isOldDataAlert = msg.includes("पुराना") || msg.includes("⚠️") || msg.includes("🚨");
+        var isSuccess = msg.includes("✅") || msg.includes("सफल");
+
+        // अगर डाउनलोडिंग के दौरान का मैसेज है तो इसे हमेशा पतली टॉप स्ट्रिप में रखें
+        if (forceSlim || isDownloadingMasterData) {
+            el.className = "alert-slim-topbar";
+            if (iconWrapper) {
+                iconWrapper.style.fontSize = "13px";
+                iconWrapper.style.marginBottom = "0px";
+                iconWrapper.innerHTML = isSuccess ? '<i class="fa-solid fa-circle-check" style="color:#22c55e;"></i>' : '<i class="fa-solid fa-arrows-rotate fa-spin" style="color:#38bdf8;"></i>';
             }
+            txt.style.fontSize = "11px";
+            txt.innerHTML = msg;
+        } else {
+            // बड़ा फ्लोटिंग बॉक्स (सेंटर में)
+            el.className = "alert-center-modal";
+            if (iconWrapper) {
+                iconWrapper.style.fontSize = "26px";
+                iconWrapper.style.marginBottom = "6px";
+                if (isOldDataAlert) {
+                    el.style.borderColor = "#ef4444";
+                    iconWrapper.innerHTML = '<i class="fa-solid fa-triangle-exclamation fa-beat" style="color:#ef4444;"></i>';
+                } else if (isSuccess) {
+                    el.style.borderColor = "#22c55e";
+                    iconWrapper.innerHTML = '<i class="fa-solid fa-circle-check" style="color:#22c55e;"></i>';
+                } else {
+                    el.style.borderColor = "#3b82f6";
+                    iconWrapper.innerHTML = '<i class="fa-solid fa-cloud-arrow-down fa-bounce" style="color:#facc15;"></i>';
+                }
+            }
+
+            txt.style.fontSize = "14px";
+            // पुराने डेटा वाले मैसेज में नीचे क्लिक करने की छोटी हिंट जोड़ें
+            if (isOldDataAlert) {
+                txt.innerHTML = msg + '<div style="font-size:10.5px; color:#fca5a5; font-weight:700; margin-top:6px;"><i class="fa-solid fa-hand-pointer"></i> (डाउनलोड करने के लिए यहाँ क्लिक करें)</div>';
+            } else {
+                txt.innerHTML = msg;
+            }
+        }
+
+        el.style.setProperty("display", "block", "important");
+
+        if (autoHide) {
+            window.thinAlertTimer = setTimeout(function(){ 
+                if(el) el.style.setProperty("display", "none", "important"); 
+                window.thinAlertTimer = null;
+            }, 3500);
         }
     }
     // 🚀 सुरक्षित वर्कफ़्लो इंजन: पहले ऑफलाइन डेटा सिंक होगा, फिर नया मास्टर डेटा डाउनलोड होगा
@@ -2931,6 +3079,13 @@ function executeSafeSyncAndDownloadWorkflow(onComplete) {
                             
                             var tsSpan = document.getElementById("lastUpdatedTimeSpan");
                             if (tsSpan) tsSpan.innerText = currentDateTimeStr;
+
+                            // नया डेटा आते ही बार को सामान्य रंग में रीसेट करें
+                            var lastUpdBar = document.getElementById('lastUpdatedLabel');
+                            if (lastUpdBar) {
+                                lastUpdBar.style.border = "1.5px solid #334155";
+                                lastUpdBar.style.background = "linear-gradient(90deg, #0f172a, #1e293b, #0f172a)";
+                            }
                             
                             buildAdminMultiSelectCheckbox(bulkData.consumers); 
                             populateDivisionFilter(bulkData.consumers);
@@ -3125,8 +3280,10 @@ window.toggleAllHeaderReaders = function(masterEl) {
             adminSelectedReaders.push(cb.value);
         }
     });
-    // डेटा व्यू और काउंटर्स को तुरंत री-फ्रेश करें
-    if (typeof refreshActiveDataViews === 'function') refreshActiveDataViews();
+    
+    // सर्च मेमोरी रीसेट करें और पूरे UI को फ्रेश री-रेंडर करें
+    appSearchDatabaseCache = null;
+    triggerGlobalDataReRender();
 };
 
 // 🎯 इंडिविजुअल रीडर चेकबॉक्स फ़िल्टर को ग्लोबली बाइंड करने का इंजन
@@ -3139,12 +3296,50 @@ window.applyHeaderReaderFilter = function() {
     
     var selectAll = document.getElementById('headerFilterSelectAll');
     if(selectAll) {
-        selectAll.checked = (adminSelectedReaders.length === cbs.length);
+        selectAll.checked = (adminSelectedReaders.length === cbs.length && cbs.length > 0);
     }
     
-    // डेटा व्यू और काउंटर्स को तुरंत री-फ्रेश करें
-    if (typeof refreshActiveDataViews === 'function') refreshActiveDataViews();
+    // सर्च मेमोरी रीसेट करें और पूरे UI को फ्रेश री-रेंडर करें
+    appSearchDatabaseCache = null;
+    triggerGlobalDataReRender();
 };
+
+// 🔄 पूरे UI (डैशबोर्ड, कार्ड्स, लिस्ट्स और खुली हुई रिपोर्ट्स) को एक साथ री-रेंडर करने का मास्टर ट्रिगर
+function triggerGlobalDataReRender() {
+    // 1. समरी, प्रोग्रेस रिंग और 8 तारीख वाले टारगेट कार्ड्स अपडेट करें
+    if (typeof updateSummaryStatsRaw === 'function') {
+        updateSummaryStatsRaw();
+    }
+
+    // 2. वर्तमान एक्टिव टैब के अनुसार लिस्ट्स को री-रेंडर करें
+    var activeTabNode = document.querySelector('.tab-bar .tab-btn.active');
+    var activeTabId = activeTabNode ? activeTabNode.id.replace('btn-tab-', '') : '';
+
+    if (activeTabId === 'list' && typeof renderNewListTab === 'function') {
+        renderNewListTab();
+    } else if (activeTabId === 'billdist' && typeof renderBillDistributionList === 'function') {
+        renderBillDistributionList();
+    } else if (activeTabId === 'visitdata' && typeof renderVisitDataList === 'function') {
+        renderVisitDataList();
+    }
+
+    // 3. यदि कोई सब-व्यू या रिपोर्ट खुली हुई है तो उसे भी नए रीडर फ़िल्टर पर अपडेट करें
+    if (activeReportType && typeof openReportGroupView === 'function') {
+        openReportGroupView(activeReportType);
+    }
+
+    // 4. यदि डेट-वाइज समरी खुली है तो उसे अपडेट करें
+    var dateView = document.getElementById('sub-view-datereport');
+    if (dateView && dateView.style.display === 'block' && typeof renderDateWiseReaderSummary === 'function') {
+        renderDateWiseReaderSummary();
+    }
+
+    // 5. यदि एनालिटिक्स डैशबोर्ड खुला है तो उसे अपडेट करें
+    var analyticsView = document.getElementById('sub-view-analytics');
+    if (analyticsView && analyticsView.style.display === 'block' && typeof renderAnalyticsDashboardEngine === 'function') {
+        renderAnalyticsDashboardEngine();
+    }
+}
 
     // 🟢 फिक्स: एडमिन पैनल से लाइव नोटिफिकेशन भेजने का मैकेनिज्म (पूर्णतः सुधरा हुआ रूप)
     function sendLiveNotificationFromAdmin() {
@@ -4413,15 +4608,7 @@ window.applyHeaderReaderFilter = function() {
     };
 
     function refreshActiveDataViews() {
-        var activeTabNode = document.querySelector('.tab-btn.active');
-        if(activeTabNode) {
-            var tid = activeTabNode.id.replace('btn-tab-', '');
-            if(tid === 'summary' || tid === 'filter') updateSummaryStatsRaw(); 
-            else if(tid === 'list') renderNewListTab();
-            else if(tid === 'billdist') renderBillDistributionList(); 
-            else if(tid === 'visitdata') renderVisitDataList();
-            else if(tid === 'reports' && document.getElementById('reportDetailContainer').style.display === "block") openReportGroupView(activeReportType);
-        } else { updateSummaryStatsRaw(); }
+        triggerGlobalDataReRender();
     }
 
     function refreshDataFromServer(isManualClick) {
@@ -4606,6 +4793,7 @@ function universalListSearch(inputId, containerId) {
 
     if (cleanInput === "") {
         appSearchDatabaseCache = null; 
+        updateSearchBadgeCount(containerId, (globalReportsDatabaseCache ? globalReportsDatabaseCache.length : 0), false);
         var currentTabNode = document.querySelector('.tab-bar .tab-btn.active');
         if (currentTabNode) {
             var activeTabName = currentTabNode.id.replace('btn-tab-', '');
@@ -4839,6 +5027,16 @@ function updateSearchBadgeCount(containerId, visibleCount, isLocked) {
     db.transaction("consumers", "readonly").objectStore("consumers").get(accountNo).onsuccess = function(e) {
         var record = e.target.result; 
         if(!record) return alert("उपभोक्ता रिकॉर्ड नहीं मिला!");
+
+        // 🔒 अनधिकृत एंट्री रोकने के लिए सख्त सत्यापन
+        var itemOwner = (record["VISIT LAST MONTH"] || getReaderName(record) || "").toString().trim().toUpperCase();
+        var currentUser = (loggedInReader || "").toString().trim().toUpperCase();
+        var isAdminUser = (currentUser === "ANURAG SHAKYA" || currentUser === "ADMIN");
+
+        if (!isAdminUser && itemOwner !== currentUser) {
+            alert("🚨 अनुमति अस्वीकृत! यह उपभोक्ता " + itemOwner + " के लिए आवंटित है। आप इस पर एंट्री दर्ज नहीं कर सकते।");
+            return;
+        }
         
         // लोकल स्टोरेज में करंट फॉर्म स्टेट锁 करना
         localStorage.setItem("app_current_form_item_" + loggedInReader, JSON.stringify(record)); 
@@ -5354,49 +5552,57 @@ function renderNewListTab() {
                     var itemLoadCat = (item["LOAD_CATOGERY (5,10)"] || "").toString().trim();
                     
                     var loadMatch = false;
-                    if (selectedLoadCat === "ALL") loadMatch = true;
-                    else if (selectedLoadCat === "5") loadMatch = itemLoadCat.includes(">=5KW");
-                    else if (selectedLoadCat === "10") loadMatch = itemLoadCat.includes(">=10KW");
+                    if (selectedLoadCat === "ALL") {
+                        loadMatch = true;
+                    } else if (selectedLoadCat === "5") {
+                        loadMatch = itemLoadCat.includes("5") || itemLoadCat.includes(">=5KW");
+                    } else if (selectedLoadCat === "10") {
+                        loadMatch = itemLoadCat.includes("10") || itemLoadCat.includes(">=10KW");
+                    }
 
                     var matchesBillCondition = false;
 
+                    // 1. वितरण स्टेटस निकालें
+                    var itemDistRaw = (getRobustKey(item, "DISTRIBUTION STATUS") || item["DISTRIBUTION STATUS"] || item.distStatus || "").toString().toUpperCase().trim();
+                    var isDistributed = (itemDistRaw === "DISTRIBUTED");
+
+                    // 2. बिल अपलोड की स्थिति
+                    var billUploadRaw = (getRobustKey(item, "IS BILL UPLOAD") || item["IS BILL UPLOAD"] || item.isBillUpload || "").toString().toUpperCase().trim();
+                    var hasBillUploaded = (billUploadRaw === "YES" || billUploadRaw === "TRUE" || parseTrue(item.isBillUpload) || (item.pdfLink && item.pdfLink.trim() !== ""));
+
+                    // 3. वितरण के लिए पात्रता (FOR_BILL DISTRIBUTION)
+                    var forDistVal = (getRobustKey(item, "FOR_BILL DISTRIBUTION") || item["FOR_BILL DISTRIBUTION"] || item.forBillDist || "").toString().toUpperCase().trim();
+                    var isForBillDist = (forDistVal === "YES" || forDistVal.includes("YES"));
+
+                    // 4. टावर कनेक्शन की जांच
+                    var consumerTypeVal = (getRobustKey(item, "Consumer Type") || getRobustKey(item, "Consumer Catogary") || item.consumerType || "").toString().toUpperCase().trim();
+                    var remarkAll = ((getRobustKey(item, "REMARK") || "") + " " + (getRobustKey(item, "CONSUMER REMARK") || "") + " " + forDistVal).toUpperCase();
+                    var isTower = forDistVal.includes("TOWER") || consumerTypeVal.includes("TOWER");
+                    var isTowerClosed = remarkAll.includes("TOWER CLOSED") || remarkAll.includes("CLOSED");
+
                     if (selectedDeliveryMode === "ALL_BILLS") {
-                        // 🎯 ALL DRIVE BILLS: ड्राइव पर बिल अपलोडेड या लिंक होना चाहिए
-                        var hasBill = (item.pdfLink && item.pdfLink.trim() !== "") || (getRobustKey(item, "IS BILL UPLOAD") || "").toString().toUpperCase().trim() === "YES" || parseTrue(item.isBillUpload);
-                        matchesBillCondition = hasBill;
+                        // सभी ड्राइव बिल: या तो बिल अपलोड हो या लिंक मौजूद हो
+                        matchesBillCondition = hasBillUploaded;
                     } else {
-                        // 🎯 FOR DISTRIBUTION (सामान्य बिल + टावर रूल्स)
-                        var forDistVal = (getRobustKey(item, "FOR_BILL DISTRIBUTION") || item.forBillDist || "").toString().toUpperCase().trim();
-                        var consumerTypeVal = (getRobustKey(item, "Consumer Type") || getRobustKey(item, "Consumer Catogary") || item.consumerType || "").toString().toUpperCase().trim();
-                        var remarkAll = ((getRobustKey(item, "REMARK") || "") + " " + (getRobustKey(item, "CONSUMER REMARK") || "") + " " + forDistVal).toUpperCase();
-
-                        // टावर पहचान व क्लोज्ड चेकर
-                        var isTower = forDistVal.includes("TOWER") || consumerTypeVal.includes("TOWER");
-                        var isTowerClosed = remarkAll.includes("TOWER CLOSED") || remarkAll.includes("CLOSED");
-
-                        var itemDistRaw = (getRobustKey(item, "DISTRIBUTION STATUS") || item.distStatus || "").toString().toUpperCase().trim();
-                        var isAlreadyDistributed = (itemDistRaw === "DISTRIBUTED" || item.isDone === true || savedEntriesMap[item.accountNo]);
-
-                        if (isAlreadyDistributed) {
+                        // FOR DISTRIBUTION: बिल पहले से 'DISTRIBUTED' नहीं होना चाहिए
+                        if (isDistributed) {
                             matchesBillCondition = false;
                         } else if (isTower) {
-                            // टावर केस: क्लोज्ड नहीं होना चाहिए और कनेक्शन Billed होना चाहिए (बिल अपलोड होना जरूरी नहीं)
                             var billedDate = (getRobustKey(item, "BILLED DATE") || item.billedDate || "").toString().trim();
                             var billingStatus = (getRobustKey(item, "BILLING STATUS") || item.billingStatus || "").toString().toUpperCase().trim();
                             var isBilled = (billedDate !== "" && billedDate !== "-" && billedDate !== "NOT FOUND") || billingStatus.includes("BILLED") || billingStatus === "YES";
                             
                             matchesBillCondition = (!isTowerClosed && isBilled);
                         } else {
-                            // सामान्य उपभोक्ता केस: FOR_BILL DISTRIBUTION = YES होना चाहिए और बिल अपलोड होना चाहिए
-                            var isForBillDist = (forDistVal === "YES" || forDistVal.includes("YES"));
-                            var isBillUpload = (getRobustKey(item, "IS BILL UPLOAD") || item.isBillUpload || "").toString().toUpperCase().trim() === "YES" || parseTrue(item.isBillUpload);
-                            var isNotDistributed = (itemDistRaw !== "DISTRIBUTED");
-
-                            matchesBillCondition = (isForBillDist && isBillUpload && isNotDistributed);
+                            // सामान्य उपभोक्ता: FOR_BILL DISTRIBUTION = YES होना चाहिए और IS BILL UPLOAD = YES होना चाहिए
+                            matchesBillCondition = (isForBillDist && hasBillUploaded);
                         }
                     }
 
-                    if(matchesBillCondition && isReaderAllowed(getReaderName(item)) && loadMatch) {
+                    // 🎯 ALL_BILLS पर सभी रीडर्स के बिल दिखेंगे, FOR_DIST पर केवल असाइन्ड/लॉगिन रीडर के बिल दिखेंगे
+                    var isUserPermitted = (selectedDeliveryMode === "ALL_BILLS") ? true : isReaderAllowed(getReaderName(item));
+
+                    if(matchesBillCondition && isUserPermitted && loadMatch) {
                         
                         var pdfBtn = (item.pdfLink && item.pdfLink !== "") 
                             ? '<a href="' + item.pdfLink + '" target="_blank" class="pdf-icon" onclick="event.stopPropagation();"><i class="fa-solid fa-file-pdf"></i></a>' 
@@ -6605,7 +6811,7 @@ function openReportGroupView(reportType) {
         if (!db) return alert("🚨 डेटाबेस रेडी नहीं है!");
         
         var reportNameStr = tabName.toUpperCase();
-        var currentTabKey = activeReportType; 
+        var currentTabKey = activeReportType || ""; 
 
         if(tabName === 'list') {
             currentTabKey = "all_consumers_list";
@@ -8589,7 +8795,8 @@ function triggerSilentBackgroundSync() {
         var currentLoggedInUser = (loggedInReader || "").toString().trim().toUpperCase();
         var editBtnNode = document.getElementById('quickViewEditBtn');
         
-        var canEdit = (currentLoggedInUser === "ANURAG SHAKYA" || currentLoggedInUser === "ADMIN" || itemOwner === currentLoggedInUser);
+        var isAdminUser = (currentLoggedInUser === "ANURAG SHAKYA" || currentLoggedInUser === "ADMIN");
+        var canEdit = isAdminUser || (itemOwner === currentLoggedInUser && currentLoggedInUser !== "");
         
         if (editBtnNode) {
             if (canEdit) {
@@ -8599,10 +8806,10 @@ function triggerSilentBackgroundSync() {
             }
         }
 
-        // 🟢 क्विक व्यू से एंट्री फॉर्म खोलने का इंजन
+        // 🟢 क्विक व्यू से एंट्री फॉर्म खोलने का इंजन (सख्त सुरक्षा चेकर के साथ)
         document.getElementById('quickViewEditBtn').onclick = function() {
             if (!canEdit) {
-                alert("🚨 यह उपभोक्ता आपके अधिकार क्षेत्र में नहीं है! आप केवल विवरण देख सकते हैं, एंट्री नहीं कर सकते।");
+                alert("🚨 यह उपभोक्ता किसी अन्य मीटर रीडर (" + itemOwner + ") का है! आप इस पर एंट्री नहीं कर सकते।");
                 return;
             }
             document.getElementById('quickViewModal').style.display = 'none';
@@ -9280,6 +9487,7 @@ function renderAnalyticsDashboardEngine() {
         var billArr = [], billDistArr = [];
 
         var sortedReaders = Object.keys(readerMatrix).sort();
+        window.billDeliveredArr = []; // 🛠️ Fix: लूप से पहले एरे को खाली किया ताकि पुराना डेटा न जुड़े
         sortedReaders.forEach(function(name) {
             var m = readerMatrix[name];
             var donePct = m.total > 0 ? Math.round((m.done / m.total) * 100) : 0;
@@ -10547,28 +10755,60 @@ function downloadColorfulDashboardPDF() {
         }
     };
 }
-// 🔊 हिंदी वॉइस अनाउंसमेंट इंजन (स्पष्ट एवं तेज़ आवाज़)
+// 🔊 हिंदी वॉइस अनाउंसमेंट इंजन (बिना APK बदले सीधे HTML से 100% वर्किंग)
+var globalVoiceAudioPlayer = null;
+
 function speakHindiVoice(message) {
-    if (!('speechSynthesis' in window)) return;
+    if (!message) return;
 
-    // पुराना कोई ऑडियो चल रहा हो तो उसे रोकें
-    window.speechSynthesis.cancel();
+    try {
+        // अगर पहले से कोई ऑडियो बज रहा हो तो उसे रोकें
+        if (globalVoiceAudioPlayer) {
+            globalVoiceAudioPlayer.pause();
+            globalVoiceAudioPlayer.currentTime = 0;
+        }
 
-    var utterance = new SpeechSynthesisUtterance(message);
-    utterance.lang = 'hi-IN';
-    utterance.rate = 1.0;   // सामान्य स्पष्ट गति
-    utterance.pitch = 1.0;  // साफ़ आवाज़
-
-    // Android/Chrome में उपलब्ध हिंदी आवाज़ को प्राथमिकता देना
-    var voices = window.speechSynthesis.getVoices();
-    var hindiVoice = voices.find(function(v) {
-        return v.lang === 'hi-IN' || v.lang.includes('hi');
-    });
-    if (hindiVoice) {
-        utterance.voice = hindiVoice;
+        // Google Translate का हाई-स्पीड हिंदी TTS ऑडियो URL
+        var audioUrl = "https://translate.google.com/translate_tts?ie=UTF-8&tl=hi&client=tw-ob&q=" + encodeURIComponent(message);
+        
+        globalVoiceAudioPlayer = new Audio(audioUrl);
+        globalVoiceAudioPlayer.play().catch(function(e) {
+            // यदि ब्राउज़र का ऑटो-प्ले ब्लॉक हो, तो पुराना फॉलबैक चलाएं
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                var u = new SpeechSynthesisUtterance(message);
+                u.lang = 'hi-IN';
+                window.speechSynthesis.speak(u);
+            }
+        });
+    } catch (err) {
+        console.error("Audio TTS Error:", err);
     }
+}
+// 🕒 डेटा 1 घंटे से अधिक पुराना होने पर वॉयस एवं स्क्रीन अलर्ट इंजन
+function checkDataAgeAndAlertUser() {
+    if (!loggedInReader) return;
+    
+    var lastSyncMs = localStorage.getItem("last_sync_time_ms_" + loggedInReader);
+    if (!lastSyncMs) return;
 
-    window.speechSynthesis.speak(utterance);
+    var currentTime = new Date().getTime();
+    var timeDiffHours = (currentTime - parseInt(lastSyncMs, 10)) / (1000 * 60 * 60);
+
+    // यदि डेटा 1 घंटे (60 मिनट) से अधिक पुराना है
+    if (timeDiffHours >= 1) {
+        showThinAlert("⚠️ आपका डेटा पुराना है, कृपया नया डेटा डाउनलोड करें!", false);
+        
+        // यूज़र को बोलकर सूचित करें
+        speakHindiVoice("आपका डेटा पुराना है, कृपया नया डेटा डाउनलोड करें");
+
+        // LAST UPDATED बार को लाल/अलर्ट कलर में ब्लिंक कराएं
+        var lastUpdBar = document.getElementById('lastUpdatedLabel');
+        if (lastUpdBar) {
+            lastUpdBar.style.border = "2px solid #ef4444";
+            lastUpdBar.style.background = "linear-gradient(90deg, #450a0a, #7f1d1d, #450a0a)";
+        }
+    }
 }
 </script>
 
