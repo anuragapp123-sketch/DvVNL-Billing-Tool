@@ -939,8 +939,8 @@
     <div id="alertIconWrapper" style="font-size:24px; color:#facc15; margin-bottom:6px;">
       <i class="fa-solid fa-cloud-arrow-down fa-bounce"></i>
     </div>
-    <div id="thinDarkAlertTxt" style="font-size:14px; font-weight:800; line-height:1.35; letter-spacing:0.3px; color:#f8fafc;">
-      Master Data Downloading In Process Pls wait...
+    <div id="thinDarkAlertTxt" style="font-size:12px; font-weight:800; line-height:1.35; letter-spacing:0.3px; color:#f8fafc; min-height:16px;">
+      सूचना
     </div>
   </div>
 
@@ -1852,6 +1852,8 @@
                 </button>
                 <span style="font-size: 13px; font-weight: 900; color: #1e40af; text-transform: uppercase;">Bills & Distribution</span>
             </div>
+            <!-- 🔔 बिल वितरण टैब के लिए नोटिफिकेशन पट्टी -->
+            <div id="billAlertPlaceholderContainer" style="width: 100%; margin-bottom: 8px;"></div>
     <div class="universal-header-actions">
     <button onclick="universalExportToExcel('billdist')" class="export-btn excel-bg"><i class="fa-solid fa-file-excel"></i></button>
     <button onclick="generateUniversalPDF('billdist')" class="export-btn pdf-bg"><i class="fa-solid fa-file-pdf"></i></button>
@@ -2866,7 +2868,6 @@ function renderDivisionDropdownHTML(divSet, select, currentSelection) {
         }
     }
 
-    // नोटिफिकेशन को बिल्कुल पतली स्ट्रिप में कन्वर्ट करने का हेल्पर
     function turnAlertToSlimTop(msgText) {
         var el = document.getElementById('thinDarkAlert');
         var txt = document.getElementById('thinDarkAlertTxt');
@@ -2880,20 +2881,26 @@ function renderDivisionDropdownHTML(divSet, select, currentSelection) {
             iconWrapper.innerHTML = '<i class="fa-solid fa-arrows-rotate fa-spin" style="color:#38bdf8;"></i>';
         }
         if (txt) {
+            txt.style.display = "inline-block";
             txt.style.fontSize = "11px";
-            txt.innerText = msgText;
+            txt.innerText = msgText || "कृपया प्रतीक्षा करें...";
         }
+        el.style.setProperty("display", "flex", "important");
     }
 
     function showThinAlert(msg, autoHide, forceSlim) {
+        if (!msg) return;
         if (autoHide === undefined) autoHide = true;
         var el = document.getElementById('thinDarkAlert');
         var txt = document.getElementById('thinDarkAlertTxt');
         var iconWrapper = document.getElementById('alertIconWrapper');
         if (!el || !txt) return;
 
-        // 🎯 स्ट्रिप को हमेशा हेडर और LAST UPDATED बार के बीच में इंजेक्ट करना
+        var activeTab = document.querySelector('.tab-content[style*="display: block"]') || document.getElementById('view-summary');
         var placeholder = document.getElementById('alertPlaceholderContainer');
+        if (activeTab && activeTab.id === 'view-billdist') {
+            placeholder = document.getElementById('billAlertPlaceholderContainer') || placeholder;
+        }
         if (placeholder && el.parentElement !== placeholder) {
             placeholder.appendChild(el);
         }
@@ -2903,43 +2910,39 @@ function renderDivisionDropdownHTML(divSet, select, currentSelection) {
             window.thinAlertTimer = null;
         }
 
-        var isOldDataAlert = msg.includes("पुराना") || msg.includes("⚠️") || msg.includes("🚨");
-        var isSuccess = msg.includes("✅") || msg.includes("सफल");
+        var isOldDataAlert = msg.indexOf("पुराना") !== -1 || msg.indexOf("⚠️") !== -1 || msg.indexOf("🚨") !== -1;
+        var isSuccess = msg.indexOf("✅") !== -1 || msg.indexOf("सफल") !== -1 || msg.indexOf("🎉") !== -1;
 
-        // यदि डाउनलोड चालू है और अभी सफलता का मैसेज नहीं आया है, तभी ऑटो-हाइड रोकें
         if (isDownloadingMasterData && !isSuccess) {
             autoHide = false;
-            forceSlim = true;
-        } else if (isSuccess) {
-            autoHide = true;
         }
 
         el.className = "alert-slim-topbar";
         if (iconWrapper) {
             iconWrapper.style.fontSize = "14px";
             iconWrapper.style.marginBottom = "0px";
-            if (isDownloadingMasterData) {
+            if (isDownloadingMasterData && !isSuccess) {
                 iconWrapper.innerHTML = '<i class="fa-solid fa-arrows-rotate fa-spin" style="color:#38bdf8;"></i>';
             } else if (isSuccess) {
                 iconWrapper.innerHTML = '<i class="fa-solid fa-circle-check" style="color:#22c55e;"></i>';
             } else if (isOldDataAlert) {
                 iconWrapper.innerHTML = '<i class="fa-solid fa-triangle-exclamation fa-beat" style="color:#f87171;"></i>';
             } else {
-                iconWrapper.innerHTML = '<i class="fa-solid fa-cloud-arrow-down fa-bounce" style="color:#facc15;"></i>';
+                iconWrapper.innerHTML = '<i class="fa-solid fa-bell" style="color:#facc15;"></i>';
             }
         }
 
+        txt.style.display = "inline-block";
         txt.style.fontSize = "11.5px";
         txt.innerHTML = msg;
 
         el.style.setProperty("display", "flex", "important");
 
-        // सफलता या सामान्य अलर्ट पर पट्टी 3.5 सेकंड में अपने-आप गायब हो जाएगी
         if (autoHide) {
             window.thinAlertTimer = setTimeout(function(){ 
-                if(el) el.style.setProperty("display", "none", "important"); 
+                if (el) el.style.setProperty("display", "none", "important"); 
                 window.thinAlertTimer = null;
-            }, 3500);
+            }, 4000);
         }
     }
     // 🚀 सुरक्षित वर्कफ़्लो इंजन: पहले ऑफलाइन डेटा सिंक होगा, फिर नया मास्टर डेटा डाउनलोड होगा
@@ -3127,7 +3130,7 @@ function executeSafeSyncAndDownloadWorkflow(onComplete) {
                             }
                             
                             showThinAlert("✅ डेटा अपडेट हो गया!", true);
-                            speakHindiVoice("डेटा डाउनलोड हो गया है");
+                            speakHindiVoice("आपका नया डेटा डाउनलोड हो गया है, अब आप नई रिपोर्ट देख सकते हैं");
                         } catch(e) {
                             console.error("UI update error:", e);
                         } finally {
@@ -5361,7 +5364,8 @@ function renderNewListTab() {
                     var currentConsumerMobile = getRobustKey(item, "Master Mobile Number") || item.masterMobileNumber || "-";
                     var currentDivisionDisplay = getRobustKey(item, "DIVISION") || item.division || "";
 
-                    var listInfoBtn = '<button onclick="event.stopPropagation(); openContactUpdateModal(\'' + item.accountNo + '\')" class="export-btn mini" style="padding: 5px 8px; font-size: 10px; background:#0ea5e9; display:inline-flex; align-items:center; justify-content:center; gap:3px; margin-top:4px;" title="Update Contact Info"><i class="fa-solid fa-mobile-screen-button" style="font-size:9px;"></i><i class="fa-solid fa-envelope" style="font-size:9px;"></i></button>';
+                    var listInfoBtn = '<button onclick="event.stopPropagation(); openContactUpdateModal(\'' + item.accountNo + '\')" class="export-btn mini" style="padding: 5px 8px; font-size: 10px; background:#0ea5e9; display:inline-flex; align-items:center; justify-content:center; gap:3px;" title="Update Contact Info"><i class="fa-solid fa-mobile-screen-button" style="font-size:9px;"></i><i class="fa-solid fa-envelope" style="font-size:9px;"></i></button>';
+                    var directEditBtn = '<button onclick="event.stopPropagation(); openForm(\'' + item.accountNo + '\', \'EDIT\')" class="export-btn mini" style="padding: 5px 9px; font-size: 10.5px; background:linear-gradient(135deg, #059669, #10b981); color:#fff; display:inline-flex; align-items:center; justify-content:center; gap:4px; font-weight:800; border-radius:6px; box-shadow:0 2px 4px rgba(16,185,129,0.3);" title="सीधे एंट्री फॉर्म भरें"><i class="fa-solid fa-pen-to-square"></i> Entry</button>';
                     
                     var qvAcc = item.accountNo;
                     var loadGroupVal = getRobustKey(item, "LOAD GROUP (5-10-50)") || item.loadGroup || "";
@@ -5374,10 +5378,11 @@ function renderNewListTab() {
                             '<!-- Hero Top Bar: Account No & Meta Badges -->' +
                             '<div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #f1f5f9; padding-bottom:5px;">' +
                                 '<span style="background:#0f172a; color:#ffffff; font-size:11.5px; font-weight:900; padding:2px 8px; border-radius:6px; letter-spacing:0.5px; display:inline-flex; align-items:center; gap:4px;"><i class="fa-solid fa-bolt" style="color:#facc15; font-size:10px;"></i> ' + item.accountNo + '</span>' +
-                                '<div style="display:flex; gap:4px; align-items:center;">' +
+                                '<div style="display:flex; gap:5px; align-items:center;">' +
                                     loadBadgeHtml +
                                     '<span style="font-size:9.5px; font-weight:800; color:#4338ca; background:#e0e7ff; padding:1px 6px; border-radius:4px;">' + currentDivisionDisplay + '</span>' +
                                     '<div onclick="event.stopPropagation();">' + listInfoBtn + '</div>' +
+                                    '<div onclick="event.stopPropagation();">' + directEditBtn + '</div>' +
                                 '</div>' +
                             '</div>' +
                             '<!-- Hero Name -->' +
@@ -5687,8 +5692,11 @@ function renderNewListTab() {
                                 '<div style="font-size:10.5px; margin-top:3px; color:#4f46e5; font-weight:700;">M-Mtr: ' + billDistMm + ' | P-Mtr: ' + billDistPm + '</div>' +
                             '</div>' +
                             '<div style="text-align:right; flex-shrink: 0; display:flex; flex-direction:column; align-items:flex-end; justify-content:center; gap:6px;" onclick="event.stopPropagation();">' +
-                                '<div style="display:flex; gap:4px;">' + pdfBtn + waBtn + '</div>' +
-                            '</div></div>'
+                            '<div style="display:flex; gap:4px; align-items:center;">' +
+                                '<button onclick="event.stopPropagation(); openForm(\'' + item.accountNo + '\', \'BILL_DIST\')" class="export-btn mini" style="padding: 4px 8px; font-size: 10px; background:linear-gradient(135deg, #059669, #10b981); color:#fff; display:inline-flex; align-items:center; gap:3px; font-weight:800; border-radius:6px;" title="बिल वितरण फॉर्म भरें"><i class="fa-solid fa-pen-to-square"></i></button>' +
+                                pdfBtn + waBtn +
+                            '</div>' +
+                        '</div></div>'
                         );
                     } 
                 }
@@ -5711,6 +5719,18 @@ function renderNewListTab() {
 async function downloadSelectedMergedPDF() {
     var checkboxes = document.querySelectorAll('.bill-select-cb:checked');
     if(checkboxes.length === 0) return customAlert("🚨 कृपया उपभोक्ता चुनें!");
+
+    // 🎯 बिल मर्ज शुरू होते ही चेकबॉक्सेज को अनचेक/रीसेट करें ताकि क्लिक वापस सामान्य हो जाए
+    setTimeout(function() {
+        checkboxes.forEach(function(cb) {
+            cb.checked = false;
+            cb.removeAttribute('checked');
+        });
+        var selectAllDist = document.getElementById('selectAllBillsReport');
+        if (selectAllDist) selectAllDist.checked = false;
+        var selectAllRep = document.getElementById('selectAllBillsReportTab');
+        if (selectAllRep) selectAllRep.checked = false;
+    }, 500);
 
     var fileIds = [];
     var printedAccNos = [];
@@ -5772,7 +5792,8 @@ async function downloadSelectedMergedPDF() {
 
         for (let i = 0; i < fileIds.length; i += BATCH_SIZE) {
             const currentBatch = fileIds.slice(i, i + BATCH_SIZE);
-            showThinAlert("⚡ सुपर-फास्ट प्रोसेसिंग: " + Math.min(i + BATCH_SIZE, totalFiles) + " / " + totalFiles + "...", false);
+            var currentProcessed = Math.min(i + BATCH_SIZE, totalFiles);
+            showThinAlert("⚡ बिल मर्ज हो रहे हैं: " + currentProcessed + " / " + totalFiles + "...", false);
 
             // पैरेलल फेच
             const base64Results = await Promise.all(currentBatch.map(id => fetchSinglePdf(id)));
@@ -5806,11 +5827,11 @@ async function downloadSelectedMergedPDF() {
 
         if (successfulCount === 0) {
             alert("🚨 सर्वर से पीडीएफ डेटा नहीं मिल सका।");
-            showThinAlert("🚨 प्रोसेस फेल हुआ।", true);
+            showThinAlert("🚨 प्रोसेस फेल हुआ। कोई बिल डाउनलोड नहीं हो सका।", true);
             return;
         }
 
-        showThinAlert("⚙️ फाइल्स मर्ज हो चुकी हैं! फोन रेडी किया जा रहा है...", false);
+        showThinAlert("⚙️ " + successfulCount + " फाइल्स मर्ज हो चुकी हैं! PDF तैयार हो रही है...", false);
         const mergedPdfBytes = await mergedPdf.save({ useObjectStreams: true });
         mergedPdf = null; // 🧹 तुरंत मेमोरी खाली करें
 
@@ -5883,7 +5904,7 @@ async function downloadSelectedMergedPDF() {
         
     } catch (err) {
         alert("🚨 मर्ज फेल एरर विवरण:\n" + err.toString());
-        showThinAlert("🚨 प्रोसेस फेल हुआ।", true);
+        showThinAlert("🚨 बिल मर्ज प्रोसेस फेल: " + (err.message || err.toString()), true);
     }
 }
 
@@ -8370,8 +8391,10 @@ function saveToIndexedDB(entryData) {
         mainContainerNode.style.setProperty("padding-bottom", "140px", "important");
     }
 
-    showThinAlert("✅ एंट्री सुरक्षित!", true);
     speakHindiVoice("एंट्री सुरक्षित हो गई है");
+    setTimeout(function() {
+        showThinAlert("✅ एंट्री सुरक्षित हो गई है!", true);
+    }, 100);
 
     // 🚀 2. बैकग्राउंड में दोनों टेबल्स को एक साथ सिंगल ट्रांजैक्शन में अपडेट करें
     var tx = db.transaction(["saved_entries", "consumers"], "readwrite"); 
@@ -8649,6 +8672,18 @@ function triggerSilentBackgroundSync() {
     function openQuickViewModal(accNo, mode) {
     if (window.getSelection && window.getSelection().toString().length > 0) return;
 
+    // 🎯 स्मार्ट मल्टी-सिलेक्ट गार्ड: यदि 2 या अधिक चेकबॉक्स टिक हैं, तो कार्ड क्लिक चेकबॉक्स की तरह कार्य करेगा
+    var checkedBoxes = document.querySelectorAll('.bill-select-cb:checked');
+    if (checkedBoxes.length >= 2) {
+        var targetCb = document.querySelector('.bill-select-cb[data-acc="' + accNo + '"]');
+        if (targetCb) {
+            targetCb.checked = !targetCb.checked;
+            if (targetCb.checked) targetCb.setAttribute('checked', 'true');
+            else targetCb.removeAttribute('checked');
+            return;
+        }
+    }
+
     // 🚀 स्क्रीन पर मौजूद सारी लिस्ट को कैप्चर करना ताकि Next/Prev काम करे
     var allAccElements = document.querySelectorAll('[onclick*="openQuickViewModal"]');
     if(allAccElements.length > 0) {
@@ -8794,10 +8829,10 @@ function triggerSilentBackgroundSync() {
                    '</table>' +
                    '</div>';
         } else {
-            // 👦 नियम 2: मीटर रीडर (लड़कों) की लॉगिन होने पर शीट का डेटा चाहे जैसा भी हो, सिर्फ और सिर्फ ये 17 कॉलम ही लॉक होकर दिखेंगे
+            // 👦 नियम 2: मीटर रीडर (लड़कों) के लिए प्रोफेशनल कार्ड ग्रिड लेआउट
             var contentContainerNode = document.getElementById('quickViewContent');
             if (contentContainerNode) {
-                contentContainerNode.style.setProperty("display", "grid", "important");
+                contentContainerNode.style.setProperty("display", "block", "important");
             }
 
             var targetCols = [
@@ -8810,14 +8845,13 @@ function triggerSilentBackgroundSync() {
                 "MR NAME", "MR MOBILE NO."
             ];
 
-            var pdfDownloadBtnHtml = '<div style="grid-column: span 2; display: flex; justify-content: flex-end; margin-bottom: -4px;">' +
-                                     '<button onclick="exportSingleConsumerPDF(event, \'' + accNo + '\', \'MASTER_COLS\')" class="export-btn mini pdf-bg" style="padding: 5px 12px; font-size: 11px; display: inline-flex; align-items: center; gap: 4px; box-shadow: 0 2px 4px rgba(220,38,38,0.25);">' +
-                                     '<i class="fa-solid fa-file-pdf"></i> Download PDF</button>' +
-                                     '</div>';
+            html = '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; background:#f8fafc; padding:6px 10px; border-radius:8px; border:1px solid #e2e8f0;">' +
+                   '<span style="font-size:12px; font-weight:900; color:#1e3a8a;"><i class="fa-solid fa-bolt" style="color:#f59e0b;"></i> ' + accNo + '</span>' +
+                   '<button onclick="exportSingleConsumerPDF(event, \'' + accNo + '\', \'MASTER_COLS\')" class="export-btn mini pdf-bg" style="padding: 4px 10px; font-size: 10.5px; border-radius:6px;"><i class="fa-solid fa-file-pdf"></i> PDF</button>' +
+                   '</div>';
 
-            html = pdfDownloadBtnHtml;
+            html += '<div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; width:100%; box-sizing:border-box;">';
 
-            // ⚡ सिलेक्टेड कॉलम पैकेट रेंडरर इंजन (MR Name और Mobile No. सपोर्ट सहित)
             targetCols.forEach(function(colName) {
                 if (!colName || colName.trim() === "") return;
                 var val = "-";
@@ -8833,14 +8867,22 @@ function triggerSilentBackgroundSync() {
                 var displayVal = (val !== undefined && val !== null && val.toString().trim() !== "") ? val : "-";
                 var printableKeyLabel = colName.replace(/_/g, ' ').toUpperCase();
 
-                // मोबाइल नंबर होने पर कॉल करने का क्लिकेबल लिंक
                 if (colName === "MR MOBILE NO." && displayVal !== "-" && displayVal.length >= 10) {
-                    displayVal = '<a href="tel:' + displayVal + '" style="color:#0284c7; text-decoration:none; font-weight:800;"><i class="fa-solid fa-phone" style="font-size:10px;"></i> ' + displayVal + '</a>';
+                    displayVal = '<a href="tel:' + displayVal + '" style="color:#0284c7; text-decoration:none; font-weight:800;"><i class="fa-solid fa-phone" style="font-size:9px;"></i> ' + displayVal + '</a>';
                 }
 
-                html += '<b style="color:#1e3a8a; font-size:11px; font-weight:800;">' + printableKeyLabel + ':</b>' +
-                        '<span style="font-weight:700; color:#0f172a; font-size:11.5px; white-space:normal; word-break:break-word;">' + displayVal + '</span>';
+                var isWide = (colName === "CONSUMER-NAME" || colName === "ADDRESS" || colName.includes("REMARK"));
+                var gridSpan = isWide ? "grid-column: span 2;" : "";
+                var cardBg = (colName.includes("MAIN") || colName.includes("MM")) ? "#eff6ff" : (colName.includes("POLE") || colName.includes("PM")) ? "#f0fdfa" : "#f8fafc";
+                var labelColor = (colName.includes("MAIN")) ? "#1e40af" : (colName.includes("POLE")) ? "#0f766e" : "#475569";
+
+                html += '<div style="' + gridSpan + ' background:' + cardBg + '; border:1px solid #e2e8f0; border-radius:8px; padding:6px 8px; box-sizing:border-box;">' +
+                        '<div style="font-size:9.5px; font-weight:800; color:' + labelColor + '; letter-spacing:0.3px; text-transform:uppercase;">' + printableKeyLabel + '</div>' +
+                        '<div style="font-size:11.5px; font-weight:800; color:#0f172a; margin-top:2px; word-break:break-word; line-height:1.25;">' + displayVal + '</div>' +
+                        '</div>';
             });
+
+            html += '</div>';
         }
 
         document.getElementById('quickViewContent').innerHTML = html;
@@ -9043,41 +9085,39 @@ function quickViewNavigate(direction) {
     }, 1000);
 </script>
 
-<div id="quickViewModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15, 23, 42, 0.78); z-index:99999; align-items:center; justify-content:center; backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); padding:16px; box-sizing:border-box;">
-    <div id="qvSwipeBox" style="background:#ffffff; width:100%; max-width:540px; max-height:90vh; display:flex; flex-direction:column; border-radius:24px; position:relative; padding:18px 18px 20px 18px; box-shadow:0 25px 60px -15px rgba(0,0,0,0.5), 0 0 25px rgba(59,130,246,0.15); border:1.5px solid #cbd5e1; transition: transform 0.2s ease; box-sizing:border-box;">
+<div id="quickViewModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15, 23, 42, 0.82); z-index:99999; align-items:center; justify-content:center; backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); padding:12px; box-sizing:border-box;">
+    <div id="qvSwipeBox" style="background:#ffffff; width:100%; max-width:540px; max-height:92vh; display:flex; flex-direction:column; border-radius:20px; position:relative; padding:14px 14px 12px 14px; box-shadow:0 25px 60px -15px rgba(0,0,0,0.6); border:1.5px solid #cbd5e1; box-sizing:border-box;">
         
-        <!-- Header Strip -->
-        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; padding-bottom:10px; border-bottom:2px solid #e2e8f0;">
-            <div style="display:inline-flex; align-items:center; gap:8px;">
-                <div style="width:34px; height:34px; border-radius:10px; background:linear-gradient(135deg, #1e40af, #3b82f6); display:flex; align-items:center; justify-content:center; color:#ffffff; font-size:16px; box-shadow:0 4px 10px rgba(30,64,175,0.3);">
-                    <i class="fa-solid fa-user-check"></i>
-                </div>
-                <div>
-                    <h3 style="margin:0; color:#0f172a; font-size:16px; font-weight:900; text-transform:uppercase; letter-spacing:0.5px;">Consumer Details</h3>
-                    <div style="font-size:10px; font-weight:700; color:#64748b; text-transform:uppercase;">Overview &amp; Readings</div>
-                </div>
+        <!-- Professional Top Bar -->
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; padding-bottom:8px; border-bottom:1.5px solid #e2e8f0;">
+            <div style="display:flex; align-items:center; gap:8px;">
+                <span style="background:#1e40af; color:#fff; font-size:11px; font-weight:900; padding:3px 8px; border-radius:6px; letter-spacing:0.5px;">
+                    <i class="fa-solid fa-id-card"></i> QUICK VIEW
+                </span>
+                <span style="font-size:11px; font-weight:700; color:#64748b;">Swipe ◀ ▶ for Next</span>
             </div>
             
-            <button onclick="document.getElementById('quickViewModal').style.display='none'" style="background:#fee2e2; border:1px solid #fca5a5; color:#dc2626; border-radius:50%; width:32px; height:32px; font-size:14px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.2s;" onmouseover="this.style.background='#ef4444'; this.style.color='#fff';" onmouseout="this.style.background='#fee2e2'; this.style.color='#dc2626';">
+            <button onclick="document.getElementById('quickViewModal').style.display='none'" style="background:#f1f5f9; border:1px solid #cbd5e1; color:#475569; border-radius:50%; width:28px; height:28px; font-size:13px; cursor:pointer; display:flex; align-items:center; justify-content:center;">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
         
         <!-- Inner Scrollable Content -->
-        <div id="quickViewContent" style="display:block; margin-bottom:8px; overflow-y:auto; flex:1; padding:2px 4px 6px 2px; box-sizing:border-box; -webkit-overflow-scrolling:touch;">
+        <div id="quickViewContent" style="display:block; margin-bottom:8px; overflow-y:auto; flex:1; padding-right:2px; box-sizing:border-box; -webkit-overflow-scrolling:touch;">
         </div>
 
-        <!-- Floating Action & Navigation Controls -->
-        <button id="quickViewEditBtn" style="position:absolute; bottom:18px; right:18px; background:linear-gradient(135deg, #059669, #10b981); color:white; border:2.5px solid #ffffff; border-radius:50%; width:48px; height:48px; font-size:18px; cursor:pointer; box-shadow:0 8px 20px rgba(16,185,129,0.45); z-index:15; display:flex; align-items:center; justify-content:center; transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.08)'" onmouseout="this.style.transform='scale(1)'" title="Edit Offline Form">
-            <i class="fa-solid fa-pen-to-square"></i>
-        </button>
-
-        <button onclick="quickViewNavigate(-1)" style="position:absolute; top:50%; left:-14px; transform:translateY(-50%); background:linear-gradient(135deg, #f59e0b, #d97706); color:#fff; border:2px solid #fff; border-radius:50%; width:34px; height:34px; font-size:14px; cursor:pointer; box-shadow:0 4px 12px rgba(217,119,6,0.35); z-index:15; display:flex; align-items:center; justify-content:center;">
-            <i class="fa-solid fa-chevron-left"></i>
-        </button>
-        <button onclick="quickViewNavigate(1)" style="position:absolute; top:50%; right:-14px; transform:translateY(-50%); background:linear-gradient(135deg, #f59e0b, #d97706); color:#fff; border:2px solid #fff; border-radius:50%; width:34px; height:34px; font-size:14px; cursor:pointer; box-shadow:0 4px 12px rgba(217,119,6,0.35); z-index:15; display:flex; align-items:center; justify-content:center;">
-            <i class="fa-solid fa-chevron-right"></i>
-        </button>
+        <!-- Bottom Action Bar (Clear & Direct) -->
+        <div style="display:flex; gap:8px; align-items:center; padding-top:8px; border-top:1.5px solid #e2e8f0; margin-top:auto;">
+            <button onclick="quickViewNavigate(-1)" class="btn" style="flex:1; background:#64748b !important; padding:9px; font-size:12px; margin-bottom:0; border-radius:8px;">
+                <i class="fa-solid fa-chevron-left"></i> Previous
+            </button>
+            <button id="quickViewEditBtn" class="btn" style="flex:2; background:linear-gradient(90deg, #059669, #10b981) !important; padding:9px; font-size:12.5px; margin-bottom:0; border-radius:8px; box-shadow:0 4px 10px rgba(16,185,129,0.3);">
+                <i class="fa-solid fa-pen-to-square"></i> Open Entry Form
+            </button>
+            <button onclick="quickViewNavigate(1)" class="btn" style="flex:1; background:#64748b !important; padding:9px; font-size:12px; margin-bottom:0; border-radius:8px;">
+                Next <i class="fa-solid fa-chevron-right"></i>
+            </button>
+        </div>
     </div>
 </div>
     
