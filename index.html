@@ -5668,7 +5668,7 @@ function renderNewListTab() {
                     if(matchesBillCondition && isUserPermitted && loadMatch) {
                         
                         var pdfBtn = (item.pdfLink && item.pdfLink !== "") 
-                            ? '<a href="' + item.pdfLink + '" target="_blank" class="pdf-icon" onclick="event.stopPropagation();"><i class="fa-solid fa-file-pdf"></i></a>' 
+                            ? '<button class="pdf-icon" style="border:none; cursor:pointer;" onclick="downloadDirectBillPdf(event, \'' + item.pdfLink + '\', \'' + item.accountNo + '\')" title="Download Bill PDF"><i class="fa-solid fa-file-pdf"></i></button>' 
                             : '';
                         
                         var waBtn = '<button class="whatsapp-icon" onclick="event.stopPropagation(); triggerWhatsApp(event, \'' + item.accountNo + '\')"><i class="fa-brands fa-whatsapp"></i></button>';
@@ -5730,6 +5730,83 @@ function renderNewListTab() {
             };
         };
     }
+    window.downloadDirectBillPdf = function(event, pdfLink, accNo) {
+    if (event) {
+        event.stopPropagation();
+        event.preventDefault();
+    }
+    if (!pdfLink || pdfLink === "#" || pdfLink.trim() === "") {
+        return alert("🚨 इस उपभोक्ता का बिल लिंक उपलब्ध नहीं है!");
+    }
+
+    var fileId = "";
+    if (pdfLink.indexOf('id=') !== -1) {
+        fileId = pdfLink.split('id=')[1].split('&')[0];
+    } else if (pdfLink.indexOf('/d/') !== -1) {
+        fileId = pdfLink.split('/d/')[1].split('/')[0];
+    } else {
+        fileId = pdfLink;
+    }
+
+    if (!fileId || fileId.trim() === "") {
+        return alert("🚨 अमान्य फाइल आईडी!");
+    }
+
+    showThinAlert("⏳ बिल PDF डाउनलोड हो रहा है, प्रतीक्षा करें...", false);
+
+    google.script.run
+        .withSuccessHandler(function(base64Data) {
+            if (!base64Data || typeof base64Data !== "string" || base64Data.trim() === "") {
+                showThinAlert("🚨 बिल लोड नहीं हो सका!", true);
+                return alert("🚨 सर्वर से बिल फाइल प्राप्त नहीं हो सकी।");
+            }
+
+            var filename = "Bill_" + accNo + "_" + getFormattedDateTimeForFile() + ".pdf";
+            var cleanBase64 = base64Data.replace(/^data:application\/pdf;base64,/, '').replace(/[^A-Za-z0-9+/=]/g, '');
+
+            if (typeof AndroidBridge !== "undefined" && typeof AndroidBridge.processBase64Download === "function") {
+                if (typeof AndroidBridge.processBase64DownloadWithFileName === "function") {
+                    AndroidBridge.processBase64DownloadWithFileName(cleanBase64, "pdf", filename);
+                } else if (AndroidBridge.processBase64Download.length >= 3) {
+                    AndroidBridge.processBase64Download(cleanBase64, "pdf", filename);
+                } else {
+                    AndroidBridge.processBase64Download(cleanBase64, "pdf");
+                }
+                showThinAlert("🎉 बिल PDF सफलतापूर्वक डाउनलोड हो गया!", true);
+            } else {
+                try {
+                    var rawBinary = window.atob(cleanBase64);
+                    var bytes = new Uint8Array(rawBinary.length);
+                    for (var i = 0; i < rawBinary.length; i++) {
+                        bytes[i] = rawBinary.charCodeAt(i);
+                    }
+                    var blob = new Blob([bytes], { type: "application/pdf" });
+                    var blobUrl = URL.createObjectURL(blob);
+                    var link = document.createElement('a');
+                    link.href = blobUrl;
+                    link.download = filename;
+                    document.body.appendChild(link);
+                    link.click();
+                    setTimeout(function() {
+                        document.body.removeChild(link);
+                        URL.revokeObjectURL(blobUrl);
+                    }, 1000);
+                    showThinAlert("🎉 बिल PDF डाउनलोड सफल!", true);
+                } catch(err) {
+                    var fallbackLink = document.createElement('a');
+                    fallbackLink.href = "data:application/pdf;base64," + cleanBase64;
+                    fallbackLink.download = filename;
+                    fallbackLink.click();
+                    showThinAlert("🎉 बिल PDF डाउनलोड सफल!", true);
+                }
+            }
+        })
+        .withFailureHandler(function(err) {
+            showThinAlert("🚨 नेटवर्क एरर!", true);
+            alert("🚨 बिल डाउनलोड एरर: " + (err.message || err.toString()));
+        })
+        .getPdfDataAsBase64(fileId.trim());
+};
 async function downloadSelectedMergedPDF() {
     var checkboxes = document.querySelectorAll('.bill-select-cb:checked');
     if(checkboxes.length === 0) return customAlert("🚨 कृपया उपभोक्ता चुनें!");
@@ -6600,7 +6677,7 @@ function openReportGroupView(reportType) {
                     if (reportType === 'all_bills_report') {
                         // 🎯 ऑल बिल्स रिपोर्ट के लिए विशिष्ट आइकन्स, व्हाट्सएप और बिल मर्ज चेकबॉक्स रीस्टोर
                         var billPdfUrl = item.pdfLink || "#";
-                        var pdfDownloadIcon = '<a href="' + billPdfUrl + '" target="_blank" class="export-btn mini pdf-bg" style="padding: 5px 8px; font-size: 10px; display:inline-flex; align-items:center; justify-content:center;" title="View Bill PDF"><i class="fa-solid fa-file-pdf"></i></a>';
+                        var pdfDownloadIcon = '<button class="export-btn mini pdf-bg" style="padding: 5px 8px; font-size: 10px; display:inline-flex; align-items:center; justify-content:center; border:none; cursor:pointer;" onclick="downloadDirectBillPdf(event, \'' + billPdfUrl + '\', \'' + item.accountNo + '\')" title="Download Bill PDF"><i class="fa-solid fa-file-pdf"></i></button>';
                         var whatsappShareIcon = '<button class="export-btn mini" style="padding: 5px 8px; font-size: 10px; background:#25D366; display:inline-flex; align-items:center; justify-content:center;" onclick="event.stopPropagation(); triggerWhatsApp(event, \'' + item.accountNo + '\')"><i class="fa-brands fa-whatsapp"></i></button>';
                         
                         singlePdfBtn = '<div style="display:flex; gap:4px; align-items:center;">' + pdfDownloadIcon + whatsappShareIcon + '</div>';
