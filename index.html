@@ -5,7 +5,7 @@
 <script>
   (function() {
     // ⚠️ अपना नया Deployment URL यहाँ पेस्ट करें
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxMIvvxkFtKSzmDlAX8NTKOTMCc0M8wnV_GIAGOCrqF9N33Uo6MbNqkQwosRjiMoYtQ1A/exec";
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwltfTqiCJxIb3z5LfrrfypbvacMO568j60756sJpn3G1rJ2iHXa7ANo4gOGtgIB49_cw/exec";
 
     function createHandler(successCallback, failureCallback) {
       return new Proxy({}, {
@@ -5448,21 +5448,35 @@ function renderNewListTab() {
             var base64Data = item.mainPhotoCompressedBase64 || ""; 
             
             if (base64Data === "" && pdfLink) {
-                // 🚀 व्हाट्सएप क्लिक: ऐप्स स्क्रिप्ट से पूरा ओरिजिनल पीडीएफ (बिना पेज हटाए) लाकर व्हाट्सएप पर भेजें
+                // 🚀 सुरक्षित फाइल आईडी एक्सट्रैक्टर (id= और /d/ दोनों सपोर्टेड)
+                var fileId = "";
+                if (pdfLink.indexOf('id=') !== -1) {
+                    fileId = pdfLink.split('id=')[1].split('&')[0];
+                } else if (pdfLink.indexOf('/d/') !== -1) {
+                    fileId = pdfLink.split('/d/')[1].split('/')[0];
+                } else {
+                    fileId = pdfLink;
+                }
+
+                if (!fileId || fileId.trim() === "") {
+                    alert("🚨 बिल फाइल का लिंक अमान्य है!");
+                    return;
+                }
+
                 google.script.run
                     .withSuccessHandler(function(serverBase64) {
-                        if(serverBase64) {
-                            var cleanServerBase64 = serverBase64.replace(/\s/g, '');
+                        if(serverBase64 && typeof serverBase64 === "string" && serverBase64.trim() !== "") {
+                            var cleanServerBase64 = serverBase64.replace(/^data:application\/pdf;base64,/, '').replace(/[^A-Za-z0-9+/=]/g, '');
                             AndroidBridge.shareBillToWhatsApp(cleanPhone, cleanServerBase64, fileName);
                             showThinAlert("📸 पूरे दोनों पेज व्हाट्सएप पर अटैच हो गए!", true);
                         } else {
-                            alert("🚨 सर्वर से बिल फाइल का डेटा नहीं मिल सका।");
+                            alert("🚨 सर्वर से बिल फाइल का डेटा नहीं मिल सका। कृपया ड्राइव पर फाइल शेयरिंग परमिशन चेक करें।");
                         }
                     })
                     .withFailureHandler(function(err) {
-                        alert("🚨 नेटवर्क एरर: " + err.toString());
+                        alert("🚨 नेटवर्क एरर: " + (err.message || err.toString()));
                     })
-                    .getPdfDataAsBase64(pdfLink.split('id=')[1]);
+                    .getPdfDataAsBase64(fileId.trim());
             } else if (base64Data !== "") {
                 // अगर बेस64 लोकल में है (पूरा 2 पेज)
                 var cleanBase64 = base64Data.split(',')[1] || base64Data;
@@ -5720,7 +5734,6 @@ async function downloadSelectedMergedPDF() {
     var checkboxes = document.querySelectorAll('.bill-select-cb:checked');
     if(checkboxes.length === 0) return customAlert("🚨 कृपया उपभोक्ता चुनें!");
 
-    // 🎯 बिल मर्ज शुरू होते ही चेकबॉक्सेज को अनचेक/रीसेट करें ताकि क्लिक वापस सामान्य हो जाए
     setTimeout(function() {
         checkboxes.forEach(function(cb) {
             cb.checked = false;
@@ -5742,9 +5755,18 @@ async function downloadSelectedMergedPDF() {
     }
 
     checkboxes.forEach(function(cb, index) { 
-        var id = cb.value.split('id=')[1];
-        if(id) { 
-            fileIds.push(id); 
+        var rawVal = cb.value || "";
+        var id = "";
+        if (rawVal.indexOf('id=') !== -1) {
+            id = rawVal.split('id=')[1].split('&')[0];
+        } else if (rawVal.indexOf('/d/') !== -1) {
+            id = rawVal.split('/d/')[1].split('/')[0];
+        } else {
+            id = rawVal;
+        }
+
+        if(id && id.trim() !== "") { 
+            fileIds.push(id.trim()); 
             var accNo = cb.getAttribute('data-acc');
             if(accNo) {
                 printedAccNos.push(accNo);
@@ -5764,7 +5786,7 @@ async function downloadSelectedMergedPDF() {
 
     try {
         if (typeof PDFLib === 'undefined') {
-            alert("🚨 PDFLib लाइब्रेरी लोड नहीं हो पाई है! कृपया इंटरनेट कनेक्शन चेक करें।");
+            alert("🚨 PDFLib लाइब्रेरी लोड नहीं हो पाई है! इंटरनेट कनेक्शन चेक करें।");
             return;
         }
 
@@ -5772,11 +5794,10 @@ async function downloadSelectedMergedPDF() {
         let mergedPdf = await PDFDocument.create();
         var successfulCount = 0;
         
-        // ⚡ 100x ULTRA-FAST PARALLEL BATCH STREAM ENGINE
-        const BATCH_SIZE = 6; // एक साथ 6 फाइलों का पैरेलल डाउनलोड
+        const BATCH_SIZE = 5;
         const fetchSinglePdf = (fileId) => {
             return new Promise((resolve) => {
-                const timeoutTimer = setTimeout(() => resolve(null), 12000);
+                const timeoutTimer = setTimeout(() => resolve(null), 15000);
                 google.script.run
                     .withSuccessHandler((res) => {
                         clearTimeout(timeoutTimer);
@@ -5793,17 +5814,18 @@ async function downloadSelectedMergedPDF() {
         for (let i = 0; i < fileIds.length; i += BATCH_SIZE) {
             const currentBatch = fileIds.slice(i, i + BATCH_SIZE);
             var currentProcessed = Math.min(i + BATCH_SIZE, totalFiles);
-            showThinAlert("⚡ बिल मर्ज हो रहे हैं: " + currentProcessed + " / " + totalFiles + "...", false);
+            showThinAlert("⚡ बिल लोड हो रहे हैं: " + currentProcessed + " / " + totalFiles + "...", false);
 
-            // पैरेलल फेच
             const base64Results = await Promise.all(currentBatch.map(id => fetchSinglePdf(id)));
 
-            // पैरेलल डिकोड व पेज कॉपी
             for (let b = 0; b < base64Results.length; b++) {
-                const base64Data = base64Results[b];
-                if (base64Data && base64Data.trim() !== "") {
+                var base64Data = base64Results[b];
+                if (base64Data && typeof base64Data === "string" && base64Data.trim() !== "") {
                     try {
-                        const cleanBase64 = base64Data.replace(/\s/g, '');
+                        if (base64Data.indexOf(',') !== -1) {
+                            base64Data = base64Data.split(',')[1];
+                        }
+                        const cleanBase64 = base64Data.replace(/[^A-Za-z0-9+/=]/g, '');
                         const rawBinary = window.atob(cleanBase64);
                         const len = rawBinary.length;
                         const bytes = new Uint8Array(len);
@@ -5812,70 +5834,75 @@ async function downloadSelectedMergedPDF() {
                         }
 
                         const pdf = await PDFDocument.load(bytes, { ignoreEncryption: true });
-                        if (pdf.getPageCount() > 0) {
-                            const copiedPages = await mergedPdf.copyPages(pdf, [0]);
+                        const pageIndices = pdf.getPageIndices();
+                        if (pageIndices.length > 0) {
+                            const copiedPages = await mergedPdf.copyPages(pdf, pageIndices);
                             copiedPages.forEach(page => mergedPdf.addPage(page));
                             successfulCount++;
                         }
                     } catch (innerErr) {
-                        console.error("Fast Merge Error:", innerErr);
+                        console.error("Single PDF decode/copy error:", innerErr);
                     }
                 }
             }
         }
-        
 
         if (successfulCount === 0) {
-            alert("🚨 सर्वर से पीडीएफ डेटा नहीं मिल सका।");
-            showThinAlert("🚨 प्रोसेस फेल हुआ। कोई बिल डाउनलोड नहीं हो सका।", true);
+            showThinAlert("🚨 कोई भी बिल लोड नहीं हो सका!", true);
+            alert("🚨 सर्वर से पीडीएफ फाइलें लोड नहीं हो पाईं। कृपया दोबारा प्रयास करें।");
             return;
         }
 
-        showThinAlert("⚙️ " + successfulCount + " फाइल्स मर्ज हो चुकी हैं! PDF तैयार हो रही है...", false);
-        const mergedPdfBytes = await mergedPdf.save({ useObjectStreams: true });
-        mergedPdf = null; // 🧹 तुरंत मेमोरी खाली करें
+        showThinAlert("⚙️ " + successfulCount + " बिल मर्ज हो चुके हैं! PDF फाइल तैयार हो रही है...", false);
+        
+        // 🎯 FIX: useObjectStreams को false रखा है ताकि सभी मोबाइल व्यूअर इसे खोल सकें
+        const mergedPdfBytes = await mergedPdf.save({ useObjectStreams: false });
+        mergedPdf = null;
 
         var now = new Date();
         var timeStampStr = now.getDate() + "_" + (now.getMonth() + 1) + "_" + now.getFullYear() + "_" + now.getHours() + now.getMinutes() + now.getSeconds();
         
-        var cleanMrName = finalReaderName.replace(/[\\/:*?"<>|]/g, "").replace(/\s+/g, "_").toUpperCase();
-        var prefix = cleanMrName ? cleanMrName + "_Merged_Bills_" : "Merged_Bills_";
-        var filename = prefix + timeStampStr + ".pdf";
+        var cleanMrName = (finalReaderName || "DVVNL").replace(/[\\/:*?"<>|]/g, "").replace(/\s+/g, "_").toUpperCase();
+        var filename = cleanMrName + "_Merged_Bills_" + timeStampStr + ".pdf";
 
-        // 🚀 Android Studio APK (Native Bridge) Fix - Dynamic Name Enabled
-        if (typeof AndroidBridge !== "undefined" && AndroidBridge.processBase64Download) {
-            var bytes = new Uint8Array(mergedPdfBytes);
-            var binary = '';
-            const chunk = 8192; 
-            for (var k = 0; k < bytes.byteLength; k += chunk) {
-                var subArray = bytes.subarray(k, Math.min(k + chunk, bytes.byteLength));
-                binary += String.fromCharCode.apply(null, subArray);
+        // 🎯 मोबाइल Base64 जनरेशन (Chunked to prevent stack overflow)
+        var bytes = new Uint8Array(mergedPdfBytes);
+        var binary = '';
+        const chunk = 8192; 
+        for (var k = 0; k < bytes.byteLength; k += chunk) {
+            binary += String.fromCharCode.apply(null, bytes.subarray(k, Math.min(k + chunk, bytes.byteLength)));
+        }
+        var base64Pdf = window.btoa(binary);
+
+        // 🚀 Android Studio Native Bridge Fix
+        if (typeof AndroidBridge !== "undefined" && typeof AndroidBridge.processBase64Download === "function") {
+            try {
+                if (AndroidBridge.processBase64Download.length >= 3) {
+                    AndroidBridge.processBase64Download(base64Pdf, "pdf", filename);
+                } else {
+                    AndroidBridge.processBase64Download(base64Pdf, "pdf");
+                }
+                showThinAlert("🎉 " + successfulCount + " बिल सफलतापूर्वक डाउनलोड हो गए!", true);
+            } catch(bridgeErr) {
+                console.error("Bridge download error:", bridgeErr);
             }
-            var base64Pdf = window.btoa(binary);
-            
-            // Checking if multi-parameter interface exists
-            if (AndroidBridge.processBase64Download.length >= 3) {
-                AndroidBridge.processBase64Download(base64Pdf, "pdf", filename);
-            } else {
-                AndroidBridge.processBase64Download(base64Pdf, "pdf");
-            }
-            showThinAlert("🎉 सभी " + successfulCount + " बिल मर्ज होकर सफलतापूर्वक डाउनलोड हो गए!", true);
         } else {
-            // WebView Backup Mode
-            var blob = new Blob([mergedPdfBytes], { type: 'application/pdf' });
+            // 🌐 Browser/WebView Standard Blob Engine
+            var blob = new Blob([mergedPdfBytes], { type: 'application/pdf;charset=utf-8' });
             var blobUrl = URL.createObjectURL(blob);
-            
             var link = document.createElement('a');
             link.href = blobUrl;
             link.download = filename;
             document.body.appendChild(link);
             link.click();
-            document.body.removeChild(link);
-            
-            showThinAlert("🎉 सभी " + successfulCount + " बिल मर्ज होकर डाउनलोड हो गए!", true);
+            setTimeout(function() {
+                document.body.removeChild(link);
+                URL.revokeObjectURL(blobUrl);
+            }, 1500);
+            showThinAlert("🎉 " + successfulCount + " बिल मर्ज होकर डाउनलोड हो गए!", true);
         }
-        
-        // प्रिंट स्टेटस अपडेट लॉजिक (प्रॉक्सी कम्पैटिबल मोड)
+
+        // प्रिंट स्टेटस अपडेट
         if(printedAccNos.length > 0) {
             var printDateStr = new Date().toLocaleString('en-IN');
             var tx = db.transaction("consumers", "readwrite");
@@ -5893,9 +5920,10 @@ async function downloadSelectedMergedPDF() {
                     }
                 };
             });
-            tx.oncomplete = function() { if(typeof refreshActiveDataViews === 'function') refreshActiveDataViews(); };
+            tx.oncomplete = function() { 
+                if(typeof refreshActiveDataViews === 'function') refreshActiveDataViews(); 
+            };
             
-            // 🎯 FIXED BRIDGING CALL: इसे भी प्रॉक्सी एनवायरनमेंट के अनुसार विथ हैंडल्स बांध दिया गया है
             google.script.run
                 .withSuccessHandler(function(){})
                 .withFailureHandler(function(){})
@@ -5903,7 +5931,8 @@ async function downloadSelectedMergedPDF() {
         }
         
     } catch (err) {
-        alert("🚨 मर्ज फेल एरर विवरण:\n" + err.toString());
+        console.error("Merge fatal error:", err);
+        alert("🚨 बिल मर्ज प्रोसेस में त्रुटि:\n" + err.toString());
         showThinAlert("🚨 बिल मर्ज प्रोसेस फेल: " + (err.message || err.toString()), true);
     }
 }
@@ -7027,6 +7056,72 @@ function openReportGroupView(reportType) {
                     if (!isReaderAllowed(itemReader)) return false;
                 }
 
+                // 📦 Bill Distribution Tab ke liye exact Pending & Filter Logic
+                if (tabName === 'billdist') {
+                    var selectedLoadCat = document.getElementById('billLoadCategoryFilter') ? document.getElementById('billLoadCategoryFilter').value : "ALL";
+                    var selectedDeliveryMode = document.getElementById('billDeliveryCategoryFilter') ? document.getElementById('billDeliveryCategoryFilter').value : "FOR_DIST";
+                    var selectedDeliveryStatus = document.getElementById('billDeliveryStatusFilter') ? document.getElementById('billDeliveryStatusFilter').value : "Distribution Pending";
+                    var billSearchVal = document.getElementById('billSearchBar') ? document.getElementById('billSearchBar').value.trim().toUpperCase() : "";
+
+                    // Load match
+                    var rawLoadGrp = (getRobustKey(item, "LOAD GROUP (5-10-50)") || item.loadGroup || "").toString().toUpperCase().trim();
+                    var rawLoadCat = (item["LOAD_CATOGERY (5,10)"] || "").toString().toUpperCase().trim();
+                    var numLoad = parseFloat(getRobustKey(item, "LOAD IN KW") || item.loadInKw || "0");
+
+                    var loadMatch = false;
+                    if (selectedLoadCat === "ALL") {
+                        loadMatch = true;
+                    } else if (selectedLoadCat === "5") {
+                        loadMatch = (rawLoadGrp === "5" || rawLoadGrp === "5KW" || (rawLoadGrp.includes("5") && !rawLoadGrp.includes("50")) || rawLoadCat.includes(">=5") || (numLoad >= 5 && numLoad < 10));
+                    } else if (selectedLoadCat === "10") {
+                        loadMatch = (rawLoadGrp === "10" || rawLoadGrp === "10KW" || rawLoadGrp.includes("10") || rawLoadCat.includes(">=10") || (numLoad >= 10));
+                    }
+                    if (!loadMatch) return false;
+
+                    // Upload and eligibility match
+                    var billUploadRaw = (getRobustKey(item, "IS BILL UPLOAD") || item["IS BILL UPLOAD"] || item.isBillUpload || "").toString().toUpperCase().trim();
+                    var hasBillUploaded = (billUploadRaw === "YES" || billUploadRaw === "TRUE" || parseTrue(item.isBillUpload) || (item.pdfLink && item.pdfLink.trim() !== ""));
+
+                    var forDistVal = (getRobustKey(item, "FOR_BILL DISTRIBUTION") || item["FOR_BILL DISTRIBUTION"] || item.forBillDist || "").toString().toUpperCase().trim();
+                    var isForBillDist = (forDistVal === "YES" || forDistVal.includes("YES"));
+
+                    var consumerTypeVal = (getRobustKey(item, "Consumer Type") || getRobustKey(item, "Consumer Catogary") || item.consumerType || "").toString().toUpperCase().trim();
+                    var remarkAll = ((getRobustKey(item, "REMARK") || "") + " " + (getRobustKey(item, "CONSUMER REMARK") || "") + " " + forDistVal).toUpperCase();
+                    var isTower = forDistVal.includes("TOWER") || consumerTypeVal.includes("TOWER");
+                    var isTowerClosed = remarkAll.includes("TOWER CLOSED") || remarkAll.includes("CLOSED");
+
+                    var matchesBillCondition = false;
+                    if (selectedDeliveryMode === "ALL_BILLS") {
+                        matchesBillCondition = hasBillUploaded;
+                    } else {
+                        if (isTower) {
+                            var billedDate = (getRobustKey(item, "BILLED DATE") || item.billedDate || "").toString().trim();
+                            var billingStatus = (getRobustKey(item, "BILLING STATUS") || item.billingStatus || "").toString().toUpperCase().trim();
+                            var isBilled = (billedDate !== "" && billedDate !== "-" && billedDate !== "NOT FOUND") || billingStatus.includes("BILLED") || billingStatus === "YES";
+                            matchesBillCondition = (!isTowerClosed && isBilled);
+                        } else {
+                            matchesBillCondition = (isForBillDist && hasBillUploaded);
+                        }
+                    }
+                    if (!matchesBillCondition) return false;
+
+                    // Distribution Status (Pending vs Delivered)
+                    var distColVal = (getRobustKey(item, "DISTRIBUTION STATUS") || item["DISTRIBUTION STATUS"] || item.distStatus || "").toString().trim().toUpperCase();
+                    var isColDelivered = (distColVal.includes("DELIVER") || distColVal.includes("DELEIVER") || distColVal === "DISTRIBUTED");
+                    var isColPending = (!isColDelivered || distColVal.includes("PENDING"));
+
+                    if (selectedDeliveryStatus === "Distribution Pending" && !isColPending) return false;
+                    if (selectedDeliveryStatus === "Deleiverd" && !isColDelivered) return false;
+
+                    // Search filter
+                    if (billSearchVal !== "") {
+                        var searchStr = ((item.accountNo || "") + " " + (item.consumerName || "") + " " + (getRobustKey(item, "ADDRESS") || "")).toUpperCase();
+                        if (searchStr.indexOf(billSearchVal) === -1) return false;
+                    }
+
+                    return true;
+                }
+
                 // Consumer Tab (List) के लिए एक्टिव फ़िल्टर (Division, Load, Status) का पालन
                 if (tabName === 'list') {
                     var itemDiv = (getRobustKey(item, "DIVISION") || item.division || "").toString().toUpperCase().trim();
@@ -7138,6 +7233,72 @@ function openReportGroupView(reportType) {
                 if (itemReader !== currentLoggedInUser) return false;
             } else {
                 if (!isReaderAllowed(itemReader)) return false;
+            }
+
+            // 📦 Bill Distribution Tab PDF ke liye exact Pending filter
+            if (tabName === 'billdist') {
+                var selectedLoadCat = document.getElementById('billLoadCategoryFilter') ? document.getElementById('billLoadCategoryFilter').value : "ALL";
+                var selectedDeliveryMode = document.getElementById('billDeliveryCategoryFilter') ? document.getElementById('billDeliveryCategoryFilter').value : "FOR_DIST";
+                var selectedDeliveryStatus = document.getElementById('billDeliveryStatusFilter') ? document.getElementById('billDeliveryStatusFilter').value : "Distribution Pending";
+                var billSearchVal = document.getElementById('billSearchBar') ? document.getElementById('billSearchBar').value.trim().toUpperCase() : "";
+
+                // Load check
+                var rawLoadGrp = (getRobustKey(item, "LOAD GROUP (5-10-50)") || item.loadGroup || "").toString().toUpperCase().trim();
+                var rawLoadCat = (item["LOAD_CATOGERY (5,10)"] || "").toString().toUpperCase().trim();
+                var numLoad = parseFloat(getRobustKey(item, "LOAD IN KW") || item.loadInKw || "0");
+
+                var loadMatch = false;
+                if (selectedLoadCat === "ALL") {
+                    loadMatch = true;
+                } else if (selectedLoadCat === "5") {
+                    loadMatch = (rawLoadGrp === "5" || rawLoadGrp === "5KW" || (rawLoadGrp.includes("5") && !rawLoadGrp.includes("50")) || rawLoadCat.includes(">=5") || (numLoad >= 5 && numLoad < 10));
+                } else if (selectedLoadCat === "10") {
+                    loadMatch = (rawLoadGrp === "10" || rawLoadGrp === "10KW" || rawLoadGrp.includes("10") || rawLoadCat.includes(">=10") || (numLoad >= 10));
+                }
+                if (!loadMatch) return false;
+
+                // Eligibility check
+                var billUploadRaw = (getRobustKey(item, "IS BILL UPLOAD") || item["IS BILL UPLOAD"] || item.isBillUpload || "").toString().toUpperCase().trim();
+                var hasBillUploaded = (billUploadRaw === "YES" || billUploadRaw === "TRUE" || parseTrue(item.isBillUpload) || (item.pdfLink && item.pdfLink.trim() !== ""));
+
+                var forDistVal = (getRobustKey(item, "FOR_BILL DISTRIBUTION") || item["FOR_BILL DISTRIBUTION"] || item.forBillDist || "").toString().toUpperCase().trim();
+                var isForBillDist = (forDistVal === "YES" || forDistVal.includes("YES"));
+
+                var consumerTypeVal = (getRobustKey(item, "Consumer Type") || getRobustKey(item, "Consumer Catogary") || item.consumerType || "").toString().toUpperCase().trim();
+                var remarkAll = ((getRobustKey(item, "REMARK") || "") + " " + (getRobustKey(item, "CONSUMER REMARK") || "") + " " + forDistVal).toUpperCase();
+                var isTower = forDistVal.includes("TOWER") || consumerTypeVal.includes("TOWER");
+                var isTowerClosed = remarkAll.includes("TOWER CLOSED") || remarkAll.includes("CLOSED");
+
+                var matchesBillCondition = false;
+                if (selectedDeliveryMode === "ALL_BILLS") {
+                    matchesBillCondition = hasBillUploaded;
+                } else {
+                    if (isTower) {
+                        var billedDate = (getRobustKey(item, "BILLED DATE") || item.billedDate || "").toString().trim();
+                        var billingStatus = (getRobustKey(item, "BILLING STATUS") || item.billingStatus || "").toString().toUpperCase().trim();
+                        var isBilled = (billedDate !== "" && billedDate !== "-" && billedDate !== "NOT FOUND") || billingStatus.includes("BILLED") || billingStatus === "YES";
+                        matchesBillCondition = (!isTowerClosed && isBilled);
+                    } else {
+                        matchesBillCondition = (isForBillDist && hasBillUploaded);
+                    }
+                }
+                if (!matchesBillCondition) return false;
+
+                // Delivery Status
+                var distColVal = (getRobustKey(item, "DISTRIBUTION STATUS") || item["DISTRIBUTION STATUS"] || item.distStatus || "").toString().trim().toUpperCase();
+                var isColDelivered = (distColVal.includes("DELIVER") || distColVal.includes("DELEIVER") || distColVal === "DISTRIBUTED");
+                var isColPending = (!isColDelivered || distColVal.includes("PENDING"));
+
+                if (selectedDeliveryStatus === "Distribution Pending" && !isColPending) return false;
+                if (selectedDeliveryStatus === "Deleiverd" && !isColDelivered) return false;
+
+                // Search Box Match
+                if (billSearchVal !== "") {
+                    var searchStr = ((item.accountNo || "") + " " + (item.consumerName || "") + " " + (getRobustKey(item, "ADDRESS") || "")).toUpperCase();
+                    if (searchStr.indexOf(billSearchVal) === -1) return false;
+                }
+
+                return true;
             }
 
             if (tabName === 'list') {
