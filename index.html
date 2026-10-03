@@ -5,7 +5,7 @@
 <script>
   (function() {
     // ⚠️ अपना नया Deployment URL यहाँ पेस्ट करें
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwltfTqiCJxIb3z5LfrrfypbvacMO568j60756sJpn3G1rJ2iHXa7ANo4gOGtgIB49_cw/exec";
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyP2fUQmU97Ft5Q8Ec17EMzhMcYGKAzBWq03SbMpDx7RbaE_7yj_xsMTG1eOvzAheGHSg/exec";
 
     function createHandler(successCallback, failureCallback) {
       return new Proxy({}, {
@@ -4813,9 +4813,9 @@ function universalListSearch(inputId, containerId) {
     var container = document.getElementById(containerId);
     if (!container) return;
 
-    if (cleanInput === "") {
+        if (cleanInput === "") {
         appSearchDatabaseCache = null;
-        updateSearchBadgeCount(containerId, (globalReportsDatabaseCache ? globalReportsDatabaseCache.length : 0), false);
+        // Removed the wrong total count update. Let the specific tab renderer handle the correct count.
         
         var currentTabNode = document.querySelector('.tab-bar .tab-btn.active');
         if (currentTabNode) {
@@ -5414,15 +5414,14 @@ function renderNewListTab() {
                     container.innerHTML = htmlBuffer.join('');
                 }
             }
-            
-            var listCountNode = document.getElementById('count-list');
-            if (listCountNode) {
-                listCountNode.innerText = htmlBuffer.length;
-                listCountNode.className = (htmlBuffer.length === 0) ? "badge-count zero" : "badge-count alert";
+
+            // 🎯 फ़िल्टर किए गए कुल उपभोक्ताओं का लाइव काउंट अपडेट
+            var countNode = document.getElementById('count-list');
+            if (countNode) {
+                countNode.innerText = htmlBuffer.length;
+                countNode.className = (htmlBuffer.length === 0) ? "badge-count zero" : "badge-count alert";
+                countNode.removeAttribute('data-search-locked');
             }
-            
-            universalListSearch('listSearchBar', 'listDataContainer'); 
-            if(typeof updateSummaryStatsRaw === 'function') { updateSummaryStatsRaw(); }
         }; 
     };
 }
@@ -5715,19 +5714,15 @@ function renderNewListTab() {
                     } 
                 }
             };
-            cTx.oncomplete = function() { 
-                // 🎯 फ़िक्स: डेटा को सीधे इनपुट किया गया बिना किसी री-सर्च क्लैश के
-                var distContainerNode = document.getElementById('billDistributionContainer');
-                if (distContainerNode) {
-                    distContainerNode.innerHTML = htmlBuffer.length === 0 ? '<div style="text-align:center; padding:25px; color:#475569;">कोई उपभोक्ता शेष नहीं है।</div>' : htmlBuffer.join('');
-                }
-                
-                var countNode = document.getElementById('count-billdist');
-                if(countNode) {
-                    countNode.innerText = htmlBuffer.length;
-                    countNode.className = (htmlBuffer.length === 0) ? "badge-count zero" : "badge-count alert";
-                }
-            };
+                        var listCountNode = document.getElementById('count-list');
+            if (listCountNode) {
+                listCountNode.innerText = htmlBuffer.length;
+                listCountNode.className = (htmlBuffer.length === 0) ? "badge-count zero" : "badge-count alert";
+                listCountNode.setAttribute('data-search-locked', 'false');
+            }
+            
+            // universalListSearch('listSearchBar', 'listDataContainer'); 
+            if(typeof updateSummaryStatsRaw === 'function') { updateSummaryStatsRaw(); }
         };
     }
     window.downloadDirectBillPdf = function(event, pdfLink, accNo) {
