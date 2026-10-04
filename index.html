@@ -806,6 +806,144 @@ body.desktop-force .tab-btn span { font-size: 12.5px !important; font-weight: 70
         animation: shimmer 1.5s infinite;
     }
     @keyframes shimmer { 100% { left: 100%; } }
+
+    /* 🌙 DARK MODE STYLING */
+    body.dark-mode {
+        background: #090d16 !important;
+        color: #e2e8f0 !important;
+    }
+    body.dark-mode .card,
+    body.dark-mode .list-item,
+    body.dark-mode .stat-card,
+    body.dark-mode #qvSwipeBox {
+        background: #111827 !important;
+        color: #f8fafc !important;
+        border-color: #1f2937 !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4) !important;
+    }
+
+    /* 💎 4 Big Cards: Sharp White Text & Premium Glass Lighting */
+    body.dark-mode .portal-square-card {
+        background: #131c2e !important;
+        border: 1.5px solid rgba(59, 130, 246, 0.25) !important;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.05) !important;
+    }
+    body.dark-mode .portal-square-card span {
+        color: #f8fafc !important;
+        font-weight: 900 !important;
+        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6) !important;
+        letter-spacing: 0.6px !important;
+    }
+
+    /* ⚡ Icon Boxes: Soft Translucent Neon Lighting Effects */
+    body.dark-mode .portal-square-card:nth-child(1) .icon-box {
+        background: radial-gradient(circle, rgba(37, 99, 235, 0.35) 0%, rgba(30, 64, 175, 0.15) 100%) !important;
+        border: 1.5px solid rgba(59, 130, 246, 0.4) !important;
+        box-shadow: 0 0 18px rgba(37, 99, 235, 0.3) !important;
+    }
+    body.dark-mode .portal-square-card:nth-child(1) i {
+        color: #60a5fa !important;
+        filter: drop-shadow(0 2px 6px rgba(96, 165, 250, 0.5));
+    }
+
+    body.dark-mode .portal-square-card:nth-child(2) .icon-box {
+        background: radial-gradient(circle, rgba(99, 102, 241, 0.35) 0%, rgba(79, 70, 229, 0.15) 100%) !important;
+        border: 1.5px solid rgba(129, 140, 248, 0.4) !important;
+        box-shadow: 0 0 18px rgba(99, 102, 241, 0.3) !important;
+    }
+    body.dark-mode .portal-square-card:nth-child(2) i {
+        color: #a5b4fc !important;
+        filter: drop-shadow(0 2px 6px rgba(165, 180, 252, 0.5));
+    }
+
+    body.dark-mode .portal-square-card:nth-child(3) .icon-box {
+        background: radial-gradient(circle, rgba(234, 88, 12, 0.35) 0%, rgba(194, 65, 12, 0.15) 100%) !important;
+        border: 1.5px solid rgba(251, 146, 60, 0.4) !important;
+        box-shadow: 0 0 18px rgba(234, 88, 12, 0.3) !important;
+    }
+    body.dark-mode .portal-square-card:nth-child(3) i {
+        color: #fb923c !important;
+        filter: drop-shadow(0 2px 6px rgba(251, 146, 60, 0.5));
+    }
+
+    body.dark-mode .portal-square-card:nth-child(4) .icon-box {
+        background: radial-gradient(circle, rgba(13, 148, 136, 0.35) 0%, rgba(15, 118, 110, 0.15) 100%) !important;
+        border: 1.5px solid rgba(45, 212, 191, 0.4) !important;
+        box-shadow: 0 0 18px rgba(13, 148, 136, 0.3) !important;
+    }
+    body.dark-mode .portal-square-card:nth-child(4) i {
+        color: #2dd4bf !important;
+        filter: drop-shadow(0 2px 6px rgba(45, 212, 191, 0.5));
+    }
+
+    /* Greeting Box & Footer Strip Fix in Dark Mode */
+    body.dark-mode #professionalGreetingBox {
+        background: linear-gradient(135deg, #111827 0%, #1e293b 100%) !important;
+        border-color: #1f2937 !important;
+        border-left: 5px solid #3b82f6 !important;
+    }
+    body.dark-mode #greetingUserName {
+        color: #f8fafc !important;
+    }
+    body.dark-mode #greetingLine {
+        color: #94a3b8 !important;
+    }
+    body.dark-mode .app-branding-strip-footer {
+        background: linear-gradient(135deg, #111827 0%, #1e293b 100%) !important;
+        border-color: #374151 !important;
+    }
+    body.dark-mode input,
+    body.dark-mode select,
+    body.dark-mode textarea {
+        background: #1f2937 !important;
+        color: #f8fafc !important;
+        border-color: #374151 !important;
+    }
+    body.dark-mode .summary-table th {
+        background: #1f2937 !important;
+        color: #93c5fd !important;
+        border-color: #374151 !important;
+    }
+    body.dark-mode .summary-table td {
+        background: #111827 !important;
+        color: #f1f5f9 !important;
+        border-color: #1f2937 !important;
+    }
+    /* 🌟 List & Report Headings Text Fix in Dark Mode */
+    body.dark-mode h3 {
+        color: #f8fafc !important;
+    }
+    body.dark-mode .badge-count {
+        background: #1e293b !important;
+        color: #38bdf8 !important;
+        border: 1px solid #334155 !important;
+    }
+    body.dark-mode .badge-count.zero {
+        background: rgba(34, 197, 94, 0.15) !important;
+        color: #4ade80 !important;
+        border-color: rgba(34, 197, 94, 0.3) !important;
+    }
+    body.dark-mode .badge-count.alert {
+        background: rgba(239, 68, 68, 0.15) !important;
+        color: #f87171 !important;
+        border-color: rgba(239, 68, 68, 0.3) !important;
+    }
+    body.dark-mode .c-name {
+        color: #f8fafc !important;
+    }
+    body.dark-mode .c-addr {
+        color: #94a3b8 !important;
+    }
+    body.dark-mode .tab-bar {
+        background: #030712 !important;
+        border-top-color: #1f2937 !important;
+    }
+    body.dark-mode .old-data-box,
+    body.dark-mode .login-input-card {
+        background: #1f2937 !important;
+        border-color: #374151 !important;
+        color: #f8fafc !important;
+    }
 </style>
     
     <script>
@@ -907,22 +1045,19 @@ body.desktop-force .tab-btn span { font-size: 12.5px !important; font-weight: 70
 
 <div class="container" id="mainAppContainer">
     <!-- 🚀 ULTRA-MODERN PREMIUM GLASSMORPHIC SPLASH SCREEN -->
+    <!-- 🚀 ULTRA-PREMIUM COSMIC SAPPHIRE SPLASH SCREEN -->
     <style>
-        @keyframes cosmicBgMove {
+        @keyframes cosmicAuraShift {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
         }
-        @keyframes boltPulseGlow {
-            0% { transform: scale(1); filter: drop-shadow(0 0 10px #facc15) drop-shadow(0 0 25px rgba(250, 204, 21, 0.6)); }
-            50% { transform: scale(1.1) rotate(6deg); filter: drop-shadow(0 0 22px #facc15) drop-shadow(0 0 45px rgba(245, 158, 11, 0.9)); }
-            100% { transform: scale(1); filter: drop-shadow(0 0 10px #facc15) drop-shadow(0 0 25px rgba(250, 204, 21, 0.6)); }
+        @keyframes neonPulseGlow {
+            0% { box-shadow: 0 0 25px rgba(0, 186, 242, 0.35), inset 0 0 15px rgba(0, 186, 242, 0.2); }
+            50% { box-shadow: 0 0 45px rgba(0, 186, 242, 0.65), inset 0 0 25px rgba(0, 186, 242, 0.4); }
+            100% { box-shadow: 0 0 25px rgba(0, 186, 242, 0.35), inset 0 0 15px rgba(0, 186, 242, 0.2); }
         }
-        @keyframes ringSpinAura {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        @keyframes streamSlide {
+        @keyframes streamSlideSmooth {
             0% { transform: translateX(-100%); }
             100% { transform: translateX(100%); }
         }
@@ -936,188 +1071,155 @@ body.desktop-force .tab-btn span { font-size: 12.5px !important; font-weight: 70
             display: flex !important;
             flex-direction: column !important;
             align-items: center !important;
-            justify-content: center !important;
-            background: linear-gradient(-45deg, #050b1a, #0d1b3e, #1a0b2e, #091224) !important;
-            background-size: 350% 350% !important;
-            animation: cosmicBgMove 10s ease infinite !important;
-            padding: 20px !important;
+            justify-content: space-between !important;
+            background: radial-gradient(circle at 50% 40%, #032159 0%, #021235 45%, #01081a 100%) !important;
+            padding: calc(20px + env(safe-area-inset-top, 0px)) 16px calc(25px + env(safe-area-inset-bottom, 0px)) 16px !important;
             box-sizing: border-box !important;
             user-select: none !important;
+            overflow: hidden !important;
         }
         .splash-glass-card {
-            background: rgba(15, 23, 42, 0.68) !important;
-            backdrop-filter: blur(20px) !important;
-            -webkit-backdrop-filter: blur(20px) !important;
-            border: 1.5px solid rgba(59, 130, 246, 0.28) !important;
-            box-shadow: 0 25px 60px -10px rgba(0, 0, 0, 0.75), 0 0 35px rgba(37, 99, 235, 0.18) !important;
-            border-radius: 28px !important;
-            padding: 38px 28px !important;
+            background: transparent !important;
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+            border: none !important;
+            box-shadow: none !important;
+            border-radius: 0 !important;
+            padding: 0 !important;
             width: 100% !important;
-            max-width: 440px !important;
+            max-width: 480px !important;
             text-align: center !important;
             display: flex !important;
             flex-direction: column !important;
             align-items: center !important;
+            justify-content: center !important;
             box-sizing: border-box !important;
-            position: relative !important;
+            flex: 1 !important;
+            margin: auto 0 !important;
         }
-        .splash-icon-halo {
-            position: relative !important;
-            width: 96px !important;
-            height: 96px !important;
-            border-radius: 50% !important;
+        .splash-logo-halo {
+            background: #ffffff !important;
+            width: 130px !important;
+            height: 130px !important;
+            margin: 0 auto 22px auto !important;
+            border-radius: 32px !important;
             display: flex !important;
             align-items: center !important;
             justify-content: center !important;
-            margin-bottom: 22px !important;
-            background: radial-gradient(circle, rgba(30, 64, 175, 0.45) 0%, rgba(15, 23, 42, 0.1) 70%) !important;
-        }
-        .splash-icon-halo::before {
-            content: '' !important;
-            position: absolute !important;
-            top: -4px !important;
-            left: -4px !important;
-            right: -4px !important;
-            bottom: -4px !important;
-            border-radius: 50% !important;
-            border: 2px dashed rgba(250, 204, 21, 0.6) !important;
-            animation: ringSpinAura 12s linear infinite !important;
-        }
-        .splash-bolt-svg {
-            font-size: 46px !important;
-            color: #facc15 !important;
-            animation: boltPulseGlow 2.5s ease-in-out infinite !important;
+            padding: 10px !important;
+            box-sizing: border-box !important;
+            border: 3.5px solid #00baf2 !important;
+            animation: neonPulseGlow 3s infinite ease-in-out !important;
         }
         .splash-title-text {
-            font-size: 24px !important;
+            font-size: clamp(15px, 4.2vw, 20px) !important;
             font-weight: 900 !important;
             letter-spacing: 0.5px !important;
-            line-height: 1.25 !important;
-            margin-bottom: 8px !important;
-            background: linear-gradient(90deg, #ffffff, #93c5fd, #fef08a) !important;
-            -webkit-background-clip: text !important;
-            -webkit-text-fill-color: transparent !important;
-            text-shadow: 0 10px 25px rgba(0, 0, 0, 0.5) !important;
+            margin-bottom: 10px !important;
+            color: #ffffff !important;
+            white-space: nowrap !important;
+            overflow: visible !important;
+            text-overflow: clip !important;
+            width: 100% !important;
+            text-align: center !important;
+            text-transform: uppercase !important;
+            text-shadow: 0 0 20px rgba(0, 186, 242, 0.6) !important;
         }
         .splash-company-badge {
-            font-size: 13px !important;
+            font-size: 11.5px !important;
             font-weight: 800 !important;
-            color: #60a5fa !important;
-            letter-spacing: 1.2px !important;
+            color: #38bdf8 !important;
+            letter-spacing: 0.8px !important;
             text-transform: uppercase !important;
-            background: rgba(30, 58, 138, 0.4) !important;
-            border: 1px solid rgba(96, 165, 250, 0.3) !important;
-            padding: 5px 16px !important;
-            border-radius: 30px !important;
-            margin-bottom: 18px !important;
+            background: rgba(0, 186, 242, 0.12) !important;
+            border: 1px solid rgba(56, 189, 248, 0.35) !important;
+            padding: 4px 14px !important;
+            border-radius: 20px !important;
+            margin-bottom: 20px !important;
             display: inline-flex !important;
             align-items: center !important;
             gap: 6px !important;
         }
         .splash-status-line {
-            font-size: 14.5px !important;
+            font-size: 12.5px !important;
             font-weight: 700 !important;
             color: #cbd5e1 !important;
-            margin-bottom: 22px !important;
+            margin-bottom: 16px !important;
             display: flex !important;
             align-items: center !important;
-            gap: 8px !important;
+            gap: 7px !important;
         }
         .splash-progress-track {
-            width: 82% !important;
-            height: 6px !important;
-            background: rgba(51, 65, 85, 0.6) !important;
-            border-radius: 12px !important;
+            width: 86% !important;
+            height: 5px !important;
+            background: rgba(30, 41, 59, 0.8) !important;
+            border-radius: 10px !important;
             overflow: hidden !important;
             position: relative !important;
         }
         .splash-progress-stream {
-    position: absolute !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
-    background: linear-gradient(90deg, transparent, #00baf2, #facc15, transparent) !important;
-    border-radius: 12px !important;
-    animation: streamSlide 1.8s cubic-bezier(0.4, 0, 0.2, 1) infinite !important;
-}
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            background: linear-gradient(90deg, transparent, #00baf2, #38bdf8, transparent) !important;
+            border-radius: 10px !important;
+            animation: streamSlideSmooth 1.6s cubic-bezier(0.4, 0, 0.2, 1) infinite !important;
+        }
         .splash-footer-box {
             position: absolute !important;
-            bottom: 30px !important;
+            bottom: 22px !important;
             text-align: center !important;
             width: 100% !important;
         }
         .splash-dev-badge {
-            background: rgba(15, 23, 42, 0.6) !important;
-            border: 1px solid rgba(255, 255, 255, 0.1) !important;
-            padding: 8px 18px !important;
-            border-radius: 25px !important;
+            background: rgba(2, 12, 35, 0.75) !important;
+            border: 1px solid rgba(0, 186, 242, 0.25) !important;
+            padding: 6px 16px !important;
+            border-radius: 20px !important;
             display: inline-block !important;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
-        }
-        @media (min-width: 769px) {
-            .splash-glass-card {
-                padding: 48px 36px !important;
-                max-width: 500px !important;
-                border-radius: 32px !important;
-            }
-            .splash-title-text {
-                font-size: 30px !important;
-            }
-            .splash-company-badge {
-                font-size: 14px !important;
-                padding: 6px 20px !important;
-            }
-            .splash-status-line {
-                font-size: 16px !important;
-            }
-            .splash-icon-halo {
-                width: 110px !important;
-                height: 110px !important;
-            }
-            .splash-bolt-svg {
-                font-size: 54px !important;
-            }
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5) !important;
         }
     </style>
 
-    <div id="appSplashScreen" class="modern-splash-backdrop" style="background: linear-gradient(-45deg, #002970, #0086b3, #00baf2, #002970) !important; background-size: 350% 350% !important;">
-        <div class="splash-glass-card" style="background: rgba(0, 41, 112, 0.75) !important; border: 1.5px solid rgba(0, 186, 242, 0.4) !important;">
-            <!-- 🎯 DVVNL LOGO (Bada Kiya Gaya) -->
-            <div style="text-align: center; margin-bottom: 18px;">
-                <div style="background: #ffffff; width: 150px; height: 150px; margin: 0 auto; border-radius: 32px; display: flex; align-items: center; justify-content: center; box-shadow: 0 20px 45px -5px rgba(0, 186, 242, 0.6), 0 0 40px rgba(255, 255, 255, 0.25); padding: 10px; box-sizing: border-box; border: 4px solid #00baf2;">
-                    <img src="https://lh3.googleusercontent.com/d/1do652Y1yo4YXFWj9rVhA678z_bUSgIk0" style="width: 100%; height: 100%; border-radius: 24px; object-fit: contain;" alt="DVVNL Logo" onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=\'fa-solid fa-bolt\' style=\'font-size:72px; color:#00baf2;\'></i>';">
-                </div>
+    <div id="appSplashScreen" class="modern-splash-backdrop">
+        <div style="height: 10px; width: 100%;"></div>
+
+        <div class="splash-glass-card">
+            <!-- 🎯 Original DVVNL Logo (Full-Screen Glow) -->
+            <div class="splash-logo-halo">
+                <img src="https://lh3.googleusercontent.com/d/1do652Y1yo4YXFWj9rVhA678z_bUSgIk0" style="width: 100%; height: 100%; border-radius: 22px; object-fit: contain;" alt="DVVNL Logo" onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=\'fa-solid fa-bolt\' style=\'font-size:56px; color:#00baf2;\'></i>';">
             </div>
             
-            <!-- मुख्य शीर्षक -->
-            <div class="splash-title-text" style="background: linear-gradient(90deg, #ffffff, #00baf2, #facc15) !important; -webkit-background-clip: text !important; -webkit-text-fill-color: transparent !important;">DvVNL Mainpuri Reporting App</div>
+            <!-- ⚡ App Name: Single Line Full Width Auto-Fitting -->
+            <div class="splash-title-text">DVVNL MAINPURI REPORTING APP</div>
             
-            <!-- कंपनी सब-हेडिंग बैज -->
-            <div class="splash-company-badge" style="background: rgba(0, 186, 242, 0.2) !important; border: 1px solid rgba(0, 186, 242, 0.4) !important; color: #00baf2 !important;">
+            <!-- Company Tagline Badge -->
+            <div class="splash-company-badge">
                 <i class="fa-solid fa-building-columns"></i> SAI COMPUTERS LTD MAINPURI
             </div>
             
-            <!-- लोडिंग स्थिति संदेश -->
+            <!-- Loading Status Line -->
             <div class="splash-status-line">
                 <i class="fa-solid fa-arrows-rotate fa-spin" style="color: #00baf2;"></i>
-                <span>एप्लिकेशन लोड हो रहा है, कृपया प्रतीक्षा करें...</span>
+                <span>एप्लिकेशन लोड हो रहा है, प्रतीक्षा करें...</span>
             </div>
             
-            <!-- हाई-स्पीड स्ट्रीम प्रोग्रेस बार -->
+            <!-- Stream Progress Bar -->
             <div class="splash-progress-track">
                 <div class="splash-progress-stream"></div>
             </div>
         </div>
 
-        <!-- डेवलपर एवं सपोर्ट फुटर -->
-        <div class="splash-footer-box">
-            <div class="splash-dev-badge" style="background: rgba(0, 41, 112, 0.7) !important; border: 1px solid rgba(0, 186, 242, 0.3) !important;">
-                <div style="color: #f8fafc; font-size: 13.5px; font-weight: 900; letter-spacing: 0.4px;">
-                    Developed by: Anurag Shakya
+        <!-- Sleek Footer Badge -->
+        <div style="width: 100%; text-align: center; margin-bottom: 10px;">
+            <div class="splash-dev-badge">
+                <div style="color: #f8fafc; font-size: 12px; font-weight: 800; letter-spacing: 0.4px;">
+                    Developed by: Er. Anurag Shakya
                 </div>
-                <div style="color: #00baf2; font-size: 12.5px; font-weight: 800; margin-top: 3px;">
-                    <i class="fa-solid fa-phone-volume" style="font-size: 11px;"></i> +91 9761414105
+                <div style="color: #38bdf8; font-size: 11px; font-weight: 800; margin-top: 3px;">
+                    <i class="fa-solid fa-phone-volume" style="font-size: 10px;"></i> +91 9761414105
                 </div>
             </div>
         </div>
@@ -1270,14 +1372,20 @@ body.desktop-force .tab-btn span { font-size: 12.5px !important; font-weight: 70
         <div class="app-top-header" style="position: relative; padding: 6px 10px !important; margin: 0 -8px 8px -8px !important; border-radius: 0 0 10px 10px !important; z-index: 10005; display: flex !important; justify-content: space-between !important; align-items: center !important; gap: 4px; min-height: 38px;">
             
             <div style="display: flex; align-items: center; gap: 6px; flex: 1; min-width: 0;">
-                <button id="headerMenuBtn" onclick="toggleReportSidebar(true)" class="header-icon-btn" style="color: white; font-size: 15px; padding: 0 2px; flex-shrink: 0; display: none;"><i class="fa-solid fa-bars"></i></button>
-                
                 <span style="font-size: 11px !important; font-weight: 900; color: white; letter-spacing: 0.2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: inline-flex; align-items: center; gap: 3px; flex-shrink: 0;">
                     <i class="fa-solid fa-bolt" style="color: #facc15; font-size: 10px;"></i> DvVNL Billing
                 </span>
             </div>
             
             <div style="display: flex; align-items: center; gap: 6px; flex-shrink: 0;">
+                <!-- 🔊 Voice Alert Toggle Button -->
+                <button id="headerVoiceToggleBtn" onclick="toggleVoiceAlertState()" class="header-icon-btn" title="Voice Alert On/Off" style="color: #38bdf8; font-size: 13px; padding: 2px;">
+                    <i id="headerVoiceIcon" class="fa-solid fa-volume-high"></i>
+                </button>
+                <!-- 🌙 Dark Mode Toggle Button -->
+                <button id="headerDarkModeBtn" onclick="toggleDarkModeState()" class="header-icon-btn" title="Dark/Light Mode" style="color: #facc15; font-size: 13px; padding: 2px;">
+                    <i id="headerThemeIcon" class="fa-solid fa-moon"></i>
+                </button>
                 <button onclick="syncOfflineDataToServer()" class="header-icon-btn" title="Sync Manual Entry to Server" style="color: #10b981; font-size: 14px; padding: 2px; position: relative;">
                     <i class="fa-solid fa-cloud-arrow-up"></i>
                     <span id="headerSyncDotBadge" style="display:none; position:absolute; top:-4px; right:-6px; background:#ef4444; color:#ffffff; font-size:8px; font-weight:900; padding:1px 4px; border-radius:10px; border:1.5px solid #ffffff; line-height:1; min-width:12px; text-align:center;">0</span>
@@ -1393,10 +1501,10 @@ body.desktop-force .tab-btn span { font-size: 12.5px !important; font-weight: 70
                     </div>
                 </div>
                 
-                <!-- Right: Live Time Badge (optional) -->
+                <!-- Right: Live Time Badge (Dynamic Online / Old Data Status) -->
                 <div style="flex-shrink: 0; text-align: right;">
-                    <div style="font-size: 9px; font-weight: 800; color: #1e40af; background: #dbeafe; padding: 3px 8px; border-radius: 10px; border: 1px solid #93c5fd; white-space: nowrap;">
-                        <i class="fa-solid fa-circle" style="color: #22c55e; font-size: 6px; margin-right: 3px;"></i> ONLINE
+                    <div id="headerOnlineBadge" style="font-size: 9px; font-weight: 800; color: #dc2626; background: #fee2e2; padding: 3px 8px; border-radius: 10px; border: 1px solid #fca5a5; white-space: nowrap; transition: all 0.3s ease;">
+                        <i id="headerOnlineDot" class="fa-solid fa-circle" style="color: #ef4444; font-size: 6px; margin-right: 3px;"></i> <span id="headerOnlineText">OLD DATA</span>
                     </div>
                 </div>
             </div>
@@ -1879,41 +1987,7 @@ body.desktop-force .tab-btn span { font-size: 12.5px !important; font-weight: 70
             <h3 style="font-size: 13px; margin: 5px 0 8px 2px; color: #0f172a; font-weight: bold;">🗃️ सम्पूर्ण विजिट डेटा:</h3>
             <div id="visitDataListContainer"></div>
         </div>
-
-        <div id="reportSidebarOverlay" class="sidebar-overlay" onclick="toggleReportSidebar(false)"></div>
-        <div id="reportsMenuContainer" class="report-sidebar">
-            <div style="background: linear-gradient(135deg, #0f172a, #1e293b); color: white; padding: 15px; border-radius: 8px; margin-bottom: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <i class="fa-solid fa-circle-user" style="font-size: 24px; color: #facc15;"></i>
-                        <div>
-                            <div style="font-size: 11px; color: #94a3b8; font-weight: 700; text-transform: uppercase;">Logged In As</div>
-                            <div id="sidebarMrName" style="font-size: 15px; font-weight: 900; letter-spacing: 0.5px;">-</div>
-                        </div>
-                    </div>
-                    <button onclick="toggleReportSidebar(false)" style="background: #ef4444; color: white; border: none; border-radius: 50%; width: 30px; height: 30px; font-size: 16px; cursor: pointer; box-shadow: 0 2px 4px rgba(239,68,68,0.4); display: flex; align-items: center; justify-content: center;"><i class="fa-solid fa-xmark"></i></button>
-                </div>
-            </div>
-
-            <!-- 🛠️ Admin Control Panel (English Labels & No Master Export Icons) -->
-            <div id="sidebarAdminControlSection" style="display: none; margin-bottom: 15px; background: #faf5ff; border: 1px solid #e9d5ff; padding: 10px; border-radius: 8px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);">
-                <div style="font-size: 11px; font-weight: 900; color: #6b21a8; text-transform: uppercase; margin-bottom: 8px; border-bottom: 1px dashed #c084fc; padding-bottom: 4px;"><i class="fa-solid fa-user-shield"></i> Admin Control Panel</div>
-                <div style="display: flex; flex-direction: column; gap: 6px;">
-                    <button onclick="switchTab('summary'); switchSubSummary('analytics'); toggleReportSidebar(false);" class="report-menu-btn" style="margin-bottom:0; padding:10px; background:#ffffff; border-color:#d8b4fe; color:#6b21a8;"><span style="font-weight:700;"><i class="fa-solid fa-chart-pie" style="color:#9333ea; margin-right:6px;"></i> Analytics Dashboard</span><i class="fa-solid fa-chevron-right" style="font-size:10px; color:#c084fc;"></i></button>
-                    <button onclick="switchTab('notifyadmin'); toggleReportSidebar(false);" class="report-menu-btn" style="margin-bottom:0; padding:10px; background:#ffffff; border-color:#d8b4fe; color:#6b21a8;"><span style="font-weight:700;"><i class="fa-solid fa-paper-plane" style="color:#7c3aed; margin-right:6px;"></i> Live Notification Sender</span><i class="fa-solid fa-chevron-right" style="font-size:10px; color:#c084fc;"></i></button>
-                    <button onclick="switchTab('configmaker'); toggleReportSidebar(false);" class="report-menu-btn" style="margin-bottom:0; padding:10px; background:#ffffff; border-color:#d8b4fe; color:#6b21a8;"><span style="font-weight:700;"><i class="fa-solid fa-sliders" style="color:#7c3aed; margin-right:6px;"></i> Report Config Maker</span><i class="fa-solid fa-chevron-right" style="font-size:10px; color:#c084fc;"></i></button>
-                </div>
-            </div>
-            
-            <div id="dynamicReportsMenuContainer"></div>
-            
-            <div style="text-align: center; margin-top: 25px; padding-top: 15px; border-top: 1px dashed #cbd5e1; color: #64748b;">
-                <div style="font-size: 12px; font-weight: bold;">Developed by: Anurag Shakya</div>
-                <div style="font-size: 11px; color: #ef4444; font-weight: 900; margin-top: 4px;">V1.0.28</div>
-            </div>
-        </div>
-
-        <div id="view-reports" class="tab-content" style="display: none;">
+<div id="view-reports" class="tab-content" style="display: none;">
             <div id="reportDetailContainer" style="display:none;">
                 <!-- 🌟 सुपर-क्लीन और कॉम्पैक्ट हेडर बार (सब-मेनू बटन मुक्त) -->
                 <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; background: #ffffff; padding: 8px 12px; border-radius: 10px; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.04);">
@@ -1948,25 +2022,25 @@ body.desktop-force .tab-btn span { font-size: 12.5px !important; font-weight: 70
                 <div id="reportListContainer"></div>
             </div>
         </div>
-        <!-- 🪶 Compact Footer Branding Strip (Patli Patti) -->
-        <div style="width: 100%; height: 25px; clear: both; display: block !important; visibility: hidden; pointer-events: none;"></div>
-        
-        <div style="background: linear-gradient(135deg, #f8fafc, #eff6ff); border-radius: 10px; padding: 8px 14px; margin: 8px auto 15px auto; max-width: 500px; text-align: center; border: 1px solid #cbd5e1; box-shadow: 0 2px 6px rgba(15, 23, 42, 0.05); display: flex; justify-content: center; align-items: center; gap: 10px; flex-wrap: wrap;">
-            
-            <!-- Version Badge -->
-            <span style="display: inline-flex; align-items: center; gap: 4px; background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; font-size: 10px; font-weight: 900; padding: 2px 8px; border-radius: 12px; letter-spacing: 0.4px;">
-                <i class="fa-solid fa-code-branch" style="font-size: 9px;"></i> V1.2.0
-            </span>
-            
-            <!-- Developer Name -->
-            <span style="font-size: 11px; font-weight: 800; color: #334155; display: inline-flex; align-items: center; gap: 4px;">
-                <i class="fa-solid fa-laptop-code" style="color: #6366f1; font-size: 10px;"></i> Er. Anurag Shakya
-            </span>
-            
-            <!-- Contact Info -->
-            <span style="font-size: 11px; font-weight: 900; color: #059669; display: inline-flex; align-items: center; gap: 4px; background: #f0fdf4; padding: 2px 8px; border-radius: 10px; border: 1px solid #bbf7d0;">
-                <i class="fa-solid fa-phone-volume" style="font-size: 9px;"></i> +91 9761414105
-            </span>
+        <!-- 🪶 Compact Footer Branding Strip (Screen ke Bottom par Positioned) -->
+        <div style="margin-top: auto; padding-top: 25px; padding-bottom: 12px; width: 100%;">
+            <div style="background: linear-gradient(135deg, #f8fafc, #eff6ff); border-radius: 12px; padding: 7px 14px; margin: 0 auto; max-width: 440px; text-align: center; border: 1px solid #cbd5e1; box-shadow: 0 2px 6px rgba(15, 23, 42, 0.05); display: flex; justify-content: center; align-items: center; gap: 10px; flex-wrap: wrap;" class="app-branding-strip-footer">
+                
+                <!-- Version Badge -->
+                <span style="display: inline-flex; align-items: center; gap: 4px; background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; font-size: 10px; font-weight: 900; padding: 2px 8px; border-radius: 12px; letter-spacing: 0.4px;">
+                    <i class="fa-solid fa-code-branch" style="font-size: 9px;"></i> V1.2.0
+                </span>
+                
+                <!-- Developer Name -->
+                <span style="font-size: 11px; font-weight: 800; color: #334155; display: inline-flex; align-items: center; gap: 4px;">
+                    <i class="fa-solid fa-laptop-code" style="color: #6366f1; font-size: 10px;"></i> Er. Anurag Shakya
+                </span>
+                
+                <!-- Contact Info -->
+                <span style="font-size: 11px; font-weight: 900; color: #059669; display: inline-flex; align-items: center; gap: 4px; background: #f0fdf4; padding: 2px 8px; border-radius: 10px; border: 1px solid #bbf7d0;">
+                    <i class="fa-solid fa-phone-volume" style="font-size: 9px;"></i> +91 9761414105
+                </span>
+            </div>
         </div>
         
         <div style="width: 100%; height: 12px; clear: both; display: block !important; visibility: hidden; pointer-events: none;"></div>
@@ -2168,12 +2242,12 @@ function shouldTriggerScheduledSlotDownload() {
     var hr = now.getHours();
     var todayStr = now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate();
 
-    // 4 स्लॉट: 1 (सुबह 7-9), 2 (11-13 बजे), 3 (17-18 बजे), 4 (19-21 बजे)
+    // 4 स्लॉट: 10:00 AM, 01:00 PM (13:00), 06:00 PM (18:00), 08:00 PM (20:00)
     var currentSlot = "";
-    if (hr >= 7 && hr < 10) currentSlot = "SLOT_MORNING";
-    else if (hr >= 11 && hr < 13) currentSlot = "SLOT_11AM";
-    else if (hr >= 17 && hr < 19) currentSlot = "SLOT_5PM";
-    else if (hr >= 19 && hr < 21) currentSlot = "SLOT_7PM";
+    if (hr >= 10 && hr < 12) currentSlot = "SLOT_10AM";
+    else if (hr >= 13 && hr < 15) currentSlot = "SLOT_1PM";
+    else if (hr >= 18 && hr < 20) currentSlot = "SLOT_6PM";
+    else if (hr >= 20 && hr < 22) currentSlot = "SLOT_8PM";
 
     if (!currentSlot) return false;
 
@@ -3087,6 +3161,11 @@ function executeSafeSyncAndDownloadWorkflow(onComplete) {
                             var currentDateTimeStr = new Date().toLocaleString('en-IN');
                             localStorage.setItem("data_last_updated_" + loggedInReader, currentDateTimeStr);
                             localStorage.setItem("last_sync_time_ms_" + loggedInReader, new Date().getTime()); 
+                            
+                            // Download hote hi badge turant Online (Green) ho jaye
+                            if (typeof updateDataStatusBadge === 'function') {
+                                updateDataStatusBadge(true);
+                            } 
                             
                             var tsSpan = document.getElementById("lastUpdatedTimeSpan");
                             if (tsSpan) tsSpan.innerText = currentDateTimeStr;
@@ -4708,7 +4787,7 @@ function triggerGlobalDataReRender() {
     }
 
     function navigateToViewRaw(viewId) {
-        // किसी भी व्यू में जाने पर स्प्लैश स्क्रीन हमेशा बंद रहेगी
+        // Safe Splash Hide
         var splash = document.getElementById('appSplashScreen');
         if (splash) {
             splash.style.setProperty("display", "none", "important");
@@ -4717,12 +4796,30 @@ function triggerGlobalDataReRender() {
             splash.style.setProperty("z-index", "-9999", "important");
         }
 
-        document.getElementById('loginView').style.display = (viewId === 'loginView') ? "block" : "none";
-        document.getElementById('formView').style.display = (viewId === 'formView') ? "block" : "none";
-        document.getElementById('appDashboardView').style.display = (viewId === 'appDashboardView' || viewId === 'reportDetailContainer') ? "block" : "none";
-        if(viewId === 'reportDetailContainer') { document.getElementById('reportsMenuContainer').style.display = "none"; document.getElementById('reportDetailContainer').style.display = "block"; if(loggedInReader) localStorage.setItem("app_current_view_state_" + loggedInReader, "reportDetailContainer"); } 
-        else if (viewId === 'appDashboardView') { document.getElementById('reportDetailContainer').style.display = "none"; document.getElementById('reportsMenuContainer').style.display = "block"; if(loggedInReader) localStorage.setItem("app_current_view_state_" + loggedInReader, "dashboard"); }
-        if(viewId === 'formView' && loggedInReader) { localStorage.setItem("app_current_view_state_" + loggedInReader, "formView"); }
+        // Safe Elements Toggle (Null Crash Protection)
+        var loginEl = document.getElementById('loginView');
+        var formEl = document.getElementById('formView');
+        var dashEl = document.getElementById('appDashboardView');
+        var repDetailEl = document.getElementById('reportDetailContainer');
+        var repMenuEl = document.getElementById('reportsMenuContainer');
+
+        if (loginEl) loginEl.style.display = (viewId === 'loginView') ? "block" : "none";
+        if (formEl) formEl.style.display = (viewId === 'formView') ? "block" : "none";
+        if (dashEl) dashEl.style.display = (viewId === 'appDashboardView' || viewId === 'reportDetailContainer') ? "block" : "none";
+
+        if (viewId === 'reportDetailContainer') {
+            if (repMenuEl) repMenuEl.style.display = "none";
+            if (repDetailEl) repDetailEl.style.display = "block";
+            if (loggedInReader) localStorage.setItem("app_current_view_state_" + loggedInReader, "reportDetailContainer");
+        } else if (viewId === 'appDashboardView') {
+            if (repDetailEl) repDetailEl.style.display = "none";
+            if (repMenuEl) repMenuEl.style.display = "block";
+            if (loggedInReader) localStorage.setItem("app_current_view_state_" + loggedInReader, "dashboard");
+        }
+
+        if (viewId === 'formView' && loggedInReader) {
+            localStorage.setItem("app_current_view_state_" + loggedInReader, "formView");
+        }
     }
 
     function navigateTo(viewId) {
@@ -4846,10 +4943,10 @@ function triggerGlobalDataReRender() {
             greetingColor = "#1e40af";
         }
 
-        // Greeting Line Update (with Welcome word)
+        // Greeting Line Update (Keval Greeting aur Icon rahega)
         var greetingLineNode = document.getElementById('greetingLine');
         if(greetingLineNode) {
-            greetingLineNode.innerHTML = '<i class="fa-solid ' + greetingIcon + '" style="color: ' + greetingColor + '; font-size: 10px; margin-right: 2px;"></i> Welcome, ' + greeting;
+            greetingLineNode.innerHTML = '<i class="fa-solid ' + greetingIcon + '" style="color: ' + greetingColor + '; font-size: 10px; margin-right: 2px;"></i> ' + greeting;
         }
         
         // User Name Update
@@ -4858,34 +4955,25 @@ function triggerGlobalDataReRender() {
             greetingUserNameNode.innerText = toTitleProperCase(loggedInReader);
         }
         
+        // Voice & Dark mode UI state refresh
+        if (typeof updateVoiceToggleUI === 'function') updateVoiceToggleUI();
+        if (typeof applyThemeState === 'function') applyThemeState(isDarkModeActive());
+
+        // 🔔 Notification Permission Request & Initial Check
+        if (typeof requestSystemNotificationPermission === 'function') {
+            requestSystemNotificationPermission();
+        }
+        
         // Sidebar Name Update
-        var sidebarName = document.getElementById('sidebarMrName');
-        if(sidebarName) sidebarName.innerText = toTitleProperCase(loggedInReader);
-        
-        // 🛠️ एडमिन पैनल विज़िबिलिटी कंट्रोल ड्राइवर (Sidebar & Header Menu Admin Check)
         var btnAllMrPdfSummary = document.getElementById('btnAllMrPdfSummary');
-        var sidebarAdminSec = document.getElementById('sidebarAdminControlSection');
         var visitTabBtn = document.getElementById('btn-tab-visitdata');
-        var headerMenuBtn = document.getElementById('headerMenuBtn');
-        var reportsSidebar = document.getElementById('reportsMenuContainer');
-        var sidebarOverlay = document.getElementById('reportSidebarOverlay');
-        
         var isAdmin = loggedInReader && (loggedInReader.toUpperCase() === "ANURAG SHAKYA" || loggedInReader.toUpperCase() === "ADMIN");
 
         if(!isAdmin) { 
-            // Meter Reader: Sidebar button aur drawer poori tarah hide
-            if(headerMenuBtn) headerMenuBtn.style.setProperty("display", "none", "important");
-            if(reportsSidebar) reportsSidebar.style.setProperty("display", "none", "important");
-            if(sidebarOverlay) sidebarOverlay.style.setProperty("display", "none", "important");
             if(btnAllMrPdfSummary) btnAllMrPdfSummary.style.display = "none";
-            if(sidebarAdminSec) sidebarAdminSec.style.setProperty("display", "none", "important");
             if(visitTabBtn) visitTabBtn.style.setProperty("display", "none", "important");
         } else {
-            // Admin: Sidebar menu aur drawer visible
-            if(headerMenuBtn) headerMenuBtn.style.setProperty("display", "inline-flex", "important");
-            if(reportsSidebar) reportsSidebar.style.removeProperty("display");
             if(btnAllMrPdfSummary) btnAllMrPdfSummary.style.display = "inline-flex";
-            if(sidebarAdminSec) sidebarAdminSec.style.setProperty("display", "block", "important");
             if(visitTabBtn) visitTabBtn.style.setProperty("display", "flex", "important");
         }
     
@@ -6624,21 +6712,8 @@ async function downloadSelectedMergedPDF() {
 }
 
     function toggleReportSidebar(forceOpen) {
-        var isAdmin = loggedInReader && (loggedInReader.toUpperCase() === "ANURAG SHAKYA" || loggedInReader.toUpperCase() === "ADMIN");
-        if (!isAdmin) return; // Meter reader ke liye sidebar drawer open hona block
-
-        var sidebar = document.getElementById('reportsMenuContainer');
-        var overlay = document.getElementById('reportSidebarOverlay');
-        if (!sidebar || !overlay) return;
-        
-        if (forceOpen === true) {
-            sidebar.classList.add('open'); overlay.style.display = 'block';
-        } else if (forceOpen === false) {
-            sidebar.classList.remove('open'); overlay.style.display = 'none';
-        } else {
-            if (sidebar.classList.contains('open')) { sidebar.classList.remove('open'); overlay.style.display = 'none'; } 
-            else { sidebar.classList.add('open'); overlay.style.display = 'block'; }
-        }
+        // Redundant sidebar bypass
+        return;
     }
 
     // 🟢 फ़िक्स: रिपोर्ट्स क्लिक पर लिस्ट तुरंत और गारंटीड खोलने वाला इंजन
@@ -11372,6 +11447,8 @@ function announceSpecialPendingVoiceReport() {
     var activeUser = loggedInReader || localStorage.getItem("mtr_reader_session_lock") || "";
     if (!db || !activeUser) return;
 
+    var currentUser = activeUser.toString().trim().toUpperCase();
+    var isAdmin = (currentUser === "ANURAG SHAKYA" || currentUser === "ADMIN");
     var readerNameProper = toTitleProperCase(activeUser);
 
     var tx = db.transaction("consumers", "readonly");
@@ -11383,10 +11460,9 @@ function announceSpecialPendingVoiceReport() {
         for (var i = 0; i < allData.length; i++) {
             var item = allData[i] || {};
             
-            // केवल लॉगिन यूजर/आवंटित रीडर का डेटा फिल्टर करें
             if (!isReaderAllowed(getReaderName(item))) continue;
 
-            // 1. मेन मीटर: रिमार्क MRI Done में है लेकिन MRI अपलोड नहीं है
+            // 1. मेन मीटर MRI Done par upload nahi
             var mainRem = (getRobustKey(item, "FINAL_MAIN_METER_SITE_REMARK") || item.mainStatusRemark || "").toString().toUpperCase();
             var isMainMriDone = mainRem.includes("MRI DONE") || mainRem.includes("CMRI DONE");
             var isMainMriAvail = parseTrue(getRobustKey(item, "IS MRI AVAILABLE (MAIN METER)")) || parseTrue(item.mriAvailableMain);
@@ -11395,7 +11471,7 @@ function announceSpecialPendingVoiceReport() {
                 mainMriPendingCount++;
             }
 
-            // 2. पोल मीटर: रिमार्क MRI Done में है लेकिन MRI अपलोड नहीं है
+            // 2. पोल मीटर MRI Done par upload nahi
             var poleRem = (getRobustKey(item, "FINAL_POLE_METER_SITE_REMARK") || item.poleStatusRemark || "").toString().toUpperCase();
             var isPoleMriDone = poleRem.includes("MRI DONE") || poleRem.includes("CMRI DONE");
             var isPoleMriAvail = parseTrue(getRobustKey(item, "IS MRI AVAILABLE (POLE METER)")) || parseTrue(item.mriAvailablePole);
@@ -11405,9 +11481,15 @@ function announceSpecialPendingVoiceReport() {
             }
         }
 
-        // यदि दोनों में से किसी भी कार्ड में पेंडेंसी है तो पूरा विस्तृत संदेश बोलेगा
         if (mainMriPendingCount > 0 || poleMriPendingCount > 0) {
-            var msg = "Dear " + readerNameProper + " जी, आपके मेन मीटर के " + mainMriPendingCount + " कंज्यूमर्स ऐसे हैं जिनका रिमार्क एम आर आई में है लेकिन डेटा अभी तक अपलोड नहीं हुआ है, और ऐसे ही पोल मीटर में भी " + poleMriPendingCount + " कंज्यूमर्स ऐसे हैं जिनका रिमार्क एम आर आई में दिया है लेकिन एम आर आई नहीं है। अगर इनका डेटा मशीन में है तो तुरंत ऑफिस जाकर डाउनलोड करवाएं, और अगर डेटा करप्ट है तो इनकी दोबारा विजिट करके जल्द से जल्द डेटा डाउनलोड करवाएं। कंज्यूमर्स लिस्ट रिपोर्ट सेक्शन में जाकर देखें। धन्यवाद।";
+            var msg = "";
+            if (isAdmin) {
+                // Admin login mein keval count bolega
+                msg = "Dear " + readerNameProper + " सर, मेन मीटर में " + mainMriPendingCount + " और पोल मीटर में " + poleMriPendingCount + " एम आर आई पेंडिंग हैं।";
+            } else {
+                // Reader login mein detailed aadesh + consumers list report section ka nirdesh
+                msg = "Dear " + readerNameProper + " जी, आपके मेन मीटर के " + mainMriPendingCount + " कंज्यूमर्स ऐसे हैं जिनका रिमार्क एम आर आई में है लेकिन डेटा अभी तक अपलोड नहीं हुआ है, और ऐसे ही पोल मीटर में भी " + poleMriPendingCount + " कंज्यूमर्स ऐसे हैं जिनका रिमार्क एम आर आई में दिया है लेकिन एम आर आई नहीं है। अगर इनका डेटा मशीन में है तो तुरंत ऑफिस जाकर डाउनलोड करवाएं, और अगर डेटा करप्ट है तो इनकी दोबारा विजिट करके जल्द से जल्द डेटा डाउनलोड करवाएं। कंज्यूमर्स लिस्ट रिपोर्ट सेक्शन में जाकर देखें, धन्यवाद।";
+            }
             speakHindiVoice(msg);
         }
     };
@@ -11445,8 +11527,240 @@ function unlockVoicePermission() {
     document.addEventListener(evt, unlockVoicePermission, { capture: true });
 });
 
+// 🔊 Voice Alert Enable/Disable Engine (Permanent Local Storage Lock)
+function isVoiceAlertEnabled() {
+    var stored = localStorage.getItem("app_voice_alert_enabled");
+    return stored === null ? true : (stored === "true");
+}
+
+function updateVoiceToggleUI() {
+    var icon = document.getElementById('headerVoiceIcon');
+    var btn = document.getElementById('headerVoiceToggleBtn');
+    if (!icon || !btn) return;
+    
+    var isEnabled = isVoiceAlertEnabled();
+    if (isEnabled) {
+        icon.className = "fa-solid fa-volume-high";
+        btn.style.color = "#38bdf8";
+        btn.title = "Voice Alert Enabled (Click to Mute)";
+    } else {
+        icon.className = "fa-solid fa-volume-xmark";
+        btn.style.color = "#ef4444";
+        btn.title = "Voice Alert Muted (Click to Enable)";
+    }
+}
+
+function toggleVoiceAlertState() {
+    var currentState = isVoiceAlertEnabled();
+    var newState = !currentState;
+    localStorage.setItem("app_voice_alert_enabled", newState ? "true" : "false");
+    updateVoiceToggleUI();
+    
+    if (newState) {
+        showThinAlert("🔊 वॉयस अलर्ट चालू कर दिया गया है!", true);
+        speakHindiVoice("Voice alert chalu ho gaya hai");
+    } else {
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+        }
+        if (globalVoiceAudioPlayer) {
+            try { globalVoiceAudioPlayer.pause(); } catch(e){}
+        }
+        showThinAlert("🔇 वॉयस अलर्ट बंद कर दिया गया है!", true);
+    }
+}
+
+// 🌙 Dark Mode Toggle Engine
+function isDarkModeActive() {
+    return localStorage.getItem("app_dark_mode_active") === "true";
+}
+
+function applyThemeState(isDark) {
+    var icon = document.getElementById('headerThemeIcon');
+    if (isDark) {
+        document.body.classList.add('dark-mode');
+        if (icon) icon.className = "fa-solid fa-sun";
+    } else {
+        document.body.classList.remove('dark-mode');
+        if (icon) icon.className = "fa-solid fa-moon";
+    }
+}
+
+function toggleDarkModeState() {
+    var isDark = !isDarkModeActive();
+    localStorage.setItem("app_dark_mode_active", isDark ? "true" : "false");
+    applyThemeState(isDark);
+    showThinAlert(isDark ? "🌙 डार्क मोड सक्रिय!" : "☀️ लाइट मोड सक्रिय!", true);
+}
+
+// Page load par theme aur voice status restore karein
+document.addEventListener("DOMContentLoaded", function() {
+    updateVoiceToggleUI();
+    applyThemeState(isDarkModeActive());
+});
+// 🔔 SYSTEM PUSH NOTIFICATION & HOURLY BACKGROUND ENGINE
+
+// 1. Notification Permission Request (App khulte hi mangega)
+function requestSystemNotificationPermission() {
+    if ("Notification" in window && Notification.permission !== "granted" && Notification.permission !== "denied") {
+        Notification.requestPermission().then(function(permission) {
+            if (permission === "granted") {
+                console.log("✅ Notification permission granted");
+            }
+        });
+    }
+}
+
+// 2. System Status Bar Notification Fire karne ka function
+function sendSystemPushNotification(title, message, iconType) {
+    // Android APK Native Bridge check
+    if (typeof AndroidBridge !== "undefined" && typeof AndroidBridge.showSystemNotification === "function") {
+        AndroidBridge.showSystemNotification(title, message);
+        return;
+    }
+
+    // Browser / WebView Notification API
+    if ("Notification" in window && Notification.permission === "granted") {
+        var notifOptions = {
+            body: message,
+            icon: "https://lh3.googleusercontent.com/d/1do652Y1yo4YXFWj9rVhA678z_bUSgIk0",
+            badge: "https://lh3.googleusercontent.com/d/1do652Y1yo4YXFWj9rVhA678z_bUSgIk0",
+            vibrate: [200, 100, 200],
+            requireInteraction: false
+        };
+        try {
+            var n = new Notification(title, notifOptions);
+            n.onclick = function() {
+                window.focus();
+                this.close();
+            };
+        } catch(e) {
+            console.warn("Push notification failed via standard API:", e);
+        }
+    }
+}
+
+// 3. Hourly Data Fetch aur Differences / Pendency Check Engine
+function runHourlyBackgroundSyncAndNotify() {
+    if (!navigator.onLine || !loggedInReader || isDownloadingMasterData) return;
+
+    var targetUser = loggedInReader.toUpperCase().trim();
+    console.log("⏰ Running Hourly Background Data Check for:", targetUser);
+
+    google.script.run
+        .withSuccessHandler(function(bulkData) {
+            if (!bulkData || !bulkData.consumers || bulkData.consumers.length === 0) return;
+
+            var newConsumers = bulkData.consumers;
+            var readerNameProper = toTitleProperCase(loggedInReader);
+
+            // Purana count cache read karein
+            var prevCountsStr = localStorage.getItem("prev_counts_" + targetUser);
+            var prevCounts = prevCountsStr ? JSON.parse(prevCountsStr) : null;
+
+            // Naye data ke metrics calculate karein
+            var visitPending = 0;
+            var mainMriPending = 0;
+            var poleMriPending = 0;
+            var billDistPending = 0;
+            var newBillsUploadedCount = 0;
+
+            for (var i = 0; i < newConsumers.length; i++) {
+                var item = newConsumers[i] || {};
+                if (!isReaderAllowed(getReaderName(item))) continue;
+
+                var rStatus = (item.attendStatus || "").toString().toUpperCase().trim();
+                var dStatus = (item.distStatus || "").toString().toUpperCase().trim();
+                var isDone = parseTrue(item.isDone) || rStatus === "ATTEND" || dStatus === "DISTRIBUTED";
+
+                if (!isDone) visitPending++;
+
+                // Main Meter MRI Pending
+                var mainRem = (getRobustKey(item, "FINAL_MAIN_METER_SITE_REMARK") || item.mainStatusRemark || "").toString().toUpperCase();
+                var isMainMriDone = mainRem.includes("MRI DONE") || mainRem.includes("CMRI DONE");
+                var isMainMriAvail = parseTrue(getRobustKey(item, "IS MRI AVAILABLE (MAIN METER)")) || parseTrue(item.mriAvailableMain);
+                if (isMainMriDone && !isMainMriAvail) mainMriPending++;
+
+                // Pole Meter MRI Pending
+                var poleRem = (getRobustKey(item, "FINAL_POLE_METER_SITE_REMARK") || item.poleStatusRemark || "").toString().toUpperCase();
+                var isPoleMriDone = poleRem.includes("MRI DONE") || poleRem.includes("CMRI DONE");
+                var isPoleMriAvail = parseTrue(getRobustKey(item, "IS MRI AVAILABLE (POLE METER)")) || parseTrue(item.mriAvailablePole);
+                if (isPoleMriDone && !isPoleMriAvail) poleMriPending++;
+
+                // Bill Dist Pending
+                var forDistVal = (getRobustKey(item, "FOR_BILL DISTRIBUTION") || item.forBillDist || "").toString().toUpperCase().trim();
+                var hasBillUp = parseTrue(item.isBillUpload) || (getRobustKey(item, "IS BILL UPLOAD") || "").toString().toUpperCase().trim() === "YES";
+                if (!isDone && (forDistVal === "YES" || forDistVal.includes("YES")) && hasBillUp) {
+                    billDistPending++;
+                }
+
+                if (hasBillUp) newBillsUploadedCount++;
+            }
+
+            // Current state store karein
+            var currentCounts = {
+                visitPending: visitPending,
+                mainMriPending: mainMriPending,
+                poleMriPending: poleMriPending,
+                billDistPending: billDistPending,
+                newBillsUploadedCount: newBillsUploadedCount
+            };
+            localStorage.setItem("prev_counts_" + targetUser, JSON.stringify(currentCounts));
+
+            // 🎯 Notification Conditions (Paytm style live alerts)
+            if (prevCounts) {
+                // A. Naye Bill upload hone par
+                if (currentCounts.newBillsUploadedCount > prevCounts.newBillsUploadedCount) {
+                    var diffBills = currentCounts.newBillsUploadedCount - prevCounts.newBillsUploadedCount;
+                    sendSystemPushNotification(
+                        "📄 Naye Bijli Bill Upload Huye!",
+                        readerNameProper + " ji, aapke " + diffBills + " naye bills upload ho chuke hain. Distribution shuru karein."
+                    );
+                }
+
+                // B. Data me koi badlav (changes) aane par
+                if (prevCounts.visitPending !== currentCounts.visitPending) {
+                    sendSystemPushNotification(
+                        "🔄 Data Update Alert",
+                        "Aapki allocated consumers list update hui hai. Abhi " + visitPending + " visits pending hain."
+                    );
+                }
+            }
+
+            // C. Pending status notifications (Agar counts bache hue hain)
+            if (mainMriPending > 0 || poleMriPending > 0) {
+                sendSystemPushNotification(
+                    "⚠️ MRI Upload Pending Alert",
+                    "Main Meter: " + mainMriPending + " | Pole Meter: " + poleMriPending + " consumers ka data upload hona baaki hai!"
+                );
+            } else if (billDistPending > 0) {
+                sendSystemPushNotification(
+                    "📦 Bill Distribution Pending",
+                    "Aapke " + billDistPending + " bills distribution ke liye pending hain."
+                );
+            }
+
+            // Local cache update
+            triggerSilentBackgroundDataDownload(null, false);
+        })
+        .withFailureHandler(function(err) {
+            console.warn("Hourly background fetch failed:", err);
+        })
+        .getBulkDashboardData("ALL");
+}
+
+// 4. Har 1 Ghante (3600000 ms) me run karne ka interval scheduler
+setInterval(function() {
+    runHourlyBackgroundSyncAndNotify();
+}, 3600000); // 1 hour = 60 * 60 * 1000 ms
+
 function speakHindiVoice(message) {
     if (!message) return;
+    // 🛑 Check if user has muted the voice alert
+    if (!isVoiceAlertEnabled()) {
+        console.log("🔇 Voice alert is muted by user:", message);
+        return;
+    }
     var fullVoiceMessage = message.toString().trim();
     console.log("🔊 Speaking Voice:", fullVoiceMessage);
 
@@ -11529,6 +11843,30 @@ function playGoogleTTSFallback(msg) {
         pendingAutoVoiceQueue = msg;
     }
 }
+// 🕒 डेटा एज और ऑनलाइन/ओल्ड स्टेटस बैज अपडेट इंजन
+function updateDataStatusBadge(isFresh) {
+    var badge = document.getElementById('headerOnlineBadge');
+    var dot = document.getElementById('headerOnlineDot');
+    var txt = document.getElementById('headerOnlineText');
+    if (!badge || !dot || !txt) return;
+
+    if (isFresh) {
+        // Naya Data (Green Online)
+        badge.style.color = "#1e40af";
+        badge.style.background = "#dbeafe";
+        badge.style.border = "1px solid #93c5fd";
+        dot.style.color = "#22c55e";
+        txt.innerText = "ONLINE";
+    } else {
+        // Purana Data (Red Old Data)
+        badge.style.color = "#dc2626";
+        badge.style.background = "#fee2e2";
+        badge.style.border = "1px solid #fca5a5";
+        dot.style.color = "#ef4444";
+        txt.innerText = "OLD DATA";
+    }
+}
+
 // 🕒 डेटा 1 घंटे से अधिक पुराना होने पर वॉयस एवं स्क्रीन अलर्ट इंजन
 function checkDataAgeAndAlertUser() {
     if (!loggedInReader) return;
@@ -11537,7 +11875,6 @@ function checkDataAgeAndAlertUser() {
     var currentTime = new Date().getTime();
     var isStale = false;
 
-    // यदि कभी सिंक नहीं हुआ या 1 घंटे (60 मिनट) से ज़्यादा पुराना है
     if (!lastSyncMs) {
         isStale = true;
     } else {
@@ -11547,10 +11884,11 @@ function checkDataAgeAndAlertUser() {
         }
     }
 
+    // Badge ko status ke anusaar set karein
+    updateDataStatusBadge(!isStale);
+
     if (isStale) {
         showThinAlert("⚠️ आपका डेटा पुराना है, कृपया नया डेटा डाउनलोड करें!", false);
-        
-        // स्पष्ट शुद्ध हिंदी में उद्घोषणा
         speakHindiVoice("आपका डेटा पुराना हो गया है, कृपया नया डेटा डाउनलोड करें");
 
         var lastUpdBar = document.getElementById('lastUpdatedLabel');
