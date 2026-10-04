@@ -5,7 +5,7 @@
 <script>
   (function() {
     // ⚠️ अपना नया Deployment URL यहाँ पेस्ट करें
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyP2fUQmU97Ft5Q8Ec17EMzhMcYGKAzBWq03SbMpDx7RbaE_7yj_xsMTG1eOvzAheGHSg/exec";
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwCimP3IxE9lCRirALk1m71bypyn-Mkc-RCQDGUso1rzssoXBGcYwnu8oBHUTtdxXx72A/exec";
 
     function createHandler(successCallback, failureCallback) {
       return new Proxy({}, {
@@ -157,18 +157,21 @@
     <style>
    /* 🎨 EYE-CARE SOFT CORPORATE SLATE THEME (NO EYE STRAIN & 100% SHARP) */
     :root {
-        --theme-bg: #f1f5f9;            /* सॉफ्ट आरामदायक स्लेट-ग्रे */
-        --theme-primary: #1e40af;       /* संतुलित क्लासिक रॉयल ब्लू */
-        --theme-primary-dark: #1e3a8a;
-        --theme-sec-bg: #e2e8f0;
-        --theme-border: #3b82f6;
-        --theme-header-gradient: linear-gradient(135deg, #1e293b, #1e3a8a);
-        --theme-card-bg: #ffffff;
-        --theme-text: #0f172a;          /* डीप शार्प चारकोल (धुंधलापन मुक्त) */
-        --theme-heading: #0f172a;
-        --theme-table-th: #e2e8f0;
-        --theme-table-border: #cbd5e1;
-    }
+    --theme-bg: #f0f4f8;                              /* Paytm style soft blue-gray bg */
+    --theme-primary: #00baf2;                          /* Paytm Sky Blue */
+    --theme-primary-dark: #0086b3;                     /* Dark Sky Blue */
+    --theme-sec-bg: #e6f7fc;
+    --theme-border: #00baf2;
+    --theme-header-gradient: linear-gradient(135deg, #002970 0%, #00baf2 100%);  /* Paytm Navy → Sky Blue */
+    --theme-card-bg: #ffffff;
+    --theme-text: #002970;                             /* Paytm Deep Navy Text */
+    --theme-heading: #002970;
+    --theme-table-th: #e6f7fc;
+    --theme-table-border: #b3e5f5;
+    --theme-accent: #ffb800;                           /* Paytm Yellow Accent */
+    --theme-success: #00c853;
+    --theme-danger: #ff3d3d;
+}
 
     /* 🚀 ULTIMATE GOOGLE APPS SCRIPT BANNER FORCED-HIDE ENGINE */
     body > div:first-child[style*="background-color"], 
@@ -204,33 +207,31 @@
     }
 
     html, body {
-        height: 100%; 
-        min-height: 100svh; 
-        background: var(--theme-bg) !important;
-        background-size: 400% 400% !important;
-        animation: movingGradient 15s ease infinite; 
-        color: var(--theme-text); 
-        font-size: 13px; 
-        padding: 0; 
-        margin: 0; 
-        margin-top: 0 !important;
-        padding-top: 0 !important;
-    }
+    height: 100%; 
+    min-height: 100svh; 
+    background: linear-gradient(180deg, #f0f4f8 0%, #e6f7fc 100%) !important;
+    color: var(--theme-text); 
+    font-size: 13px; 
+    padding: 0; 
+    margin: 0; 
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+}
 
     body { padding: calc(5px + env(safe-area-inset-top)) 8px calc(65px + env(safe-area-inset-bottom)) 8px; box-sizing: border-box; }
     .container { max-width: 450px; margin: 0 auto; min-height: 100svh; padding-bottom: 75px !important; box-sizing: border-box; }
     
     /* 💎 SOOTHING EYE-CARE CARD DESIGN */
     .card { 
-        background: #ffffff; 
-        border-radius: 16px; 
-        padding: 16px;       
-        box-shadow: 0 2px 8px rgba(15, 23, 42, 0.05); 
-        margin-bottom: 14px; 
-        border: 1px solid #cbd5e1; 
-        transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-        color: #0f172a;
-    }
+    background: #ffffff; 
+    border-radius: 16px; 
+    padding: 16px;       
+    box-shadow: 0 4px 20px rgba(0, 41, 112, 0.08), 0 1px 3px rgba(0, 41, 112, 0.04); 
+    margin-bottom: 14px; 
+    border: 1px solid #d6e9f5; 
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    color: var(--theme-text);
+}
     .card:active {
         transform: scale(0.985);
     }
@@ -259,24 +260,24 @@
     
     /* 🚀 SOLID FLAT ENTERPRISE BUTTONS */
     .btn { 
-        width: 100%; 
-        background: linear-gradient(90deg, var(--theme-primary), var(--theme-primary-dark, #1d4ed8)) !important; 
-        color: white; 
-        border: none; 
-        padding: 12px 16px; 
-        border-radius: 10px; 
-        font-size: 13px; 
-        font-weight: 900; 
-        cursor: pointer; 
-        display: block; 
-        text-align: center; 
-        margin-bottom: 6px; 
-        text-decoration: none; 
-        transition: all 0.2s ease; 
-        box-shadow: 0 4px 12px rgba(30,64,175,0.15); 
-        letter-spacing: 0.5px; 
-        text-transform: uppercase;
-    }
+    width: 100%; 
+    background: linear-gradient(135deg, #00baf2 0%, #0086b3 100%) !important; 
+    color: white; 
+    border: none; 
+    padding: 12px 16px; 
+    border-radius: 12px; 
+    font-size: 13px; 
+    font-weight: 900; 
+    cursor: pointer; 
+    display: block; 
+    text-align: center; 
+    margin-bottom: 6px; 
+    text-decoration: none; 
+    transition: all 0.2s ease; 
+    box-shadow: 0 6px 20px rgba(0, 186, 242, 0.35); 
+    letter-spacing: 0.5px; 
+    text-transform: uppercase;
+}
     .btn:active { transform: scale(0.98); box-shadow: 0 2px 4px rgba(30,64,175,0.1); }
     .btn:active { background: var(--theme-primary-dark) !important; transform: translateY(1px); }
     .btn-back { background: #64748b; box-shadow: 0 2px 4px rgba(100,116,139,0.2); margin-top: 5px; }
@@ -284,24 +285,19 @@
     
     /* 🚀 APK BOTTOM TABS OVERLAP ENGINE FIX (नीचे घुसने और थीम न बदलने का अचूक इलाज) */
     .tab-bar { 
-        position: fixed !important; 
-        bottom: 0 !important; 
-        left: 0 !important; 
-        right: 0 !important; 
-        /* 🎯 फिक्स: मोबाइल व्यू में बॉटम बार अब थीम के प्राइमरी कलर के हिसाब से बदलेगा */
-        background: var(--theme-primary, #0f172a) !important; 
-        display: flex !important; 
-        justify-content: space-around !important; 
-        box-shadow: 0 -4px 25px rgba(0,0,0,0.4) !important; 
-        z-index: 9999 !important; 
-        
-        /* 🎯 मोबाइल स्क्रीन के लिए संतुलित स्पेसिंग */
-        padding-bottom: env(safe-area-inset-bottom, 5px) !important; 
-        
-        /* 🎯 ऊंचाई को कम किया ताकि नीचे फालतू स्पेस न छूटे */
-        height: calc(55px + env(safe-area-inset-bottom, 5px)) !important; 
-        border-top: 1px solid rgba(255, 255, 255, 0.1) !important; 
-    }
+    position: fixed !important; 
+    bottom: 0 !important; 
+    left: 0 !important; 
+    right: 0 !important; 
+    background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%) !important; 
+    display: flex !important; 
+    justify-content: space-around !important; 
+    box-shadow: 0 -4px 25px rgba(0, 0, 0, 0.5) !important; 
+    z-index: 9999 !important; 
+    padding-bottom: env(safe-area-inset-bottom, 5px) !important; 
+    height: calc(55px + env(safe-area-inset-bottom, 5px)) !important; 
+    border-top: 1px solid rgba(0, 186, 242, 0.2) !important; 
+}
     .tab-btn { 
         flex: 1; 
         padding: 8px 2px !important; 
@@ -325,10 +321,10 @@
     
     /* 🎯 फिक्स: एक्टिव होने पर बैकग्राउंड और बॉर्डर को डायनामिक थीम से लिंक किया */
     .tab-btn.active { 
-        color: #ffffff !important; 
-        border-top: 3px solid #facc15 !important; 
-        background: rgba(255, 255, 255, 0.15) !important; 
-    }
+    color: #ffffff !important; 
+    border-top: 3px solid #00baf2 !important; 
+    background: rgba(0, 186, 242, 0.15) !important; 
+}
     .tab-btn.active i { transform: translateY(-3px) scale(1.15); color: #ffffff !important; text-shadow: 0 2px 8px rgba(250, 204, 21, 0.4); }
     .tab-btn.active span { color: #ffffff !important; }
     
@@ -538,15 +534,15 @@
     
     /* 🌈 हेडर में प्रीमियम डार्क मल्टीकलर चलता हुआ इफेक्ट */
     .app-top-header { 
-        display: flex; 
-        justify-content: space-between; 
-        align-items: center; 
-        background: var(--theme-header-gradient) !important;
-        background-size: 300% 300% !important;
-        animation: movingGradient 8s ease infinite; 
-        color: white; 
-        box-shadow: 0 10px 15px -3px rgba(30, 64, 175, 0.2); 
-    }
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    background: linear-gradient(135deg, #002970 0%, #00baf2 100%) !important;
+    background-size: 300% 300% !important;
+    animation: movingGradient 8s ease infinite; 
+    color: white; 
+    box-shadow: 0 10px 25px -5px rgba(0, 41, 112, 0.35); 
+}
     .app-top-header span { font-weight: 900; font-size: 11.5px !important; letter-spacing: 0.2px; }
     .header-icon-btn { color: #facc15; background: none; border: none; cursor: pointer; font-size: 15px; padding: 0 4px; }
     .header-icon-btn.logout { color: #fda4af; font-size: 14px; margin-left: 2px;}
@@ -633,12 +629,12 @@
         box-shadow: none !important;
     }
     .login-btn-primary {
-        background: linear-gradient(90deg, #1e40af, #7c3aed) !important;
-        box-shadow: 0 6px 18px rgba(124, 58, 237, 0.35) !important;
-        border-radius: 14px !important;
-        font-size: 14px !important;
-        padding: 13px !important;
-    }
+    background: linear-gradient(135deg, #002970, #00baf2) !important;
+    box-shadow: 0 6px 18px rgba(0, 186, 242, 0.4) !important;
+    border-radius: 14px !important;
+    font-size: 14px !important;
+    padding: 13px !important;
+}
     .login-btn-bio {
         background: linear-gradient(135deg, #059669, #0d9488) !important;
         box-shadow: 0 6px 18px rgba(13, 148, 136, 0.35) !important;
@@ -670,23 +666,23 @@
     
     /* 🎯 फिक्स: डेस्कटॉप साइडबार अब गहरे काले के बजाय चुनी हुई थीम का मुख्य रंग ले लेगा */
     body.desktop-force .tab-bar { 
-        top: 0 !important; 
-        left: 0 !important; 
-        bottom: 0 !important; 
-        width: 250px !important; 
-        height: 100vh !important; 
-        flex-direction: column !important; 
-        justify-content: flex-start !important; 
-        padding: 30px 12px !important; 
-        background: linear-gradient(180deg, var(--theme-primary, #1e40af), var(--theme-primary-dark, #1d4ed8)) !important; 
-        box-shadow: 4px 0 25px rgba(15, 23, 42, 0.15) !important; 
-        position: fixed !important; 
-        border-radius: 0 !important; 
-        display: flex !important; 
-        border-right: 1px solid rgba(255, 255, 255, 0.08) !important;
-        border-top: none !important;
-        box-sizing: border-box !important;
-    }
+    top: 0 !important; 
+    left: 0 !important; 
+    bottom: 0 !important; 
+    width: 250px !important; 
+    height: 100vh !important; 
+    flex-direction: column !important; 
+    justify-content: flex-start !important; 
+    padding: 30px 12px !important; 
+    background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%) !important; 
+    box-shadow: 4px 0 25px rgba(0, 0, 0, 0.4) !important; 
+    position: fixed !important; 
+    border-radius: 0 !important; 
+    display: flex !important; 
+    border-right: 1px solid rgba(0, 186, 242, 0.15) !important;
+    border-top: none !important;
+    box-sizing: border-box !important;
+}
     /* 🦾 ULTRA-PREMIUM SIDEBAR TAB BUTTONS */
     body.desktop-force .tab-btn { 
         padding: 12px 18px !important; 
@@ -706,27 +702,28 @@
         transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
         box-sizing: border-box !important;
     }
-    body.desktop-force .tab-btn i { font-size: 15px !important; margin-right: 0px !important; color: rgba(255, 255, 255, 0.7) !important; transition: all 0.2s; }
-    body.desktop-force .tab-btn span { font-size: 12.5px !important; font-weight: 700 !important; color: rgba(255, 255, 255, 0.85) !important; letter-spacing: 0.3px; }
+    body.desktop-force .tab-btn i { font-size: 15px !important; margin-right: 0px !important; color: rgba(0, 186, 242, 0.9) !important; transition: all 0.2s; }
+body.desktop-force .tab-btn span { font-size: 12.5px !important; font-weight: 700 !important; color: #e2e8f0 !important; letter-spacing: 0.3px; }
     
     /* माउस ले जाने पर हल्का ग्लास इफेक्ट */
     body.desktop-force .tab-btn:hover {
-        background: rgba(255, 255, 255, 0.08) !important;
-        color: #ffffff !important;
-    }
+    background: rgba(0, 186, 242, 0.12) !important;
+    color: #ffffff !important;
+}
     
     /* 🎯 डेस्कटॉप एक्टिव टैब को सुपर-लक्ज़री कर्व्ड कैप्सूल लुक देने का फिक्स */
     body.desktop-force .tab-btn.active {
-        background: rgba(255, 255, 255, 0.18) !important;
-        color: #ffffff !important;
-        border-left: none !important;
-        box-shadow: inset 0 1px 1px rgba(255,255,255,0.2), 0 4px 12px rgba(0, 0, 0, 0.08) !important;
-    }
+    background: linear-gradient(90deg, rgba(0, 186, 242, 0.25), rgba(0, 186, 242, 0.1)) !important;
+    color: #ffffff !important;
+    border-left: 4px solid #00baf2 !important;
+    box-shadow: inset 0 1px 1px rgba(0, 186, 242, 0.2), 0 4px 15px rgba(0, 186, 242, 0.15) !important;
+    border-radius: 10px !important;
+}
     body.desktop-force .tab-btn.active i { 
-        transform: scale(1.1) !important; 
-        color: #facc15 !important; /* एक्टिव होने पर आइकॉन चमकीला पीला होगा */
-        text-shadow: 0 0 10px rgba(250, 204, 21, 0.5) !important;
-    }
+    transform: scale(1.1) !important; 
+    color: #00baf2 !important;
+    text-shadow: 0 0 12px rgba(0, 186, 242, 0.7) !important;
+}
     body.desktop-force .tab-btn.active span { 
         color: #ffffff !important; 
         font-weight: 900 !important; 
@@ -823,67 +820,7 @@
     </script>
 </head>
 <body>
-  <!-- 🛑 डेटा डाउनलोडिंग के दौरान आवश्यक निर्देश एवं डार्क वेटिंग स्क्रीन -->
-  <div id="dataDownloadInstructionScreen" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15, 23, 42, 0.94); z-index:99999999; align-items:center; justify-content:center; backdrop-filter:blur(8px); padding:16px; box-sizing:border-box;">
-    <div style="background:#ffffff; width:100%; max-width:440px; border-radius:20px; padding:22px 18px; box-shadow:0 25px 50px -12px rgba(0,0,0,0.6); border:2px solid #ef4444; position:relative; box-sizing:border-box; animation: popIn 0.3s ease;">
-      
-      <div style="text-align:center; margin-bottom:14px;">
-        <span style="background:#fee2e2; color:#b91c1c; font-size:15px; font-weight:900; padding:6px 16px; border-radius:30px; border:1.5px solid #f87171; display:inline-flex; align-items:center; gap:8px;">
-          <i class="fa-solid fa-triangle-exclamation fa-beat"></i> ⚠️ आवश्यक निर्देश ⚠️
-        </span>
-      </div>
 
-      <div style="background:#fff7ed; border-left:4px solid #ea580c; border:1px solid #fed7aa; border-radius:12px; padding:12px 10px; margin-bottom:18px; max-height:270px; overflow-y:auto;">
-        <ul style="list-style:none; padding:0; margin:0; font-size:12px; font-weight:800; color:#1e293b; line-height:1.6;">
-          <li style="margin-bottom:8px; display:flex; align-items:flex-start; gap:6px;">
-            <span style="color:#ea580c; font-weight:900;">1.</span>
-            <span>मैन और पोल मीटर के सही व वास्तविक रिमार्क ही दर्ज करें।</span>
-          </li>
-          <li style="margin-bottom:8px; display:flex; align-items:flex-start; gap:6px;">
-            <span style="color:#ea580c; font-weight:900;">2.</span>
-            <span>साइट से सही मीटर नंबर मैन एवं पोल मीटर का भरना अनिवार्य है।</span>
-          </li>
-          <li style="margin-bottom:8px; display:flex; align-items:flex-start; gap:6px;">
-            <span style="color:#ea580c; font-weight:900;">3.</span>
-            <span>साइट पर मास्टर मोबाइल नंबर गलत या पुराना है, तो नया 10 अंकों का सक्रिय नंबर अपडेट करना अनिवार्य है।</span>
-          </li>
-          <li style="margin-bottom:8px; display:flex; align-items:flex-start; gap:6px;">
-            <span style="color:#ea580c; font-weight:900;">4.</span>
-            <span>10 KW से अधिक भार वाले सभी स्मार्ट मीटर परिसरों पर पोल मीटर अनिवार्य रूप से चेक करें और 100% MRI करें।</span>
-          </li>
-          <li style="margin-bottom:8px; display:flex; align-items:flex-start; gap:6px;">
-            <span style="color:#ea580c; font-weight:900;">5.</span>
-            <span>मैन और पोल मीटर दोनों में कम से कम 97% लोड सर्वे डेटा लाना अनिवार्य है ऐसा न करने पर होने वाली कार्यवाही के लिए स्वयं जिम्मेदार होंगे।</span>
-          </li>
-          <li style="margin-bottom:8px; display:flex; align-items:flex-start; gap:6px;">
-            <span style="color:#ea580c; font-weight:900;">6.</span>
-            <span>बिल वितरण करते समय प्राप्तकर्ता का नाम, सही मोबाइल नंबर और हाथ में बिल लिए हुए स्पष्ट फोटो लेना अनिवार्य है।</span>
-          </li>
-          <li style="margin-bottom:8px; display:flex; align-items:flex-start; gap:6px;">
-            <span style="color:#ea580c; font-weight:900;">7.</span>
-            <span>दिन का कार्य समाप्त होने पर नेटवर्क क्षेत्र में आकर ऑफलाइन डेटा तुरंत सर्वर पर सिंक करें।</span>
-          </li>
-          <li style="display:flex; align-items:flex-start; gap:6px;">
-            <span style="color:#ea580c; font-weight:900;">8.</span>
-            <span>माह की दी गई टारगेट तारीख (8 तारीख) पर विजिट खत्म अवश्य करें।</span>
-          </li>
-        </ul>
-      </div>
-
-      <div style="background:#0f172a; border-radius:14px; padding:16px 12px; text-align:center; border:2px solid #3b82f6; box-shadow:0 8px 16px rgba(15,23,42,0.4);">
-        <div style="color:#facc15; font-size:24px; margin-bottom:8px;">
-          <i class="fa-solid fa-arrows-rotate fa-spin"></i>
-        </div>
-        <div style="font-size:16px; font-weight:900; color:#ffffff; line-height:1.4; letter-spacing:0.4px; text-transform:uppercase;">
-          "जब तक आपका डाटा सर्वर से डाउनलोड हो रहा है कृपया प्रतीक्षा करें"
-        </div>
-        <div style="font-size:11px; font-weight:700; color:#94a3b8; margin-top:8px;">
-          कृपया ऐप को बंद न करें, डेटा डाउनलोड होते ही स्क्रीन अपने आप खुल जाएगी...
-        </div>
-      </div>
-
-    </div>
-  </div>
 
   <!-- 🚀 क्लिकेबल अलर्ट: क्लिक पर डाउनलोड शुरू और अपने आप पतली स्ट्रिप में कन्वर्ट होने वाला बॉक्स -->
   <div id="thinDarkAlert" onclick="handleNotificationClickToDownload()" style="display:none; position:fixed; z-index:9999999; box-sizing:border-box; cursor:pointer; user-select:none; transition:all 0.3s cubic-bezier(0.4, 0, 0.2, 1);">
@@ -1052,9 +989,9 @@
             animation: boltPulseGlow 2.5s ease-in-out infinite !important;
         }
         .splash-title-text {
-            font-size: 26px !important;
+            font-size: 24px !important;
             font-weight: 900 !important;
-            letter-spacing: 0.8px !important;
+            letter-spacing: 0.5px !important;
             line-height: 1.25 !important;
             margin-bottom: 8px !important;
             background: linear-gradient(90deg, #ffffff, #93c5fd, #fef08a) !important;
@@ -1095,15 +1032,15 @@
             position: relative !important;
         }
         .splash-progress-stream {
-            position: absolute !important;
-            top: 0 !important;
-            left: 0 !important;
-            width: 100% !important;
-            height: 100% !important;
-            background: linear-gradient(90deg, transparent, #38bdf8, #facc15, transparent) !important;
-            border-radius: 12px !important;
-            animation: streamSlide 1.8s cubic-bezier(0.4, 0, 0.2, 1) infinite !important;
-        }
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    background: linear-gradient(90deg, transparent, #00baf2, #facc15, transparent) !important;
+    border-radius: 12px !important;
+    animation: streamSlide 1.8s cubic-bezier(0.4, 0, 0.2, 1) infinite !important;
+}
         .splash-footer-box {
             position: absolute !important;
             bottom: 30px !important;
@@ -1144,24 +1081,26 @@
         }
     </style>
 
-    <div id="appSplashScreen" class="modern-splash-backdrop">
-        <div class="splash-glass-card">
-            <!-- ⚡ चमकती हुई बिजली का आइकॉन -->
-            <div class="splash-icon-halo">
-                <i class="fa-solid fa-bolt splash-bolt-svg"></i>
+    <div id="appSplashScreen" class="modern-splash-backdrop" style="background: linear-gradient(-45deg, #002970, #0086b3, #00baf2, #002970) !important; background-size: 350% 350% !important;">
+        <div class="splash-glass-card" style="background: rgba(0, 41, 112, 0.75) !important; border: 1.5px solid rgba(0, 186, 242, 0.4) !important;">
+            <!-- 🎯 DVVNL LOGO (Bada Kiya Gaya) -->
+            <div style="text-align: center; margin-bottom: 18px;">
+                <div style="background: #ffffff; width: 150px; height: 150px; margin: 0 auto; border-radius: 32px; display: flex; align-items: center; justify-content: center; box-shadow: 0 20px 45px -5px rgba(0, 186, 242, 0.6), 0 0 40px rgba(255, 255, 255, 0.25); padding: 10px; box-sizing: border-box; border: 4px solid #00baf2;">
+                    <img src="https://lh3.googleusercontent.com/d/1do652Y1yo4YXFWj9rVhA678z_bUSgIk0" style="width: 100%; height: 100%; border-radius: 24px; object-fit: contain;" alt="DVVNL Logo" onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=\'fa-solid fa-bolt\' style=\'font-size:72px; color:#00baf2;\'></i>';">
+                </div>
             </div>
             
             <!-- मुख्य शीर्षक -->
-            <div class="splash-title-text">DvVNL Reading Tool</div>
+            <div class="splash-title-text" style="background: linear-gradient(90deg, #ffffff, #00baf2, #facc15) !important; -webkit-background-clip: text !important; -webkit-text-fill-color: transparent !important;">DvVNL Mainpuri Reporting App</div>
             
             <!-- कंपनी सब-हेडिंग बैज -->
-            <div class="splash-company-badge">
+            <div class="splash-company-badge" style="background: rgba(0, 186, 242, 0.2) !important; border: 1px solid rgba(0, 186, 242, 0.4) !important; color: #00baf2 !important;">
                 <i class="fa-solid fa-building-columns"></i> SAI COMPUTERS LTD MAINPURI
             </div>
             
             <!-- लोडिंग स्थिति संदेश -->
             <div class="splash-status-line">
-                <i class="fa-solid fa-arrows-rotate fa-spin" style="color: #38bdf8;"></i>
+                <i class="fa-solid fa-arrows-rotate fa-spin" style="color: #00baf2;"></i>
                 <span>एप्लिकेशन लोड हो रहा है, कृपया प्रतीक्षा करें...</span>
             </div>
             
@@ -1173,11 +1112,11 @@
 
         <!-- डेवलपर एवं सपोर्ट फुटर -->
         <div class="splash-footer-box">
-            <div class="splash-dev-badge">
+            <div class="splash-dev-badge" style="background: rgba(0, 41, 112, 0.7) !important; border: 1px solid rgba(0, 186, 242, 0.3) !important;">
                 <div style="color: #f8fafc; font-size: 13.5px; font-weight: 900; letter-spacing: 0.4px;">
-                    Developed by: अनुराग शाक्य
+                    Developed by: Anurag Shakya
                 </div>
-                <div style="color: #38bdf8; font-size: 12.5px; font-weight: 800; margin-top: 3px;">
+                <div style="color: #00baf2; font-size: 12.5px; font-weight: 800; margin-top: 3px;">
                     <i class="fa-solid fa-phone-volume" style="font-size: 11px;"></i> +91 9761414105
                 </div>
             </div>
@@ -1189,8 +1128,8 @@
     <div id="loginView" class="card" style="display: none;">
         <!-- ⚡ ग्लोइंग मल्टीकलर लोगो -->
         <div class="login-logo-container">
-            <div class="login-logo-wrapper">
-                <i class="fa-solid fa-bolt"></i>
+            <div class="login-logo-wrapper" style="background: linear-gradient(135deg, #002970, #00baf2) !important; padding: 8px; box-sizing: border-box;">
+                <img src="https://lh3.googleusercontent.com/d/1do652Y1yo4YXFWj9rVhA678z_bUSgIk0" style="width: 100%; height: 100%; border-radius: 18px; object-fit: contain;" alt="DVVNL Logo" onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=\'fa-solid fa-bolt\' style=\'font-size:38px; color:#facc15;\'></i>';">
             </div>
         </div>
 
@@ -1328,32 +1267,23 @@
         <!-- 🎯 अल्टीमेट फिक्स: स्टेटस बार और कैमरे के लिए ऊपर 35px का फिक्स खाली स्पेस -->
         <div style="width: 100%; height: 35px; display: block; clear: both; pointer-events: none;"></div>
 
-        <div class="app-top-header" style="position: relative; padding: 10px 8px !important; margin: 0 -8px 12px -8px !important; border-radius: 0 0 12px 12px !important; z-index: 10005; display: flex !important; justify-content: space-between !important; align-items: center !important; gap: 4px;">
+        <div class="app-top-header" style="position: relative; padding: 6px 10px !important; margin: 0 -8px 8px -8px !important; border-radius: 0 0 10px 10px !important; z-index: 10005; display: flex !important; justify-content: space-between !important; align-items: center !important; gap: 4px; min-height: 38px;">
             
             <div style="display: flex; align-items: center; gap: 6px; flex: 1; min-width: 0;">
-                <button onclick="toggleReportSidebar(true)" class="header-icon-btn" style="color: white; font-size: 16px; padding: 0 2px; flex-shrink: 0;"><i class="fa-solid fa-bars"></i></button>
+                <button id="headerMenuBtn" onclick="toggleReportSidebar(true)" class="header-icon-btn" style="color: white; font-size: 15px; padding: 0 2px; flex-shrink: 0; display: none;"><i class="fa-solid fa-bars"></i></button>
                 
-                <span style="font-size: 11.5px !important; font-weight: 900; color: white; letter-spacing: 0.2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: inline-flex; align-items: center; gap: 3px; flex-shrink: 0;">
-                    <i class="fa-solid fa-bolt" style="color: #facc15;"></i> DvVNL Billing
+                <span style="font-size: 11px !important; font-weight: 900; color: white; letter-spacing: 0.2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: inline-flex; align-items: center; gap: 3px; flex-shrink: 0;">
+                    <i class="fa-solid fa-bolt" style="color: #facc15; font-size: 10px;"></i> DvVNL Billing
                 </span>
-                
-                <button id="headerFilterBtn" onclick="toggleHeaderFilterDropdown(event)" class="header-icon-btn" style="color: #facc15; font-size: 11px !important; display: none; background: rgba(255,255,255,0.15); padding: 4px 6px !important; border-radius: 4px; white-space: nowrap; flex-shrink: 0; margin-left: 2px; line-height: 1;">
-                    <i class="fa-solid fa-filter" style="font-size: 10px;"></i> फ़िल्टर <i class="fa-solid fa-caret-down" style="font-size: 8px;"></i>
-                </button>
-
-                <div id="headerFilterDropdownContent" style="display: none; position: absolute; top: 100%; left: 8px; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px; max-height: 280px; width: 220px; overflow-y: auto; z-index: 1010; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.3); -webkit-overflow-scrolling: touch; margin-top: 2px;">
-                    <div id="headerReaderCheckboxesContainer" style="display: flex; flex-direction: column; gap: 4px;"></div>
-                </div>
             </div>
             
-            <div style="display: flex; align-items: center; gap: 8px; flex-shrink: 0;">
-                <button onclick="syncOfflineDataToServer()" class="header-icon-btn" title="Sync Manual Entry to Server" style="color: #10b981; font-size: 16px; padding: 2px; position: relative;">
+            <div style="display: flex; align-items: center; gap: 6px; flex-shrink: 0;">
+                <button onclick="syncOfflineDataToServer()" class="header-icon-btn" title="Sync Manual Entry to Server" style="color: #10b981; font-size: 14px; padding: 2px; position: relative;">
                     <i class="fa-solid fa-cloud-arrow-up"></i>
-                    <span id="headerSyncDotBadge" style="display:none; position:absolute; top:-4px; right:-6px; background:#ef4444; color:#ffffff; font-size:9px; font-weight:900; padding:1px 4px; border-radius:10px; border:1.5px solid #ffffff; line-height:1; min-width:14px; text-align:center;">0</span>
+                    <span id="headerSyncDotBadge" style="display:none; position:absolute; top:-4px; right:-6px; background:#ef4444; color:#ffffff; font-size:8px; font-weight:900; padding:1px 4px; border-radius:10px; border:1.5px solid #ffffff; line-height:1; min-width:12px; text-align:center;">0</span>
                 </button>
-                <!-- Theme Palette & Manual Color Picker Buttons Removed -->
-                <button onclick="forceAppCodeUpdate()" class="header-icon-btn" title="Download New App Update" style="color: #facc15; font-size: 15px; padding: 2px;"><i class="fa-solid fa-cloud-arrow-down"></i></button>
-                <button onclick="logoutSafely()" class="header-icon-btn logout" title="Logout" style="color: #fda4af; font-size: 14px; padding: 2px; margin-left: 2px;"><i class="fa-solid fa-power-off"></i></button>
+                <button onclick="forceAppCodeUpdate()" class="header-icon-btn" title="Download New App Update" style="color: #facc15; font-size: 13px; padding: 2px;"><i class="fa-solid fa-cloud-arrow-down"></i></button>
+                <button onclick="logoutSafely()" class="header-icon-btn logout" title="Logout" style="color: #fda4af; font-size: 13px; padding: 2px; margin-left: 0px;"><i class="fa-solid fa-power-off"></i></button>
             </div>
         </div>
 
@@ -1438,75 +1368,116 @@
             <!-- 🔔 नोटिफिकेशन यहाँ पट्टी और Last Updated के बीच में दिखेगा -->
             <div id="alertPlaceholderContainer"></div>
 
-            <!-- ⚡ एकीकृत क्लिकेबल लास्ट अपडेटेड बार (मास्टर डेटा डाउनलोड) -->
-            <div id="lastUpdatedLabel" onclick="refreshDataFromServer(true)" style="text-align: center; font-size: 12px; font-weight: 900; margin-bottom: 16px; color: #ffffff; background: linear-gradient(90deg, #0f172a, #1e293b, #0f172a); padding: 10px 18px; border-radius: 30px; border: 1.5px solid #334155; letter-spacing: 0.5px; text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; box-sizing: border-box; box-shadow: 0 4px 14px rgba(15,23,42,0.25); cursor: pointer; user-select: none;" title="क्लिक करके मास्टर डेटा डाउनलोड करें">
-                <i id="syncRotateIcon" class="fa-solid fa-cloud-arrow-down" style="color: #facc15; font-size: 15px;"></i>
+            <!-- ⚡ एकीकृत क्लिकेबल लास्ट अपडेटेड बार (मास्टर डेटा डाउनलोड) - Compact -->
+            <div id="lastUpdatedLabel" onclick="refreshDataFromServer(true)" style="text-align: center; font-size: 10.5px; font-weight: 800; margin-bottom: 10px; color: #ffffff; background: linear-gradient(90deg, #0f172a, #1e293b, #0f172a); padding: 6px 14px; border-radius: 20px; border: 1px solid #334155; letter-spacing: 0.3px; text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; box-sizing: border-box; box-shadow: 0 2px 8px rgba(15,23,42,0.2); cursor: pointer; user-select: none;" title="क्लिक करके मास्टर डेटा डाउनलोड करें">
+                <i id="syncRotateIcon" class="fa-solid fa-cloud-arrow-down" style="color: #facc15; font-size: 12px;"></i>
                 <span>LAST UPDATED:- <span id="lastUpdatedTimeSpan" style="color: #facc15; margin-left: 2px;">NOT DOWNLOADED YET</span></span>
-                <span style="font-size: 9.5px; background: rgba(250,204,21,0.15); color: #facc15; border: 1px solid #facc15; padding: 2px 8px; border-radius: 12px; margin-left: 4px;"><i class="fa-solid fa-arrow-down"></i> SYNC</span>
+                <span style="font-size: 8.5px; background: rgba(250,204,21,0.15); color: #facc15; border: 1px solid #facc15; padding: 1px 6px; border-radius: 10px; margin-left: 2px;"><i class="fa-solid fa-arrow-down"></i> SYNC</span>
+            </div>
+
+            <!-- 🌅 PROFESSIONAL GREETING HEADER (Thin greeting + Bold User Name) -->
+            <div id="professionalGreetingBox" style="max-width: 440px; margin: 12px auto 16px auto; padding: 10px 16px; background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%); border-radius: 14px; border-left: 5px solid #1e40af; border-top: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; box-shadow: 0 4px 12px rgba(30, 64, 175, 0.08); display: flex; align-items: center; gap: 12px; box-sizing: border-box;">
+                
+                <!-- Left: User Avatar Circle -->
+                <div style="width: 42px; height: 42px; flex-shrink: 0; background: linear-gradient(135deg, #1e40af, #3b82f6); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(30, 64, 175, 0.25); border: 2px solid #ffffff;">
+                    <i class="fa-solid fa-user-tie" style="color: #ffffff; font-size: 18px;"></i>
+                </div>
+                
+                <!-- Right: Greeting + Name -->
+                <div style="flex: 1; min-width: 0; text-align: left;">
+                    <div id="greetingLine" style="font-size: 10.5px; font-weight: 800; color: #64748b; letter-spacing: 0.4px; text-transform: uppercase; line-height: 1.2; margin-bottom: 2px;">
+                        <i class="fa-solid fa-hand-wave" style="color: #f59e0b; font-size: 10px;"></i> Good Morning
+                    </div>
+                    <div id="greetingUserName" style="font-size: 16px; font-weight: 900; color: #0f172a; letter-spacing: 0.2px; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                        Loading Profile...
+                    </div>
+                </div>
+                
+                <!-- Right: Live Time Badge (optional) -->
+                <div style="flex-shrink: 0; text-align: right;">
+                    <div style="font-size: 9px; font-weight: 800; color: #1e40af; background: #dbeafe; padding: 3px 8px; border-radius: 10px; border: 1px solid #93c5fd; white-space: nowrap;">
+                        <i class="fa-solid fa-circle" style="color: #22c55e; font-size: 6px; margin-right: 3px;"></i> ONLINE
+                    </div>
+                </div>
             </div>
 
             <!-- 🌟 मुख्य 4 बड़े राउंडेड कार्ड्स (डिफ़ॉल्ट रूप से केवल यही 4 कार्ड्स दिखेंगे) -->
-            <div id="mainHubCardsContainer" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; padding: 15px 5px; width: 100%; max-width: 440px; margin: 15px auto 25px auto; box-sizing: border-box;">
+            <div id="mainHubCardsContainer" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; padding: 5px 5px 15px 5px; width: 100%; max-width: 440px; margin: 0 auto 12px auto; box-sizing: border-box;">
                 <style>
                     .portal-square-card {
                         background: #ffffff;
                         border: 2px solid #e2e8f0;
-                        border-radius: 26px;
-                        padding: 22px 10px;
+                        border-radius: 32px;
+                        padding: 26px 12px;
                         display: flex;
                         flex-direction: column;
                         align-items: center;
                         justify-content: center;
                         cursor: pointer;
-                        box-shadow: 0 10px 25px -4px rgba(15, 23, 42, 0.08);
+                        box-shadow: 0 12px 28px -6px rgba(15, 23, 42, 0.12);
                         transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-                        min-height: 120px;
+                        min-height: 145px;
                         user-select: none;
                     }
                     .portal-square-card:active { transform: scale(0.92); }
                     .portal-square-card .icon-box {
-                        width: 55px;
-                        height: 55px;
-                        border-radius: 18px;
+                        width: 72px;
+                        height: 72px;
+                        border-radius: 24px;
                         display: flex;
                         align-items: center;
                         justify-content: center;
-                        margin-bottom: 10px;
+                        margin-bottom: 14px;
                     }
-                    .portal-square-card i { font-size: 26px; }
-                    .portal-square-card span { font-size: 13.5px; font-weight: 900; letter-spacing: 0.4px; text-transform: uppercase; color: #0f172a; }
+                    .portal-square-card i { font-size: 34px; }
+                    .portal-square-card span { font-size: 14px; font-weight: 900; letter-spacing: 0.5px; text-transform: uppercase; color: #0f172a; }
                 </style>
 
-                <!-- कार्ड 1: Dashboard -->
+                <!-- कार्ड 1: Dashboard (Speedometer Gauge) -->
                 <div class="portal-square-card" onclick="selectHubMode('dashboard')">
-                    <div class="icon-box" style="background: #eff6ff;">
-                        <i class="fa-solid fa-chart-pie" style="color: #2563eb;"></i>
+                    <div class="icon-box" style="background: linear-gradient(135deg, #dbeafe, #bfdbfe);">
+                        <i class="fa-solid fa-gauge-high" style="color: #2563eb;"></i>
                     </div>
                     <span>Dashboard</span>
                 </div>
 
-                <!-- कार्ड 2: Consumers -->
+                <!-- कार्ड 2: Consumers (User Group) -->
                 <div class="portal-square-card" onclick="selectHubMode('consumers')">
-                    <div class="icon-box" style="background: #eef2ff;">
-                        <i class="fa-solid fa-users" style="color: #4f46e5;"></i>
+                    <div class="icon-box" style="background: linear-gradient(135deg, #e0e7ff, #c7d2fe);">
+                        <i class="fa-solid fa-user-group" style="color: #4f46e5;"></i>
                     </div>
                     <span>Consumers</span>
                 </div>
 
-                <!-- कार्ड 3: Bills -->
+                <!-- कार्ड 3: Bills (Receipt) -->
                 <div class="portal-square-card" onclick="selectHubMode('bills')">
-                    <div class="icon-box" style="background: #fff7ed;">
-                        <i class="fa-solid fa-file-invoice-dollar" style="color: #ea580c;"></i>
+                    <div class="icon-box" style="background: linear-gradient(135deg, #ffedd5, #fed7aa);">
+                        <i class="fa-solid fa-receipt" style="color: #ea580c;"></i>
                     </div>
                     <span>Bills</span>
                 </div>
 
-                <!-- कार्ड 4: Reports -->
+                <!-- कार्ड 4: Reports (Chart Line) -->
                 <div class="portal-square-card" onclick="selectHubMode('reports')">
-                    <div class="icon-box" style="background: #f0fdfa;">
-                        <i class="fa-solid fa-folder-tree" style="color: #0d9488;"></i>
+                    <div class="icon-box" style="background: linear-gradient(135deg, #ccfbf1, #99f6e4);">
+                        <i class="fa-solid fa-chart-line" style="color: #0d9488;"></i>
                     </div>
                     <span>Reports</span>
+                </div>
+            </div>
+
+            <!-- 🎯 CARDS KE THEEK NEECHE ADMIN FILTER CONTAINER -->
+            <div id="bottomCardsFilterBox" style="display: none; max-width: 440px; margin: 0 auto 16px auto; width: 100%; box-sizing: border-box; position: relative;">
+                <div onclick="toggleHeaderFilterDropdown(event)" style="background: #ffffff; border: 1.5px solid #3b82f6; border-radius: 12px; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; box-shadow: 0 4px 12px rgba(37,99,235,0.08); user-select: none;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <i class="fa-solid fa-users-gear" style="color: #2563eb; font-size: 14px;"></i>
+                        <span id="bottomFilterSelectedSummary" style="font-size: 12px; font-weight: 800; color: #1e40af;">फ़िल्टर मीटर रीडर (All Selected)</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-down" id="bottomFilterArrowIcon" style="color: #2563eb; font-size: 11px; transition: transform 0.2s;"></i>
+                </div>
+                
+                <div id="headerFilterDropdownContent" style="display: none; position: absolute; top: 100%; left: 0; right: 0; background: #ffffff; border: 1.5px solid #bfdbfe; border-radius: 12px; padding: 10px 12px; max-height: 260px; overflow-y: auto; z-index: 10005; box-shadow: 0 12px 30px rgba(15,23,42,0.2); margin-top: 4px; box-sizing: border-box;">
+                    <div id="headerReaderCheckboxesContainer" style="display: flex; flex-direction: column; gap: 5px;"></div>
                 </div>
             </div>
 
@@ -1967,63 +1938,38 @@
                         <i class="fa-solid fa-microphone" onclick="startVoiceSearch('reportSearchBar', 'reportListContainer')" style="position: absolute; right: 8px; color: #1e40af; cursor: pointer; font-size: 12px; padding: 2px; z-index: 10;"></i>
                     </div>
 
-                    <!-- लोड फ़िल्टर (छिपाया गया) -->
-                    <select id="reportLoadCategoryFilter" style="display: none;" onchange="applyRemarkGroupFilter()">
-                        <option value="ALL" selected>Load: All</option>
-                        <option value="5">5 KW</option>
-                        <option value="10">10 KW</option>
-                    </select>
-
-                    <!-- डायनामिक रिमार्क फ़िल्टर (जो लिस्ट में रिमार्क होंगे वही दिखेंगे) -->
+                    <!-- डायनामिक रिमार्क फ़िल्टर -->
                     <select id="reportMainRemarkFilter" style="flex: 1.2; font-weight: bold; color: #7c3aed; padding: 0 6px; font-size: 11px; border: 1px solid #cbd5e1; border-radius: 8px; height: 32px; background: #fff;" onchange="applyRemarkGroupFilter()">
                         <option value="ALL">Remark: All</option>
                     </select>
-
-                    <select id="reportPoleRemarkFilter" style="display: none;" onchange="applyRemarkGroupFilter()">
-                        <option value="ALL">Pole: All</option>
-                    </select>
-                    <select id="reportWaFilter" style="display: none;" onchange="applyRemarkGroupFilter()">
-                        <option value="ALL">WA: All</option>
-                    </select>
                     <div id="reportSelectAllWrapper" style="display: none;"></div>
-                </div>
-
-                <div id="groupFilterContainer" style="display: none;">
-                    <select id="reportRemarkFilterGroup" style="display: none;"></select>
                 </div>
                 
                 <div id="reportListContainer"></div>
             </div>
         </div>
-        <!-- फिक्स: होम स्क्रीन के लिए नीचे एक्स्ट्रा स्पेस और प्रीमियम ब्रांडिंग फ़ुटर इंजन -->
-        <div style="width: 100%; height: 40px; clear: both; display: block !important; visibility: hidden; pointer-events: none;"></div>
+        <!-- 🪶 Compact Footer Branding Strip (Patli Patti) -->
+        <div style="width: 100%; height: 25px; clear: both; display: block !important; visibility: hidden; pointer-events: none;"></div>
         
-        <div style="background: #ffffff; border-radius: 16px; padding: 16px 20px; margin: 15px auto 25px auto; max-width: 500px; text-align: center; border: 1.5px solid #e2e8f0; box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.08), 0 4px 6px -2px rgba(15, 23, 42, 0.04);">
+        <div style="background: linear-gradient(135deg, #f8fafc, #eff6ff); border-radius: 10px; padding: 8px 14px; margin: 8px auto 15px auto; max-width: 500px; text-align: center; border: 1px solid #cbd5e1; box-shadow: 0 2px 6px rgba(15, 23, 42, 0.05); display: flex; justify-content: center; align-items: center; gap: 10px; flex-wrap: wrap;">
+            
             <!-- Version Badge -->
-            <div style="display: inline-flex; align-items: center; gap: 5px; background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; font-size: 11.5px; font-weight: 900; padding: 3px 12px; border-radius: 20px; letter-spacing: 0.8px; margin-bottom: 10px;">
-                <i class="fa-solid fa-code-branch" style="font-size: 10px;"></i> RELEASE V20.8.95
-            </div>
-
-            <!-- User Greeting & Name -->
-            <div style="font-size: 16px; font-weight: 900; color: #1e3a8a; letter-spacing: 0.4px; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 8px;">
-                <div style="width: 32px; height: 32px; background: #eff6ff; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid #bfdbfe;">
-                    <i class="fa-solid fa-user-check" style="color: #2563eb; font-size: 14px;"></i>
-                </div>
-                <span id="welcomeTxt">Welcome | Loading Profile...</span>
-            </div>
-
-            <!-- Developer & Contact Info -->
-            <div style="border-top: 1.5px dashed #cbd5e1; padding-top: 10px; display: flex; justify-content: center; align-items: center; gap: 14px; flex-wrap: wrap;">
-                <span style="font-size: 13.5px; font-weight: 800; color: #334155; display: inline-flex; align-items: center; gap: 6px;">
-                    <i class="fa-solid fa-laptop-code" style="color: #6366f1;"></i> Developed by: Er. Anurag Shakya
-                </span>
-                <span style="font-size: 13.5px; font-weight: 900; color: #059669; display: inline-flex; align-items: center; gap: 6px; background: #f0fdf4; padding: 3px 10px; border-radius: 8px; border: 1px solid #bbf7d0;">
-                    <i class="fa-solid fa-phone-volume" style="font-size: 12px;"></i> +91 9761414105
-                </span>
-            </div>
+            <span style="display: inline-flex; align-items: center; gap: 4px; background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; font-size: 10px; font-weight: 900; padding: 2px 8px; border-radius: 12px; letter-spacing: 0.4px;">
+                <i class="fa-solid fa-code-branch" style="font-size: 9px;"></i> V1.2.0
+            </span>
+            
+            <!-- Developer Name -->
+            <span style="font-size: 11px; font-weight: 800; color: #334155; display: inline-flex; align-items: center; gap: 4px;">
+                <i class="fa-solid fa-laptop-code" style="color: #6366f1; font-size: 10px;"></i> Er. Anurag Shakya
+            </span>
+            
+            <!-- Contact Info -->
+            <span style="font-size: 11px; font-weight: 900; color: #059669; display: inline-flex; align-items: center; gap: 4px; background: #f0fdf4; padding: 2px 8px; border-radius: 10px; border: 1px solid #bbf7d0;">
+                <i class="fa-solid fa-phone-volume" style="font-size: 9px;"></i> +91 9761414105
+            </span>
         </div>
         
-        <div style="width: 100%; height: 20px; clear: both; display: block !important; visibility: hidden; pointer-events: none;"></div>
+        <div style="width: 100%; height: 12px; clear: both; display: block !important; visibility: hidden; pointer-events: none;"></div>
 
     <!-- 📱 ऑटो-सिंक बॉटम बार (शुरुआत में बिल्कुल छुपा रहेगा) -->
     <div class="tab-bar" id="dynamicBottomTabBar" style="display: none !important;">
@@ -2166,14 +2112,6 @@ try {
 } catch(manifestErr) {
     console.warn("Manifest Blob bypass in sandbox:", manifestErr);
 }
-
-var deferredPrompt;
-window.addEventListener('beforeinstallprompt', (e) => {
-    deferredPrompt = e;
-});
-
-// 🎨 वैश्विक थीम लिस्ट इंजन
-var availableThemesList = ["default", "velvet", "teal", "gold", "midnight", "pink", "cyber", "sunset", "frost", "emerald", "volcano", "nebula", "espresso", "steel", "cherry", "ocean", "plum", "lemon", "imperial"];
 var db = null; var loggedInReader = ""; var activeReportType = "";
 var currentReportDataList = []; var viewHistoryStack = []; var adminSelectedReaders = [];
 var globalReportConfigs = []; // शीट कॉन्फ़िगरेशन को स्टोर करने के लिए
@@ -2399,7 +2337,10 @@ function getRobustKey(obj, searchKey) {
                                 var key = val.accountNo || ("key_" + Date.now());
                                 memoryStorage[storeName][key] = val;
                                 var req = { result: key, onsuccess: null };
-                                setTimeout(function() { if (req.onsuccess) req.onsuccess({ target: req }); }, 0);
+                                setTimeout(function() { 
+                                    if (req.onsuccess) req.onsuccess({ target: req }); 
+                                    if (currentTx.oncomplete) currentTx.oncomplete();
+                                }, 0);
                                 return req;
                             },
                             clear: function() {
@@ -2663,25 +2604,116 @@ function getRobustKey(obj, searchKey) {
                 if(savedRepType) openReportGroupView(savedRepType);
             }
             
-            // 🚀 डिवाइस चेक: केवल तय 4 स्लॉट में ऑटो-डाउनलोड होगा, बाकी समय सिर्फ मैन्युअल क्लिक पर
+            // 🚀 SPLASH SCREEN PAR DATA DOWNLOAD ENGINE (10 Second tak Splash Screen par hi rahega)
+            var splash = document.getElementById('appSplashScreen');
+            var downloadCompletedOrFailed = false;
+            
+            // Splash Screen update karein - loading text
+            var splashStatusNode = document.querySelector('.splash-status-line span');
+            if (splashStatusNode) {
+                splashStatusNode.innerText = "डेटा डाउनलोड हो रहा है, कृपया प्रतीक्षा करें...";
+            }
+            
+            // Function jo splash ko hide karega
+            var hideSplashAndOpenApp = function() {
+                if (downloadCompletedOrFailed) return;
+                downloadCompletedOrFailed = true;
+                if (splash) {
+                    splash.style.setProperty("display", "none", "important");
+                    splash.style.setProperty("visibility", "hidden", "important");
+                    splash.style.setProperty("opacity", "0", "important");
+                    splash.style.setProperty("z-index", "-9999", "important");
+                }
+            };
+            
             if (navigator.onLine) {
-                var splash = document.getElementById('appSplashScreen');
                 if (window.isDesktopDevice) {
-                    if (splash) splash.style.setProperty("display", "none", "important");
-                    showThinAlert("🖥️ कंप्यूटर मोड: लाइव डेटा लोड करने के लिए LAST UPDATED बार पर क्लिक करें।", true);
-                } else if (shouldTriggerScheduledSlotDownload()) {
-                    showThinAlert("⚡ तय समय का स्लॉट डेटा डाउनलोड हो रहा है...", false);
-                    executeSafeSyncAndDownloadWorkflow(function() {
-                        if (splash) splash.style.setProperty("display", "none", "important");
-                    });
+                    // Desktop: 2 second baad splash hatayega, background mein silent download chalega
+                    setTimeout(function() {
+                        hideSplashAndOpenApp();
+                        showThinAlert("🖥️ कंप्यूटर मोड: LAST UPDATED बार पर क्लिक करके लाइव डेटा लोड करें।", true);
+                    }, 2000);
+                    
+                    // Desktop par bhi silent download trigger karein
+                    setTimeout(function() {
+                        triggerSilentBackgroundDataDownload();
+                    }, 2500);
+                    
                 } else {
-                    if (splash) splash.style.setProperty("display", "none", "important");
-                    showThinAlert("✅ ऑफलाइन डेटा लोड है। नया डेटा चाहिए तो LAST UPDATED पर क्लिक करें।", true);
+                    // 📱 MOBILE: Splash screen par hi data download karein, minimum 10 second dikhayein
+                    var splashStartTime = new Date().getTime();
+                    var MIN_SPLASH_TIME = 10000; // 10 second minimum
+                    
+                    showThinAlert("⚡ डेटा डाउनलोड हो रहा है, कृपया प्रतीक्षा करें...", false);
+                    
+                    // 🔊 VOICE — SPLASH SCREEN DIKHTE HI TURANT BAJAO (1 second delay se)
+                    var voiceAlreadyPlayed = false;
+                    var playDownloadVoice = function(successFlag) {
+                        if (voiceAlreadyPlayed) return;
+                        voiceAlreadyPlayed = true;
+                        
+                        try {
+                            var hrNow = new Date().getHours();
+                            var greetVoice = "Good Morning";
+                            if(hrNow >= 12 && hrNow < 17) greetVoice = "Good Afternoon";
+                            else if(hrNow >= 17 && hrNow < 21) greetVoice = "Good Evening";
+                            else if(hrNow >= 21 || hrNow < 5) greetVoice = "Good Night";
+                            
+                            var readerNameProper = toTitleProperCase(loggedInReader || "User");
+                            var voiceMsg = greetVoice + " " + readerNameProper + " जी, आपका डेटा डाउनलोड हो रहा है। कृपया प्रतीक्षा करें।";
+                            console.log("🔊 Voice Triggered from Splash:", voiceMsg);
+                            speakHindiVoice(voiceMsg);
+                        } catch(ve) {
+                            console.error("Voice error:", ve);
+                        }
+                    };
+                    
+                    // 🎯 VOICE TURANT TRIGGER — 1 second baad (splash screen dikhte hi)
+                    setTimeout(function() {
+                        playDownloadVoice(false);
+                    }, 1000);
+
+                    // Data download trigger karein
+                    executeSafeSyncAndDownloadWorkflow(function() {
+                        var elapsedTime = new Date().getTime() - splashStartTime;
+                        var remainingTime = MIN_SPLASH_TIME - elapsedTime;
+                        
+                        if (remainingTime > 0) {
+                            setTimeout(function() {
+                                hideSplashAndOpenApp();
+                                setTimeout(function() {
+                                    autoTriggerSilentDownloadIfStale();
+                                }, 500);
+                            }, remainingTime);
+                        } else {
+                            hideSplashAndOpenApp();
+                            setTimeout(function() {
+                                autoTriggerSilentDownloadIfStale();
+                            }, 500);
+                        }
+                    });
+                    
+                    // Safety fallback: 15 second baad har haal mein splash hata do
+                    setTimeout(function() {
+                        hideSplashAndOpenApp();
+                    }, 15000);
                 }
             } else {
-                var splash = document.getElementById('appSplashScreen');
-                if (splash) splash.style.setProperty("display", "none", "important");
-                showThinAlert("⚠️ इंटरनेट बंद है! केवल ऑफलाइन डेटा दिखाया जा रहा है।", true);
+                // Internet off hai
+                var splashStartTimeOffline = new Date().getTime();
+                setTimeout(function() {
+                    hideSplashAndOpenApp();
+                    showThinAlert("⚠️ इंटरनेट बंद है! केवल ऑफलाइन डेटा दिखाया जा रहा है।", true);
+                    
+                    // Internet online hone par auto-download trigger
+                    window.addEventListener('online', function() {
+                        setTimeout(function() {
+                            if (navigator.onLine) {
+                                autoTriggerSilentDownloadIfStale();
+                            }
+                        }, 1000);
+                    }, { once: true });
+                }, 2000);
             }
 
             // 📢 1 घंटे से पुराने डेटा की तुरंत जांच एवं वॉयस अनाउंसमेंट
@@ -2830,22 +2862,7 @@ function renderDropdownsHTML(divSet, selectDiv, currentDivSelection, loadGroupSe
         else selectLoad.value = "ALL";
     }
 }
-
-// ड्रॉपडाउन रेंडर करने का हेल्पर इंजन
-function renderDivisionDropdownHTML(divSet, select, currentSelection) {
-    select.innerHTML = '<option value="ALL">All Div</option>';
-    var sortedDivs = Array.from(divSet).sort();
-    sortedDivs.forEach(function(div) { 
-        select.innerHTML += '<option value="' + div + '">' + div + '</option>'; 
-    });
-    if (divSet.has(currentSelection)) { 
-        select.value = currentSelection; 
-    } else {
-        select.value = "ALL";
-    }
-}
-
-    // 🚀 नोटिफिकेशन पर क्लिक करने पर डाउनलोडिंग शुरू और बॉक्स को तुरंत बिल्कुल पतला (Slim) करने का इंजन
+ // 🚀 नोटिफिकेशन पर क्लिक करने पर डाउनलोडिंग शुरू और बॉक्स को तुरंत बिल्कुल पतला (Slim) करने का इंजन
     function handleNotificationClickToDownload() {
         var el = document.getElementById('thinDarkAlert');
         if (!el) return;
@@ -3010,26 +3027,13 @@ function executeSafeSyncAndDownloadWorkflow(onComplete) {
         
         isDownloadingMasterData = true;
 
-        var instructScreen = document.getElementById('dataDownloadInstructionScreen');
         var isCurrentUserAdmin = loggedInReader && (loggedInReader.toUpperCase() === "ANURAG SHAKYA" || loggedInReader.toUpperCase() === "ADMIN");
-
-        // ✅ Admin per kabhi instruction screen nahi dikhegi
-        // ✅ MR jab andar se manual click karega (isManualClick === true), tab bhi instruction screen nahi dikhegi (keval thin alert dikhega)
-        // ✅ MR jab login karega ya auto-download chalega tabhi instruction screen dikhegi
-        if (instructScreen) {
-            if (!isCurrentUserAdmin && !isManualClick) {
-                instructScreen.style.setProperty("display", "flex", "important");
-            } else {
-                instructScreen.style.setProperty("display", "none", "important");
-            }
-        }
         showThinAlert("⚡ डेटा डाउनलोड हो रहा है, कृपया प्रतीक्षा करें...", false);
 
         // ⏱️ टाइमआउट को 10 सेकंड से बढ़ाकर 90 सेकंड किया गया ताकि भारी डेटा पूरा लोड हो सके
         var fallbackTimer = setTimeout(function() {
             if (isDownloadingMasterData) {
                 isDownloadingMasterData = false;
-                if (instructScreen) instructScreen.style.setProperty("display", "none", "important");
                 if (syncIcon) syncIcon.className = "fa-solid fa-cloud-arrow-down";
                 showThinAlert("⚠️ सर्वर से प्रतिक्रिया में अधिक समय लग रहा है, पुनः प्रयास करें!", true);
                 refreshActiveDataViews();
@@ -3061,16 +3065,11 @@ function executeSafeSyncAndDownloadWorkflow(onComplete) {
                     tx.onerror = function() {
                         clearTimeout(fallbackTimer);
                         isDownloadingMasterData = false;
-                        // एरर आने पर निर्देश स्क्रीन बंद करें
-                        var instructScreen = document.getElementById('dataDownloadInstructionScreen');
-                        if (instructScreen) {
-                            instructScreen.style.setProperty("display", "none", "important");
-                        }
                         if (syncIcon) syncIcon.className = "fa-solid fa-cloud-arrow-down";
                         if(onComplete) onComplete();
                     };
 
-                    tx.oncomplete = function() {
+                                        tx.oncomplete = function() {
                         clearTimeout(fallbackTimer);
                         try {
                             if (bulkData.reportConfigs) {
@@ -3092,7 +3091,6 @@ function executeSafeSyncAndDownloadWorkflow(onComplete) {
                             var tsSpan = document.getElementById("lastUpdatedTimeSpan");
                             if (tsSpan) tsSpan.innerText = currentDateTimeStr;
 
-                            // 🚀 गूगल शीट में डाउनलोड डेट व टाइम लॉग करने का कॉल
                             try {
                                 if (loggedInReader && navigator.onLine) {
                                     google.script.run
@@ -3104,7 +3102,6 @@ function executeSafeSyncAndDownloadWorkflow(onComplete) {
                                 console.error("Failed to trigger updateReaderLastDownload:", logErr);
                             }
 
-                            // नया डेटा आते ही बार को सामान्य रंग में रीसेट करें
                             var lastUpdBar = document.getElementById('lastUpdatedLabel');
                             if (lastUpdBar) {
                                 lastUpdBar.style.border = "1.5px solid #334155";
@@ -3130,20 +3127,25 @@ function executeSafeSyncAndDownloadWorkflow(onComplete) {
                             }
                             
                             showThinAlert("✅ डेटा अपडेट हो गया!", true);
-                            speakHindiVoice("आपका नया डेटा डाउनलोड हो गया है, अब आप नई रिपोर्ट देख सकते हैं");
+
                         } catch(e) {
                             console.error("UI update error:", e);
                         } finally {
                             isDownloadingMasterData = false;
 
-                            // 🛑 डेटा लोड होते ही निर्देश स्क्रीन को बंद करें
-                            var instructScreen = document.getElementById('dataDownloadInstructionScreen');
-                            if (instructScreen) {
-                                instructScreen.style.setProperty("display", "none", "important");
-                            }
-
                             if (syncIcon) syncIcon.className = "fa-solid fa-cloud-arrow-down";
                             if (onComplete) onComplete();
+
+                            // 🔊 1. नया डेटा डाउनलोड पूरा होने की सामान्य सूचना
+                            var downloadReaderName = toTitleProperCase(loggedInReader || "यूज़र");
+                            speakHindiVoice("Dear " + downloadReaderName + " जी, नया डेटा डाउनलोड हो गया है।");
+
+                            // 🔊 2. कुछ सेकंड (3 सेकंड) बाद विशेष पेंडेंसी कार्ड्स का काउंट विस्तार से बोलेगा
+                            setTimeout(function() {
+                                if (typeof announceSpecialPendingVoiceReport === 'function') {
+                                    announceSpecialPendingVoiceReport();
+                                }
+                            }, 3200);
                         }
                     };
                 } else { 
@@ -3171,12 +3173,6 @@ function executeSafeSyncAndDownloadWorkflow(onComplete) {
             clearTimeout(fallbackTimer);
             isDownloadingMasterData = false;
 
-            // 🛑 नेटवर्क एरर आने पर भी निर्देश स्क्रीन को बंद करें
-            var instructScreen = document.getElementById('dataDownloadInstructionScreen');
-            if (instructScreen) {
-                instructScreen.style.setProperty("display", "none", "important");
-            }
-
             if (syncIcon) syncIcon.className = "fa-solid fa-cloud-arrow-down";
             showThinAlert("🚨 नेटवर्क धीमा है, पुनः प्रयास करें!", true);
             if (onComplete) onComplete();
@@ -3194,13 +3190,14 @@ function executeSafeSyncAndDownloadWorkflow(onComplete) {
         
         var isAdminUser = loggedInReader && (loggedInReader.toUpperCase() === "ANURAG SHAKYA" || loggedInReader.toUpperCase() === "ADMIN");
 
+        var bottomFilterBox = document.getElementById('bottomCardsFilterBox');
         if (isAdminUser) {
-            if(headerFilterBtn) headerFilterBtn.style.setProperty("display", "inline-block", "important");
+            if (bottomFilterBox) bottomFilterBox.style.setProperty("display", "block", "important");
         } else {
-            if(headerFilterBtn) headerFilterBtn.style.setProperty("display", "none", "important");
-            if(filterTabBtn) filterTabBtn.style.setProperty("display", "none", "important"); 
-            if(visitTabBtn) visitTabBtn.style.setProperty("display", "none", "important"); 
-            if(notifyTabBtn) notifyTabBtn.style.setProperty("display", "none", "important"); 
+            if (bottomFilterBox) bottomFilterBox.style.setProperty("display", "none", "important");
+            if (filterTabBtn) filterTabBtn.style.setProperty("display", "none", "important"); 
+            if (visitTabBtn) visitTabBtn.style.setProperty("display", "none", "important"); 
+            if (notifyTabBtn) notifyTabBtn.style.setProperty("display", "none", "important"); 
             return; 
         }
         
@@ -3281,51 +3278,81 @@ function executeSafeSyncAndDownloadWorkflow(onComplete) {
         }
     }, 10);
 }
-// 🎯 हेडर पट्टी एक्सेल-स्टाइल फ़िल्टर को खोलने और बंद करने का कोर ड्राइवर
+// 🎯 Cards ke neeche filter dropdown toggle
 function toggleHeaderFilterDropdown(e) {
-    if (e) e.stopPropagation(); // क्लिक इवेंट को बाहर जाने से रोकें
+    if (e) e.stopPropagation();
     var box = document.getElementById('headerFilterDropdownContent');
+    var arrow = document.getElementById('bottomFilterArrowIcon');
     if (!box) return;
     
-    // यदि बंद है तो खोलें, खुला है तो बंद करें
     if (box.style.display === 'none' || box.style.display === '') {
         box.style.setProperty("display", "block", "important");
+        if (arrow) arrow.style.transform = "rotate(180deg)";
     } else {
         box.style.setProperty("display", "none", "important");
+        if (arrow) arrow.style.transform = "rotate(0deg)";
     }
 }
-// 🎯 एक्सेल-फ़िल्टर के 'Select All' चेकबॉक्स को ग्लोबली बाइंड करने का इंजन
+
+// ⚡ Anti-Hang Debounced Render Dispatcher
+var globalFilterReRenderTimer = null;
+function scheduleSmoothReRender() {
+    if (globalFilterReRenderTimer) clearTimeout(globalFilterReRenderTimer);
+    globalFilterReRenderTimer = setTimeout(function() {
+        appSearchDatabaseCache = null;
+        window.requestAnimationFrame(function() {
+            triggerGlobalDataReRender();
+        });
+    }, 180);
+}
+
+function updateBottomFilterLabel(totalCount) {
+    var lbl = document.getElementById('bottomFilterSelectedSummary');
+    if (!lbl) return;
+    var selectedLen = adminSelectedReaders.length;
+    if (selectedLen === totalCount || totalCount === 0) {
+        lbl.innerText = "फ़िल्टर मीटर रीडर (All " + totalCount + " Selected)";
+        lbl.style.color = "#1e40af";
+    } else if (selectedLen === 0) {
+        lbl.innerText = "कोई मीटर रीडर नहीं चुना (0)";
+        lbl.style.color = "#dc2626";
+    } else {
+        lbl.innerText = "मीटर रीडर फ़िल्टर (" + selectedLen + " चुने गए)";
+        lbl.style.color = "#059669";
+    }
+}
+
+// 🎯 Non-blocking Select/Unselect All
 window.toggleAllHeaderReaders = function(masterEl) {
     var cbs = document.querySelectorAll('.header-reader-cb');
     adminSelectedReaders = [];
-    cbs.forEach(function(cb) {
-        cb.checked = masterEl.checked;
-        if(masterEl.checked) {
-            adminSelectedReaders.push(cb.value);
-        }
-    });
+    var state = masterEl.checked;
     
-    // सर्च मेमोरी रीसेट करें और पूरे UI को फ्रेश री-रेंडर करें
-    appSearchDatabaseCache = null;
-    triggerGlobalDataReRender();
+    for (var i = 0; i < cbs.length; i++) {
+        cbs[i].checked = state;
+        if (state) adminSelectedReaders.push(cbs[i].value);
+    }
+    
+    updateBottomFilterLabel(cbs.length);
+    scheduleSmoothReRender();
 };
 
-// 🎯 इंडिविजुअल रीडर चेकबॉक्स फ़िल्टर को ग्लोबली बाइंड करने का इंजन
+// 🎯 Non-blocking Single Checkbox Click
 window.applyHeaderReaderFilter = function() {
     var cbs = document.querySelectorAll('.header-reader-cb');
     adminSelectedReaders = [];
-    cbs.forEach(function(cb) { 
-        if(cb.checked) adminSelectedReaders.push(cb.value); 
-    });
+    
+    for (var i = 0; i < cbs.length; i++) {
+        if (cbs[i].checked) adminSelectedReaders.push(cbs[i].value);
+    }
     
     var selectAll = document.getElementById('headerFilterSelectAll');
-    if(selectAll) {
+    if (selectAll) {
         selectAll.checked = (adminSelectedReaders.length === cbs.length && cbs.length > 0);
     }
     
-    // सर्च मेमोरी रीसेट करें और पूरे UI को फ्रेश री-रेंडर करें
-    appSearchDatabaseCache = null;
-    triggerGlobalDataReRender();
+    updateBottomFilterLabel(cbs.length);
+    scheduleSmoothReRender();
 };
 
 // 🔄 पूरे UI (डैशबोर्ड, कार्ड्स, लिस्ट्स और खुली हुई रिपोर्ट्स) को एक साथ री-रेंडर करने का मास्टर ट्रिगर
@@ -3374,7 +3401,7 @@ function triggerGlobalDataReRender() {
 
         // 🎯 सभी टिक किए गए लड़कों के नाम इकट्ठे करना
         var selectedNotifyReaders = [];
-        var masterSelectAll = document.getElementById('notifyTargetMasterSelectAll') || document.getElementById('notifySelectAllRows');
+        var masterSelectAll = document.getElementById('notifyTargetMasterSelectAll');
         var cbs = document.querySelectorAll('.notify-reader-cb');
         
         cbs.forEach(function(cb) { if(cb.checked) selectedNotifyReaders.push(cb.value); });
@@ -4571,12 +4598,35 @@ function triggerGlobalDataReRender() {
             globalDateDrilldownCache.forEach(function(item) {
                 aoa.push(globalDateDrilldownCols.map(function(c) {
                     var val = (c === "MR NAME") ? getReaderName(item) : (getRobustKey(item, c) || "");
-                    return { v: val.toString() };
+                    var isLeftAlign = (c === "CONSUMER-NAME" || c === "ADDRESS");
+                    return { 
+                        v: val.toString().trim(),
+                        s: {
+                            font: { sz: 9 },
+                            alignment: { horizontal: isLeftAlign ? "left" : "center", vertical: "center" }
+                        }
+                    };
                 }));
             });
 
             var wb = XLSX.utils.book_new();
             var ws = XLSX.utils.aoa_to_sheet(aoa);
+
+            // 🎯 Auto-Fit Columns
+            var maxDrillLens = globalDateDrilldownCols.map(function(c) { return c.toString().length; });
+            globalDateDrilldownCache.forEach(function(item) {
+                globalDateDrilldownCols.forEach(function(c, cIdx) {
+                    var valStr = ((c === "MR NAME") ? getReaderName(item) : (getRobustKey(item, c) || "")) || "";
+                    var l = valStr.toString().trim().length;
+                    if (l > maxDrillLens[cIdx]) maxDrillLens[cIdx] = l;
+                });
+            });
+            ws['!cols'] = maxDrillLens.map(function(len) { return { wch: Math.min(Math.max(len + 4, 12), 48) }; });
+
+            // 🎯 Auto-Filter Apply
+            var drillEndCol = XLSX.utils.encode_col(globalDateDrilldownCols.length - 1);
+            ws['!autofilter'] = { ref: "A1:" + drillEndCol + (globalDateDrilldownCache.length + 1) };
+
             XLSX.utils.book_append_sheet(wb, ws, "Details");
 
             var wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'base64' });
@@ -4641,11 +4691,18 @@ function triggerGlobalDataReRender() {
             showThinAlert("Master Data Downloading In Process Pls wait...");
             return;
         }
+        
+        var startDownloadWithVoice = function() {
+            var readerNameProper = toTitleProperCase(loggedInReader || "यूज़र");
+            speakHindiVoice(readerNameProper + " जी, आपका डेटा डाउनलोड हो रहा है, कृपया प्रतीक्षा करें");
+            triggerSilentBackgroundDataDownload(function(){}, true);
+        };
+
         if(isManualClick) {
-            triggerSilentBackgroundDataDownload(function(){}, true); 
+            startDownloadWithVoice(); 
         } else {
             customConfirm("क्या आप मास्टर डेटा डाउनलोड करना चाहते हैं?", function() {
-                triggerSilentBackgroundDataDownload(function(){}, true); 
+                startDownloadWithVoice(); 
             });
         }
     }
@@ -4767,31 +4824,66 @@ function triggerGlobalDataReRender() {
             resetToHubLanding();
         }, 50);
         
-        // 🌅 Dynamic English Greetings Engine
+        // 🌅 Dynamic English Greetings Engine (Professional Split Layout)
         var hr = new Date().getHours();
-        var greeting = "Good Morning ☀️";
-        if(hr >= 12 && hr < 17) greeting = "Good Afternoon 🌤️";
-        else if(hr >= 17) greeting = "Good Evening 🌙";
-
-        // 🚀 Sidebar और Header में नाम + ग्रीटिंग अपडेट करना
-        var welcomeNode = document.getElementById('welcomeTxt');
-        if(welcomeNode) welcomeNode.innerText = greeting + " | " + toTitleProperCase(loggedInReader); 
+        var greeting = "Good Morning";
+        var greetingIcon = "fa-sun";
+        var greetingColor = "#f59e0b";
         
+        if(hr >= 12 && hr < 17) { 
+            greeting = "Good Afternoon"; 
+            greetingIcon = "fa-cloud-sun";
+            greetingColor = "#ea580c";
+        }
+        else if(hr >= 17 && hr < 21) { 
+            greeting = "Good Evening"; 
+            greetingIcon = "fa-cloud-moon";
+            greetingColor = "#7c3aed";
+        }
+        else if(hr >= 21 || hr < 5) { 
+            greeting = "Good Night"; 
+            greetingIcon = "fa-moon";
+            greetingColor = "#1e40af";
+        }
+
+        // Greeting Line Update (with Welcome word)
+        var greetingLineNode = document.getElementById('greetingLine');
+        if(greetingLineNode) {
+            greetingLineNode.innerHTML = '<i class="fa-solid ' + greetingIcon + '" style="color: ' + greetingColor + '; font-size: 10px; margin-right: 2px;"></i> Welcome, ' + greeting;
+        }
+        
+        // User Name Update
+        var greetingUserNameNode = document.getElementById('greetingUserName');
+        if(greetingUserNameNode) {
+            greetingUserNameNode.innerText = toTitleProperCase(loggedInReader);
+        }
+        
+        // Sidebar Name Update
         var sidebarName = document.getElementById('sidebarMrName');
         if(sidebarName) sidebarName.innerText = toTitleProperCase(loggedInReader);
         
-        // 🛠️ एडमिन पैनल विज़िबिलिटी कंट्रोल ड्राइवर (विजिट्स टैब व MDM बॉटम बटन फिक्स)
+        // 🛠️ एडमिन पैनल विज़िबिलिटी कंट्रोल ड्राइवर (Sidebar & Header Menu Admin Check)
         var btnAllMrPdfSummary = document.getElementById('btnAllMrPdfSummary');
         var sidebarAdminSec = document.getElementById('sidebarAdminControlSection');
         var visitTabBtn = document.getElementById('btn-tab-visitdata');
+        var headerMenuBtn = document.getElementById('headerMenuBtn');
+        var reportsSidebar = document.getElementById('reportsMenuContainer');
+        var sidebarOverlay = document.getElementById('reportSidebarOverlay');
         
         var isAdmin = loggedInReader && (loggedInReader.toUpperCase() === "ANURAG SHAKYA" || loggedInReader.toUpperCase() === "ADMIN");
 
         if(!isAdmin) { 
+            // Meter Reader: Sidebar button aur drawer poori tarah hide
+            if(headerMenuBtn) headerMenuBtn.style.setProperty("display", "none", "important");
+            if(reportsSidebar) reportsSidebar.style.setProperty("display", "none", "important");
+            if(sidebarOverlay) sidebarOverlay.style.setProperty("display", "none", "important");
             if(btnAllMrPdfSummary) btnAllMrPdfSummary.style.display = "none";
             if(sidebarAdminSec) sidebarAdminSec.style.setProperty("display", "none", "important");
             if(visitTabBtn) visitTabBtn.style.setProperty("display", "none", "important");
         } else {
+            // Admin: Sidebar menu aur drawer visible
+            if(headerMenuBtn) headerMenuBtn.style.setProperty("display", "inline-flex", "important");
+            if(reportsSidebar) reportsSidebar.style.removeProperty("display");
             if(btnAllMrPdfSummary) btnAllMrPdfSummary.style.display = "inline-flex";
             if(sidebarAdminSec) sidebarAdminSec.style.setProperty("display", "block", "important");
             if(visitTabBtn) visitTabBtn.style.setProperty("display", "flex", "important");
@@ -4887,11 +4979,16 @@ function executeFastCacheSearch(searchKeywords, allData, container, containerId)
             }
         }
 
-        // 🎯 उपभोक्ता टैब के वर्तमान पेंडिंग/अटेंड फ़िल्टर का सम्मान (यथावत सुरक्षित)
+        // 🎯 उपभोक्ता टैब: Division, Status और Load Group तीनों फ़िल्टर्स का सख्त मिलान
         if (containerId === 'listDataContainer') {
             var itemDiv = (getRobustKey(item, "DIVISION") || item.division || "").toString().toUpperCase().trim();
             if (currentFilterDiv !== "ALL" && currentFilterDiv !== itemDiv) continue;
             
+            // ⚡ Load Group Filter Check
+            var currentFilterLoad = document.getElementById('listLoadGroupFilter') ? document.getElementById('listLoadGroupFilter').value : "ALL";
+            var itemLoadGroup = (getRobustKey(item, "LOAD GROUP (5-10-50)") || item.loadGroup || "").toString().toUpperCase().trim();
+            if (currentFilterLoad !== "ALL" && itemLoadGroup !== currentFilterLoad) continue;
+
             var rawStatus = (getRobustKey(item, "ATTEND STATUS") || item.attendStatus || "").toString().toUpperCase().trim();
             var rawDistStatus = (getRobustKey(item, "DISTRIBUTION STATUS") || item.distStatus || "").toString().toUpperCase().trim();
             var isStrictlyDone = (item.isDone === true || item.isDone === "true" || rawStatus === "ATTEND" || rawStatus === "DONE" || rawDistStatus === "DISTRIBUTED");
@@ -4982,19 +5079,37 @@ function executeFastCacheSearch(searchKeywords, allData, container, containerId)
                         '</div>'
                     );
                 } else {
+                    // 🎯 नया कार्ड लेआउट: Load Group, A/C No., Contact Update और Direct Entry Button के साथ
+                    var loadGroupVal = getRobustKey(item, "LOAD GROUP (5-10-50)") || item.loadGroup || "";
+                    var loadBadgeHtml = loadGroupVal ? '<span style="font-size:9.5px; font-weight:800; background:#fef3c7; color:#b45309; border:1px solid #fde68a; padding:1px 6px; border-radius:4px;">' + loadGroupVal + '</span>' : '';
+                    var telLink = (mob && mob !== "-" && mob.length >= 10) ? '<a href="tel:' + mob + '" onclick="event.stopPropagation();" style="color:#0284c7; text-decoration:none; font-weight:700;"><i class="fa-solid fa-phone" style="font-size:10px;"></i> ' + mob + '</a>' : '<span style="color:#64748b;">' + mob + '</span>';
+                    var directEditBtn = '<button onclick="event.stopPropagation(); openForm(\'' + accNo + '\', \'EDIT\')" class="export-btn mini" style="padding: 5px 9px; font-size: 10.5px; background:linear-gradient(135deg, #059669, #10b981); color:#fff; display:inline-flex; align-items:center; justify-content:center; gap:4px; font-weight:800; border-radius:6px; box-shadow:0 2px 4px rgba(16,185,129,0.3);" title="सीधे एंट्री फॉर्म भरें"><i class="fa-solid fa-pen-to-square"></i> Entry</button>';
+
                     matchedItemsHtml.push(
-                        '<div class="list-item" style="padding: 6px 10px !important; margin-bottom: 4px !important; border-radius: 8px !important;" onclick="openQuickViewModal(\'' + accNo + '\', \'STANDARD\')">' +
-                        '<div style="display:flex; width:100%; align-items:center; justify-content:space-between; cursor: pointer;">' +
-                        '<div style="flex: 1; text-align: left; min-width: 0; padding-right: 5px;">' +
-                        '<div class="c-name" style="font-size:12.5px !important; font-weight:900 !important; line-height:1.2 !important;">' + item.consumerName + '</div>' +
-                        '<div class="c-acc" style="font-size:11px !important; margin-top:1px !important; color:#475569;">A/C: ' + accNo + ' | Mob: ' + mob + '</div>' +
-                        '<div class="c-addr" style="font-size:11px !important; margin-top:2px !important; color:#64748b;"><b>पता:</b> ' + addr + '</div>' +
-                        '<div class="c-mtr" style="font-size:11px !important; margin-top:2px !important; color:#4f46e5; font-weight:700;">M-Mtr: ' + mainMtrNo + ' | P-Mtr: ' + poleMtrNo + '</div>' +
-                        '</div>' +
-                        '<div style="text-align:right; flex-shrink: 0; display:flex; flex-direction:column; align-items:flex-end; gap:2px;">' +
-                        '<div style="font-size:10px; font-weight:bold; color:#4338ca; background:#e0e7ff; padding:2px 6px; border-radius:4px;">' + divisionDisplay + '</div>' +
-                        '<div onclick="event.stopPropagation();">' + listInfoBtn + '</div>' +
-                        '</div></div></div>'
+                        '<div class="list-item" style="padding: 10px 12px !important; margin-bottom: 8px !important; border-radius: 12px !important; border-left: 5px solid #1e40af !important; box-shadow: 0 2px 6px rgba(15,23,42,0.06) !important; background:#ffffff;" onclick="openQuickViewModal(\'' + accNo + '\', \'STANDARD\')">' +
+                        '<div style="display:flex; width:100%; flex-direction:column; gap:4px; cursor: pointer;">' +
+                            '<!-- Hero Top Bar: Account No & Meta Badges -->' +
+                            '<div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #f1f5f9; padding-bottom:5px;">' +
+                                '<span style="background:#0f172a; color:#ffffff; font-size:11.5px; font-weight:900; padding:2px 8px; border-radius:6px; letter-spacing:0.5px; display:inline-flex; align-items:center; gap:4px;"><i class="fa-solid fa-bolt" style="color:#facc15; font-size:10px;"></i> ' + accNo + '</span>' +
+                                '<div style="display:flex; gap:5px; align-items:center;">' +
+                                    loadBadgeHtml +
+                                    '<span style="font-size:9.5px; font-weight:800; color:#4338ca; background:#e0e7ff; padding:1px 6px; border-radius:4px;">' + divisionDisplay + '</span>' +
+                                    '<div onclick="event.stopPropagation();">' + listInfoBtn + '</div>' +
+                                    '<div onclick="event.stopPropagation();">' + directEditBtn + '</div>' +
+                                '</div>' +
+                            '</div>' +
+                            '<!-- Hero Name -->' +
+                            '<div class="c-name" style="font-size:14px !important; font-weight:900 !important; color:#0f172a; line-height:1.3; margin-top:2px;">' + item.consumerName + '</div>' +
+                            '<!-- Mobile -->' +
+                            '<div style="font-size:11.5px; font-weight:700;">' + telLink + '</div>' +
+                            '<!-- Address -->' +
+                            '<div class="c-addr" style="font-size:11px; color:#475569; line-height:1.3; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;"><i class="fa-solid fa-location-dot" style="color:#94a3b8; margin-right:3px;"></i> ' + addr + '</div>' +
+                            '<!-- Meters Strip -->' +
+                            '<div style="font-size:11px; margin-top:3px; background:#f8fafc; padding:3px 6px; border-radius:6px; border:1px solid #e2e8f0; display:flex; justify-content:space-between;">' +
+                                '<span style="color:#1e40af; font-weight:800;">M-Mtr: ' + mainMtrNo + '</span>' +
+                                '<span style="color:#0f766e; font-weight:800;">P-Mtr: ' + poleMtrNo + '</span>' +
+                            '</div>' +
+                        '</div></div>'
                     );
                 }
             }
@@ -6379,62 +6494,120 @@ async function downloadSelectedMergedPDF() {
 }
 
     function exportSingleConsumerPDF(event, accNo, mode) {
-    event.stopPropagation();
+    if (event) event.stopPropagation();
+    if (!db) return alert("Database taiyar nahi hai!");
+
     db.transaction("consumers", "readonly").objectStore("consumers").get(accNo).onsuccess = function(e) {
-        var record = e.target.result; if(!record) return;
-        var rows = [];
-        var mrName = getReaderName(record) || "N/A";
+        var record = e.target.result; 
+        if (!record) return alert("Upbhokta ka data nahi mila!");
         
-        // 🎯 केवल चुनिंदा जरूरी 18 कॉलम्स जो PDF में आने चाहिए
+        var mrName = (getReaderName(record) || "N/A").trim();
+        var consumerName = (getRobustKey(record, "CONSUMER-NAME") || record.consumerName || "").trim();
+
+        // 🎯 Column Name clean Proper Case engine (No Underscores)
         var reqCols = [
             "DIVISION", "ACCOUNT NO", "CONSUMER-NAME", "ADDRESS", "LOAD IN KW", 
             "LOAD GROUP (5-10-50)", "FINAL VISIT DATE", "LAST MONTH FINAL MM NO.", 
             "LAST MONTH FINAL MM MAKE", "EXCEPTION TYPE (MAIN METER)", 
-            "FINAL_MAIN_METER_SITE_REMARK", "REMARK", "FINAL_POLE_METER_SITE_REMARK",
+            "FINAL_MAIN_METER_SITE_REMARK", "REMARK", "FINAL_POLE_METER_SITE_REMARK", 
             "IS MRI AVAILABLE (MAIN METER)", "LAST MONTH FINAL PM NO.", 
             "LAST MONTH FINAL PM MAKE", "EXCEPTION TYPE (POLE METER)", "IS MRI AVAILABLE (POLE METER)", "MR NAME"
         ];
 
-        rows = reqCols.map(function(k) {
-            var val = (k === "MR NAME") ? getReaderName(record) : getRobustKey(record, k);
-            return [k, val !== undefined && val !== null && val.toString().trim() !== "" ? val.toString() : "-"];
+        var rows = reqCols.map(function(k) {
+            var val = (k === "MR NAME") ? mrName : getRobustKey(record, k);
+            var cleanKey = k.replace(/[_\-]+/g, " ").replace(/\s+/g, " ").trim();
+            var titleKey = cleanKey.toLowerCase().replace(/\b[a-z]/g, function(l) { return l.toUpperCase(); });
+            return [titleKey, (val !== undefined && val !== null && val.toString().trim() !== "") ? val.toString().trim() : "-"];
         });
         
         var doc = new window.jspdf.jsPDF({ orientation: 'landscape', unit: 'pt', format: 'a4' });
-        doc.setFontSize(16); doc.setTextColor(15, 23, 42); doc.setFont("Helvetica", "bold");
-        doc.text("CONSUMER DETAIL REPORT", 40, 40);
-        
-        doc.setFontSize(12); doc.setTextColor(22, 163, 74); 
-        doc.text("MR Name: " + mrName, doc.internal.pageSize.width - 40, 40, { align: 'right' });
+        var pageWidth = doc.internal.pageSize.width;
+        var pageHeight = doc.internal.pageSize.height;
 
-        doc.setFontSize(10); doc.setTextColor(15, 23, 42); doc.setFont("Helvetica", "normal");
-        doc.text("Account No: " + accNo + " | Generated: " + getPrintableDateTime(), 40, 55);
+        // 🌟 Sleek Header
+        doc.setFontSize(13); 
+        doc.setTextColor(30, 58, 138); 
+        doc.setFont("Helvetica", "bold");
+        doc.text("Consumer Detail Report", 30, 28);
         
+        doc.setFontSize(9.5); 
+        doc.setTextColor(22, 163, 74); 
+        doc.text("MR Name: " + mrName, pageWidth - 30, 28, { align: 'right' });
+
+        doc.setFontSize(8); 
+        doc.setTextColor(71, 85, 105); 
+        doc.setFont("Helvetica", "normal");
+        doc.text("Account No: " + accNo + (consumerName ? " (" + consumerName + ")" : "") + "   |   Date: " + getPrintableDateTime(), 30, 42);
+        
+        // 📊 Compact Grid (Chhota font aur neat cell padding)
         doc.autoTable({
-            head: [["Column Name", "Data Value"]],
+            head: [["Column Description", "Consumer Data Value"]],
             body: rows,
-            startY: 70,
+            startY: 50,
             theme: 'grid',
-            styles: { fontSize: 8, overflow: 'linebreak' },
-            headStyles: { fillColor: [15, 23, 42] },
-            columnStyles: { 0: { cellWidth: 200 } }
+            margin: { left: 30, right: 30, bottom: 24 },
+            styles: { 
+                fontSize: 6.8, 
+                cellPadding: 2.2, 
+                overflow: 'linebreak', 
+                textColor: [15, 23, 42],
+                lineColor: [226, 232, 240],
+                lineWidth: 0.4
+            },
+            headStyles: { 
+                fillColor: [30, 58, 138], 
+                textColor: [255, 255, 255], 
+                fontSize: 7.2, 
+                fontStyle: 'bold', 
+                cellPadding: 3.5 
+            },
+            alternateRowStyles: { 
+                fillColor: [248, 250, 252] 
+            },
+            columnStyles: { 
+                0: { cellWidth: 180, fontStyle: 'bold', textColor: [30, 41, 59] },
+                1: { cellWidth: 'auto' }
+            }
         });
         
+        // 👑 Ekdum Patli (Thin Line & Sleek) Branding Footer
         var pageCount = doc.internal.getNumberOfPages();
         for (var i = 1; i <= pageCount; i++) { 
-            doc.setPage(i); doc.setFontSize(10); doc.setTextColor(30,58,138); 
-            doc.text('Report Prepared By: Billing_App Tool | Anurag Shakya | Mo: 9761414105 - Page ' + i, doc.internal.pageSize.width / 2, doc.internal.pageSize.height - 15, { align: 'center' }); 
+            doc.setPage(i); 
+            
+            // Thin separator line
+            doc.setDrawColor(226, 232, 240);
+            doc.setLineWidth(0.5);
+            doc.line(30, pageHeight - 16, pageWidth - 30, pageHeight - 16);
+            
+            doc.setFontSize(6.8); 
+            doc.setTextColor(100, 116, 139); 
+            doc.setFont("Helvetica", "normal");
+            doc.text("Report Prepared By: DvVNL Reading Tool | Er. Anurag Shakya | Mo: 9761414105", 30, pageHeight - 7);
+            doc.text("Page " + i + " of " + pageCount, pageWidth - 30, pageHeight - 7, { align: 'right' });
         }
         
-        var filename = "Consumer_" + accNo + "_" + getFormattedDateTimeForFile() + ".pdf";
+        // 🎯 Clean File Name (Bina kisi underscore ya symbol ke)
+        var safeAccNo = accNo.replace(/[^a-zA-Z0-9]/g, "");
+        var dateFormatted = getFormattedDateTimeForFile().replace(/_/g, "-");
+        var filename = "Consumer Detail " + safeAccNo + " (" + dateFormatted + ").pdf";
+
         if (typeof AndroidBridge !== "undefined" && AndroidBridge.processBase64Download) {
             var rawBase64 = doc.output('arraybuffer');
-            var uint8 = new Uint8Array(rawBase64); var binary = '';
+            var uint8 = new Uint8Array(rawBase64); 
+            var binary = '';
             for (var j = 0; j < uint8.byteLength; j++) { binary += String.fromCharCode(uint8[j]); }
-            AndroidBridge.processBase64Download(btoa(binary), "pdf", filename);
-            showThinAlert("🎉 PDF डाउनलोड शुरू हुआ...", true);
+            
+            if (typeof AndroidBridge.processBase64DownloadWithFileName === "function") {
+                AndroidBridge.processBase64DownloadWithFileName(btoa(binary), "pdf", filename);
+            } else if (AndroidBridge.processBase64Download.length >= 3) {
+                AndroidBridge.processBase64Download(btoa(binary), "pdf", filename);
+            } else {
+                AndroidBridge.processBase64Download(btoa(binary), "pdf");
+            }
+            showThinAlert("🎉 PDF download shuru ho gaya!", true);
         } else {
-            // Universal Blob Download Engine (GitHub / Web Safe)
             var blob = doc.output('blob');
             var link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
@@ -6445,12 +6618,15 @@ async function downloadSelectedMergedPDF() {
                 document.body.removeChild(link);
                 URL.revokeObjectURL(link.href);
             }, 100);
-            showThinAlert("🎉 PDF डाउनलोड सफल!", true);
+            showThinAlert("🎉 PDF download safal!", true);
         }
     };
 }
 
     function toggleReportSidebar(forceOpen) {
+        var isAdmin = loggedInReader && (loggedInReader.toUpperCase() === "ANURAG SHAKYA" || loggedInReader.toUpperCase() === "ADMIN");
+        if (!isAdmin) return; // Meter reader ke liye sidebar drawer open hona block
+
         var sidebar = document.getElementById('reportsMenuContainer');
         var overlay = document.getElementById('reportSidebarOverlay');
         if (!sidebar || !overlay) return;
@@ -6815,17 +6991,6 @@ function openReportGroupView(reportType) {
             topRemarkDropdown.style.setProperty("display", "inline-block", "important");
         }
 
-        var dropdown = document.getElementById('reportRemarkFilterGroup'); 
-        if(dropdown) {
-            dropdown.innerHTML = '<option value="ALL">-- सभी उपभोक्ता (Show All) --</option>';
-            uniqueRemarksSet.forEach(function(rem) { dropdown.innerHTML += '<option value="' + rem.toUpperCase() + '">' + rem + '</option>'; }); 
-            dropdown.value = "ALL";
-        }
-        
-        if(groupFilterBarBox) {
-            groupFilterBarBox.style.setProperty("display", "none", "important");
-        }
-        
         loadOfflineReportFiltered("ALL");
     };
 }
@@ -6982,7 +7147,13 @@ function openReportGroupView(reportType) {
         if(tabName === 'list') {
             currentTabKey = "all_consumers_list";
             var currentFilterStatus = document.getElementById('listStatusFilter') ? document.getElementById('listStatusFilter').value : "PENDING";
-            reportNameStr = (currentFilterStatus === "PENDING") ? "VisiT_Pending Consumers List" : "Attend Consumers List";
+            if (currentFilterStatus === "ALL") {
+                reportNameStr = "All Consumers List";
+            } else if (currentFilterStatus === "PENDING") {
+                reportNameStr = "VisiT_Pending Consumers List";
+            } else {
+                reportNameStr = "Attend Consumers List";
+            }
         } else if(tabName === 'billdist') {
             reportNameStr = "Bill Distribution Pending";
             currentTabKey = "all_bills_report";
@@ -7045,12 +7216,15 @@ function openReportGroupView(reportType) {
             fullData.forEach(function(item) { 
                 aoa.push(reqCols.map(function(c) { 
                     var val = (c === "MR NAME") ? getReaderName(item) : getRobustKey(item, c); 
-                    var isLeftAlign = (c === "CONSUMER-NAME" || c === "ADDRESS");
+                    var isLeftAlign = (c.toUpperCase().indexOf("CONSUMER-NAME") !== -1 || c.toUpperCase().indexOf("CONSUMER NAME") !== -1 || c.toUpperCase().indexOf("ADDRESS") !== -1);
                     return { 
-                        v: (val !== undefined && val !== null) ? val.toString() : "",
+                        v: (val !== undefined && val !== null) ? val.toString().trim() : "",
                         s: {
-                            font: { sz: 8.5 },
-                            alignment: { horizontal: isLeftAlign ? "left" : "center", vertical: "center" }
+                            font: { sz: 9 },
+                            alignment: { 
+                                horizontal: isLeftAlign ? "left" : "center", 
+                                vertical: "center" 
+                            }
                         }
                     }; 
                 })); 
@@ -7058,16 +7232,30 @@ function openReportGroupView(reportType) {
             
             var wb = XLSX.utils.book_new(); 
             var ws = XLSX.utils.aoa_to_sheet(aoa);
-            
-            var colWidths = reqCols.map(function(c, columnIndex) {
-                if (c === "CONSUMER-NAME") return { wch: 22 };
-                if (c === "ADDRESS") return { wch: 28 };
-                if (c === "Master Mobile Number") return { wch: 13 };
-                if (c === "ACCOUNT NO") return { wch: 14 };
-                if (c.includes("REMARK")) return { wch: 18 };
-                return { wch: Math.max(c.length + 2, 10) };
+
+            // 🎯 Dynamic Auto-Fit Columns Engine
+            var maxLenPerCol = reqCols.map(function(c) { return c.toString().length; });
+            fullData.forEach(function(item) {
+                reqCols.forEach(function(c, cIdx) {
+                    var valStr = ((c === "MR NAME") ? getReaderName(item) : getRobustKey(item, c)) || "";
+                    var len = valStr.toString().trim().length;
+                    if (len > maxLenPerCol[cIdx]) {
+                        maxLenPerCol[cIdx] = len;
+                    }
+                });
             });
-            ws['!cols'] = colWidths;
+
+            ws['!cols'] = maxLenPerCol.map(function(len, idx) {
+                var cHeader = reqCols[idx].toUpperCase();
+                var padded = Math.min(Math.max(len + 4, 12), 48); // Min 12, Max 48 width safety
+                if (cHeader.indexOf("ADDRESS") !== -1) padded = Math.max(padded, 28);
+                if (cHeader.indexOf("CONSUMER-NAME") !== -1) padded = Math.max(padded, 22);
+                return { wch: padded };
+            });
+
+            // 🎯 Apply Auto-Filter on All Headers
+            var endColChar = XLSX.utils.encode_col(reqCols.length - 1);
+            ws['!autofilter'] = { ref: "A1:" + endColChar + (fullData.length + 1) };
             
             XLSX.utils.book_append_sheet(wb, ws, "Data");
             
@@ -7227,29 +7415,138 @@ function openReportGroupView(reportType) {
             processAndDownloadExcel(finalExportData);
         };
     }
+    function formatReportTitleProperCase(str) {
+    if (!str) return "Report";
+    return str
+        .replace(/_/g, " ")
+        .replace(/\s+/g, " ")
+        .trim()
+        .toLowerCase()
+        .replace(/\b[a-z]/g, function(letter) { return letter.toUpperCase(); });
+}
     function generateUniversalPDF(tabName) {
     if (!db) return customAlert("डेटाबेस तैयार नहीं है!");
 
-    var reportNameStr = tabName.toUpperCase();
-    if(tabName === 'reports' && activeReportType) reportNameStr = REPORT_NAMES[activeReportType] || activeReportType;
-    if(tabName === 'list') {
-        var currentFilterStatus = document.getElementById('listStatusFilter') ? document.getElementById('listStatusFilter').value : "PENDING";
-        if (currentFilterStatus === "PENDING") {
-            reportNameStr = "VisiT_Pending Consumers List";
-        } else {
-            reportNameStr = "Attend Consumers List";
-        }
-    }
-    if(tabName === 'billdist') reportNameStr = "Bill Distribution Pending";
-    if(tabName === 'visitdata') reportNameStr = "All Visits Data";
+    // 🎯 1. Master English Proper Case Map Engine (No Underscore, No Hindi/Corrupt Text)
+    var getSanitizedEnglishTitle = function(inputKey, configObj) {
+        var k = (inputKey || "").toString().toLowerCase().trim();
+        var rawName = ((configObj && configObj.name) ? configObj.name : "").toString().toLowerCase().trim();
 
-    var ctxKey = activeReportType;
+        // 🌟 A. 50 KW PENDENCY REPORTS
+        if (k.includes("50") || rawName.includes("50 किलोवाट")) {
+            if (k.includes("visit") || rawName.includes("विजिट पेंडिंग")) {
+                return "50 KW And Above VisiT Pending Consumers List";
+            }
+            if (k.includes("pole") || rawName.includes("पोल")) {
+                if (k.includes("no_mri") || k.includes("not_upload") || rawName.includes("mri नहीं") || rawName.includes("mri nahi")) {
+                    return "50 Kw Pole Meters Remark In MRI Done But MRI Not Upload On Portal Consumers List";
+                }
+                if (k.includes("exc") || k.includes("tdc") || rawName.includes("अलावा अन्य") || rawName.includes("alawa")) {
+                    return "50 Kw Pole Meters Remark Other Than MRI (Like TDC, PDC, Meter Defective, Lead Faulty, Lock ETC.) Consumers List";
+                }
+            } else {
+                if (k.includes("no_mri") || k.includes("not_upload") || rawName.includes("mri नहीं") || rawName.includes("mri nahi")) {
+                    return "50 Kw Remark In MRI Done But MRI Not Upload On Portal Consumers List";
+                }
+                if (k.includes("exc") || k.includes("tdc") || rawName.includes("अलावा अन्य") || rawName.includes("alawa")) {
+                    return "50 Kw Remark Other Than MRI (Like TDC, PDC, Meter Defective, Lead Faulty, Lock ETC.) Consumers List";
+                }
+            }
+        }
+
+        // 🌟 B. MAIN METER PENDENCY REPORTS
+        if (k.includes("main") || rawName.includes("मेन मीटर")) {
+            if (k.includes("mri_pending") || rawName.includes("mri नहीं") || rawName.includes("mri nahi")) {
+                return "Main Meter Remark In MRI Done But MRI Not Upload On Portal Consumers List";
+            }
+            if (k.includes("field_exception") || k.includes("exc") || rawName.includes("अलावा अन्य") || rawName.includes("alawa")) {
+                return "Main Meter Remark Other Than MRI (Like TDC, PDC, Meter Defective, Lead Faulty, Lock ETC.) Consumers List";
+            }
+            if (k.includes("survey") || rawName.includes("लोड सर्वे") || rawName.includes("load survey")) {
+                return "Main Meter MRI Available But No Load Survey Consumers List";
+            }
+            if (k.includes("pole_pending") || rawName.includes("पोल मीटर की एंट्री पेंडिंग")) {
+                return "Main Meter Entry Done But Pole Meter Entry Pending Consumers List";
+            }
+        }
+
+        // 🌟 C. POLE METER PENDENCY REPORTS
+        if (k.includes("pole") || rawName.includes("पोल मीटर")) {
+            if (k.includes("mri_pending") || rawName.includes("mri नहीं") || rawName.includes("mri nahi")) {
+                return "Pole Meter Remark In MRI Done But MRI Not Upload On Portal Consumers List";
+            }
+            if (k.includes("field_exception") || k.includes("exc") || rawName.includes("अलावा अन्य") || rawName.includes("alawa")) {
+                return "Pole Meter Remark Other Than MRI (Like TDC, PDC, Meter Defective, Lead Faulty, Lock ETC.) Consumers List";
+            }
+            if (k.includes("survey") || rawName.includes("लोड सर्वे") || rawName.includes("load survey")) {
+                return "Pole Meter MRI Available But No Load Survey Consumers List";
+            }
+            if (k.includes("main_pending") || rawName.includes("मेन मीटर की एंट्री पेंडिंग")) {
+                return "Pole Meter Entry Done But Main Meter Entry Pending Consumers List";
+            }
+        }
+
+        // 🌟 D. BILL DISTRIBUTION PENDENCY REPORTS
+        if (k.includes("bill_dist") || rawName.includes("bill distribution")) {
+            return "Bill Distribution Pending Consumers List";
+        }
+        if (k.includes("billed_no_bill") || rawName.includes("no bill")) {
+            return "Billed But No Bill Available Consumers List";
+        }
+        if (k.includes("bill_print") || rawName.includes("no print")) {
+            return "Bill Available But Print Pending Consumers List";
+        }
+        if (k.includes("unbill") || rawName.includes("unbilled")) {
+            return "Unbilled Consumers List";
+        }
+
+        // Fallback: Clean Proper Title Case
+        var raw = (configObj && configObj.name) ? configObj.name : (REPORT_NAMES[inputKey] || inputKey || "Consumers List");
+        raw = raw.replace(/^\d+[\.\-\)]\s*/g, '');
+        raw = raw.replace(/[_\-\/\\]+/g, ' ');
+        raw = raw.replace(/[^a-zA-Z0-9\s\(\)\&\,]/g, ' ');
+        raw = raw.replace(/\s+/g, ' ').trim();
+        return raw.toLowerCase().replace(/\b[a-z]/g, function(l) { return l.toUpperCase(); });
+    };
+
+    // 🎯 2. Filter ke anusaar Accurate Title nikalna (Fix: Title Overwrite Bug)
+    var reportNameStr = "";
+    var ctxKey = activeReportType || "";
+
+    if (tabName === 'list') {
+        var listFilterEl = document.getElementById('listStatusFilter');
+        var curStat = listFilterEl ? listFilterEl.value.toUpperCase().trim() : "PENDING";
+        if (curStat === "ALL") {
+            reportNameStr = "All Consumers List";
+        } else if (curStat === "ATTEND" || curStat === "DONE") {
+            reportNameStr = "Attend Consumers List";
+        } else {
+            reportNameStr = "Visit Pending Consumers List";
+        }
+    } else if (tabName === 'billdist') {
+        reportNameStr = "Bill Distribution Pending Consumers List";
+        ctxKey = 'bill_dist_pending';
+    } else if (tabName === 'visitdata') {
+        reportNameStr = "All Visits Data Consumers List";
+    } else if (tabName === 'reports' && activeReportType) {
+        var matchedCfg = (typeof globalReportConfigs !== 'undefined' && Array.isArray(globalReportConfigs)) 
+            ? globalReportConfigs.find(function(c) { return c.key === activeReportType; }) 
+            : null;
+        reportNameStr = getSanitizedEnglishTitle(activeReportType, matchedCfg);
+    } else {
+        reportNameStr = "Consumers List";
+    }
+
+    var pdfDisplayTitle = reportNameStr;
+
     if (!ctxKey) {
         if (tabName === 'billdist') ctxKey = 'bill_dist_pending';
         else if (tabName === 'list') ctxKey = 'all_consumers_list';
     }
     
-    var matchedConfig = globalReportConfigs.find(function(c) { return c.key === ctxKey; });
+    var matchedConfig = (typeof globalReportConfigs !== 'undefined' && Array.isArray(globalReportConfigs))
+        ? globalReportConfigs.find(function(c) { return c.key === ctxKey; })
+        : null;
     var reqCols = [];
     
     if (matchedConfig && matchedConfig.reqColumnsStr && matchedConfig.reqColumnsStr.trim() !== "") {
@@ -7267,16 +7564,22 @@ function openReportGroupView(reportType) {
         reqCols = [
             "DIVISION", 
             "ACCOUNT NO", 
-            "Consumer Type", 
             "CONSUMER-NAME", 
             "ADDRESS", 
             "Master Mobile Number", 
             "LOAD IN KW", 
+            "LOAD GROUP (5-10-50)",
             "FINAL VISIT_DATE", 
+            "LAST MONTH FINAL MM NO.",
+            "LAST MONTH FINAL MM MAKE",
+            "EXCEPTION TYPE (MAIN METER)",
             "FINAL_MAIN_METER_SITE_REMARK", 
-            "REMARK", 
+            "IS MRI AVAILABLE (MAIN METER)",
+            "LAST MONTH FINAL PM NO.",
+            "LAST MONTH FINAL PM MAKE",
+            "EXCEPTION TYPE (POLE METER)",
             "FINAL_POLE_METER_SITE_REMARK", 
-            "ATTEND STATUS", 
+            "IS MRI AVAILABLE (POLE METER)",
             "MR NAME"
         ];
     }
@@ -7284,7 +7587,6 @@ function openReportGroupView(reportType) {
     var fullData = []; 
     var tx = db.transaction("consumers", "readonly");
     
-    // 🚀 DOM के बजाय संपूर्ण डेटाबेस से सीधे यूज़र के रिकॉर्ड्स फ़िल्टर करना
     tx.objectStore("consumers").getAll().onsuccess = function(e) {
         var allRecords = e.target.result || [];
         var currentLoggedInUser = (loggedInReader || "").toString().trim().toUpperCase();
@@ -7300,21 +7602,19 @@ function openReportGroupView(reportType) {
             
             var itemReader = (getReaderName(item) || "").toString().trim().toUpperCase();
             
-            // 🔒 कड़ा सुरक्षा फ़िल्टर: केवल लॉगिन रीडर का ही डेटा जाएगा
             if (!isAdmin) {
-                if (itemReader !== currentLoggedInUser) return false;
+                var selectedScope = document.getElementById('listScopeFilter') ? document.getElementById('listScopeFilter').value : "MY";
+                if (selectedScope !== "ALL_CON" && itemReader !== currentLoggedInUser) return false;
             } else {
                 if (!isReaderAllowed(itemReader)) return false;
             }
 
-            // 📦 Bill Distribution Tab PDF ke liye exact Pending filter
             if (tabName === 'billdist') {
                 var selectedLoadCat = document.getElementById('billLoadCategoryFilter') ? document.getElementById('billLoadCategoryFilter').value : "ALL";
                 var selectedDeliveryMode = document.getElementById('billDeliveryCategoryFilter') ? document.getElementById('billDeliveryCategoryFilter').value : "FOR_DIST";
                 var selectedDeliveryStatus = document.getElementById('billDeliveryStatusFilter') ? document.getElementById('billDeliveryStatusFilter').value : "Distribution Pending";
                 var billSearchVal = document.getElementById('billSearchBar') ? document.getElementById('billSearchBar').value.trim().toUpperCase() : "";
 
-                // Load check
                 var rawLoadGrp = (getRobustKey(item, "LOAD GROUP (5-10-50)") || item.loadGroup || "").toString().toUpperCase().trim();
                 var rawLoadCat = (item["LOAD_CATOGERY (5,10)"] || "").toString().toUpperCase().trim();
                 var numLoad = parseFloat(getRobustKey(item, "LOAD IN KW") || item.loadInKw || "0");
@@ -7329,7 +7629,6 @@ function openReportGroupView(reportType) {
                 }
                 if (!loadMatch) return false;
 
-                // Eligibility check
                 var billUploadRaw = (getRobustKey(item, "IS BILL UPLOAD") || item["IS BILL UPLOAD"] || item.isBillUpload || "").toString().toUpperCase().trim();
                 var hasBillUploaded = (billUploadRaw === "YES" || billUploadRaw === "TRUE" || parseTrue(item.isBillUpload) || (item.pdfLink && item.pdfLink.trim() !== ""));
 
@@ -7356,7 +7655,6 @@ function openReportGroupView(reportType) {
                 }
                 if (!matchesBillCondition) return false;
 
-                // Delivery Status
                 var distColVal = (getRobustKey(item, "DISTRIBUTION STATUS") || item["DISTRIBUTION STATUS"] || item.distStatus || "").toString().trim().toUpperCase();
                 var isColDelivered = (distColVal.includes("DELIVER") || distColVal.includes("DELEIVER") || distColVal === "DISTRIBUTED");
                 var isColPending = (!isColDelivered || distColVal.includes("PENDING"));
@@ -7364,7 +7662,6 @@ function openReportGroupView(reportType) {
                 if (selectedDeliveryStatus === "Distribution Pending" && !isColPending) return false;
                 if (selectedDeliveryStatus === "Deleiverd" && !isColDelivered) return false;
 
-                // Search Box Match
                 if (billSearchVal !== "") {
                     var searchStr = ((item.accountNo || "") + " " + (item.consumerName || "") + " " + (getRobustKey(item, "ADDRESS") || "")).toUpperCase();
                     if (searchStr.indexOf(billSearchVal) === -1) return false;
@@ -7404,77 +7701,156 @@ function openReportGroupView(reportType) {
     
     tx.oncomplete = function() {
         if (fullData.length === 0) return customAlert("डाउनलोड के लिए कोई डेटा उपलब्ध नहीं है!");
+        
+        // 🎯 3. Meter Reader Name A to Z Sorting (Sabhi ke liye)
         fullData.sort(function(a, b) {
-            var nameA = (getReaderName(a) || "").toUpperCase().trim();
-            var nameB = (getReaderName(b) || "").toUpperCase().trim();
+            var mrA = (getReaderName(a) || "").toUpperCase().trim();
+            var mrB = (getReaderName(b) || "").toUpperCase().trim();
+            if (mrA !== mrB) return mrA.localeCompare(mrB);
+            var nameA = (a.consumerName || "").toUpperCase().trim();
+            var nameB = (b.consumerName || "").toUpperCase().trim();
             return nameA.localeCompare(nameB);
         });
 
-        var doc = new window.jspdf.jsPDF({ orientation: 'landscape', unit: 'pt', format: 'a3' }); 
+        // 🎯 4. Header text cleaning (No Underscore, Proper Case)
+        var cleanHeadCols = reqCols.map(function(col) {
+            var cClean = col.replace(/[_\-]+/g, " ").replace(/\s+/g, " ").trim();
+            return cClean.toLowerCase().replace(/\b[a-z]/g, function(l) { return l.toUpperCase(); });
+        });
+
         var rows = fullData.map(function(r) { 
             return reqCols.map(function(c) { 
                 var val = (c === "MR NAME") ? getReaderName(r) : getRobustKey(r, c);
-                return (val !== undefined && val !== null && val.toString().trim() !== "") ? val.toString() : "-"; 
+                return (val !== undefined && val !== null && val.toString().trim() !== "") ? val.toString().trim() : "-"; 
             }); 
         });
+
+        // 🚀 FIX: A2 Landscape (A3 se bada — saare columns fit honge)
+        var doc = new window.jspdf.jsPDF({ orientation: 'landscape', unit: 'pt', format: 'a2' });
+        var pWidth = doc.internal.pageSize.width;  // 1684 pt (A3 tha 1190 pt)
+        var usableTableWidth = pWidth - 20;        // 1664 pt total width budget
+        var marginLeft = 10;
+        var marginRight = 10;
+
+        // 🎯 5. DYNAMIC Auto-Fit Column Width Engine
+        // Pehle calculate karo: har column ki "natural width" kya honi chahiye
+        // Phir total ko usableTableWidth mein adjust karo (proportionately)
         
-        var pdfDisplayTitle = (tabName === 'reports' && activeReportType) ? activeReportType.toUpperCase() : reportNameStr.replace(/[^\x00-\x7F]/g, "").trim();
-        if (!pdfDisplayTitle || pdfDisplayTitle === "") pdfDisplayTitle = "REPORT";
+        var minColWidths = reqCols.map(function(col) {
+            var colUpper = col.toUpperCase().trim().replace(/[\r\n_]/g, " ");
+            
+            if (colUpper.indexOf("MR NAME") !== -1 || colUpper.indexOf("METER READER") !== -1) return 65;
+            if (colUpper.indexOf("CONSUMER-NAME") !== -1 || colUpper.indexOf("CONSUMER NAME") !== -1) return 95;
+            if (colUpper.indexOf("ADDRESS") !== -1) return 130;
+            if (colUpper.indexOf("ACCOUNT") !== -1) return 52;
+            if (colUpper.indexOf("MOBILE") !== -1) return 52;
+            if (colUpper.indexOf("DIVISION") !== -1) return 55;
+            if (colUpper.indexOf("SUB DIVISION") !== -1) return 55;
+            if (colUpper.indexOf("LOAD IN KW") !== -1) return 42;
+            if (colUpper.indexOf("LOAD GROUP") !== -1) return 48;
+            if (colUpper.indexOf("VISIT DATE") !== -1 || colUpper.indexOf("VISIT_DATE") !== -1) return 58;
+            if (colUpper.indexOf("REMARK") !== -1 || colUpper.indexOf("EXCEPTION") !== -1) return 75;
+            if (colUpper.indexOf("METER NO") !== -1 || colUpper.indexOf("MM NO") !== -1 || colUpper.indexOf("PM NO") !== -1) return 52;
+            if (colUpper.indexOf("MAKE") !== -1) return 40;
+            if (colUpper.indexOf("IS MRI") !== -1 || colUpper.indexOf("SURVAY") !== -1 || colUpper.indexOf("SURVEY") !== -1) return 35;
+            if (colUpper.indexOf("MRI") !== -1) return 35;
+            if (colUpper.indexOf("DATE") !== -1) return 55;
+            return 42; // default
+        });
+
+        // Total natural width nikalo
+        var totalNaturalWidth = minColWidths.reduce(function(a, b) { return a + b; }, 0);
+        var scaleFactor = usableTableWidth / totalNaturalWidth;
+
+        // 🎯 Har column ki width ko scale karo — agar sab fit ho jaye toh
+        // scale = 1, warna thoda squeeze karo
+        var dynamicColStyles = {};
+        reqCols.forEach(function(col, idx) {
+            var colUpper = col.toUpperCase().trim().replace(/[\r\n_]/g, " ");
+            var naturalW = minColWidths[idx];
+            var finalW = Math.max(28, Math.floor(naturalW * scaleFactor));
+
+            // Halign decide karo
+            var halign = 'center';
+            var fontStyle = 'normal';
+            
+            if (colUpper.indexOf("CONSUMER-NAME") !== -1 || colUpper.indexOf("ADDRESS") !== -1 || colUpper.indexOf("REMARK") !== -1) {
+                halign = 'left';
+            }
+            if (colUpper.indexOf("MR NAME") !== -1 || colUpper.indexOf("CONSUMER-NAME") !== -1 || colUpper.indexOf("ACCOUNT") !== -1) {
+                fontStyle = 'bold';
+            }
+
+            dynamicColStyles[idx] = { cellWidth: finalW, halign: halign, fontStyle: fontStyle };
+        });
 
         doc.autoTable({ 
-            head: [reqCols], 
+            head: [cleanHeadCols], 
             body: rows, 
-            startY: 75, 
+            startY: 55, 
             theme: 'grid',
-            tableWidth: 'auto',
-            margin: { top: 75, left: 15, right: 15, bottom: 35 },
+            tableWidth: usableTableWidth,
+            margin: { top: 55, left: marginLeft, right: marginRight, bottom: 25 },
             styles: { 
-                fontSize: 6.5, 
+                fontSize: 5.5,              // 🎯 Font chhota kiya (6.2 → 5.5)
                 textColor: [15, 23, 42], 
                 overflow: 'linebreak', 
-                cellPadding: 2.5,
+                cellPadding: 1.8,            // 🎯 Padding kam ki
                 halign: 'center', 
-                valign: 'middle'
+                valign: 'middle',
+                lineColor: [203, 213, 225],
+                lineWidth: 0.3
             }, 
             headStyles: { 
                 fillColor: [30, 58, 138], 
                 textColor: [255, 255, 255], 
-                fontSize: 7, 
-                fontStyle: 'bold',
-                halign: 'center' 
+                fontSize: 5.8,               // 🎯 Header font chhota
+                fontStyle: 'bold', 
+                halign: 'center', 
+                valign: 'middle',
+                cellPadding: 2.5
             },
-            columnStyles: {
-                0: { halign: 'center' }, // DIVISION
-                1: { halign: 'center', fontStyle: 'bold' }, // ACCOUNT NO
-                3: { cellWidth: 100, halign: 'left' }, // CONSUMER-NAME
-                4: { cellWidth: 130, halign: 'left' }, // ADDRESS
-                5: { halign: 'center' } // Master Mobile Number
+            alternateRowStyles: {
+                fillColor: [248, 250, 252]
             },
+            columnStyles: dynamicColStyles,
             didDrawPage: function(data) {
-                doc.setFontSize(15); doc.setTextColor(30, 58, 138); doc.setFont("Helvetica", "bold");
-                doc.text("Report Name :- " + pdfDisplayTitle, 15, 35);
-                doc.setFontSize(9.5); doc.setTextColor(71, 85, 105); doc.setFont("Helvetica", "normal");
-                doc.text("Date & Time :- " + getPrintableDateTime() + "   |   Total Count: " + fullData.length, 15, 55);
+                doc.setFontSize(12); doc.setTextColor(30, 58, 138); doc.setFont("Helvetica", "bold");
+                doc.text("Report Name: " + pdfDisplayTitle, marginLeft, 25);
+                
+                doc.setFontSize(9); doc.setTextColor(71, 85, 105); doc.setFont("Helvetica", "normal");
+                doc.text("Date & Time: " + getPrintableDateTime() + "   |   Total Count: " + fullData.length, marginLeft, 42);
             }
         });
         
         var pageCount = doc.internal.getNumberOfPages();
         for (var i = 1; i <= pageCount; i++) { 
-            doc.setPage(i); doc.setFontSize(10); doc.setTextColor(30,58,138); doc.setFont("Helvetica", "bold");
-            doc.text('Report Prepared By: DvVNL Billing Tool | Er. Anurag Shakya | Mo: 9761414105 - Page ' + i + ' of ' + pageCount, doc.internal.pageSize.width / 2, doc.internal.pageSize.height - 15, { align: 'center' }); 
+            doc.setPage(i); 
+            doc.setFontSize(7.5); doc.setTextColor(71, 85, 105); doc.setFont("Helvetica", "normal");
+            doc.text('Report Prepared By: DvVNL Billing Tool | Er. Anurag Shakya | Mo: 9761414105', 14, doc.internal.pageSize.height - 10);
+            doc.text('Page ' + i + ' of ' + pageCount, doc.internal.pageSize.width - 14, doc.internal.pageSize.height - 10, { align: 'right' }); 
         }
         
-        var filename = pdfDisplayTitle.replace(/[^a-zA-Z0-9_ ]/g, "").replace(/\s+/g, "_") + "_" + getFormattedDateTimeForFile() + ".pdf";
+        // 🎯 6. Clean File Name (Bina kisi underscore ke)
+        var cleanFileNameOnly = pdfDisplayTitle.replace(/[^a-zA-Z0-9 ]/g, " ").replace(/\s+/g, " ").trim();
+        var dateFormatted = getFormattedDateTimeForFile().replace(/_/g, "-");
+        var filename = cleanFileNameOnly + " (" + dateFormatted + ").pdf";
+
         if (typeof AndroidBridge !== "undefined" && AndroidBridge.processBase64Download) {
             var rawBase64 = doc.output('arraybuffer');
             var uint8 = new Uint8Array(rawBase64);
             var binary = '';
             for (var j = 0; j < uint8.byteLength; j++) { binary += String.fromCharCode(uint8[j]); }
             var base64String = btoa(binary);
-            AndroidBridge.processBase64Download(base64String, "pdf", filename);
-            showThinAlert("🎉 Report PDF डाउनलोड होना शुरू हो गया है...", true);
+            if (typeof AndroidBridge.processBase64DownloadWithFileName === "function") {
+                AndroidBridge.processBase64DownloadWithFileName(base64String, "pdf", filename);
+            } else if (AndroidBridge.processBase64Download.length >= 3) {
+                AndroidBridge.processBase64Download(base64String, "pdf", filename);
+            } else {
+                AndroidBridge.processBase64Download(base64String, "pdf");
+            }
+            showThinAlert("🎉 PDF डाउनलोड शुरू हो गया...", true);
         } else {
-            // Universal GitHub / Web Browsers Failsafe Download
             var blob = doc.output('blob');
             var link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
@@ -7485,7 +7861,7 @@ function openReportGroupView(reportType) {
                 document.body.removeChild(link);
                 URL.revokeObjectURL(link.href);
             }, 100);
-            showThinAlert("🎉 Report PDF डाउनलोड सफल!", true);
+            showThinAlert("🎉 PDF डाउनलोड सफल!", true);
         }
     };
 }
@@ -7699,9 +8075,36 @@ function openReportGroupView(reportType) {
                     });
 
                     r.data.forEach(function(item) {
-                        rAoa.push(reqCols.map(function(c) { return { v: ((c === "MR NAME") ? getReaderName(item) : getRobustKey(item, c)).toString() }; }));
+                        rAoa.push(reqCols.map(function(c) { 
+                            var val = (c === "MR NAME") ? getReaderName(item) : getRobustKey(item, c);
+                            var isLeftAlign = (c.toUpperCase().indexOf("CONSUMER-NAME") !== -1 || c.toUpperCase().indexOf("ADDRESS") !== -1);
+                            return { 
+                                v: (val !== undefined && val !== null) ? val.toString().trim() : "",
+                                s: {
+                                    font: { sz: 9 },
+                                    alignment: { horizontal: isLeftAlign ? "left" : "center", vertical: "center" }
+                                }
+                            }; 
+                        }));
                     });
+
                     var ws = XLSX.utils.aoa_to_sheet(rAoa); 
+
+                    // 🎯 Auto-Fit Columns
+                    var maxLens = reqCols.map(function(c) { return c.toString().length; });
+                    r.data.forEach(function(item) {
+                        reqCols.forEach(function(c, cIdx) {
+                            var valStr = ((c === "MR NAME") ? getReaderName(item) : getRobustKey(item, c)) || "";
+                            var l = valStr.toString().trim().length;
+                            if (l > maxLens[cIdx]) maxLens[cIdx] = l;
+                        });
+                    });
+                    ws['!cols'] = maxLens.map(function(len) { return { wch: Math.min(Math.max(len + 4, 12), 48) }; });
+
+                    // 🎯 Auto-Filter Apply
+                    var lastCol = XLSX.utils.encode_col(reqCols.length - 1);
+                    ws['!autofilter'] = { ref: "A1:" + lastCol + (r.data.length + 1) };
+
                     var safeName = r.name.replace(/[^a-zA-Z0-9 ]/g, "").substring(0, 30);
                     XLSX.utils.book_append_sheet(wb, ws, safeName);
                 }
@@ -8624,7 +9027,7 @@ function saveToIndexedDB(entryData) {
         mainContainerNode.style.setProperty("padding-bottom", "140px", "important");
     }
 
-    speakHindiVoice("एंट्री सुरक्षित हो गई है");
+    speakHindiVoice("entry surakshit ho gayi hai");
     setTimeout(function() {
         showThinAlert("✅ एंट्री सुरक्षित हो गई है!", true);
     }, 100);
@@ -8695,7 +9098,7 @@ function triggerSilentBackgroundSync() {
                                 var delTx = db.transaction("saved_entries", "readwrite"); 
                                 delTx.objectStore("saved_entries").clear(); 
                                 delTx.oncomplete = function() { 
-                                    speakHindiVoice("डेटा सर्वर पर सिंक हो गया है");
+                                    speakHindiVoice("data server par sync ho gaya hai");
                                     if (typeof checkSyncStatus === 'function') checkSyncStatus();
                                     if (typeof updateSummaryStatsRaw === 'function') updateSummaryStatsRaw();
                                 };
@@ -8783,7 +9186,7 @@ function triggerSilentBackgroundSync() {
 
         document.body.classList.remove('desktop-force');
 
-        var overlays = ['customDialogOverlay', 'quickViewModal', 'dateDrilldownModal', 'contactUpdateModal', 'globalNotificationOverlay', 'dataDownloadInstructionScreen'];
+        var overlays = ['customDialogOverlay', 'quickViewModal', 'dateDrilldownModal', 'contactUpdateModal', 'globalNotificationOverlay'];
         overlays.forEach(function(id) {
             var el = document.getElementById(id);
             if (el) el.style.setProperty("display", "none", "important");
@@ -10683,130 +11086,10 @@ function renderSurveyListHtml(elemId, list, isTop) {
     });
     node.innerHTML = html;
 }
-
-function toggleSkeletonShimmerLoader(show) {
-    var loader = document.getElementById('appSkeletonLoader');
-    var mainContent = document.getElementById('listDataContainer');
-    if (!loader) return;
-
-    if (show) {
-        loader.style.display = 'flex';
-        if (mainContent) mainContent.style.opacity = '0.3';
-    } else {
-        loader.style.display = 'none';
-        if (mainContent) mainContent.style.opacity = '1';
-    }
-}
-
 // =========================================================================
 // 🎨 POINT 4: CUSTOM THEME BUILDER & DYNAMIC COLOR PICKER ENGINE
 // =========================================================================
-// 📊 लोड सर्वे बैनर पॉप-अप पूरी तरह बंद
-function openLoadSurveyBanner(isManualClick) {
-    return; // पॉप-अप पूरी तरह डिसेबल कर दिया गया है
-}
 
-function closeLoadSurveyBanner() {
-    var modal = document.getElementById('loadSurveyBannerModal');
-    if (modal) {
-        modal.style.setProperty("display", "none", "important");
-    }
-}
-
-// 📈 मेन मीटर लोड सर्वे प्रतिशत की गणना और रेंडरिंग इंजन
-function calculateAndRenderLoadSurveyData() {
-    if (!db) return;
-    
-    var topListContainer = document.getElementById('bannerTopLoadSurveyList');
-    var poorListContainer = document.getElementById('bannerPoorLoadSurveyList');
-    
-    // प्रतिबंधित नाम (Anurag Shakya, Kapil, Gaurav)
-    var restrictedKeywords = ["ANURAG", "KAPIL", "GAURAV", "GIRISH", "GREESH"];
-
-    var tx = db.transaction("consumers", "readonly");
-    tx.objectStore("consumers").getAll().onsuccess = function(e) {
-        var allConsumers = e.target.result || [];
-        var readerSurveyMap = {};
-
-        allConsumers.forEach(function(item) {
-            var rName = getReaderName(item);
-            if (!rName || rName.trim() === "") return;
-            rName = rName.trim().toUpperCase();
-
-            // Restricted Keywords (ANURAG, KAPIL, GAURAV नाम या उपनाम वाले सभी यूज़र्स को हटाने के लिए)
-           var restrictedKeywords = ["ANURAG", "KAPIL", "GAURAV", "GIRISH", "GREESH"];
-            if (restrictedKeywords.some(function(k) { return rName.includes(k); })) return;
-
-            if (!readerSurveyMap[rName]) {
-                readerSurveyMap[rName] = { mriCount: 0, surveyCount: 0 };
-            }
-
-            var mainRem = (getRobustKey(item, "FINAL_MAIN_METER_SITE_REMARK") || item.mainStatusRemark || "").toString().toUpperCase();
-            var hasSurvey = parseTrue(getRobustKey(item, "IS LOAD SURVAY AVAILBLE (MAIN Mtr)")) || parseTrue(item.surveyAvailableMain);
-
-            // यदि MRI हुई है
-            if (mainRem.includes("MRI DONE") || mainRem.includes("CMRI DONE")) {
-                readerSurveyMap[rName].mriCount++;
-                if (hasSurvey) {
-                    readerSurveyMap[rName].surveyCount++;
-                }
-            }
-        });
-
-        var performers = Object.keys(readerSurveyMap).map(function(name) {
-            var data = readerSurveyMap[name];
-            var pct = data.mriCount > 0 ? Math.round((data.surveyCount / data.mriCount) * 100) : 0;
-            return {
-                name: name,
-                mriCount: data.mriCount,
-                surveyCount: data.surveyCount,
-                pct: pct
-            };
-        }).filter(function(p) { return p.mriCount > 0; });
-
-        // उच्चतम % के आधार पर सॉर्ट करें
-        performers.sort(function(a, b) { return b.pct - a.pct; });
-
-        // 1. उच्चतम लोड सर्वे % (Top Performers)
-        if (topListContainer) {
-            var top3 = performers.slice(0, 3);
-            var medals = ["🥇", "🥈", "🥉"];
-            var topHtml = "";
-
-            if (top3.length === 0) {
-                topHtml = '<div style="color:#64748b; font-size:11px; text-align:center;">कोई डेटा उपलब्ध नहीं है</div>';
-            } else {
-                top3.forEach(function(p, idx) {
-                    topHtml += '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; padding-bottom: 4px; border-bottom: 1px dashed #bbf7d0;">' +
-                               '<span>' + medals[idx] + ' <b>' + p.name + '</b></span>' +
-                               '<span style="color:#15803d; font-weight:900;">' + p.pct + '% <small style="color:#64748b; font-size:10px;">(' + p.surveyCount + '/' + p.mriCount + ')</small></span>' +
-                               '</div>';
-                });
-            }
-            topListContainer.innerHTML = topHtml;
-        }
-
-        // 2. न्यूनतम लोड सर्वे % (Lower Performers)
-        if (poorListContainer) {
-            var poorSorted = performers.slice().reverse();
-            var poor3 = poorSorted.slice(0, 3);
-            var warningIcons = ["🚨", "⚠️", "🔻"];
-            var poorHtml = "";
-
-            if (poor3.length === 0) {
-                poorHtml = '<div style="color:#64748b; font-size:11px; text-align:center;">कोई डेटा उपलब्ध नहीं है</div>';
-            } else {
-                poor3.forEach(function(p, idx) {
-                    poorHtml += '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; padding-bottom: 4px; border-bottom: 1px dashed #fecdd3;">' +
-                                '<span>' + warningIcons[idx] + ' <b style="color:#b91c1c;">' + p.name + '</b></span>' +
-                                '<span style="color:#dc2626; font-weight:900;">' + p.pct + '% <small style="color:#64748b; font-size:10px;">(' + p.surveyCount + '/' + p.mriCount + ')</small></span>' +
-                                '</div>';
-                });
-            }
-            poorListContainer.innerHTML = poorHtml;
-        }
-    };
-}
 
 
 // 📄 स्क्रीन जैसा बड़े फ़ॉन्ट वाला सुपर-क्लियर कलरफुल डैशबोर्ड PDF डाउनलोड करने का इंजन
@@ -11084,37 +11367,166 @@ function downloadColorfulDashboardPDF() {
         }
     };
 }
-// 🔊 हिंदी वॉइस अनाउंसमेंट इंजन (बिना APK बदले सीधे HTML से 100% वर्किंग)
+// 📢 डेटा डाउनलोड के बाद विशिष्ट पेंडेंसी कार्ड्स का काउंट बोलकर बताने वाला इंजन
+function announceSpecialPendingVoiceReport() {
+    var activeUser = loggedInReader || localStorage.getItem("mtr_reader_session_lock") || "";
+    if (!db || !activeUser) return;
+
+    var readerNameProper = toTitleProperCase(activeUser);
+
+    var tx = db.transaction("consumers", "readonly");
+    tx.objectStore("consumers").getAll().onsuccess = function(e) {
+        var allData = e.target.result || [];
+        var mainMriPendingCount = 0;
+        var poleMriPendingCount = 0;
+
+        for (var i = 0; i < allData.length; i++) {
+            var item = allData[i] || {};
+            
+            // केवल लॉगिन यूजर/आवंटित रीडर का डेटा फिल्टर करें
+            if (!isReaderAllowed(getReaderName(item))) continue;
+
+            // 1. मेन मीटर: रिमार्क MRI Done में है लेकिन MRI अपलोड नहीं है
+            var mainRem = (getRobustKey(item, "FINAL_MAIN_METER_SITE_REMARK") || item.mainStatusRemark || "").toString().toUpperCase();
+            var isMainMriDone = mainRem.includes("MRI DONE") || mainRem.includes("CMRI DONE");
+            var isMainMriAvail = parseTrue(getRobustKey(item, "IS MRI AVAILABLE (MAIN METER)")) || parseTrue(item.mriAvailableMain);
+
+            if (isMainMriDone && !isMainMriAvail) {
+                mainMriPendingCount++;
+            }
+
+            // 2. पोल मीटर: रिमार्क MRI Done में है लेकिन MRI अपलोड नहीं है
+            var poleRem = (getRobustKey(item, "FINAL_POLE_METER_SITE_REMARK") || item.poleStatusRemark || "").toString().toUpperCase();
+            var isPoleMriDone = poleRem.includes("MRI DONE") || poleRem.includes("CMRI DONE");
+            var isPoleMriAvail = parseTrue(getRobustKey(item, "IS MRI AVAILABLE (POLE METER)")) || parseTrue(item.mriAvailablePole);
+
+            if (isPoleMriDone && !isPoleMriAvail) {
+                poleMriPendingCount++;
+            }
+        }
+
+        // यदि दोनों में से किसी भी कार्ड में पेंडेंसी है तो पूरा विस्तृत संदेश बोलेगा
+        if (mainMriPendingCount > 0 || poleMriPendingCount > 0) {
+            var msg = "Dear " + readerNameProper + " जी, आपके मेन मीटर के " + mainMriPendingCount + " कंज्यूमर्स ऐसे हैं जिनका रिमार्क एम आर आई में है लेकिन डेटा अभी तक अपलोड नहीं हुआ है, और ऐसे ही पोल मीटर में भी " + poleMriPendingCount + " कंज्यूमर्स ऐसे हैं जिनका रिमार्क एम आर आई में दिया है लेकिन एम आर आई नहीं है। अगर इनका डेटा मशीन में है तो तुरंत ऑफिस जाकर डाउनलोड करवाएं, और अगर डेटा करप्ट है तो इनकी दोबारा विजिट करके जल्द से जल्द डेटा डाउनलोड करवाएं। कंज्यूमर्स लिस्ट रिपोर्ट सेक्शन में जाकर देखें। धन्यवाद।";
+            speakHindiVoice(msg);
+        }
+    };
+}
+// 🔊 हिंदी वॉइस अनाउंसमेंट इंजन (Autoplay Bypass, Queue & Background Guard)
 var globalVoiceAudioPlayer = null;
+var pendingAutoVoiceQueue = null;
+var audioContextUnlocked = false;
+
+function unlockVoicePermission() {
+    try {
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.resume();
+        }
+        
+        var AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (AudioContextClass && !audioContextUnlocked) {
+            var ctx = new AudioContextClass();
+            if (ctx.state === 'suspended') {
+                ctx.resume();
+            }
+            audioContextUnlocked = true;
+        }
+
+        // Touch hote hi pending messages queue se play ho jayenge
+        if (pendingAutoVoiceQueue) {
+            var queuedMsg = pendingAutoVoiceQueue;
+            pendingAutoVoiceQueue = null;
+            speakHindiVoice(queuedMsg);
+        }
+    } catch(e) {}
+}
+
+['click', 'touchstart', 'touchend', 'keydown'].forEach(function(evt) {
+    document.addEventListener(evt, unlockVoicePermission, { capture: true });
+});
 
 function speakHindiVoice(message) {
     if (!message) return;
+    var fullVoiceMessage = message.toString().trim();
+    console.log("🔊 Speaking Voice:", fullVoiceMessage);
 
-    // 1. Android APK में नेटिव TextToSpeech चलाएं (100% वर्किंग)
-    if (typeof AndroidBridge !== "undefined" && typeof AndroidBridge.speakOut === "function") {
-        AndroidBridge.speakOut(message);
-        return;
+    // 1. Android Native Bridge (No Autoplay restrictions here)
+    if (typeof AndroidBridge !== "undefined") {
+        if (typeof AndroidBridge.speakOut === "function") {
+            try { AndroidBridge.speakOut(fullVoiceMessage); return; } catch(e){}
+        }
+        if (typeof AndroidBridge.speak === "function") {
+            try { AndroidBridge.speak(fullVoiceMessage); return; } catch(e){}
+        }
     }
 
-    // 2. कंप्यूटर/वेब ब्राउज़र के लिए फॉलबैक
+    // 2. Web SpeechSynthesis Engine
+    if ('speechSynthesis' in window) {
+        try {
+            window.speechSynthesis.cancel();
+            window.speechSynthesis.resume();
+
+            var utterance = new SpeechSynthesisUtterance(fullVoiceMessage);
+            utterance.lang = 'hi-IN';
+            utterance.rate = 0.95;
+            utterance.pitch = 1.0;
+            utterance.volume = 1.0;
+
+            var voices = window.speechSynthesis.getVoices();
+            if (voices && voices.length > 0) {
+                var hindiVoice = voices.find(function(v) { 
+                    return v.lang && (v.lang.toLowerCase().indexOf('hi') === 0 || v.lang.indexOf('IN') !== -1); 
+                });
+                if (hindiVoice) utterance.voice = hindiVoice;
+            }
+
+            var hasStartedSpeaking = false;
+            utterance.onstart = function() {
+                hasStartedSpeaking = true;
+                pendingAutoVoiceQueue = null;
+            };
+
+            utterance.onerror = function(err) {
+                playGoogleTTSFallback(fullVoiceMessage);
+            };
+
+            window.speechSynthesis.speak(utterance);
+
+            setTimeout(function() {
+                if (!hasStartedSpeaking && window.speechSynthesis.speaking === false) {
+                    playGoogleTTSFallback(fullVoiceMessage);
+                }
+            }, 1000);
+            return;
+        } catch(speechErr) {
+            console.warn("SpeechSynthesis error:", speechErr);
+        }
+    }
+
+    // 3. Fallback
+    playGoogleTTSFallback(fullVoiceMessage);
+}
+
+function playGoogleTTSFallback(msg) {
     try {
         if (globalVoiceAudioPlayer) {
-            globalVoiceAudioPlayer.pause();
-            globalVoiceAudioPlayer.currentTime = 0;
+            try { globalVoiceAudioPlayer.pause(); globalVoiceAudioPlayer.currentTime = 0; } catch(e){}
         }
-
-        var audioUrl = "https://translate.google.com/translate_tts?ie=UTF-8&tl=hi&client=tw-ob&q=" + encodeURIComponent(message);
+        var audioUrl = "https://translate.google.com/translate_tts?ie=UTF-8&tl=hi&client=tw-ob&q=" + encodeURIComponent(msg);
         globalVoiceAudioPlayer = new Audio(audioUrl);
-        globalVoiceAudioPlayer.play().catch(function(e) {
-            if ('speechSynthesis' in window) {
-                window.speechSynthesis.cancel();
-                var u = new SpeechSynthesisUtterance(message);
-                u.lang = 'hi-IN';
-                window.speechSynthesis.speak(u);
-            }
-        });
+        globalVoiceAudioPlayer.volume = 1.0;
+
+        var playPromise = globalVoiceAudioPlayer.play();
+        if (playPromise !== undefined) {
+            playPromise.then(function() {
+                pendingAutoVoiceQueue = null;
+            }).catch(function(e) {
+                // Autoplay block hone par queue mein daal dega, screen chhoote hi bol dega
+                pendingAutoVoiceQueue = msg;
+            });
+        }
     } catch (err) {
-        console.error("Audio TTS Error:", err);
+        pendingAutoVoiceQueue = msg;
     }
 }
 // 🕒 डेटा 1 घंटे से अधिक पुराना होने पर वॉयस एवं स्क्रीन अलर्ट इंजन
@@ -11122,19 +11534,25 @@ function checkDataAgeAndAlertUser() {
     if (!loggedInReader) return;
     
     var lastSyncMs = localStorage.getItem("last_sync_time_ms_" + loggedInReader);
-    if (!lastSyncMs) return;
-
     var currentTime = new Date().getTime();
-    var timeDiffHours = (currentTime - parseInt(lastSyncMs, 10)) / (1000 * 60 * 60);
+    var isStale = false;
 
-    // यदि डेटा 1 घंटे (60 मिनट) से अधिक पुराना है
-    if (timeDiffHours >= 1) {
+    // यदि कभी सिंक नहीं हुआ या 1 घंटे (60 मिनट) से ज़्यादा पुराना है
+    if (!lastSyncMs) {
+        isStale = true;
+    } else {
+        var diffHours = (currentTime - parseInt(lastSyncMs, 10)) / (1000 * 60 * 60);
+        if (diffHours >= 1) {
+            isStale = true;
+        }
+    }
+
+    if (isStale) {
         showThinAlert("⚠️ आपका डेटा पुराना है, कृपया नया डेटा डाउनलोड करें!", false);
         
-        // यूज़र को बोलकर सूचित करें
-        speakHindiVoice("आपका डेटा पुराना है, कृपया नया डेटा डाउनलोड करें");
+        // स्पष्ट शुद्ध हिंदी में उद्घोषणा
+        speakHindiVoice("आपका डेटा पुराना हो गया है, कृपया नया डेटा डाउनलोड करें");
 
-        // LAST UPDATED बार को लाल/अलर्ट कलर में ब्लिंक कराएं
         var lastUpdBar = document.getElementById('lastUpdatedLabel');
         if (lastUpdBar) {
             lastUpdBar.style.border = "2px solid #ef4444";
@@ -11142,6 +11560,83 @@ function checkDataAgeAndAlertUser() {
         }
     }
 }
+
+// 🚀 NAYA FUNCTION: Agar data fail hua tha ya purana tha, to app khulte hi silently background download start karega
+function autoTriggerSilentDownloadIfStale() {
+    if (!navigator.onLine || !loggedInReader) return;
+    if (isDownloadingMasterData) return; // Already chal raha hai to skip
+    
+    var lastSyncMs = localStorage.getItem("last_sync_time_ms_" + loggedInReader);
+    var currentTime = new Date().getTime();
+    var shouldDownload = false;
+    var reason = "";
+    
+    if (!lastSyncMs) {
+        // Kabhi download nahi hua
+        shouldDownload = true;
+        reason = "First time download";
+    } else {
+        var timeDiffHours = (currentTime - parseInt(lastSyncMs, 10)) / (1000 * 60 * 60);
+        if (timeDiffHours >= 1) {
+            // 1 ghante se zyada purana data
+            shouldDownload = true;
+            reason = "Data is " + Math.round(timeDiffHours) + " hours old";
+        }
+    }
+    
+    // Agar slot-based download time hai
+    if (!shouldDownload && shouldTriggerScheduledSlotDownload()) {
+        shouldDownload = true;
+        reason = "Scheduled slot download";
+    }
+    
+    if (shouldDownload) {
+        console.log("🔄 Auto silent download triggered: " + reason);
+        showThinAlert("⚡ बैकग्राउंड में नया डेटा डाउनलोड हो रहा है...", false);
+        
+        // 🔊 VOICE — DOWNLOAD SHURU HOTE HI BAJAO (callback ka wait mat karo)
+        try {
+            var hrNow = new Date().getHours();
+            var greetVoice = "Good Morning";
+            if(hrNow >= 12 && hrNow < 17) greetVoice = "Good Afternoon";
+            else if(hrNow >= 17 && hrNow < 21) greetVoice = "Good Evening";
+            else if(hrNow >= 21 || hrNow < 5) greetVoice = "Good Night";
+            
+            var readerNameProper = toTitleProperCase(loggedInReader);
+            var voiceMsg = greetVoice + " " + readerNameProper + " जी, आपका नया डेटा डाउनलोड हो रहा है। कृपया प्रतीक्षा करें।";
+            console.log("🔊 Voice Triggered (auto):", voiceMsg);
+            speakHindiVoice(voiceMsg);
+        } catch(ve) { console.error("Voice error:", ve); }
+        
+        // Silent download trigger karein (koi splash nahi dikhayega)
+        triggerSilentBackgroundDataDownload(function() {
+            var activeUser = loggedInReader || localStorage.getItem("mtr_reader_session_lock") || "यूज़र";
+            var autoDownloadReaderName = toTitleProperCase(activeUser);
+
+            console.log("✅ Auto download completed, playing announcement");
+            showThinAlert("✅ डेटा अपडेट हो गया! अब आप नई रिपोर्ट देख सकते हैं।", true);
+            
+            // 🔊 1. Pehle download complete hone ka message bolega
+            speakHindiVoice("Dear " + autoDownloadReaderName + " जी, नया डेटा डाउनलोड हो गया है। अब आप नई रिपोर्ट देख सकते हैं, धन्यवाद।");
+            
+            // 🔊 2. Theek 4 second baad pending cards ka count check karke detailed warning bolega
+            setTimeout(function() {
+                if (typeof announceSpecialPendingVoiceReport === 'function') {
+                    announceSpecialPendingVoiceReport();
+                }
+            }, 4000);
+        }, false);
+    }
+}
+
+// 🌐 Internet online aane par auto-download trigger (Global)
+window.addEventListener('online', function() {
+    if (loggedInReader && !isDownloadingMasterData) {
+        setTimeout(function() {
+            autoTriggerSilentDownloadIfStale();
+        }, 1500);
+    }
+});
 </script>
 
 <div id="contactUpdateModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15, 23, 42, 0.75); z-index:999999; align-items:center; justify-content:center; backdrop-filter:blur(4px); padding: 15px; box-sizing: border-box;">
