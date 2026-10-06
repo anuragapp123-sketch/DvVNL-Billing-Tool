@@ -5,7 +5,7 @@
 <script>
   (function() {
     // ⚠️ अपना नया Deployment URL यहाँ पेस्ट करें
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwCimP3IxE9lCRirALk1m71bypyn-Mkc-RCQDGUso1rzssoXBGcYwnu8oBHUTtdxXx72A/exec";
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyL-jJacMaVR-w9LWQfVgMBIwOSexKvqDPXcjaoSJJLZ-gtZwbHweauUsYgU_Pwf1gPyg/exec";
 
     function createHandler(successCallback, failureCallback) {
       return new Proxy({}, {
@@ -2004,8 +2004,8 @@ body.desktop-force .tab-btn span { font-size: 12.5px !important; font-weight: 70
                     </div>
                 </div>
 
-                <!-- 🔍 कॉम्पैक्ट 2-कॉलम फ़िल्टर बार (सर्च + सिंगल एक्टिव फ़िल्टर) -->
-                <div id="reportBillFilters" style="display: flex; flex-direction: row; align-items: center; gap: 6px; margin-bottom: 8px; width: 100%; box-sizing: border-box;">
+                <!-- 🔍 कॉम्पैक्ट फ़िल्टर बार (सर्च + रिमार्क + विजिट डेट फ़िल्टर) -->
+                <div id="reportBillFilters" style="display: flex; flex-direction: row; align-items: center; gap: 6px; margin-bottom: 8px; width: 100%; box-sizing: border-box; flex-wrap: wrap;">
                     <div style="position: relative; flex: 2; min-width: 0; display: flex; align-items: center; height: 32px;">
                         <input type="text" id="reportSearchBar" style="width: 100%; padding: 6px 42px 6px 8px; font-size: 11.5px; height: 32px; border: 1px solid #cbd5e1; border-radius: 8px; background: #ffffff;" placeholder="🔍 नाम या खाता संख्या खोजें..." onkeyup="document.getElementById('clearReportSearchBtn').style.display = this.value ? 'block' : 'none'; universalListSearch('reportSearchBar', 'reportListContainer');">
                         <span id="clearReportSearchBtn" onclick="document.getElementById('reportSearchBar').value=''; this.style.display='none'; universalListSearch('reportSearchBar', 'reportListContainer');" style="display:none; position:absolute; right:24px; color:#94a3b8; cursor:pointer; font-size:12px; font-weight:bold; padding:2px 4px; z-index:11;">✕</span>
@@ -2016,6 +2016,18 @@ body.desktop-force .tab-btn span { font-size: 12.5px !important; font-weight: 70
                     <select id="reportMainRemarkFilter" style="flex: 1.2; font-weight: bold; color: #7c3aed; padding: 0 6px; font-size: 11px; border: 1px solid #cbd5e1; border-radius: 8px; height: 32px; background: #fff;" onchange="applyRemarkGroupFilter()">
                         <option value="ALL">Remark: All</option>
                     </select>
+
+                    <!-- 🎯 नया: FINAL VISIT DATE मल्टी-सिलेक्ट ड्रॉपडाउन फ़िल्टर -->
+                    <div style="position: relative; flex: 1.3; min-width: 0;">
+                        <div onclick="toggleVisitDateDropdown(event)" style="width: 100%; padding: 0 6px; font-weight: bold; color: #0d9488; font-size: 11px; border: 1px solid #cbd5e1; border-radius: 8px; height: 32px; background: #fff; cursor: pointer; display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; user-select: none;">
+                            <span id="reportVisitDateLabel" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 800;">📅 Visit Date: All</span>
+                            <i class="fa-solid fa-chevron-down" id="reportVisitDateArrow" style="font-size: 10px; margin-left: 4px; flex-shrink: 0; transition: transform 0.2s;"></i>
+                        </div>
+                        <div id="reportVisitDateMenu" style="display: none; position: absolute; top: 100%; right: 0; width: 240px; background: #ffffff; border: 1.5px solid #0d9488; border-radius: 10px; padding: 8px; max-height: 280px; overflow-y: auto; z-index: 99999; box-shadow: 0 10px 25px rgba(0,0,0,0.2); margin-top: 4px; box-sizing: border-box;">
+                            <div id="reportVisitDateCheckboxesList" style="display: flex; flex-direction: column; gap: 3px;"></div>
+                        </div>
+                    </div>
+
                     <div id="reportSelectAllWrapper" style="display: none;"></div>
                 </div>
                 
@@ -2196,6 +2208,48 @@ var globalReportsDatabaseCache = null;
 // 🔥 CRITICAL FIX: 'isDownloadingMasterData' को यहाँ ग्लोबली डिफाइन किया गया है ताकि ReferenceError न आए
 var isDownloadingMasterData = false; 
 var appSearchDatabaseCache = null; // Voice और Key Search के लिए कैशे वेरिएबल
+
+// 🛡️ नया: Cooldown Engine — ताकि डाउनलोड/वॉयस बार-बार ट्रिगर न हो
+var lastDownloadTriggerTime = 0;
+var DOWNLOAD_COOLDOWN_MS = 120000; // 2 मिनट का ठहराव सिर्फ download के लिए
+
+// 🛡️ Voice के लिए: हर अलग मैसेज का अपना cooldown, और पहली वॉयस हमेशा बजे
+var lastVoiceMessagesMap = {}; // मैसेज → टाइमस्टैम्प
+var VOICE_DUPLICATE_COOLDOWN_MS = 20000; // एक जैसा मैसेज 20 सेकंड में दोबारा नहीं बोलेगा
+
+// 🛡️ हेल्पर: क्या अभी डाउनलोड ट्रिगर करना चाहिए?
+function canTriggerDownload() {
+    var now = new Date().getTime();
+    if (now - lastDownloadTriggerTime < DOWNLOAD_COOLDOWN_MS) {
+        console.log("⏸️ Download cooldown active, skipping trigger");
+        return false;
+    }
+    return true;
+}
+
+// 🛡️ हेल्पर: क्या यह वॉयस मैसेज अभी बोलना चाहिए?
+function canTriggerVoice(message) {
+    if (!message) return false;
+    var msgKey = message.toString().trim().substring(0, 60); // मैसेज का पहला हिस्सा key
+    var now = new Date().getTime();
+    var lastTime = lastVoiceMessagesMap[msgKey] || 0;
+    
+    if (now - lastTime < VOICE_DUPLICATE_COOLDOWN_MS) {
+        console.log("⏸️ Same voice message cooldown active, skipping:", msgKey);
+        return false;
+    }
+    return true;
+}
+
+// 🛡️ हेल्पर: टाइमस्टैम्प अपडेट करें
+function markDownloadTriggered() {
+    lastDownloadTriggerTime = new Date().getTime();
+}
+function markVoiceTriggered(message) {
+    if (!message) return;
+    var msgKey = message.toString().trim().substring(0, 60);
+    lastVoiceMessagesMap[msgKey] = new Date().getTime();
+}
 
 // Columns Configs
 var COLUMNS_MASTER_STD = ["DIVISION", "ACCOUNT NO", "Consumer Type", "Consumer Catogary", "Process Final", "CONSUMER-NAME", "ADDRESS", "Master Mobile Number", "LOAD IN KW", "LAST MONTH FINAL MM NO.", "LAST MONTH FINAL MM MAKE", "FINAL VISIT_DATE", "EXCEPTION TYPE (MAIN METER)", "FINAL_MAIN_METER_SITE_REMARK", "REMARK", "IS MRI AVAILABLE (MAIN METER)", "IS LOAD SURVAY AVAILBLE (MAIN Mtr)", "LAST MONTH FINAL PM NO.", "LAST MONTH FINAL PM MAKE", "EXCEPTION TYPE (POLE METER)", "FINAL_POLE_METER_SITE_REMARK", "IS MRI AVAILABLE (POLE METER)", "IS LOAD SURVAY AVAILBLE (Pole Mtr)", "TIME STAMP", "ATTEND STATUS"];
@@ -3095,32 +3149,45 @@ function executeSafeSyncAndDownloadWorkflow(onComplete) {
         if (syncIcon) syncIcon.className = "fa-solid fa-arrows-rotate fa-spin";
 
         if (isDownloadingMasterData) {
+            console.log("⏸️ Download already in progress, skipping");
+            if(onComplete) onComplete();
+            return;
+        }
+
+        // 🛡️ नया: Cooldown चेक — अगर 2 मिनट के अंदर दोबारा ट्रिगर हो रहा है तो इग्नोर करें
+        // (लेकिन Manual Click पर cooldown bypass करें, ताकि यूजर खुद दबाकर तुरंत डाउनलोड कर सके)
+        if (!isManualClick && !canTriggerDownload()) {
+            console.log("⏸️ Download cooldown active, silently skipping");
+            if (syncIcon) syncIcon.className = "fa-solid fa-cloud-arrow-down";
             if(onComplete) onComplete();
             return;
         }
         
         isDownloadingMasterData = true;
+        markDownloadTriggered(); // 🛡️ टाइमस्टैम्प सेट करें
 
         var isCurrentUserAdmin = loggedInReader && (loggedInReader.toUpperCase() === "ANURAG SHAKYA" || loggedInReader.toUpperCase() === "ADMIN");
         showThinAlert("⚡ डेटा डाउनलोड हो रहा है, कृपया प्रतीक्षा करें...", false);
 
         // ⏱️ टाइमआउट को 10 सेकंड से बढ़ाकर 90 सेकंड किया गया ताकि भारी डेटा पूरा लोड हो सके
         var fallbackTimer = setTimeout(function() {
-            if (isDownloadingMasterData) {
-                isDownloadingMasterData = false;
-                if (syncIcon) syncIcon.className = "fa-solid fa-cloud-arrow-down";
-                showThinAlert("⚠️ सर्वर से प्रतिक्रिया में अधिक समय लग रहा है, पुनः प्रयास करें!", true);
-                refreshActiveDataViews();
-                if (onComplete) onComplete();
-            }
-        }, 90000);
+    if (isDownloadingMasterData) {
+        isDownloadingMasterData = false;
+        window.downloadFailedFlag = true;
+        if (syncIcon) syncIcon.className = "fa-solid fa-cloud-arrow-down";
+        showThinAlert("⚠️ सर्वर से प्रतिक्रिया में अधिक समय लग रहा है, पुनः प्रयास करें!", true);
+        refreshActiveDataViews();
+        if (onComplete) onComplete();
+    }
+}, 90000);
 
         // 🚀 सभी रीडर्स का डेटाबेस मंगाएं ताकि MR लॉगिन पर भी Top-5 / Last-5 लीडरबोर्ड सही दिखे
         var targetUserParam = "ALL";
         
         google.script.run.withSuccessHandler(function(bulkData) {
-            try {
-                if (bulkData && bulkData.consumers && bulkData.consumers.length > 0) {
+    try {
+        window.downloadFailedFlag = false;
+        if (bulkData && bulkData.consumers && bulkData.consumers.length > 0) {
                     
                     // 🚀 SPEED BOOST 2: अल्ट्रा-फास्ट बल्क मेमोरी बैचिंग
                     globalReportsDatabaseCache = bulkData.consumers;
@@ -3219,12 +3286,12 @@ function executeSafeSyncAndDownloadWorkflow(onComplete) {
                             var downloadReaderName = toTitleProperCase(loggedInReader || "यूज़र");
                             speakHindiVoice("Dear " + downloadReaderName + " जी, नया डेटा डाउनलोड हो गया है।");
 
-                            // 🔊 2. कुछ सेकंड (3 सेकंड) बाद विशेष पेंडेंसी कार्ड्स का काउंट विस्तार से बोलेगा
+                            // 🔊 2. कुछ सेकंड (6.5 सेकंड) बाद विशेष पेंडेंसी कार्ड्स का काउंट विस्तार से बोलेगा
                             setTimeout(function() {
                                 if (typeof announceSpecialPendingVoiceReport === 'function') {
                                     announceSpecialPendingVoiceReport();
                                 }
-                            }, 3200);
+                            }, 6500);
                         }
                     };
                 } else { 
@@ -3249,13 +3316,14 @@ function executeSafeSyncAndDownloadWorkflow(onComplete) {
                 if (onComplete) onComplete();
             }
         }).withFailureHandler(function(error) {
-            clearTimeout(fallbackTimer);
-            isDownloadingMasterData = false;
+    clearTimeout(fallbackTimer);
+    isDownloadingMasterData = false;
+    window.downloadFailedFlag = true;
 
-            if (syncIcon) syncIcon.className = "fa-solid fa-cloud-arrow-down";
-            showThinAlert("🚨 नेटवर्क धीमा है, पुनः प्रयास करें!", true);
-            if (onComplete) onComplete();
-        }).getBulkDashboardData(targetUserParam);
+    if (syncIcon) syncIcon.className = "fa-solid fa-cloud-arrow-down";
+    showThinAlert("🚨 नेटवर्क धीमा है, पुनः प्रयास करें!", true);
+    if (onComplete) onComplete();
+}).getBulkDashboardData(targetUserParam);
     }
 
     function buildAdminMultiSelectCheckbox(consumersList) {
@@ -3598,6 +3666,16 @@ function triggerGlobalDataReRender() {
         if(dateMenu && dateMenu.style.display === "block") {
             if(!e.target.closest('#dateReaderCheckboxMenu') && !e.target.closest('[onclick*="toggleDateReaderDropdown"]')) {
                 dateMenu.style.setProperty("display", "none", "important");
+            }
+        }
+
+        // 🎯 नया: Visit Date ड्रॉपडाउन को बाहर क्लिक करने पर बंद करें
+        var visitDateMenuEl = document.getElementById('reportVisitDateMenu');
+        if(visitDateMenuEl && visitDateMenuEl.style.display === "block") {
+            if(!e.target.closest('#reportVisitDateMenu') && !e.target.closest('[onclick*="toggleVisitDateDropdown"]')) {
+                visitDateMenuEl.style.display = "none";
+                var arrowEl = document.getElementById('reportVisitDateArrow');
+                if (arrowEl) arrowEl.style.transform = 'rotate(0deg)';
             }
         }
     });
@@ -4772,6 +4850,7 @@ function triggerGlobalDataReRender() {
         }
         
         var startDownloadWithVoice = function() {
+            // 🛡️ Manual click पर download cooldown bypass होगा, लेकिन voice cooldown active रहेगा
             var readerNameProper = toTitleProperCase(loggedInReader || "यूज़र");
             speakHindiVoice(readerNameProper + " जी, आपका डेटा डाउनलोड हो रहा है, कृपया प्रतीक्षा करें");
             triggerSilentBackgroundDataDownload(function(){}, true);
@@ -6802,6 +6881,14 @@ function openReportGroupView(reportType) {
     // 🎯 सख्त नियम: 'Bill Merge' और 'All' चेकबॉक्स केवल 'all_bills_report' या 'bill_dist_pending' में ही दिखेंगे, बाकी सब में छुपे रहेंगे
     var isStrictBillingTab = (reportType === 'all_bills_report' || reportType === 'bill_dist_pending');
     
+    // 🎯 नया: विजिट डेट ड्रॉपडाउन को रीसेट और नई रिपोर्ट के लिए तैयार करें
+    var visitDateMenu = document.getElementById('reportVisitDateMenu');
+    if (visitDateMenu) visitDateMenu.style.display = 'none';
+    var visitDateArrow = document.getElementById('reportVisitDateArrow');
+    if (visitDateArrow) visitDateArrow.style.transform = 'rotate(0deg)';
+    var visitDateContainer = document.getElementById('reportVisitDateCheckboxesList');
+    if (visitDateContainer) visitDateContainer.innerHTML = '';
+    
     var mergeBtn = document.getElementById('reportMergePdfBtn');
     if(mergeBtn) mergeBtn.style.setProperty("display", isStrictBillingTab ? "inline-flex" : "none", "important");
     
@@ -6909,7 +6996,21 @@ function openReportGroupView(reportType) {
                 isWaSent = isWaSent.toString().toUpperCase().trim();
                 var waMatch = (reportType !== 'all_bills_report' || repWaStatus === "ALL" || isWaSent === repWaStatus);
 
-                if (loadMatch && mainRemarkMatch && poleRemarkMatch && waMatch) {
+                // 🎯 नया: FINAL VISIT DATE मल्टी-सिलेक्ट फ़िल्टर (Master Reports के लिए)
+                var dateMatch = true;
+                var allDateCbsMaster = document.querySelectorAll('.report-visitdate-cb');
+                if (allDateCbsMaster.length > 0) {
+                    var selectedDatesMaster = getSelectedVisitDates();
+                    if (selectedDatesMaster.length < allDateCbsMaster.length) {
+                        var itemDateRaw = getRobustKey(item, "FINAL VISIT_DATE") || item["FINAL VISIT DATE"] || item.finalVisitDate || "";
+                        var itemDateIso = normalizeDateToISO(itemDateRaw);
+                        if (selectedDatesMaster.indexOf(itemDateIso) === -1) {
+                            dateMatch = false;
+                        }
+                    }
+                }
+
+                if (loadMatch && mainRemarkMatch && poleRemarkMatch && waMatch && dateMatch) {
                     var consumerAddress = getRobustKey(item, "ADDRESS") || "-";
                     var consumerMobile = getRobustKey(item, "Master Mobile Number") || "-";
                     var mainMtrNo = getRobustKey(item, "LAST MONTH FINAL MM NO.") || item.lastMmNo || "-";
@@ -6979,6 +7080,11 @@ function openReportGroupView(reportType) {
                 }
             }
 
+            // 🎯 नया: मास्टर रिपोर्ट के लिए भी Visit Date ड्रॉपडाउन भरें
+            // (currentReportDataList में सारे consumers डालें ताकि dates निकल सकें)
+            currentReportDataList = allConsumers.filter(function(cItem) { return isReaderAllowed(getReaderName(cItem)); });
+            populateVisitDateDropdown();
+            
             if (reportType === 'Visit_Data_Consumers') {
                 htmlArr.sort(function(a, b) { return a.index - b.index; });
             } else if (reportType === 'all_consumers_list') {
@@ -7066,6 +7172,9 @@ function openReportGroupView(reportType) {
             topRemarkDropdown.style.setProperty("display", "inline-block", "important");
         }
 
+        // 🎯 नया: Visit Date ड्रॉपडाउन में dates भरें
+        populateVisitDateDropdown();
+
         loadOfflineReportFiltered("ALL");
     };
 }
@@ -7076,6 +7185,147 @@ function openReportGroupView(reportType) {
     } else {
         var selectedRem = document.getElementById('reportMainRemarkFilter') ? document.getElementById('reportMainRemarkFilter').value : "ALL";
         loadOfflineReportFiltered(selectedRem); 
+    }
+}
+
+// 🎯 नया: FINAL VISIT DATE मल्टी-सिलेक्ट ड्रॉपडाउन टॉगल
+function toggleVisitDateDropdown(event) {
+    if (event) event.stopPropagation();
+    var menu = document.getElementById('reportVisitDateMenu');
+    var arrow = document.getElementById('reportVisitDateArrow');
+    if (!menu) return;
+    
+    if (menu.style.display === 'none' || menu.style.display === '') {
+        menu.style.display = 'block';
+        if (arrow) arrow.style.transform = 'rotate(180deg)';
+    } else {
+        menu.style.display = 'none';
+        if (arrow) arrow.style.transform = 'rotate(0deg)';
+    }
+}
+
+// 🎯 नया: ड्रॉपडाउन में consumers की unique dates भरना
+function populateVisitDateDropdown() {
+    var container = document.getElementById('reportVisitDateCheckboxesList');
+    if (!container) return;
+    
+    var dateSet = new Set();
+    var selectedDates = getSelectedVisitDates();
+    
+    // currentReportDataList से unique dates निकालें
+    if (Array.isArray(currentReportDataList) && currentReportDataList.length > 0) {
+        currentReportDataList.forEach(function(item) {
+            var dateRaw = getRobustKey(item, "FINAL VISIT_DATE") || item["FINAL VISIT DATE"] || item.finalVisitDate || "";
+            var dateClean = dateRaw.toString().trim().split(" ")[0];
+            
+            // normalize to YYYY-MM-DD
+            if (dateClean && dateClean !== "" && dateClean !== "-" && dateClean.toUpperCase() !== "NOT FOUND") {
+                var normalized = normalizeDateToISO(dateClean);
+                if (normalized) dateSet.add(normalized);
+            }
+        });
+    }
+    
+    var sortedDates = Array.from(dateSet).sort().reverse(); // latest date pehle
+    
+    // अगर पहली बार खुल रहा है और कोई date selected नहीं है, तो सब select कर दो
+    var isFirstBuild = (selectedDates.length === 0);
+    if (isFirstBuild) {
+        selectedDates = sortedDates.slice();
+    }
+    
+    var html = '<label style="display: grid; grid-template-columns: 20px 1fr; align-items: center; gap: 6px; font-weight: bold; font-size: 11px; padding: 6px 4px; border-bottom: 1px solid #e2e8f0; cursor: pointer; color: #0d9488; width: 100%; box-sizing: border-box;" onclick="event.stopPropagation();">' +
+               '<input type="checkbox" id="reportVisitDateSelectAll" ' + (selectedDates.length === sortedDates.length ? 'checked' : '') + ' onchange="toggleAllVisitDates(this)" style="margin: 0; cursor: pointer; width: 14px; height: 14px;">' +
+               '<span>SELECT ALL DATES (' + sortedDates.length + ')</span></label>';
+    
+    if (sortedDates.length === 0) {
+        html += '<div style="text-align: center; color: #94a3b8; font-size: 11px; padding: 10px;">कोई विजिट डेट उपलब्ध नहीं</div>';
+    } else {
+        sortedDates.forEach(function(dt, idx) {
+            var checked = selectedDates.indexOf(dt) !== -1 ? 'checked' : '';
+            // अच्छे दिखने वाले फॉर्मेट में दिखाएँ: DD/MM/YYYY
+            var parts = dt.split('-');
+            var displayDate = parts[2] + '/' + parts[1] + '/' + parts[0];
+            html += '<label style="display: grid; grid-template-columns: 20px 1fr; align-items: center; gap: 6px; font-size: 11px; padding: 4px 4px; cursor: pointer; color: #334155; font-weight: 600; width: 100%; box-sizing: border-box;" onclick="event.stopPropagation();">' +
+                    '<input type="checkbox" class="report-visitdate-cb" value="' + dt + '" ' + checked + ' onchange="applyVisitDateFilter()" style="margin: 0; cursor: pointer; width: 14px; height: 14px;">' +
+                    '<span>' + displayDate + '</span></label>';
+        });
+    }
+    
+    container.innerHTML = html;
+    updateVisitDateLabel();
+}
+
+// 🎯 हेल्पर: selected dates की लिस्ट निकालें
+function getSelectedVisitDates() {
+    var cbs = document.querySelectorAll('.report-visitdate-cb');
+    var selected = [];
+    cbs.forEach(function(cb) { if (cb.checked) selected.push(cb.value); });
+    return selected;
+}
+
+// 🎯 हेल्पर: Select All toggle
+function toggleAllVisitDates(masterEl) {
+    var cbs = document.querySelectorAll('.report-visitdate-cb');
+    cbs.forEach(function(cb) { cb.checked = masterEl.checked; });
+    applyVisitDateFilter();
+}
+
+// 🎯 हेल्पर: लेबल टेक्स्ट अपडेट करें
+function updateVisitDateLabel() {
+    var lbl = document.getElementById('reportVisitDateLabel');
+    if (!lbl) return;
+    var cbs = document.querySelectorAll('.report-visitdate-cb');
+    var selected = getSelectedVisitDates();
+    
+    if (cbs.length === 0) {
+        lbl.innerText = "📅 Visit Date: None";
+        lbl.style.color = "#94a3b8";
+    } else if (selected.length === cbs.length) {
+        lbl.innerText = "📅 Visit Date: All";
+        lbl.style.color = "#0d9488";
+    } else if (selected.length === 0) {
+        lbl.innerText = "📅 Visit Date: None";
+        lbl.style.color = "#dc2626";
+    } else {
+        lbl.innerText = "📅 Visit Date: " + selected.length + " चुने गए";
+        lbl.style.color = "#059669";
+    }
+}
+
+// 🎯 हेल्पर: डेट को YYYY-MM-DD में normalize करें
+function normalizeDateToISO(dateStr) {
+    if (!dateStr) return "";
+    var cleanDate = dateStr.toString().trim().split(" ")[0];
+    if (!cleanDate || cleanDate === "-") return "";
+    
+    var parts = cleanDate.split(/[-/.]/);
+    if (parts.length < 3) return "";
+    
+    var y, m, d;
+    if (parts[0].length === 4) {
+        // YYYY-MM-DD
+        y = parts[0];
+        m = String(parseInt(parts[1], 10)).padStart(2, '0');
+        d = String(parseInt(parts[2], 10)).padStart(2, '0');
+    } else {
+        // DD-MM-YYYY या DD/MM/YYYY
+        d = String(parseInt(parts[0], 10)).padStart(2, '0');
+        m = String(parseInt(parts[1], 10)).padStart(2, '0');
+        y = parts[2];
+        if (y.length === 2) y = "20" + y;
+    }
+    return y + "-" + m + "-" + d;
+}
+
+// 🎯 नया: FINAL VISIT DATE फ़िल्टर अप्लाई करने वाला इंजन
+function applyVisitDateFilter() {
+    updateVisitDateLabel();
+    if (activeReportType === 'all_bills_report' || activeReportType === 'all_consumers_list' || activeReportType === 'Visit_Data_Consumers') {
+        openReportGroupView(activeReportType);
+    } else {
+        var selectedRem = document.getElementById('reportMainRemarkFilter') ? document.getElementById('reportMainRemarkFilter').value : "ALL";
+        loadOfflineReportFiltered(selectedRem);
     }
 }
 
@@ -7114,6 +7364,23 @@ function openReportGroupView(reportType) {
         if (groupFilterValue && groupFilterValue !== "ALL") {
             if (itemRem.toString().trim().toUpperCase() !== groupFilterValue.trim().toUpperCase()) {
                 match = false;
+            }
+        }
+
+        // 🎯 नया: FINAL VISIT DATE मल्टी-सिलेक्ट फ़िल्टर मिलान (केवल DATE, TIME नहीं)
+        var allDateCbs = document.querySelectorAll('.report-visitdate-cb');
+        if (allDateCbs.length > 0) {
+            var selectedDates = getSelectedVisitDates();
+            
+            // अगर सब select हैं, तो कोई filter नहीं (सब दिखाएँ)
+            if (selectedDates.length < allDateCbs.length) {
+                var itemVisitDateRaw = getRobustKey(item, "FINAL VISIT_DATE") || item["FINAL VISIT DATE"] || item.finalVisitDate || "";
+                var normalizedItemDate = normalizeDateToISO(itemVisitDateRaw);
+                
+                // अगर item की date selected dates में नहीं है, तो छुपा दें
+                if (selectedDates.indexOf(normalizedItemDate) === -1) {
+                    match = false;
+                }
             }
         }
 
@@ -9425,6 +9692,8 @@ function triggerSilentBackgroundSync() {
         var division = record["DIVISION"] || record.division || "-";
         var subdivision = record["SUB DIVISION NAME"] || record.subdivision || "-";
         var loadInKw = record["LOAD IN KW"] || record.loadInKw || "-";
+        // 🎯 नया: CONSUMER CATOGARY कॉलम से TARIFF वैल्यू उठाना
+        var tariffVal = getRobustKey(record, "Consumer Catogary") || getRobustKey(record, "CONSUMER CATOGARY") || getRobustKey(record, "Consumer Catogary".toUpperCase()) || record.consumerCatogary || record["CONSUMER CATOGARY"] || "-";
         
         // 🎯 VISIT LAST MONTH से रीडर का नाम और MR MOBILE NO. से मोबाइल नंबर
         var mrName = record["VISIT LAST MONTH"] || getReaderName(record) || "-";
@@ -9469,9 +9738,10 @@ function triggerSilentBackgroundSync() {
                    '</div>' +
                    
                    '<!-- Row 3 -->' +
-                   '<div style="display: grid; grid-template-columns: 1fr 1fr; border-bottom: 1px solid #e2e8f0; background: #f8fafc;">' +
+                   '<div style="display: grid; grid-template-columns: 1fr 1fr 1fr; border-bottom: 1px solid #e2e8f0; background: #f8fafc;">' +
                    '<div style="padding: 7px 10px; border-right: 1px solid #e2e8f0;"><span style="color:#64748b; font-weight:800; font-size:11px; display:block;">CONSUMER NAME</span><b style="color:#0f172a; font-size:13px;">' + name + '</b></div>' +
-                   '<div style="padding: 7px 10px;"><span style="color:#64748b; font-weight:800; font-size:11px; display:block;">LOAD IN KW</span><b style="color:#ea580c; font-size:13px; background:#fff7ed; padding:1px 6px; border-radius:4px; border:1px solid #fed7aa;">' + loadInKw + ' KW</b></div>' +
+                   '<div style="padding: 7px 10px; border-right: 1px solid #e2e8f0;"><span style="color:#64748b; font-weight:800; font-size:11px; display:block;">LOAD IN KW</span><b style="color:#ea580c; font-size:13px; background:#fff7ed; padding:1px 6px; border-radius:4px; border:1px solid #fed7aa;">' + loadInKw + ' KW</b></div>' +
+                   '<div style="padding: 7px 10px;"><span style="color:#64748b; font-weight:800; font-size:11px; display:block;">TARIFF</span><b style="color:#7c3aed; font-size:12.5px; background:#faf5ff; padding:1px 6px; border-radius:4px; border:1px solid #e9d5ff;">' + tariffVal + '</b></div>' +
                    '</div>' +
                    
                    '<!-- Row 4 -->' +
@@ -9548,6 +9818,7 @@ function triggerSilentBackgroundSync() {
 
             var targetCols = [
                 "DIVISION", "ACCOUNT NO", "CONSUMER-NAME", "ADDRESS", "LOAD IN KW", 
+                "Consumer Catogary", // 🎯 नया: TARIFF (Load के बाद)
                 "LOAD GROUP (5-10-50)", "FINAL VISIT DATE", "LAST MONTH FINAL MM NO.", 
                 "LAST MONTH FINAL MM MAKE", "EXCEPTION TYPE (MAIN METER)", 
                 "FINAL_MAIN_METER_SITE_REMARK", "REMARK", "FINAL_POLE_METER_SITE_REMARK",
@@ -9577,6 +9848,11 @@ function triggerSilentBackgroundSync() {
 
                 var displayVal = (val !== undefined && val !== null && val.toString().trim() !== "") ? val : "-";
                 var printableKeyLabel = colName.replace(/_/g, ' ').toUpperCase();
+                
+                // 🎯 नया: Consumer Catogary को "TARIFF" के रूप में दिखाएँ
+                if (colName === "Consumer Catogary") {
+                    printableKeyLabel = "TARIFF";
+                }
 
                 if (colName === "MR MOBILE NO." && displayVal !== "-" && displayVal.length >= 10) {
                     displayVal = '<a href="tel:' + displayVal + '" style="color:#0284c7; text-decoration:none; font-weight:800;"><i class="fa-solid fa-phone" style="font-size:9px;"></i> ' + displayVal + '</a>';
@@ -9679,7 +9955,45 @@ function quickViewNavigate(direction) {
     function evaluateCustomCondition(item, conditionStr) {
     if (!conditionStr || !item) return true;
 
-    // 🚀 अगर बिल वितरण की रिपोर्ट है तो डिफ़ॉल्ट पासिंग लॉजिक
+    // 🎯 FIX: Main Meter Field Exception और Pole Meter Field Exception रिपोर्ट के लिए
+    // अगर EXCEPTION TYPE (MAIN METER) या EXCEPTION TYPE (POLE METER) में
+    // "VISIT PENDING" या "MRI" जैसा कुछ है, तो उस consumer को इस रिपोर्ट में न आने दें।
+    var condUpper = conditionStr.toUpperCase();
+
+    // Main Meter Field Exception रिपोर्ट का पता लगाएँ
+    if (condUpper.indexOf("EXCEPTION TYPE (MAIN METER)") !== -1) {
+        var mainExcVal = getRobustKey(item, "EXCEPTION TYPE (MAIN METER)");
+        if (mainExcVal === "" || mainExcVal === undefined || mainExcVal === null) {
+            mainExcVal = item["EXCEPTION TYPE (MAIN METER)"] || item.mainMeterFieldException || "";
+        }
+        mainExcVal = mainExcVal.toString().toUpperCase().trim();
+
+        // 🚫 अगर VISIT PENDING या MRI जैसा कुछ है, तो रिपोर्ट से बाहर
+        if (mainExcVal.indexOf("VISIT PENDING") !== -1 ||
+            mainExcVal.indexOf("VISIT_PENDING") !== -1 ||
+            mainExcVal.indexOf("VISITPENDING") !== -1 ||
+            mainExcVal.indexOf("MRI") !== -1) {
+            return false;
+        }
+    }
+
+    // Pole Meter Field Exception रिपोर्ट का पता लगाएँ
+    if (condUpper.indexOf("EXCEPTION TYPE (POLE METER)") !== -1) {
+        var poleExcVal = getRobustKey(item, "EXCEPTION TYPE (POLE METER)");
+        if (poleExcVal === "" || poleExcVal === undefined || poleExcVal === null) {
+            poleExcVal = item["EXCEPTION TYPE (POLE METER)"] || item.poleMeterFieldException || "";
+        }
+        poleExcVal = poleExcVal.toString().toUpperCase().trim();
+
+        // 🚫 अगर VISIT PENDING या MRI जैसा कुछ है, तो रिपोर्ट से बाहर
+        if (poleExcVal.indexOf("VISIT PENDING") !== -1 ||
+            poleExcVal.indexOf("VISIT_PENDING") !== -1 ||
+            poleExcVal.indexOf("VISITPENDING") !== -1 ||
+            poleExcVal.indexOf("MRI") !== -1) {
+            return false;
+        }
+    }
+
     var conditions = conditionStr.split(',');
     for (var i = 0; i < conditions.length; i++) {
         var cond = conditions[i].trim();
@@ -9691,9 +10005,6 @@ function quickViewNavigate(direction) {
         if (parts.length === 2) {
             var searchKey = parts[0].trim();
             var expectedVal = parts[1].replace(/\(.*?\)/g, '').trim().toUpperCase();
-
-            // 🎯 Distribution Pending और Pending का केस-इन्सेंसिटिव ट्रिम मैच
-            if (expectedVal === "DISTRIBUTION PENDING") expectedVal = "DISTRIBUTION PENDING";
 
             if (expectedVal === "ALL" || expectedVal === "") continue;
 
@@ -9731,12 +10042,17 @@ function quickViewNavigate(direction) {
                 if (expectedVal === "TRUE" || expectedVal === "YES") {
                     if (actualVal !== "TRUE" && actualVal !== "YES" && actualVal !== "1") return false;
                 } else if (expectedVal === "FALSE" || expectedVal === "NO") {
-                    if (actualVal !== "FALSE" && actualVal !== "NO" && actualVal !== "0" && actualVal !== "" && actualVal !== "-") return false;
+                    // 🎯 FIX: केवल स्पष्ट FALSE/NO/0 को ही FALSE मानें।
+                    // खाली सेल ("") या "-" को FALSE नहीं मानें, वरना MRI Done + खाली फ़ील्ड वाले
+                    // consumers भी गलती से Field Exception रिपोर्ट में आ जाते हैं।
+                    if (actualVal !== "FALSE" && actualVal !== "NO" && actualVal !== "0") return false;
                 } else if (expectedVal.indexOf('|') !== -1) {
                     var options = expectedVal.split('|').map(function(s){ return s.trim(); });
                     var matchedAny = false;
                     for (var optIdx = 0; optIdx < options.length; optIdx++) {
-                        if (actualVal === options[optIdx] || actualVal.indexOf(options[optIdx]) === 0) {
+                        var opt = options[optIdx].trim();
+                        // 🎯 सिर्फ exact match करें
+                        if (actualVal === opt) {
                             matchedAny = true;
                             break;
                         }
@@ -11484,11 +11800,17 @@ function announceSpecialPendingVoiceReport() {
         if (mainMriPendingCount > 0 || poleMriPendingCount > 0) {
             var msg = "";
             if (isAdmin) {
-                // Admin login mein keval count bolega
-                msg = "Dear " + readerNameProper + " सर, मेन मीटर में " + mainMriPendingCount + " और पोल मीटर में " + poleMriPendingCount + " एम आर आई पेंडिंग हैं।";
+                // Admin login: सिर्फ count
+                msg = readerNameProper + " जी, मेन मीटर में " + mainMriPendingCount + " और पोल मीटर में " + poleMriPendingCount + " एम आर आई पेंडिंग हैं।";
             } else {
-                // Reader login mein detailed aadesh + consumers list report section ka nirdesh
-                msg = "Dear " + readerNameProper + " जी, आपके मेन मीटर के " + mainMriPendingCount + " कंज्यूमर्स ऐसे हैं जिनका रिमार्क एम आर आई में है लेकिन डेटा अभी तक अपलोड नहीं हुआ है, और ऐसे ही पोल मीटर में भी " + poleMriPendingCount + " कंज्यूमर्स ऐसे हैं जिनका रिमार्क एम आर आई में दिया है लेकिन एम आर आई नहीं है। अगर इनका डेटा मशीन में है तो तुरंत ऑफिस जाकर डाउनलोड करवाएं, और अगर डेटा करप्ट है तो इनकी दोबारा विजिट करके जल्द से जल्द डेटा डाउनलोड करवाएं। कंज्यूमर्स लिस्ट रिपोर्ट सेक्शन में जाकर देखें, धन्यवाद।";
+                // Reader login: छोटा, सीधा और असरदार निर्देश
+                if (mainMriPendingCount > 0 && poleMriPendingCount > 0) {
+                    msg = readerNameProper + " जी, मेन मीटर में " + mainMriPendingCount + " और पोल मीटर में " + poleMriPendingCount + " एम आर आई पेंडिंग हैं। तुरंत रिपोर्ट चेक करें।";
+                } else if (mainMriPendingCount > 0) {
+                    msg = readerNameProper + " जी, मेन मीटर में " + mainMriPendingCount + " एम आर आई पेंडिंग हैं। तुरंत रिपोर्ट चेक करें।";
+                } else {
+                    msg = readerNameProper + " जी, पोल मीटर में " + poleMriPendingCount + " एम आर आई पेंडिंग हैं। तुरंत रिपोर्ट चेक करें।";
+                }
             }
             speakHindiVoice(msg);
         }
@@ -11761,6 +12083,15 @@ function speakHindiVoice(message) {
         console.log("🔇 Voice alert is muted by user:", message);
         return;
     }
+    
+    // 🛡️ नया: सिर्फ same मैसेज के लिए cooldown चेक (20 सेकंड)।
+    // अलग-अलग मैसेज (डाउनलोड, काउंट, पेंडेंसी) सब बजेंगे।
+    if (!canTriggerVoice(message)) {
+        console.log("⏸️ Same voice cooldown active, skipping:", message);
+        return;
+    }
+    markVoiceTriggered(message); // 🛡️ इस मैसेज का टाइमस्टैम्प सेट करें
+    
     var fullVoiceMessage = message.toString().trim();
     console.log("🔊 Speaking Voice:", fullVoiceMessage);
 
@@ -11867,7 +12198,7 @@ function updateDataStatusBadge(isFresh) {
     }
 }
 
-// 🕒 डेटा 1 घंटे से अधिक पुराना होने पर वॉयस एवं स्क्रीन अलर्ट इंजन
+// 🕒 डेटा 1 घंटे से अधिक पुराना होने पर सीधे डाउनलोड ट्रिगर करने वाला इंजन
 function checkDataAgeAndAlertUser() {
     if (!loggedInReader) return;
     
@@ -11888,13 +12219,13 @@ function checkDataAgeAndAlertUser() {
     updateDataStatusBadge(!isStale);
 
     if (isStale) {
-        showThinAlert("⚠️ आपका डेटा पुराना है, कृपया नया डेटा डाउनलोड करें!", false);
-        speakHindiVoice("आपका डेटा पुराना हो गया है, कृपया नया डेटा डाउनलोड करें");
+        // 🎯 वॉयस हटा दी — क्योंकि autoTriggerSilentDownloadIfStale खुद वॉयस बजाएगा।
+        // यहाँ सिर्फ UI (badge + bar color) को amber कर दें।
 
         var lastUpdBar = document.getElementById('lastUpdatedLabel');
         if (lastUpdBar) {
-            lastUpdBar.style.border = "2px solid #ef4444";
-            lastUpdBar.style.background = "linear-gradient(90deg, #450a0a, #7f1d1d, #450a0a)";
+            lastUpdBar.style.border = "2px solid #f59e0b";
+            lastUpdBar.style.background = "linear-gradient(90deg, #78350f, #b45309, #78350f)";
         }
     }
 }
@@ -11904,25 +12235,28 @@ function autoTriggerSilentDownloadIfStale() {
     if (!navigator.onLine || !loggedInReader) return;
     if (isDownloadingMasterData) return; // Already chal raha hai to skip
     
+    // 🛡️ नया: Cooldown चेक — 2 मिनट के अंदर दोबारा auto-trigger नहीं होगा
+    if (!canTriggerDownload()) {
+        console.log("⏸️ Auto-download cooldown active, skipping trigger");
+        return;
+    }
+    
     var lastSyncMs = localStorage.getItem("last_sync_time_ms_" + loggedInReader);
     var currentTime = new Date().getTime();
     var shouldDownload = false;
     var reason = "";
     
     if (!lastSyncMs) {
-        // Kabhi download nahi hua
         shouldDownload = true;
         reason = "First time download";
     } else {
         var timeDiffHours = (currentTime - parseInt(lastSyncMs, 10)) / (1000 * 60 * 60);
         if (timeDiffHours >= 1) {
-            // 1 ghante se zyada purana data
             shouldDownload = true;
             reason = "Data is " + Math.round(timeDiffHours) + " hours old";
         }
     }
     
-    // Agar slot-based download time hai
     if (!shouldDownload && shouldTriggerScheduledSlotDownload()) {
         shouldDownload = true;
         reason = "Scheduled slot download";
@@ -11930,39 +12264,34 @@ function autoTriggerSilentDownloadIfStale() {
     
     if (shouldDownload) {
         console.log("🔄 Auto silent download triggered: " + reason);
-        showThinAlert("⚡ बैकग्राउंड में नया डेटा डाउनलोड हो रहा है...", false);
         
-        // 🔊 VOICE — DOWNLOAD SHURU HOTE HI BAJAO (callback ka wait mat karo)
-        try {
-            var hrNow = new Date().getHours();
-            var greetVoice = "Good Morning";
-            if(hrNow >= 12 && hrNow < 17) greetVoice = "Good Afternoon";
-            else if(hrNow >= 17 && hrNow < 21) greetVoice = "Good Evening";
-            else if(hrNow >= 21 || hrNow < 5) greetVoice = "Good Night";
-            
-            var readerNameProper = toTitleProperCase(loggedInReader);
-            var voiceMsg = greetVoice + " " + readerNameProper + " जी, आपका नया डेटा डाउनलोड हो रहा है। कृपया प्रतीक्षा करें।";
-            console.log("🔊 Voice Triggered (auto):", voiceMsg);
-            speakHindiVoice(voiceMsg);
-        } catch(ve) { console.error("Voice error:", ve); }
+        // 🎯 पहले डाउनलोड फेल फ्लैग रीसेट करें
+        window.downloadFailedFlag = false;
         
-        // Silent download trigger karein (koi splash nahi dikhayega)
+        // 🔊 VOICE — सीधे बताएं कि नया डेटा डाउनलोड हो रहा है (पुराना डेटा वाला मैसेज नहीं)
+        var readerNameProper = toTitleProperCase(loggedInReader);
+        speakHindiVoice(readerNameProper + " जी, आपका नया डेटा सर्वर से डाउनलोड हो रहा है, कृपया प्रतीक्षा करें");
+        
+        // Silent download trigger karein
         triggerSilentBackgroundDataDownload(function() {
             var activeUser = loggedInReader || localStorage.getItem("mtr_reader_session_lock") || "यूज़र";
             var autoDownloadReaderName = toTitleProperCase(activeUser);
 
-            console.log("✅ Auto download completed, playing announcement");
-            showThinAlert("✅ डेटा अपडेट हो गया! अब आप नई रिपोर्ट देख सकते हैं।", true);
-            
-            // 🔊 1. Pehle download complete hone ka message bolega
-            speakHindiVoice("Dear " + autoDownloadReaderName + " जी, नया डेटा डाउनलोड हो गया है। अब आप नई रिपोर्ट देख सकते हैं, धन्यवाद।");
-            
-            // 🔊 2. Theek 4 second baad pending cards ka count check karke detailed warning bolega
-            setTimeout(function() {
-                if (typeof announceSpecialPendingVoiceReport === 'function') {
-                    announceSpecialPendingVoiceReport();
-                }
-            }, 4000);
+            // ✅ अगर डाउनलोड फेल नहीं हुआ तो सफल मैसेज
+            if (!window.downloadFailedFlag) {
+                showThinAlert("✅ नया डेटा डाउनलोड हो गया!", true);
+                speakHindiVoice("Dear " + autoDownloadReaderName + " जी, नया डेटा डाउनलोड हो गया है।");
+                
+                setTimeout(function() {
+                    if (typeof announceSpecialPendingVoiceReport === 'function') {
+                        announceSpecialPendingVoiceReport();
+                    }
+                }, 6500);
+            } else {
+                // ❌ अगर डाउनलोड फेल हुआ तो फेल मैसेज
+                showThinAlert("🚨 आपका नया डेटा डाउनलोड नहीं हो पाया! कृपया इंटरनेट चेक करें।", true);
+                speakHindiVoice("क्षमा करें, आपका नया डेटा डाउनलोड नहीं हो पाया। कृपया इंटरनेट कनेक्शन जांच करके दोबारा प्रयास करें।");
+            }
         }, false);
     }
 }
