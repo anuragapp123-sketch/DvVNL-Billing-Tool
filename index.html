@@ -1740,8 +1740,8 @@ body.desktop-force .tab-btn span { font-size: 12.5px !important; font-weight: 70
                         </div>
                         <div style="flex: none;">
                             <button onclick="exportDateReportPDF()" class="btn pdf-bg" style="font-size: 11px; padding: 8px 14px; margin-bottom: 0; border-radius: 8px;">
-                                <i class="fa-solid fa-file-pdf"></i> Download PDF
-                            </button>
+    <i class="fa-solid fa-file-pdf"></i> Download PDF
+</button>
                         </div>
                     </div>
                 </div>
@@ -2367,6 +2367,12 @@ function getRobustKey(obj, searchKey) {
     }
     if (cleanSearch.includes("BILLINGSTATUS")) {
         return obj["BILLING STATUS"] || obj["BILLING_STATUS"] || obj.billingStatus || "";
+    }
+    if (cleanSearch.includes("ATTENDSTATUSPOLE") || cleanSearch.includes("ATTENDSTATUS(POLE)")) {
+        return obj["ATTEND STATUS (POLE)"] || obj["ATTEND_STATUS_POLE"] || obj.attendStatusPole || "";
+    }
+    if (cleanSearch.includes("ATTENDSTATUS")) {
+        return obj["ATTEND STATUS"] || obj["ATTEND_STATUS"] || obj.attendStatus || "";
     }
     
     return "";
@@ -3935,18 +3941,16 @@ function triggerGlobalDataReRender() {
 
                 var watchlistItems = filteredData.filter(function(item) {
                         if (!config.conditionStr) return false;
-                        
+
+                        // बिल वितरण पेंडेंसी में अगर बिल पहले से डिलीवर हो चुका है तो बाहर रखें
                         var groupName = (config.reportGroup || "").toUpperCase().trim();
                         var cfgKey = (config.key || "").toLowerCase();
-                        var isBillGroup = groupName.includes("BILL") || groupName.includes("DIST") || cfgKey.includes("bill") || cfgKey.includes("dist");
-                        
-                        // 1. बिल वितरण रिपोर्ट: अगर बंट चुका है तो काउंट में न आए
-                        if (isBillGroup) {
+                        if (groupName.includes("BILL") || groupName.includes("DIST") || cfgKey.includes("dist")) {
                             var distStatus = (getRobustKey(item, "DISTRIBUTION STATUS") || item.distStatus || "").toString().toUpperCase().trim();
-                            if (distStatus === "DISTRIBUTED") return false;
+                            if (distStatus === "DISTRIBUTED" || distStatus === "DELIVERED") return false;
                         }
 
-                        // 2. ठीक वही कंडीशन जो रिपोर्ट खोलने पर चलती है
+                        // सीधे गूगल शीट की कंडीशन स्ट्रिंग से मिलान करें
                         return evaluateCustomCondition(item, config.conditionStr);
                     });
 
@@ -4738,6 +4742,83 @@ function triggerGlobalDataReRender() {
         document.getElementById('dateDrilldownModal').style.display = 'none';
     };
 
+    // 📄 Date-Wise Reader Summary PDF Download Engine
+    window.exportDateReportPDF = function() {
+        if (typeof window.jspdf === 'undefined') return alert("🚨 PDF Library load nahi hui!");
+        if (!window.dateDrilldownStore) return alert("🚨 पहले डेटा लोड होने दें!");
+
+        var dateFromVal = document.getElementById('dateFilterPickerFrom') ? document.getElementById('dateFilterPickerFrom').value : "";
+        var dateToVal = document.getElementById('dateFilterPickerTo') ? document.getElementById('dateFilterPickerTo').value : "";
+        
+        if (!dateFromVal || !dateToVal) return alert("🚨 कृपया Date From और Date To चुनें!");
+
+        var doc = new window.jspdf.jsPDF({ orientation: 'landscape', unit: 'pt', format: 'a3' });
+        var pageWidth = doc.internal.pageSize.width;
+
+        doc.setFontSize(16); doc.setTextColor(30, 58, 138); doc.setFont("Helvetica", "bold");
+        doc.text("Date-Wise Reader Summary Report", 30, 30);
+        
+        doc.setFontSize(10); doc.setTextColor(100, 116, 139); doc.setFont("Helvetica", "normal");
+        doc.text("Date Range: " + dateFromVal + " to " + dateToVal + "  |  Generated: " + getPrintableDateTime(), 30, 46);
+
+        var headCols = ["Reader Name", "Status", "First Visit", "Last Visit", "Total Hours", "Today Visit", "Visit Pending", "Main MRI", "Main LS %", "No LS Main", "Main Exc", "Pole MRI", "Pole LS %", "No LS Pole", "Pole Exc"];
+        var bodyRows = [];
+
+        for (var rName in window.dateDrilldownStore) {
+            var d = window.dateDrilldownStore[rName];
+            var isAbsent = (d.totalVisit === 0);
+            var statusText = isAbsent ? "ABSENT" : "PRESENT";
+            
+            var mainLsPct = d.mainMriDone > 0 ? Math.round((d.mainLsDone / d.mainMriDone) * 100) + "%" : "-";
+            var poleLsPct = d.poleMriDone > 0 ? Math.round((d.poleLsDone / d.poleMriDone) * 100) + "%" : "-";
+
+            bodyRows.push([
+                rName,
+                statusText,
+                "-", "-", "-",
+                d.totalVisit.toString(),
+                d.realPending.toString(),
+                d.mainMriDone.toString(),
+                mainLsPct,
+                d.mainLsNoCount.toString(),
+                d.mainException.toString(),
+                d.poleMriDone.toString(),
+                poleLsPct,
+                d.poleLsNoCount.toString(),
+                d.poleException.toString()
+            ]);
+        }
+
+        doc.autoTable({
+            head: [headCols],
+            body: bodyRows,
+            startY: 60,
+            theme: 'grid',
+            styles: { fontSize: 8, cellPadding: 4, halign: 'center', overflow: 'linebreak' },
+            headStyles: { fillColor: [30, 58, 138], textColor: [255, 255, 255], fontSize: 8.5, fontStyle: 'bold' },
+            columnStyles: { 0: { halign: 'left', cellWidth: 100, fontStyle: 'bold' } }
+        });
+
+        var pageCount = doc.internal.getNumberOfPages();
+        for (var i = 1; i <= pageCount; i++) {
+            doc.setPage(i);
+            doc.setFontSize(8); doc.setTextColor(148, 163, 184);
+            doc.text("DvVNL Billing Tool | Er. Anurag Shakya | Mo: 9761414105 - Page " + i + " of " + pageCount, pageWidth / 2, doc.internal.pageSize.height - 15, { align: 'center' });
+        }
+
+        var filename = "Date_Report_" + dateFromVal + "_to_" + dateToVal + "_" + getFormattedDateTimeForFile() + ".pdf";
+        
+        if (typeof AndroidBridge !== "undefined" && AndroidBridge.processBase64Download) {
+            var rawBase64 = doc.output('arraybuffer');
+            var uint8 = new Uint8Array(rawBase64); var binary = '';
+            for (var j = 0; j < uint8.byteLength; j++) { binary += String.fromCharCode(uint8[j]); }
+            AndroidBridge.processBase64Download(btoa(binary), "pdf", filename);
+        } else {
+            doc.save(filename);
+        }
+        showThinAlert("🎉 Date Report PDF डाउनलोड सफल!", true);
+    };
+
     
 
     // 📥 EXPORT DRILLDOWN DATA (EXCEL & PDF)
@@ -5139,8 +5220,8 @@ function executeFastCacheSearch(searchKeywords, allData, container, containerId)
             
             // ग्लोबल कॉन्फ़िगरेशन से इस रिपोर्ट का नियम ढूंढें
             var matchedConfig = (typeof globalReportConfigs !== 'undefined' && Array.isArray(globalReportConfigs)) ? globalReportConfigs.find(function(c) { return c.key === activeReportType; }) : null;
-            if (matchedConfig && matchedConfig.conditionStr) {
-                if (typeof evaluateCustomCondition === 'function' && !evaluateCustomCondition(item, matchedConfig.conditionStr)) {
+            if (matchedConfig) {
+                if (typeof evaluateReportCondition === 'function' && !evaluateReportCondition(item, matchedConfig.key, matchedConfig.conditionStr)) {
                     continue; // यदि यह उपभोक्ता इस विशिष्ट रिपोर्ट के नियम में फिट नहीं बैठता, तो स्किप करें
                 }
             }
@@ -7136,9 +7217,9 @@ function openReportGroupView(reportType) {
             if (!isReaderAllowed(getReaderName(item))) continue;
 
             var match = false;
-            if (activeCfg && activeCfg.conditionStr) {
-                // सीधे शीट की कंडीशन चेक करें (ताकि कार्ड और लिस्ट दोनों का काउंट 100% एक जैसा रहे)
-                match = evaluateCustomCondition(item, activeCfg.conditionStr);
+            if (activeCfg) {
+                // 🎯 HARDCODED REPORT LOGIC (100% सही count के लिए)
+                match = evaluateReportCondition(item, activeCfg.key, activeCfg.conditionStr);
             } else {
                 // फॉलबैक जब तक कॉन्फ़िगरेशन लोड न हो
                 if (reportType === 'main_field_exception') match = parseTrue(item.isMainMeterFieldException);
@@ -7746,8 +7827,8 @@ function applyVisitDateFilter() {
                     }
                 } else if (tabName === 'reports' && activeReportType) {
                     var config = globalReportConfigs.find(function(c) { return c.key === activeReportType; });
-                    if (config && config.conditionStr) {
-                        if (!evaluateCustomCondition(item, config.conditionStr)) return false;
+                    if (config) {
+                        if (!evaluateReportCondition(item, config.key, config.conditionStr)) return false;
                     }
                 }
 
@@ -8032,8 +8113,8 @@ function applyVisitDateFilter() {
                 }
             } else if (tabName === 'reports' && activeReportType) {
                 var config = globalReportConfigs.find(function(c) { return c.key === activeReportType; });
-                if (config && config.conditionStr) {
-                    if (!evaluateCustomCondition(item, config.conditionStr)) return false;
+                if (config) {
+                    if (!evaluateReportCondition(item, config.key, config.conditionStr)) return false;
                 }
             }
 
@@ -8067,10 +8148,10 @@ function applyVisitDateFilter() {
             }); 
         });
 
-        // 🚀 FIX: A2 Landscape (A3 se bada — saare columns fit honge)
-        var doc = new window.jspdf.jsPDF({ orientation: 'landscape', unit: 'pt', format: 'a2' });
-        var pWidth = doc.internal.pageSize.width;  // 1684 pt (A3 tha 1190 pt)
-        var usableTableWidth = pWidth - 20;        // 1664 pt total width budget
+        // 🚀 FIX: A1 Landscape (Sabse bada — saare 20+ columns bilkul fit honge, kuch bhi nahi katega)
+        var doc = new window.jspdf.jsPDF({ orientation: 'landscape', unit: 'pt', format: 'a1' });
+        var pWidth = doc.internal.pageSize.width;  // 2384 pt (A1 size — A2 se bhi bada)
+        var usableTableWidth = pWidth - 20;        // 2364 pt total width budget
         var marginLeft = 10;
         var marginRight = 10;
 
@@ -8105,12 +8186,12 @@ function applyVisitDateFilter() {
         var scaleFactor = usableTableWidth / totalNaturalWidth;
 
         // 🎯 Har column ki width ko scale karo — agar sab fit ho jaye toh
-        // scale = 1, warna thoda squeeze karo
+        // scale = 1, warna thoda squeeze karo (minimum 32pt lock kiya taaki koi column na kate)
         var dynamicColStyles = {};
         reqCols.forEach(function(col, idx) {
             var colUpper = col.toUpperCase().trim().replace(/[\r\n_]/g, " ");
             var naturalW = minColWidths[idx];
-            var finalW = Math.max(28, Math.floor(naturalW * scaleFactor));
+            var finalW = Math.max(32, Math.floor(naturalW * scaleFactor));
 
             // Halign decide karo
             var halign = 'center';
@@ -8134,10 +8215,10 @@ function applyVisitDateFilter() {
             tableWidth: usableTableWidth,
             margin: { top: 55, left: marginLeft, right: marginRight, bottom: 25 },
             styles: { 
-                fontSize: 5.5,              // 🎯 Font chhota kiya (6.2 → 5.5)
+                fontSize: 6.5,              // A1 पर बड़ा होने से font भी बड़ा रख सकते हैं
                 textColor: [15, 23, 42], 
                 overflow: 'linebreak', 
-                cellPadding: 1.8,            // 🎯 Padding kam ki
+                cellPadding: 2.5,            
                 halign: 'center', 
                 valign: 'middle',
                 lineColor: [203, 213, 225],
@@ -8146,11 +8227,11 @@ function applyVisitDateFilter() {
             headStyles: { 
                 fillColor: [30, 58, 138], 
                 textColor: [255, 255, 255], 
-                fontSize: 5.8,               // 🎯 Header font chhota
+                fontSize: 7.0,               
                 fontStyle: 'bold', 
                 halign: 'center', 
                 valign: 'middle',
-                cellPadding: 2.5
+                cellPadding: 3.0
             },
             alternateRowStyles: {
                 fillColor: [248, 250, 252]
@@ -8266,14 +8347,12 @@ function applyVisitDateFilter() {
                         
                         var grpUpper = (config.reportGroup || "").toUpperCase().trim();
                         var keyLower = (config.key || "").toLowerCase();
-                        var isBillGroup = grpUpper.includes("BILL") || grpUpper.includes("DIST") || keyLower.includes("bill") || keyLower.includes("dist");
-                        
-                        // 🎯 बिल डिस्ट्रीब्यूशन पेंडेंसी के लिए केवल DISTRIBUTED चेक करें
-                        if (isBillGroup) {
+                        if (grpUpper.includes("BILL") || grpUpper.includes("DIST") || keyLower.includes("dist")) {
                             var dStat = (getRobustKey(itemObj, "DISTRIBUTION STATUS") || itemObj.distStatus || "").toString().toUpperCase().trim();
-                            if (dStat === "DISTRIBUTED") continue;
+                            if (dStat === "DISTRIBUTED" || dStat === "DELIVERED") continue;
                         }
                         
+                        // सीधे शीट की कंडीशन स्ट्रिंग से मैच
                         if (evaluateCustomCondition(itemObj, config.conditionStr)) {
                             matchedData.push(itemObj);
                         }
@@ -8377,7 +8456,8 @@ function applyVisitDateFilter() {
                             return evaluateCustomCondition(item, config.conditionStr);
                         }
                         
-                        return evaluateCustomCondition(item, config.conditionStr);
+                                                // 2. 🎯 HARDCODED REPORT LOGIC (100% सही count के लिए)
+                        return evaluateReportCondition(item, config.key, config.conditionStr);
                     });
 
                     var groupName = config.reportGroup || "OTHER REPORTS";
@@ -8569,7 +8649,8 @@ function applyVisitDateFilter() {
                             return evaluateCustomCondition(item, config.conditionStr);
                         }
                         if (item.isDone === true || item.isDone === "true") return false;
-                        return evaluateCustomCondition(item, config.conditionStr);
+                                                // 2. 🎯 HARDCODED REPORT LOGIC (100% सही count के लिए)
+                        return evaluateReportCondition(item, config.key, config.conditionStr);
                     });
 
                     var groupName = config.reportGroup || "OTHER REPORTS";
@@ -9952,49 +10033,42 @@ function quickViewNavigate(direction) {
         }
     }
 }
-    function evaluateCustomCondition(item, conditionStr) {
+// =========================================================================
+// 🎯 100% GOOGLE SHEET DRIVEN DYNAMIC CONDITION EVALUATOR
+// (आपकी शीट की कंडीशन स्ट्रिंग को सीधे पार्स और मैच करने वाला इंजन)
+// =========================================================================
+function evaluateReportCondition(item, reportKey, fallbackConditionStr) {
+    if (!item) return false;
+    var k = (reportKey || "").toString().trim().toLowerCase();
+    
+    // मास्टर रिपोर्ट्स के लिए हमेशा सब पास
+    if (k === "all_consumers_list" || k === "visit_data_consumers") {
+        return true;
+    }
+    
+    // अगर शीट से कंडीशन स्ट्रिंग पास हुई है, तो उसी से मैच करें
+    if (fallbackConditionStr && fallbackConditionStr.trim() !== "") {
+        return evaluateCustomCondition(item, fallbackConditionStr);
+    }
+    
+    // अगर सीधे Key से ढूँढना हो तो globalReportConfigs से उसकी conditionStr निकालें
+    if (typeof globalReportConfigs !== 'undefined' && Array.isArray(globalReportConfigs)) {
+        var cfg = globalReportConfigs.find(function(c) { return c.key === reportKey; });
+        if (cfg && cfg.conditionStr) {
+            return evaluateCustomCondition(item, cfg.conditionStr);
+        }
+    }
+    return false;
+}
+
+// =========================================================================
+// 🎯 100% ACCURATE SHEET-BASED DYNAMIC CONDITION EVALUATOR
+// =========================================================================
+function evaluateCustomCondition(item, conditionStr) {
     if (!conditionStr || !item) return true;
 
-    // 🎯 FIX: Main Meter Field Exception और Pole Meter Field Exception रिपोर्ट के लिए
-    // अगर EXCEPTION TYPE (MAIN METER) या EXCEPTION TYPE (POLE METER) में
-    // "VISIT PENDING" या "MRI" जैसा कुछ है, तो उस consumer को इस रिपोर्ट में न आने दें।
-    var condUpper = conditionStr.toUpperCase();
-
-    // Main Meter Field Exception रिपोर्ट का पता लगाएँ
-    if (condUpper.indexOf("EXCEPTION TYPE (MAIN METER)") !== -1) {
-        var mainExcVal = getRobustKey(item, "EXCEPTION TYPE (MAIN METER)");
-        if (mainExcVal === "" || mainExcVal === undefined || mainExcVal === null) {
-            mainExcVal = item["EXCEPTION TYPE (MAIN METER)"] || item.mainMeterFieldException || "";
-        }
-        mainExcVal = mainExcVal.toString().toUpperCase().trim();
-
-        // 🚫 अगर VISIT PENDING या MRI जैसा कुछ है, तो रिपोर्ट से बाहर
-        if (mainExcVal.indexOf("VISIT PENDING") !== -1 ||
-            mainExcVal.indexOf("VISIT_PENDING") !== -1 ||
-            mainExcVal.indexOf("VISITPENDING") !== -1 ||
-            mainExcVal.indexOf("MRI") !== -1) {
-            return false;
-        }
-    }
-
-    // Pole Meter Field Exception रिपोर्ट का पता लगाएँ
-    if (condUpper.indexOf("EXCEPTION TYPE (POLE METER)") !== -1) {
-        var poleExcVal = getRobustKey(item, "EXCEPTION TYPE (POLE METER)");
-        if (poleExcVal === "" || poleExcVal === undefined || poleExcVal === null) {
-            poleExcVal = item["EXCEPTION TYPE (POLE METER)"] || item.poleMeterFieldException || "";
-        }
-        poleExcVal = poleExcVal.toString().toUpperCase().trim();
-
-        // 🚫 अगर VISIT PENDING या MRI जैसा कुछ है, तो रिपोर्ट से बाहर
-        if (poleExcVal.indexOf("VISIT PENDING") !== -1 ||
-            poleExcVal.indexOf("VISIT_PENDING") !== -1 ||
-            poleExcVal.indexOf("VISITPENDING") !== -1 ||
-            poleExcVal.indexOf("MRI") !== -1) {
-            return false;
-        }
-    }
-
     var conditions = conditionStr.split(',');
+
     for (var i = 0; i < conditions.length; i++) {
         var cond = conditions[i].trim();
         if (!cond) continue;
@@ -10006,69 +10080,55 @@ function quickViewNavigate(direction) {
             var searchKey = parts[0].trim();
             var expectedVal = parts[1].replace(/\(.*?\)/g, '').trim().toUpperCase();
 
+            // अगर expected value ALL या खाली है तो चेक छोड़ें
             if (expectedVal === "ALL" || expectedVal === "") continue;
 
-            // 🎯 H|L|T हमेशा पास होगा
-            if (expectedVal.indexOf("H") !== -1 && expectedVal.indexOf("L") !== -1 && expectedVal.indexOf("T") !== -1) continue;
-
+            // Robust Key lookup
             var rawVal = getRobustKey(item, searchKey);
-            if ((rawVal === "" || rawVal === undefined || rawVal === null)) {
+            if (rawVal === "" || rawVal === undefined || rawVal === null) {
                 if (item[searchKey] !== undefined) rawVal = item[searchKey];
                 else if (item[searchKey.replace(/_/g, ' ')] !== undefined) rawVal = item[searchKey.replace(/_/g, ' ')];
                 else if (item[searchKey.replace(/\s+/g, '_')] !== undefined) rawVal = item[searchKey.replace(/\s+/g, '_')];
             }
 
-            // 🎯 बिलिंग और वितरण स्टेटस के सभी प्रारूपों का समर्थन
-            var cleanKey = searchKey.toUpperCase().replace(/[^A-Z0-9]/g, '');
-            if (!rawVal || rawVal === "") {
-                if (cleanKey.includes("FORBILLDIST")) rawVal = item.forBillDist || item["FOR_BILL DISTRIBUTION"] || item["FOR BILL DISTRIBUTION"];
-                else if (cleanKey.includes("DISTRIBUTIONSTATUS")) rawVal = item.distStatus || item["DISTRIBUTION STATUS"] || item["DISTRIBUTION_STATUS"];
-                else if (cleanKey.includes("ISBILLUPLOAD")) rawVal = item.isBillUpload || item["IS BILL UPLOAD"];
-                else if (cleanKey.includes("ISBILLPRINT")) rawVal = item.isBillPrint || item["IS BILL PRINT"];
-                else if (cleanKey.includes("BILLINGSTATUS")) rawVal = item.billingStatus || item["BILLING STATUS"];
-            }
-
             var actualVal = (rawVal !== undefined && rawVal !== null) ? rawVal.toString().toUpperCase().trim() : "";
-
-            // 'DISTRIBUTION PENDING' या केवल 'PENDING' का लचीला मिलान
-            if (expectedVal.includes("PENDING") && cleanKey.includes("DISTRIBUTIONSTATUS")) {
-                var isPendingMatch = (actualVal.includes("PENDING") && !actualVal.includes("DONE") && actualVal !== "DISTRIBUTED");
-                if (!isNotEqual && !isPendingMatch) return false;
-                if (isNotEqual && isPendingMatch) return false;
-                continue;
+            
+            // Empty / Dash / Not Found को खाली स्ट्रिंग में नॉर्मलाइज़ करें
+            if (actualVal === "-" || actualVal === "NOT FOUND" || actualVal === "UNDEFINED") {
+                actualVal = "";
             }
 
-            if (!isNotEqual) {
-                if (expectedVal === "TRUE" || expectedVal === "YES") {
-                    if (actualVal !== "TRUE" && actualVal !== "YES" && actualVal !== "1") return false;
-                } else if (expectedVal === "FALSE" || expectedVal === "NO") {
-                    // 🎯 FIX: केवल स्पष्ट FALSE/NO/0 को ही FALSE मानें।
-                    // खाली सेल ("") या "-" को FALSE नहीं मानें, वरना MRI Done + खाली फ़ील्ड वाले
-                    // consumers भी गलती से Field Exception रिपोर्ट में आ जाते हैं।
-                    if (actualVal !== "FALSE" && actualVal !== "NO" && actualVal !== "0") return false;
-                } else if (expectedVal.indexOf('|') !== -1) {
-                    var options = expectedVal.split('|').map(function(s){ return s.trim(); });
-                    var matchedAny = false;
-                    for (var optIdx = 0; optIdx < options.length; optIdx++) {
-                        var opt = options[optIdx].trim();
-                        // 🎯 सिर्फ exact match करें
-                        if (actualVal === opt) {
-                            matchedAny = true;
-                            break;
-                        }
+            var isMatched = false;
+
+            // 1. Multiple Values (| Pipe Operator) Exact Match
+            if (expectedVal.indexOf('|') !== -1) {
+                var options = expectedVal.split('|').map(function(s) { return s.trim(); });
+                for (var o = 0; o < options.length; o++) {
+                    var opt = options[o];
+                    if (actualVal === opt) {
+                        isMatched = true;
+                        break;
                     }
-                    if (!matchedAny) return false;
-                } else {
-                    if (actualVal !== expectedVal) return false;
                 }
+            } 
+            // 2. Boolean TRUE / YES Match
+            else if (expectedVal === "TRUE" || expectedVal === "YES") {
+                isMatched = (actualVal === "TRUE" || actualVal === "YES" || actualVal === "1");
+            } 
+            // 3. Boolean FALSE / NO / Blank Match
+            else if (expectedVal === "FALSE" || expectedVal === "NO") {
+                isMatched = (actualVal === "FALSE" || actualVal === "NO" || actualVal === "0" || actualVal === "");
+            } 
+            // 4. Exact Text Match
+            else {
+                isMatched = (actualVal === expectedVal);
+            }
+
+            // Equality & Not-Equality Logic
+            if (isNotEqual) {
+                if (isMatched) return false;
             } else {
-                if (expectedVal === "TRUE" || expectedVal === "YES") {
-                    if (actualVal === "TRUE" || actualVal === "YES" || actualVal === "1") return false;
-                } else if (expectedVal === "FALSE" || expectedVal === "NO") {
-                    if (actualVal === "FALSE" || actualVal === "NO" || actualVal === "0") return false;
-                } else {
-                    if (actualVal === expectedVal) return false;
-                }
+                if (!isMatched) return false;
             }
         }
     }
@@ -10577,9 +10637,9 @@ function renderAnalyticsDashboardEngine() {
             if (parseTrue(item.isBilledButNoBillAvailable) || parseTrue(item.isBillAvailableButPrintPending)) m.billPnd++;
             if ((item.forBillDist === "YES" || getRobustKey(item, "FOR_BILL DISTRIBUTION") === "YES") && dStatus !== "DISTRIBUTED") m.billDistPnd++;
 
-            // शीट आधारित कॉन्फ़िगरेशन इवैल्यूएटर
+            // शीट आधारित कॉन्फ़िगरेशन इवैल्यूएटर (Hardcoded logic के साथ)
             dynamicMatrixCols.forEach(function(config) {
-                if (typeof evaluateCustomCondition === 'function' && evaluateCustomCondition(item, config.conditionStr)) {
+                if (typeof evaluateReportCondition === 'function' && evaluateReportCondition(item, config.key, config.conditionStr)) {
                     m.dynamicCounts[config.key]++;
                 }
             });
